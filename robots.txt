@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://kapitomo.github.io/KapiTomo/sitemap.xml
+Sitemap: https://nanquimori.github.io/KapiTomo/sitemap.xml

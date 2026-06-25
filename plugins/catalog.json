@@ -3,8 +3,8 @@
     "plugins":  [
                     {
                         "id":  "kapitomo",
-                        "package_url":  "https://kapitomo.github.io/KapiTomo/downloads/plugins/kapitomo.zip",
-                        "sha256":  "051c86f34f0eeac557aa2dd9c6784c7cd6cc5e013ff80373007bf601b6f38309"
+                        "package_url":  "https://nanquimori.github.io/KapiTomo/downloads/plugins/kapitomo.zip",
+                        "sha256":  "35981db45f756e0bbe28279246cb7925667a9745b792b6ad6ee8c4fd70b0d769"
                     }
                 ]
 }

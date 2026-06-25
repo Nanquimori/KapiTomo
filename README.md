@@ -8,11 +8,11 @@ O plugin oficial do KapiTomo para o Nyxovira fica em `downloads/plugins/kapitomo
 
 Catalogo remoto:
 
-`https://kapitomo.github.io/KapiTomo/plugins/catalog.json`
+`https://nanquimori.github.io/KapiTomo/plugins/catalog.json`
 
 Catalogo de obras para teste no Nyxalira:
 
-`https://kapitomo.github.io/KapiTomo/api/catalog.json`
+`https://nanquimori.github.io/KapiTomo/api/catalog.json`
 
 Canal oficial:
 
@@ -40,7 +40,7 @@ GitHub Pages hospeda este site estatico sem dominio pago.
 
 Expected public URL after publishing:
 
-`https://kapitomo.github.io/KapiTomo/`
+`https://nanquimori.github.io/KapiTomo/`
 
 Configuracao usada:
 

@@ -2,7 +2,7 @@
   "name": "KapiTomo",
   "short_name": "KapiTomo",
   "description": "Site oficial para ler novels.",
-  "start_url": "https://kapitomo.github.io/KapiTomo/",
+  "start_url": "https://nanquimori.github.io/KapiTomo/",
   "display": "standalone",
   "background_color": "#fbf7ef",
   "theme_color": "#047d7a"

@@ -6,16 +6,16 @@
     "pages":  [
                   {
                       "name":  "page-001.png",
-                      "sourceUrl":  "https://kapitomo.github.io/KapiTomo/assets/comic/garoto-outro-mundo-imagens/page-001.png",
+                      "sourceUrl":  "https://nanquimori.github.io/KapiTomo/assets/comic/garoto-outro-mundo-imagens/page-001.png",
                       "lastModified":  1780358400000
                   },
                   {
                       "name":  "page-002.png",
-                      "sourceUrl":  "https://kapitomo.github.io/KapiTomo/assets/comic/garoto-outro-mundo-imagens/page-002.png",
+                      "sourceUrl":  "https://nanquimori.github.io/KapiTomo/assets/comic/garoto-outro-mundo-imagens/page-002.png",
                       "lastModified":  1780358400000
                   }
               ],
     "pageCount":  2,
     "totalImagesExpected":  2,
-    "sourceUrl":  "https://kapitomo.github.io/KapiTomo/manga/garoto-outro-mundo-imagens/0/"
+    "sourceUrl":  "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo-imagens/0/"
 }

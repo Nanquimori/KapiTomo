@@ -1,12 +1,12 @@
 {
     "mode":  "android-catalog",
     "folderName":  "KapiTomo",
-    "folderPath":  "https://kapitomo.github.io/KapiTomo/api/catalog.json",
+    "folderPath":  "https://nanquimori.github.io/KapiTomo/api/catalog.json",
     "libraries":  [
                       {
                           "id":  "kapitomo",
                           "name":  "KapiTomo",
-                          "path":  "https://kapitomo.github.io/KapiTomo/"
+                          "path":  "https://nanquimori.github.io/KapiTomo/"
                       }
                   ],
     "works":  [
@@ -20,9 +20,9 @@
                       "isTest":  true,
                       "notice":  "OBS: Esta obra e apenas de teste.",
                       "summary":  "Aos 14 anos, Caio acorda em um mundo sem humanos, onde dragoes, goblins e elfos atacam qualquer estranho.",
-                      "sourceUrl":  "https://kapitomo.github.io/KapiTomo/manga/garoto-outro-mundo/",
+                      "sourceUrl":  "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo/",
                       "coverName":  "cover-garoto-outro-mundo.png",
-                      "coverSourceUrl":  "https://kapitomo.github.io/KapiTomo/assets/cover-garoto-outro-mundo.png",
+                      "coverSourceUrl":  "https://nanquimori.github.io/KapiTomo/assets/cover-garoto-outro-mundo.png",
                       "coverLastModified":  1780358400000,
                       "updatedAt":  1780358400000,
                       "chapters":  [
@@ -36,10 +36,10 @@
                                            "wordCount":  340,
                                            "paragraphCount":  9,
                                            "textFileName":  "capitulo-001.txt",
-                                           "textSourceUrl":  "https://kapitomo.github.io/KapiTomo/api/garoto-outro-mundo/capitulo-001.txt",
-                                           "manifestSourceUrl":  "https://kapitomo.github.io/KapiTomo/api/garoto-outro-mundo/capitulo-001.json",
+                                           "textSourceUrl":  "https://nanquimori.github.io/KapiTomo/api/garoto-outro-mundo/capitulo-001.txt",
+                                           "manifestSourceUrl":  "https://nanquimori.github.io/KapiTomo/api/garoto-outro-mundo/capitulo-001.json",
                                            "updatedAt":  1780358400000,
-                                           "sourceUrl":  "https://kapitomo.github.io/KapiTomo/manga/garoto-outro-mundo/0/"
+                                           "sourceUrl":  "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo/0/"
                                        },
                                        {
                                            "folderName":  "capitulo-002",
@@ -51,10 +51,10 @@
                                            "wordCount":  334,
                                            "paragraphCount":  10,
                                            "textFileName":  "capitulo-002.txt",
-                                           "textSourceUrl":  "https://kapitomo.github.io/KapiTomo/api/garoto-outro-mundo/capitulo-002.txt",
-                                           "manifestSourceUrl":  "https://kapitomo.github.io/KapiTomo/api/garoto-outro-mundo/capitulo-002.json",
+                                           "textSourceUrl":  "https://nanquimori.github.io/KapiTomo/api/garoto-outro-mundo/capitulo-002.txt",
+                                           "manifestSourceUrl":  "https://nanquimori.github.io/KapiTomo/api/garoto-outro-mundo/capitulo-002.json",
                                            "updatedAt":  1780358400000,
-                                           "sourceUrl":  "https://kapitomo.github.io/KapiTomo/manga/garoto-outro-mundo/1/"
+                                           "sourceUrl":  "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo/1/"
                                        },
                                        {
                                            "folderName":  "capitulo-003",
@@ -66,10 +66,10 @@
                                            "wordCount":  369,
                                            "paragraphCount":  12,
                                            "textFileName":  "capitulo-003.txt",
-                                           "textSourceUrl":  "https://kapitomo.github.io/KapiTomo/api/garoto-outro-mundo/capitulo-003.txt",
-                                           "manifestSourceUrl":  "https://kapitomo.github.io/KapiTomo/api/garoto-outro-mundo/capitulo-003.json",
+                                           "textSourceUrl":  "https://nanquimori.github.io/KapiTomo/api/garoto-outro-mundo/capitulo-003.txt",
+                                           "manifestSourceUrl":  "https://nanquimori.github.io/KapiTomo/api/garoto-outro-mundo/capitulo-003.json",
                                            "updatedAt":  1780358400000,
-                                           "sourceUrl":  "https://kapitomo.github.io/KapiTomo/manga/garoto-outro-mundo/2/"
+                                           "sourceUrl":  "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo/2/"
                                        }
                                    ]
                   },
@@ -83,9 +83,9 @@
                       "isTest":  true,
                       "notice":  "OBS: Esta obra e apenas de teste.",
                       "summary":  "Versao em quadrinhos da novel, contada apenas por paginas ilustradas.",
-                      "sourceUrl":  "https://kapitomo.github.io/KapiTomo/manga/garoto-outro-mundo-imagens/",
+                      "sourceUrl":  "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo-imagens/",
                       "coverName":  "cover-garoto-outro-mundo.png",
-                      "coverSourceUrl":  "https://kapitomo.github.io/KapiTomo/assets/cover-garoto-outro-mundo.png",
+                      "coverSourceUrl":  "https://nanquimori.github.io/KapiTomo/assets/cover-garoto-outro-mundo.png",
                       "coverLastModified":  1780358400000,
                       "updatedAt":  1780358400000,
                       "chapters":  [
@@ -95,9 +95,9 @@
                                            "chapterName":  "A Queda",
                                            "pageCount":  2,
                                            "totalImagesExpected":  2,
-                                           "manifestSourceUrl":  "https://kapitomo.github.io/KapiTomo/api/garoto-outro-mundo-imagens/capitulo-001.json",
+                                           "manifestSourceUrl":  "https://nanquimori.github.io/KapiTomo/api/garoto-outro-mundo-imagens/capitulo-001.json",
                                            "updatedAt":  1780358400000,
-                                           "sourceUrl":  "https://kapitomo.github.io/KapiTomo/manga/garoto-outro-mundo-imagens/0/"
+                                           "sourceUrl":  "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo-imagens/0/"
                                        },
                                        {
                                            "folderName":  "capitulo-002",
@@ -105,9 +105,9 @@
                                            "chapterName":  "A Floresta que Caca",
                                            "pageCount":  2,
                                            "totalImagesExpected":  2,
-                                           "manifestSourceUrl":  "https://kapitomo.github.io/KapiTomo/api/garoto-outro-mundo-imagens/capitulo-002.json",
+                                           "manifestSourceUrl":  "https://nanquimori.github.io/KapiTomo/api/garoto-outro-mundo-imagens/capitulo-002.json",
                                            "updatedAt":  1780358400000,
-                                           "sourceUrl":  "https://kapitomo.github.io/KapiTomo/manga/garoto-outro-mundo-imagens/1/"
+                                           "sourceUrl":  "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo-imagens/1/"
                                        },
                                        {
                                            "folderName":  "capitulo-003",
@@ -115,9 +115,9 @@
                                            "chapterName":  "A Saida de Pedra",
                                            "pageCount":  2,
                                            "totalImagesExpected":  2,
-                                           "manifestSourceUrl":  "https://kapitomo.github.io/KapiTomo/api/garoto-outro-mundo-imagens/capitulo-003.json",
+                                           "manifestSourceUrl":  "https://nanquimori.github.io/KapiTomo/api/garoto-outro-mundo-imagens/capitulo-003.json",
                                            "updatedAt":  1780358400000,
-                                           "sourceUrl":  "https://kapitomo.github.io/KapiTomo/manga/garoto-outro-mundo-imagens/2/"
+                                           "sourceUrl":  "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo-imagens/2/"
                                        }
                                    ]
                   }
