@@ -1429,6 +1429,18 @@ body {
   text-decoration: none;
 }
 
+.footer-policy-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 18px;
+  margin-top: 10px;
+}
+
+.footer-policy-links a {
+  margin-top: 0;
+}
+
 .legal-page {
   width: min(980px, calc(100% - 36px));
   margin: 0 auto;
