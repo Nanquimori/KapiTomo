@@ -5,5 +5,17 @@
   "start_url": "https://nanquimori.github.io/KapiTomo/",
   "display": "standalone",
   "background_color": "#fbf7ef",
-  "theme_color": "#047d7a"
+  "theme_color": "#17191f",
+  "icons": [
+    {
+      "src": "assets/kapitomo-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/kapitomo-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
