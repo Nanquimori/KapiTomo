@@ -1104,29 +1104,27 @@ code {
 :root {
   color-scheme: dark;
   --app-bg: #030207;
-  --app-surface: rgba(18, 10, 31, 0.96);
+  --app-surface: rgba(14, 8, 27, 0.94);
   --app-surface-2: rgba(8, 5, 18, 0.98);
-  --app-line: rgba(166, 113, 255, 0.18);
+  --app-line: rgba(156, 92, 255, 0.2);
   --app-text: #f7f2ff;
-  --app-muted: #b9aed4;
-  --app-soft: #dcd0ff;
+  --app-muted: #b8aecf;
+  --app-soft: #ddd3ff;
   --app-pearl: #d4c4ff;
-  --app-violet: #a764ff;
+  --app-violet: #9f5cff;
   --app-midnight: #31126c;
-  --app-electric: #7b35f5;
+  --app-electric: #7f38ff;
 }
 
 body {
   color: var(--app-text);
   background:
-    radial-gradient(circle at top left, rgba(49, 18, 108, 0.36), transparent 34rem),
-    radial-gradient(circle at top right, rgba(167, 100, 255, 0.14), transparent 30rem),
-    radial-gradient(circle at 70% 105%, rgba(123, 53, 245, 0.16), transparent 34rem),
-    var(--app-bg);
+    linear-gradient(180deg, #030207 0%, #070411 38%, #10071f 100%);
+  background-attachment: fixed;
 }
 
 .site-header {
-  background: rgba(5, 4, 7, 0.88);
+  background: rgba(3, 2, 7, 0.9);
   border-bottom-color: var(--app-line);
 }
 
@@ -1146,8 +1144,8 @@ body {
 
 .hero-overlay {
   background:
-    linear-gradient(90deg, rgba(3, 2, 7, 0.95), rgba(24, 10, 47, 0.64) 58%, rgba(3, 2, 7, 0.18)),
-    linear-gradient(0deg, rgba(3, 2, 7, 1), rgba(3, 2, 7, 0.12) 54%);
+    linear-gradient(90deg, rgba(3, 2, 7, 0.96), rgba(17, 7, 35, 0.72) 58%, rgba(3, 2, 7, 0.28)),
+    linear-gradient(0deg, rgba(3, 2, 7, 1), rgba(3, 2, 7, 0.16) 54%);
 }
 
 .hero-content {
@@ -1160,11 +1158,11 @@ body {
 }
 
 .eyebrow {
-  color: var(--app-violet);
+  color: var(--app-pearl);
 }
 
 .toolbar-band {
-  background: rgba(8, 5, 18, 0.98);
+  background: rgba(7, 4, 16, 0.96);
   border-bottom-color: var(--app-line);
 }
 
@@ -1174,13 +1172,13 @@ body {
 
 .search-field input {
   color: var(--app-text);
-  background: rgba(5, 4, 7, 0.88);
+  background: rgba(3, 2, 7, 0.84);
   border-color: var(--app-line);
 }
 
 .filter {
   color: var(--app-soft);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(212, 196, 255, 0.07);
 }
 
 .filter.active {
@@ -1225,34 +1223,24 @@ body {
   align-content: start;
   padding: 10px;
   color: var(--app-text);
-  background: var(--app-surface);
+  background:
+    linear-gradient(160deg, rgba(23, 12, 44, 0.94), rgba(9, 6, 20, 0.98));
   border-color: var(--app-line);
   border-radius: 18px;
-  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.34);
   transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
 
-.work-card::before {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  content: "";
-  border-radius: inherit;
-  background:
-    linear-gradient(135deg, rgba(212, 196, 255, 0.14), transparent 38%),
-    radial-gradient(circle at 20% 0, rgba(123, 53, 245, 0.22), transparent 42%);
-  opacity: 0.72;
-}
-
 .work-card:hover {
-  border-color: rgba(212, 196, 255, 0.3);
-  box-shadow: 0 22px 46px rgba(0, 0, 0, 0.38), 0 0 30px rgba(123, 53, 245, 0.22);
+  border-color: rgba(212, 196, 255, 0.32);
+  box-shadow: 0 22px 46px rgba(0, 0, 0, 0.42), 0 0 24px rgba(127, 56, 255, 0.18);
   transform: translateY(-2px);
 }
 
 .work-cover-link {
   position: relative;
   display: block;
+  z-index: 1;
 }
 
 .work-cover-link img {
@@ -1276,8 +1264,8 @@ body {
   max-width: calc(100% - 16px);
   padding: 5px 7px;
   color: #fff;
-  background: rgba(16, 18, 24, 0.68);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(6, 4, 14, 0.72);
+  border: 1px solid rgba(212, 196, 255, 0.22);
   border-radius: 6px;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.42);
   backdrop-filter: blur(8px);
@@ -1336,15 +1324,16 @@ body {
 .manga-facts,
 .chapter-list-wrap {
   color: var(--app-text);
-  background: var(--app-surface);
+  background:
+    linear-gradient(160deg, rgba(23, 12, 44, 0.94), rgba(9, 6, 20, 0.98));
   border-color: var(--app-line);
-  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.3);
 }
 
 .official-link.primary-link {
   background:
-    linear-gradient(135deg, rgba(212, 196, 255, 0.13), transparent 44%),
-    linear-gradient(135deg, #31126c, #7b35f5 54%, #180a2f);
+    linear-gradient(135deg, rgba(212, 196, 255, 0.1), transparent 46%),
+    linear-gradient(135deg, #211044, #5e20d6 58%, #12091f);
 }
 
 .manga-genre {
@@ -1431,8 +1420,8 @@ body {
 
 .site-footer {
   background:
-    linear-gradient(180deg, rgba(18, 10, 31, 0), rgba(18, 10, 31, 0.72)),
-    #06040d;
+    linear-gradient(180deg, rgba(18, 10, 31, 0), rgba(10, 6, 20, 0.82)),
+    #05030a;
   border-top: 1px solid var(--app-line);
 }
 
