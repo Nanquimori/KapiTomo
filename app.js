@@ -159,16 +159,25 @@ function renderWorkPage(work) {
   fragment.querySelector(".chapter-count").textContent = `${work.chapters.length} capitulo${work.chapters.length === 1 ? "" : "s"}`;
 
   fragment.querySelector(".manga-badges").innerHTML = `
-    <span class="manga-info-chip chip-author"><b>Autor</b>KapiTomo</span>
-    <span class="manga-info-chip chip-genre"><b>Genero</b>${escapeHtml(work.genre)}</span>
-    <span class="manga-info-chip chip-status"><b>Status</b>${escapeHtml(work.status)}</span>
-    <span class="manga-info-chip chip-rating"><b>Classificacao</b>${escapeHtml(work.rating)}</span>
-    <span class="manga-info-chip chip-publish"><b>Publicacao</b>Oficial</span>
+    <span>${escapeHtml(work.status)}</span>
+    <span>${escapeHtml(work.rating)}</span>
+    <span>${work.chapters.length} capitulo${work.chapters.length === 1 ? "" : "s"}</span>
   `;
 
   fragment.querySelector(".manga-actions").innerHTML = `
     <a class="button primary" href="${chapterUrl(work, 0)}">Ler primeiro capitulo</a>
     <a class="button secondary" href="${chapterUrl(work, work.chapters.length - 1)}">Ultimo capitulo</a>
+  `;
+
+  fragment.querySelector(".manga-facts").innerHTML = `
+    <h2>Informacoes</h2>
+    <dl>
+      <div class="fact-author"><dt>Autor</dt><dd>KapiTomo</dd></div>
+      <div class="fact-genre"><dt>Genero</dt><dd>${escapeHtml(work.genre)}</dd></div>
+      <div class="fact-status"><dt>Status</dt><dd>${escapeHtml(work.status)}</dd></div>
+      <div class="fact-rating"><dt>Classificacao</dt><dd>${escapeHtml(work.rating)}</dd></div>
+      <div class="fact-publish"><dt>Publicacao</dt><dd>Obras oficiais do KapiTomo</dd></div>
+    </dl>
   `;
 
   workView.innerHTML = "";
