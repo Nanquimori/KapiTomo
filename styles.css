@@ -73,13 +73,10 @@ a {
 }
 
 .brand-mark {
-  display: grid;
-  width: 38px;
-  height: 38px;
-  place-items: center;
-  color: #fff;
-  background: var(--ink);
-  border-radius: 8px;
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  flex: 0 0 auto;
 }
 
 .nav-links {
@@ -1148,8 +1145,7 @@ body {
 }
 
 .brand-mark {
-  color: #140d12;
-  background: var(--app-gold);
+  filter: drop-shadow(0 0 12px rgba(122, 62, 255, 0.38));
 }
 
 .hero {
