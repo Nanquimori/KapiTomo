@@ -1418,6 +1418,204 @@ body {
   color: var(--app-pearl);
 }
 
+.chapter-control-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 220px) minmax(170px, 220px);
+  gap: 12px;
+  padding: 14px;
+  border-bottom: 1px solid var(--app-line);
+  background: rgba(7, 4, 16, 0.74);
+}
+
+.chapter-search-field {
+  display: grid;
+  gap: 8px;
+  color: var(--app-muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.chapter-search-input {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 13px;
+  color: var(--app-text);
+  background: rgba(3, 2, 7, 0.86);
+  border: 1px solid var(--app-line);
+  border-radius: 14px;
+  font: inherit;
+  font-size: 0.95rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.chapter-control-group {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-self: end;
+  gap: 8px;
+}
+
+.chapter-control-button {
+  min-height: 42px;
+  padding: 0 10px;
+  color: var(--app-soft);
+  background: rgba(212, 196, 255, 0.07);
+  border: 1px solid rgba(212, 196, 255, 0.12);
+  border-radius: 14px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 900;
+}
+
+.chapter-control-button.is-active {
+  color: #0a0710;
+  background: var(--app-pearl);
+  border-color: transparent;
+}
+
+.chapter-list {
+  gap: 12px;
+  padding: 14px;
+}
+
+.chapter-list-entry {
+  position: relative;
+}
+
+.chapter-row {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 104px;
+  padding: 12px 62px 12px 12px;
+  color: var(--app-text);
+  background:
+    linear-gradient(90deg, rgba(212, 196, 255, 0.08), transparent 18%),
+    linear-gradient(160deg, rgba(23, 12, 44, 0.94), rgba(9, 6, 20, 0.98));
+  border: 1px solid var(--app-line);
+  border-radius: 18px;
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.24);
+  overflow: hidden;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.chapter-row:hover {
+  border-color: rgba(212, 196, 255, 0.32);
+  box-shadow: 0 20px 38px rgba(0, 0, 0, 0.34), 0 0 22px rgba(127, 56, 255, 0.14);
+  transform: translateY(-1px);
+}
+
+.chapter-row:last-child {
+  border-bottom: 1px solid var(--app-line);
+}
+
+.chapter-row .chapter-thumb {
+  display: block;
+  width: 78px;
+  height: 78px;
+  overflow: hidden;
+  border: 1px solid rgba(212, 196, 255, 0.16);
+  border-radius: 14px;
+  background: rgba(3, 2, 7, 0.72);
+}
+
+.chapter-row .chapter-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.chapter-row .chapter-main {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.chapter-row .chapter-main strong {
+  font-size: 1rem;
+  line-height: 1.18;
+}
+
+.chapter-row .chapter-editorial-title {
+  display: -webkit-box;
+  color: var(--app-soft);
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 1.28;
+}
+
+.chapter-row .chapter-main small {
+  color: var(--app-muted);
+}
+
+.chapter-row .chapter-meta {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+}
+
+.chapter-row .chapter-format-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 10px;
+  color: var(--app-pearl);
+  background: rgba(212, 196, 255, 0.08);
+  border: 1px solid rgba(212, 196, 255, 0.14);
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.chapter-row .chapter-format-pill.is-novel {
+  color: #b6f2db;
+  background: rgba(111, 209, 173, 0.08);
+  border-color: rgba(111, 209, 173, 0.18);
+}
+
+.chapter-favorite-button {
+  position: absolute;
+  top: 13px;
+  right: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  color: var(--app-muted);
+  background: rgba(6, 4, 14, 0.76);
+  border: 1px solid rgba(212, 196, 255, 0.14);
+  border-radius: 14px;
+  cursor: pointer;
+  font: inherit;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24);
+}
+
+.chapter-favorite-button span {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.chapter-favorite-button.is-favorite {
+  color: var(--app-pearl);
+  border-color: rgba(212, 196, 255, 0.3);
+  box-shadow: 0 0 18px rgba(127, 56, 255, 0.2);
+}
+
+.chapter-search-empty {
+  margin: 0;
+  padding: 20px;
+  color: var(--app-muted);
+  text-align: center;
+}
+
 .site-footer {
   background:
     linear-gradient(180deg, rgba(18, 10, 31, 0), rgba(10, 6, 20, 0.82)),
@@ -1534,5 +1732,25 @@ body {
 
   .manga-cover {
     width: min(210px, 58vw);
+  }
+
+  .chapter-control-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .chapter-row {
+    grid-template-columns: 64px minmax(0, 1fr);
+    min-height: 96px;
+    padding-right: 58px;
+  }
+
+  .chapter-row .chapter-thumb {
+    width: 64px;
+    height: 64px;
+  }
+
+  .chapter-row .chapter-meta {
+    grid-column: 2;
+    justify-items: start;
   }
 }
