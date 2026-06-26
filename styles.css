@@ -1,15 +1,15 @@
 :root {
-  color-scheme: light;
-  --ink: #17191f;
-  --muted: #667085;
-  --paper: #fbf7ef;
-  --surface: #ffffff;
-  --line: #e6e0d5;
-  --teal: #047d7a;
-  --teal-dark: #055a59;
-  --coral: #df5b45;
-  --gold: #e8b451;
-  --shadow: 0 18px 50px rgba(23, 25, 31, 0.14);
+  color-scheme: dark;
+  --ink: #f7f2ff;
+  --muted: #b8adc8;
+  --paper: #05040a;
+  --surface: #100c18;
+  --line: rgba(199, 184, 255, 0.16);
+  --teal: #8a4dff;
+  --teal-dark: #c9b8ff;
+  --coral: #a879ff;
+  --gold: #efe9ff;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
 }
 
 * {
@@ -50,8 +50,8 @@ a {
   gap: 24px;
   min-height: 72px;
   padding: 14px clamp(18px, 4vw, 56px);
-  background: rgba(251, 247, 239, 0.92);
-  border-bottom: 1px solid rgba(23, 25, 31, 0.08);
+  background: rgba(5, 4, 10, 0.88);
+  border-bottom: 1px solid rgba(199, 184, 255, 0.14);
   backdrop-filter: blur(16px);
 }
 
@@ -185,7 +185,7 @@ a {
 
 .button.ghost {
   color: var(--muted);
-  background: #f1eee8;
+  background: rgba(199, 184, 255, 0.08);
 }
 
 .button.disabled {
@@ -194,7 +194,7 @@ a {
 }
 
 .toolbar-band {
-  background: #fff;
+  background: rgba(10, 7, 16, 0.98);
   border-bottom: 1px solid var(--line);
 }
 
@@ -223,6 +223,7 @@ a {
   min-height: 44px;
   padding: 0 14px;
   color: var(--ink);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--line);
   border-radius: 8px;
   font: inherit;
@@ -238,13 +239,13 @@ a {
 .filter {
   min-height: 38px;
   padding: 0 12px;
-  color: #2d3038;
-  background: #f2eee6;
+  color: var(--muted);
+  background: rgba(199, 184, 255, 0.08);
 }
 
 .filter.active {
-  color: #fff;
-  background: var(--ink);
+  color: #0a0710;
+  background: var(--teal-dark);
 }
 
 .section {
@@ -305,7 +306,7 @@ a {
   min-height: 204px;
   aspect-ratio: 2 / 3;
   object-fit: cover;
-  background: #ddd;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .work-card-body {
@@ -322,7 +323,7 @@ a {
 .work-tags span {
   padding: 6px 8px;
   color: var(--teal-dark);
-  background: #e4f5f1;
+  background: rgba(138, 77, 255, 0.16);
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 800;
@@ -364,7 +365,7 @@ a {
 }
 
 .latest-band {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .latest-list {
@@ -380,7 +381,7 @@ a {
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
 }
 
 .latest-item img {
@@ -413,7 +414,7 @@ a {
   gap: 14px;
   min-height: 64px;
   padding: 18px;
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
   text-decoration: none;
@@ -435,7 +436,7 @@ a {
   min-height: 112px;
   align-content: center;
   padding: 20px;
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
   text-decoration: none;
@@ -470,7 +471,7 @@ a {
 
 .steps article {
   padding: 20px;
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
 }
@@ -487,7 +488,7 @@ a {
 
 code {
   padding: 2px 6px;
-  background: #f2eee6;
+  background: rgba(199, 184, 255, 0.1);
   border-radius: 6px;
 }
 
@@ -728,11 +729,11 @@ code {
   max-width: 100%;
   margin: 20px 0 0;
   padding: 10px 12px;
-  color: #1b1300;
-  background: #ffc44d;
+  color: #0a0710;
+  background: #c9b8ff;
   border: 1px solid rgba(255, 255, 255, 0.26);
   border-radius: 8px;
-  box-shadow: 0 14px 26px rgba(255, 196, 77, 0.18);
+  box-shadow: 0 14px 26px rgba(138, 77, 255, 0.28);
   font-size: 0.86rem;
   font-weight: 900;
   line-height: 1.35;
@@ -926,15 +927,15 @@ code {
   place-items: center;
   padding: clamp(32px, 8vw, 78px);
   background:
-    linear-gradient(135deg, rgba(4, 125, 122, 0.18), rgba(223, 91, 69, 0.1)),
-    #111318;
+    linear-gradient(135deg, rgba(138, 77, 255, 0.2), rgba(201, 184, 255, 0.09)),
+    #100c18;
 }
 
 .webtoon-panel:nth-child(2n + 1) {
   color: var(--ink);
   background:
-    linear-gradient(135deg, rgba(232, 180, 81, 0.14), rgba(4, 125, 122, 0.1)),
-    #fff;
+    linear-gradient(135deg, rgba(168, 121, 255, 0.16), rgba(255, 255, 255, 0.05)),
+    #171124;
 }
 
 .webtoon-panel small {
@@ -984,7 +985,7 @@ code {
 
 .novel-meta {
   margin: 10px 0 8px;
-  color: #7f8895;
+  color: #b8adc8;
   font-size: 0.82rem;
 }
 
@@ -1102,22 +1103,22 @@ code {
 /* Nyxalira-inspired catalog pass */
 :root {
   color-scheme: dark;
-  --app-bg: #050407;
-  --app-surface: rgba(12, 11, 15, 0.96);
-  --app-surface-2: rgba(9, 9, 12, 0.98);
-  --app-line: rgba(255, 255, 255, 0.08);
-  --app-text: #f7f3ec;
-  --app-muted: #9a92a4;
-  --app-soft: #d4c9dd;
-  --app-gold: #f3b347;
-  --app-coral: #ff7b58;
+  --app-bg: #05040a;
+  --app-surface: rgba(16, 12, 24, 0.96);
+  --app-surface-2: rgba(10, 7, 16, 0.98);
+  --app-line: rgba(199, 184, 255, 0.16);
+  --app-text: #f7f2ff;
+  --app-muted: #b8adc8;
+  --app-soft: #d9ceef;
+  --app-gold: #c9b8ff;
+  --app-coral: #a879ff;
 }
 
 body {
   color: var(--app-text);
   background:
-    radial-gradient(circle at top left, rgba(86, 51, 190, 0.18), transparent 34rem),
-    radial-gradient(circle at top right, rgba(203, 36, 61, 0.14), transparent 32rem),
+    radial-gradient(circle at top left, rgba(138, 77, 255, 0.18), transparent 34rem),
+    radial-gradient(circle at top right, rgba(201, 184, 255, 0.1), transparent 32rem),
     var(--app-bg);
 }
 
@@ -1178,7 +1179,7 @@ body {
 }
 
 .filter.active {
-  color: #140d12;
+  color: #0a0710;
   background: var(--app-gold);
 }
 
@@ -1313,7 +1314,7 @@ body {
 }
 
 .official-link.primary-link {
-  background: #0b6f68;
+  background: linear-gradient(135deg, #5f2eea, #8a4dff);
 }
 
 .manga-genre {
