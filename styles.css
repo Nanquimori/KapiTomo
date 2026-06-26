@@ -73,10 +73,15 @@ a {
 }
 
 .brand-mark {
+  display: block;
   width: 54px;
   height: 54px;
   object-fit: contain;
   flex: 0 0 auto;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
 }
 
 .nav-links {
