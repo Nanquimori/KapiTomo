@@ -9,17 +9,14 @@ const workView = document.querySelector("#workView");
 const chapterView = document.querySelector("#chapterView");
 const workTemplate = document.querySelector("#workTemplate");
 const chapterTemplate = document.querySelector("#chapterTemplate");
-const FAVORITES_STORAGE_KEY = "kapitomo.favoriteChapters.v1";
 
 let activeFilter = "All";
 let query = new URLSearchParams(window.location.search).get("q") || "";
 let chapterUiState = {
   workId: "",
   query: "",
-  sort: "asc",
-  filter: "all"
+  sort: "asc"
 };
-let favoriteMap = loadFavoriteMap();
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -30,50 +27,8 @@ function escapeHtml(value) {
     .replace(/'/g, "&#039;");
 }
 
-function loadFavoriteMap() {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(FAVORITES_STORAGE_KEY) || "{}");
-    return parsed && typeof parsed === "object" ? parsed : {};
-  } catch {
-    return {};
-  }
-}
-
-function saveFavoriteMap() {
-  try {
-    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favoriteMap));
-  } catch {
-    favoriteMap = {};
-  }
-}
-
-function getFavoriteIds(workId) {
-  return new Set(Array.isArray(favoriteMap[workId]) ? favoriteMap[workId] : []);
-}
-
 function getChapterId(chapter, index) {
   return String(chapter.id || chapter.slug || `chapter-${index + 1}`);
-}
-
-function isChapterFavorite(workId, chapterId) {
-  return getFavoriteIds(workId).has(chapterId);
-}
-
-function toggleChapterFavorite(workId, chapterId) {
-  const favoriteIds = getFavoriteIds(workId);
-  if (favoriteIds.has(chapterId)) {
-    favoriteIds.delete(chapterId);
-  } else {
-    favoriteIds.add(chapterId);
-  }
-
-  if (favoriteIds.size) {
-    favoriteMap[workId] = [...favoriteIds];
-  } else {
-    delete favoriteMap[workId];
-  }
-
-  saveFavoriteMap();
 }
 
 function getChapterNumberLabel(index) {
@@ -191,8 +146,7 @@ function renderWorkPage(work) {
   chapterUiState = {
     workId: work.id,
     query: "",
-    sort: "asc",
-    filter: "all"
+    sort: "asc"
   };
 
   fragment.querySelector(".manga-cover").src = work.cover;
@@ -213,7 +167,6 @@ function renderWorkPage(work) {
   fragment.querySelector(".manga-actions").innerHTML = `
     <a class="button primary" href="${chapterUrl(work, 0)}">Ler primeiro capitulo</a>
     <a class="button secondary" href="${chapterUrl(work, work.chapters.length - 1)}">Ultimo capitulo</a>
-    <button class="button secondary chapter-favorites-shortcut" type="button"><span aria-hidden="true">&#9733;</span> Favoritos</button>
   `;
 
   fragment.querySelector(".manga-facts").innerHTML = `
@@ -237,14 +190,11 @@ function renderChapterList(work) {
   const list = workView.querySelector(".chapter-list");
   const count = workView.querySelector(".chapter-count");
   const queryValue = chapterUiState.query.trim().toLowerCase();
-  const favoriteIds = getFavoriteIds(work.id);
   const chapterItems = work.chapters
     .map((chapter, index) => ({ chapter, index, id: getChapterId(chapter, index) }))
     .filter((item) => {
       const searchable = `${item.chapter.title} ${item.chapter.date} ${getChapterNumberLabel(item.index)} ${getChapterTypeLabel(item.chapter)}`.toLowerCase();
-      const queryMatches = !queryValue || searchable.includes(queryValue);
-      const filterMatches = chapterUiState.filter !== "favorite" || favoriteIds.has(item.id);
-      return queryMatches && filterMatches;
+      return !queryValue || searchable.includes(queryValue);
     })
     .sort((left, right) => chapterUiState.sort === "desc" ? right.index - left.index : left.index - right.index);
 
@@ -252,13 +202,11 @@ function renderChapterList(work) {
     count.textContent = `${chapterItems.length} de ${work.chapters.length}`;
   }
 
-  workView.querySelectorAll("[data-chapter-sort]").forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.chapterSort === chapterUiState.sort);
-  });
-
-  workView.querySelectorAll("[data-chapter-filter]").forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.chapterFilter === chapterUiState.filter);
-  });
+  const sortToggle = workView.querySelector("[data-chapter-sort-toggle]");
+  if (sortToggle) {
+    sortToggle.textContent = chapterUiState.sort === "desc" ? "Recentes" : "Inicio";
+    sortToggle.setAttribute("aria-label", chapterUiState.sort === "desc" ? "Ordenado pelos capitulos recentes" : "Ordenado pelo inicio");
+  }
 
   if (!chapterItems.length) {
     list.innerHTML = '<p class="chapter-search-empty">Nenhum capitulo encontrado.</p>';
@@ -267,7 +215,6 @@ function renderChapterList(work) {
 
   list.innerHTML = chapterItems
     .map(({ chapter, index, id }) => {
-      const isFavorite = favoriteIds.has(id);
       const typeLabel = getChapterTypeLabel(chapter);
       return `
         <article class="chapter-list-entry">
@@ -285,9 +232,6 @@ function renderChapterList(work) {
               <em>Ler</em>
             </span>
           </a>
-          <button class="chapter-favorite-button ${isFavorite ? "is-favorite" : ""}" type="button" data-work-id="${escapeHtml(work.id)}" data-chapter-id="${escapeHtml(id)}" aria-pressed="${isFavorite}" aria-label="${isFavorite ? "Remover dos favoritos" : "Favoritar capitulo"}" title="${isFavorite ? "Remover dos favoritos" : "Favoritar capitulo"}">
-            <span aria-hidden="true">${isFavorite ? "&#9733;" : "&#9734;"}</span>
-          </button>
         </article>
       `;
     })
@@ -413,31 +357,9 @@ workView.addEventListener("click", (event) => {
     return;
   }
 
-  const sortButton = event.target.closest("[data-chapter-sort]");
+  const sortButton = event.target.closest("[data-chapter-sort-toggle]");
   if (sortButton) {
-    chapterUiState.sort = sortButton.dataset.chapterSort || "asc";
-    renderChapterList(work);
-    return;
-  }
-
-  const filterButton = event.target.closest("[data-chapter-filter]");
-  if (filterButton) {
-    chapterUiState.filter = filterButton.dataset.chapterFilter || "all";
-    renderChapterList(work);
-    return;
-  }
-
-  const favoriteShortcut = event.target.closest(".chapter-favorites-shortcut");
-  if (favoriteShortcut) {
-    chapterUiState.filter = "favorite";
-    renderChapterList(work);
-    workView.querySelector(".chapter-control-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    return;
-  }
-
-  const favoriteButton = event.target.closest(".chapter-favorite-button");
-  if (favoriteButton) {
-    toggleChapterFavorite(favoriteButton.dataset.workId, favoriteButton.dataset.chapterId);
+    chapterUiState.sort = chapterUiState.sort === "asc" ? "desc" : "asc";
     renderChapterList(work);
   }
 });

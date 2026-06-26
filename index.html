@@ -34,7 +34,7 @@
     <link rel="icon" type="image/png" href="assets/kapitomo-logo.png?v=20260625">
     <link rel="apple-touch-icon" href="assets/kapitomo-logo.png?v=20260625">
     <link rel="manifest" href="site.webmanifest?v=20260625-logo-fix">
-    <link rel="stylesheet" href="styles.css?v=20260625-chapter-actions">
+    <link rel="stylesheet" href="styles.css?v=20260625-chapter-sort">
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -173,14 +173,7 @@
                 <span>Buscar</span>
                 <input class="chapter-search-input" type="search" placeholder="Buscar capitulo...">
               </label>
-              <div class="chapter-control-group" aria-label="Ordenacao dos capitulos">
-                <button class="chapter-control-button is-active" type="button" data-chapter-sort="asc">Inicio</button>
-                <button class="chapter-control-button" type="button" data-chapter-sort="desc">Recentes</button>
-              </div>
-              <div class="chapter-control-group" aria-label="Filtro dos capitulos">
-                <button class="chapter-control-button is-active" type="button" data-chapter-filter="all">Todos</button>
-                <button class="chapter-control-button" type="button" data-chapter-filter="favorite">Favoritos</button>
-              </div>
+              <button class="chapter-control-button chapter-sort-toggle" type="button" data-chapter-sort-toggle>Inicio</button>
             </div>
             <div class="chapter-list"></div>
           </section>
@@ -212,6 +205,6 @@
     </footer>
 
     <script src="data/works.js?v=20260616"></script>
-    <script src="app.js?v=20260625-chapter-actions"></script>
+    <script src="app.js?v=20260625-chapter-sort"></script>
   </body>
 </html>
