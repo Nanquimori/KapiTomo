@@ -1,15 +1,15 @@
 :root {
   color-scheme: dark;
-  --ink: #f7f1f6;
-  --muted: #b9adba;
-  --paper: #050405;
-  --surface: #131017;
-  --line: rgba(226, 205, 219, 0.16);
-  --accent: #8f2f58;
-  --accent-soft: #d8cbd7;
-  --berry: #b64f73;
-  --pearl: #efe7ee;
-  --shadow: 0 18px 50px rgba(0, 0, 0, 0.34);
+  --ink: #f7f2ff;
+  --muted: #b9aed4;
+  --paper: #030207;
+  --surface: #120a1f;
+  --line: rgba(166, 113, 255, 0.18);
+  --accent: #7b35f5;
+  --accent-soft: #d4c4ff;
+  --violet: #a764ff;
+  --pearl: #f1ecff;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.36);
 }
 
 * {
@@ -50,8 +50,8 @@ a {
   gap: 24px;
   min-height: 72px;
   padding: 14px clamp(18px, 4vw, 56px);
-  background: rgba(5, 4, 5, 0.88);
-  border-bottom: 1px solid rgba(226, 205, 219, 0.14);
+  background: rgba(3, 2, 7, 0.88);
+  border-bottom: 1px solid rgba(166, 113, 255, 0.16);
   backdrop-filter: blur(16px);
 }
 
@@ -118,7 +118,7 @@ a {
 
 .eyebrow {
   margin: 0 0 10px;
-  color: var(--berry);
+  color: var(--violet);
   font-size: 0.78rem;
   font-weight: 900;
   letter-spacing: 0;
@@ -185,7 +185,7 @@ a {
 
 .button.ghost {
   color: var(--muted);
-  background: rgba(226, 205, 219, 0.08);
+  background: rgba(166, 113, 255, 0.1);
 }
 
 .button.disabled {
@@ -240,7 +240,7 @@ a {
   min-height: 38px;
   padding: 0 12px;
   color: var(--muted);
-  background: rgba(226, 205, 219, 0.08);
+  background: rgba(166, 113, 255, 0.1);
 }
 
 .filter.active {
@@ -323,7 +323,7 @@ a {
 .work-tags span {
   padding: 6px 8px;
   color: var(--accent-soft);
-  background: rgba(143, 47, 88, 0.18);
+  background: rgba(123, 53, 245, 0.18);
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 800;
@@ -392,7 +392,7 @@ a {
 }
 
 .latest-item span {
-  color: var(--berry);
+  color: var(--violet);
   font-size: 0.82rem;
   font-weight: 900;
 }
@@ -482,13 +482,13 @@ a {
   height: 36px;
   place-items: center;
   color: #fff;
-  background: var(--berry);
+  background: var(--violet);
   border-radius: 8px;
 }
 
 code {
   padding: 2px 6px;
-  background: rgba(226, 205, 219, 0.1);
+  background: rgba(166, 113, 255, 0.12);
   border-radius: 6px;
 }
 
@@ -527,7 +527,7 @@ code {
 }
 
 .reader-meta {
-  color: var(--berry);
+  color: var(--violet);
   font-size: 0.82rem;
   font-weight: 900;
 }
@@ -730,10 +730,10 @@ code {
   margin: 20px 0 0;
   padding: 10px 12px;
   color: #0a0710;
-  background: #d8cbd7;
+  background: #d4c4ff;
   border: 1px solid rgba(255, 255, 255, 0.26);
   border-radius: 8px;
-  box-shadow: 0 14px 26px rgba(143, 47, 88, 0.28);
+  box-shadow: 0 14px 26px rgba(123, 53, 245, 0.3);
   font-size: 0.86rem;
   font-weight: 900;
   line-height: 1.35;
@@ -840,7 +840,7 @@ code {
 }
 
 .chapter-row em {
-  color: var(--berry);
+  color: var(--violet);
   font-size: 0.9rem;
   font-style: normal;
   font-weight: 900;
@@ -927,19 +927,19 @@ code {
   place-items: center;
   padding: clamp(32px, 8vw, 78px);
   background:
-    linear-gradient(135deg, rgba(90, 18, 56, 0.34), rgba(182, 79, 115, 0.12)),
-    #131017;
+    linear-gradient(135deg, rgba(49, 18, 108, 0.36), rgba(167, 100, 255, 0.13)),
+    #120a1f;
 }
 
 .webtoon-panel:nth-child(2n + 1) {
   color: var(--ink);
   background:
-    linear-gradient(135deg, rgba(216, 203, 215, 0.13), rgba(90, 18, 56, 0.18)),
-    #1a141c;
+    linear-gradient(135deg, rgba(212, 196, 255, 0.12), rgba(49, 18, 108, 0.22)),
+    #160d29;
 }
 
 .webtoon-panel small {
-  color: var(--berry);
+  color: var(--violet);
   font-weight: 900;
 }
 
@@ -1103,25 +1103,25 @@ code {
 /* Nyxalira-inspired catalog pass */
 :root {
   color-scheme: dark;
-  --app-bg: #050405;
-  --app-surface: rgba(19, 16, 23, 0.96);
-  --app-surface-2: rgba(10, 8, 12, 0.98);
-  --app-line: rgba(226, 205, 219, 0.16);
-  --app-text: #f7f1f6;
-  --app-muted: #b9adba;
-  --app-soft: #ddd1dd;
-  --app-pearl: #d8cbd7;
-  --app-rose: #b64f73;
-  --app-wine: #5a1238;
-  --app-berry: #8f2f58;
+  --app-bg: #030207;
+  --app-surface: rgba(18, 10, 31, 0.96);
+  --app-surface-2: rgba(8, 5, 18, 0.98);
+  --app-line: rgba(166, 113, 255, 0.18);
+  --app-text: #f7f2ff;
+  --app-muted: #b9aed4;
+  --app-soft: #dcd0ff;
+  --app-pearl: #d4c4ff;
+  --app-violet: #a764ff;
+  --app-midnight: #31126c;
+  --app-electric: #7b35f5;
 }
 
 body {
   color: var(--app-text);
   background:
-    radial-gradient(circle at top left, rgba(90, 18, 56, 0.3), transparent 34rem),
-    radial-gradient(circle at top right, rgba(216, 203, 215, 0.08), transparent 30rem),
-    radial-gradient(circle at 70% 105%, rgba(182, 79, 115, 0.12), transparent 34rem),
+    radial-gradient(circle at top left, rgba(49, 18, 108, 0.36), transparent 34rem),
+    radial-gradient(circle at top right, rgba(167, 100, 255, 0.14), transparent 30rem),
+    radial-gradient(circle at 70% 105%, rgba(123, 53, 245, 0.16), transparent 34rem),
     var(--app-bg);
 }
 
@@ -1136,8 +1136,8 @@ body {
 
 .brand-mark {
   filter:
-    drop-shadow(0 0 10px rgba(143, 47, 88, 0.36))
-    drop-shadow(0 0 22px rgba(216, 203, 215, 0.12));
+    drop-shadow(0 0 10px rgba(123, 53, 245, 0.42))
+    drop-shadow(0 0 24px rgba(167, 100, 255, 0.18));
 }
 
 .hero {
@@ -1146,8 +1146,8 @@ body {
 
 .hero-overlay {
   background:
-    linear-gradient(90deg, rgba(5, 4, 5, 0.95), rgba(18, 8, 18, 0.62) 58%, rgba(5, 4, 5, 0.18)),
-    linear-gradient(0deg, rgba(5, 4, 5, 1), rgba(5, 4, 5, 0.12) 54%);
+    linear-gradient(90deg, rgba(3, 2, 7, 0.95), rgba(24, 10, 47, 0.64) 58%, rgba(3, 2, 7, 0.18)),
+    linear-gradient(0deg, rgba(3, 2, 7, 1), rgba(3, 2, 7, 0.12) 54%);
 }
 
 .hero-content {
@@ -1160,11 +1160,11 @@ body {
 }
 
 .eyebrow {
-  color: var(--app-rose);
+  color: var(--app-violet);
 }
 
 .toolbar-band {
-  background: rgba(10, 8, 12, 0.98);
+  background: rgba(8, 5, 18, 0.98);
   border-bottom-color: var(--app-line);
 }
 
@@ -1239,14 +1239,14 @@ body {
   content: "";
   border-radius: inherit;
   background:
-    linear-gradient(135deg, rgba(216, 203, 215, 0.16), transparent 38%),
-    radial-gradient(circle at 20% 0, rgba(182, 79, 115, 0.18), transparent 42%);
+    linear-gradient(135deg, rgba(212, 196, 255, 0.14), transparent 38%),
+    radial-gradient(circle at 20% 0, rgba(123, 53, 245, 0.22), transparent 42%);
   opacity: 0.72;
 }
 
 .work-card:hover {
-  border-color: rgba(216, 203, 215, 0.28);
-  box-shadow: 0 22px 46px rgba(0, 0, 0, 0.38), 0 0 28px rgba(90, 18, 56, 0.18);
+  border-color: rgba(212, 196, 255, 0.3);
+  box-shadow: 0 22px 46px rgba(0, 0, 0, 0.38), 0 0 30px rgba(123, 53, 245, 0.22);
   transform: translateY(-2px);
 }
 
@@ -1343,8 +1343,8 @@ body {
 
 .official-link.primary-link {
   background:
-    linear-gradient(135deg, rgba(216, 203, 215, 0.12), transparent 44%),
-    linear-gradient(135deg, #5a1238, #8f2f58 54%, #3a162a);
+    linear-gradient(135deg, rgba(212, 196, 255, 0.13), transparent 44%),
+    linear-gradient(135deg, #31126c, #7b35f5 54%, #180a2f);
 }
 
 .manga-genre {
@@ -1431,8 +1431,8 @@ body {
 
 .site-footer {
   background:
-    linear-gradient(180deg, rgba(19, 16, 23, 0), rgba(19, 16, 23, 0.72)),
-    #080608;
+    linear-gradient(180deg, rgba(18, 10, 31, 0), rgba(18, 10, 31, 0.72)),
+    #06040d;
   border-top: 1px solid var(--app-line);
 }
 
