@@ -212,8 +212,8 @@ function renderWorkPage(work) {
 
   fragment.querySelector(".manga-actions").innerHTML = `
     <a class="button primary" href="${chapterUrl(work, 0)}">Ler primeiro capitulo</a>
-    <a class="button secondary" href="${chapterUrl(work, work.chapters.length - 1)}">Ler mais recente</a>
-    <button class="button secondary chapter-favorites-shortcut" type="button">Favoritos</button>
+    <a class="button secondary" href="${chapterUrl(work, work.chapters.length - 1)}">Ultimo capitulo</a>
+    <button class="button secondary chapter-favorites-shortcut" type="button"><span aria-hidden="true">&#9733;</span> Favoritos</button>
   `;
 
   fragment.querySelector(".manga-facts").innerHTML = `
