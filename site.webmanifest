@@ -8,13 +8,8 @@
   "theme_color": "#17191f",
   "icons": [
     {
-      "src": "assets/kapitomo-icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "assets/kapitomo-icon-512.png",
-      "sizes": "512x512",
+      "src": "assets/kapitomo-logo.png",
+      "sizes": "1254x1254",
       "type": "image/png"
     }
   ]
