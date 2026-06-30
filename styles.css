@@ -432,35 +432,22 @@ a {
 
 .official-link {
   display: grid;
-  gap: 8px;
-  min-height: 112px;
-  align-content: center;
+  min-height: 72px;
+  place-items: center;
   padding: 20px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
-  text-decoration: none;
-}
-
-.official-link span {
-  color: var(--muted);
-  font-size: 0.78rem;
+  color: var(--text);
   font-weight: 900;
-  text-transform: uppercase;
-}
-
-.official-link strong {
-  font-size: 1.05rem;
+  text-align: center;
+  text-decoration: none;
 }
 
 .official-link.primary-link {
   color: #fff;
   background: var(--accent);
   border-color: var(--accent);
-}
-
-.official-link.primary-link span {
-  color: rgba(255, 255, 255, 0.74);
 }
 
 .steps {
