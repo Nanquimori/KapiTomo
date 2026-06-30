@@ -460,8 +460,6 @@
       </div>
       <div class="actions">
         <a class="button primary" href="PLUGIN_API.md" download>Baixar documentacao</a>
-        <a class="button" href="kapitomo/plugin.json" download>Baixar exemplo plugin.json</a>
-        <a class="button" href="kapitomo/browser/download_target.js" download>Baixar exemplo JS</a>
       </div>
     </div>
 
@@ -525,7 +523,7 @@
         </div>
         <div class="section-body">
           <div>
-            <div class="code-title"><span>plugin.json</span><a class="mini" href="kapitomo/plugin.json" download>Baixar exemplo</a></div>
+            <div class="code-title"><span>plugin.json</span></div>
             <pre>{
   "schema_version": 1,
   "id": "minha-fonte",
@@ -630,7 +628,7 @@
         <div class="section-body">
           <div class="note"><strong>Quando usar chapterPlan:</strong> se a pagina ou um arquivo JS publico ja tem a lista de capitulos, preencha <code>window.__nyxoviraChapterPlan</code>. Assim o app abre a selecao sem procurar capitulos no HTML.</div>
           <div>
-            <div class="code-title"><span>download_target.js resumido</span><a class="mini" href="kapitomo/browser/download_target.js" download>Baixar exemplo completo</a></div>
+            <div class="code-title"><span>download_target.js resumido</span></div>
             <pre>(function () {
   var workId = currentWorkId();
   var work = workById(workId);
