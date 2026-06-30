@@ -1,0 +1,31 @@
+{
+    "schema_version":  1,
+    "id":  "kapitomo",
+    "name":  "KapiTomo",
+    "version":  "1.0.12",
+    "match":  {
+                  "hosts":  [
+                                "nanquimori.github.io"
+                            ]
+              },
+    "browser":  {
+                    "home_url":  "https://nanquimori.github.io/KapiTomo/",
+                    "icon_url":  "https://nanquimori.github.io/KapiTomo/assets/kapitomo-logo.png?v=20260626",
+                    "icon_mode":  "pinned",
+                    "short_label":  "KapiTomo",
+                    "download_target_script_file":  "browser/download_target.js"
+                },
+    "parser":  {
+                   "adapter":  "html_series",
+                   "base_url":  "https://nanquimori.github.io/KapiTomo",
+                   "static_works_script":  "https://nanquimori.github.io/KapiTomo/data/works.js?v=20260616",
+                   "base_path_prefix":  "KapiTomo",
+                   "series_path_prefix":  "manga",
+                   "hash_series_path_prefixes":  [
+                                                      "obra",
+                                                      "ler"
+                                                  ],
+                   "chapter_path_prefix":  "chapter",
+                   "chapter_slug_pattern":  ".+"
+               }
+}

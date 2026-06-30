@@ -139,6 +139,12 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/</loc>
+    <lastmod>2026-06-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://nanquimori.github.io/KapiTomo/nyxovira/privacy/index.html</loc>
     <lastmod>2026-06-25</lastmod>
     <changefreq>yearly</changefreq>
