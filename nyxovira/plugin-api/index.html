@@ -483,6 +483,7 @@
       <a href="#manifesto">plugin.json</a>
       <a href="#rotas">Rotas e campos</a>
       <a href="#script">download_target.js</a>
+      <a href="#fluxo">Fluxo do download</a>
       <a href="#plan">chapterPlan</a>
       <a href="#conteudo">Novel e quadrinho</a>
       <a href="#publicacao">Publicacao</a>
@@ -648,6 +649,33 @@
   return workUrl(work.id);
 })()</pre>
           </div>
+        </div>
+      </section>
+
+      <section id="fluxo">
+        <div class="section-head">
+          <div class="section-kicker">runtime.flow</div>
+          <div class="section-title">
+            <h2>Fluxo do download</h2>
+            <p>O caminho rapido acontece quando o addon entrega a lista pronta durante o clique em baixar.</p>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Etapa</th><th>O que acontece no app</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>O usuario toca em baixar no navegador interno.</td></tr>
+                <tr><td>2</td><td>O WebView executa o <code>download_target.js</code> da fonte.</td></tr>
+                <tr><td>3</td><td>O script retorna a URL canonica da obra e preenche <code>window.__nyxoviraChapterPlan</code>.</td></tr>
+                <tr><td>4</td><td>Se o plano tem <code>chapters</code>, a selecao de capitulos abre imediatamente.</td></tr>
+                <tr><td>5</td><td>Se o plano tambem tem <code>paragraphs</code>, <code>pages</code> ou <code>images</code>, o download usa esse conteudo direto.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="note"><strong>Importante:</strong> se <code>window.__nyxoviraChapterPlan</code> nao existir ou vier sem <code>chapters</code>, o app tenta preparar a lista por outros meios e pode mostrar a mensagem <code>A lista de capitulos ainda esta sendo preparada pela pagina.</code></div>
         </div>
       </section>
 

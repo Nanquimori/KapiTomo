@@ -269,6 +269,26 @@ Exemplo generico:
 })()
 ```
 
+## Fluxo do download no app
+
+Quando o usuario toca em baixar, o Nyxovira executa o `download_target.js` da fonte dentro da pagina aberta no WebView.
+
+O script deve fazer duas coisas:
+
+1. Retornar a URL canonica da obra.
+2. Preencher `window.__nyxoviraChapterPlan` com um JSON valido contendo `chapters`.
+
+Se `window.__nyxoviraChapterPlan` ja existe e tem capitulos, o app abre a selecao de download imediatamente, sem esperar uma busca no HTML ou uma chamada extra da engine.
+
+Se o plano nao existe, esta vazio ou nao tem `chapters`, o app tenta preparar a lista por outros meios e pode mostrar a mensagem: `A lista de capitulos ainda esta sendo preparada pela pagina.`
+
+Para o download tambem ser rapido depois da selecao, coloque o conteudo no proprio plano:
+
+| Tipo | Campo no capitulo | Resultado |
+| --- | --- | --- |
+| Novel | `paragraphs` | O app salva o JSON offline com paragrafos separados. |
+| Quadrinho | `pages` ou `images` | O app baixa as imagens diretamente. |
+
 ## chapterPlan
 
 `chapterPlan` e a lista pronta que o app usa para abrir a selecao de capitulos.
