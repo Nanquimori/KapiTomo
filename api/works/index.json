@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "type": "nyxovira_work_index",
+  "source": {
+    "id": "kapitomo",
+    "name": "KapiTomo",
+    "url": "https://nanquimori.github.io/KapiTomo",
+    "homeUrl": "https://nanquimori.github.io/KapiTomo/"
+  },
+  "works": [
+    {
+      "id": "garoto-outro-mundo",
+      "slug": "garoto-outro-mundo",
+      "title": "O Mundo Sem Humanos",
+      "author": "KapiTomo",
+      "format": "Novel",
+      "status": "Completa",
+      "summary": "Aos 14 anos, Caio acorda em um mundo sem humanos, onde dragoes, goblins e elfos atacam qualquer estranho. Para voltar vivo, ele precisa aprender a sobreviver sem virar heroi.",
+      "description": "Aos 14 anos, Caio acorda em um mundo sem humanos, onde dragoes, goblins e elfos atacam qualquer estranho. Para voltar vivo, ele precisa aprender a sobreviver sem virar heroi.",
+      "cover": "https://nanquimori.github.io/KapiTomo/assets/works/garoto-outro-mundo/cover.png",
+      "url": "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo/",
+      "apiUrl": "https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo/index.json",
+      "chapters": [
+        {
+          "id": "capitulo-001",
+          "number": "1",
+          "title": "Capitulo 01 - A Queda",
+          "name": "A Queda",
+          "contentType": "novel",
+          "url": "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo/0/",
+          "apiUrl": "https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo/chapters/capitulo-001.json",
+          "pageCount": 0,
+          "wordCount": 340,
+          "paragraphCount": 9
+        },
+        {
+          "id": "capitulo-002",
+          "number": "2",
+          "title": "Capitulo 02 - A Floresta que Caca",
+          "name": "A Floresta que Caca",
+          "contentType": "novel",
+          "url": "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo/1/",
+          "apiUrl": "https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo/chapters/capitulo-002.json",
+          "pageCount": 0,
+          "wordCount": 334,
+          "paragraphCount": 10
+        },
+        {
+          "id": "capitulo-003",
+          "number": "3",
+          "title": "Capitulo 03 - A Saida de Pedra",
+          "name": "A Saida de Pedra",
+          "contentType": "novel",
+          "url": "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo/2/",
+          "apiUrl": "https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo/chapters/capitulo-003.json",
+          "pageCount": 0,
+          "wordCount": 369,
+          "paragraphCount": 12
+        }
+      ]
+    },
+    {
+      "id": "garoto-outro-mundo-imagens",
+      "slug": "garoto-outro-mundo-imagens",
+      "title": "O Mundo Sem Humanos: Quadrinhos",
+      "author": "KapiTomo",
+      "format": "Quadrinho",
+      "status": "Completa",
+      "summary": "Versao em quadrinhos da novel, contada apenas por paginas ilustradas.",
+      "description": "Versao em quadrinhos da novel O Mundo Sem Humanos, contada apenas por paginas ilustradas.",
+      "cover": "https://nanquimori.github.io/KapiTomo/assets/works/garoto-outro-mundo-imagens/cover.png",
+      "url": "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo-imagens/",
+      "apiUrl": "https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo-imagens/index.json",
+      "chapters": [
+        {
+          "id": "capitulo-001",
+          "number": "1",
+          "title": "Capitulo 001",
+          "name": "Capitulo 01",
+          "contentType": "images",
+          "url": "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo-imagens/0/",
+          "apiUrl": "https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo-imagens/chapters/capitulo-001.json",
+          "pageCount": 2,
+          "wordCount": 0,
+          "paragraphCount": 0
+        },
+        {
+          "id": "capitulo-002",
+          "number": "2",
+          "title": "Capitulo 002",
+          "name": "Capitulo 02",
+          "contentType": "images",
+          "url": "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo-imagens/1/",
+          "apiUrl": "https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo-imagens/chapters/capitulo-002.json",
+          "pageCount": 2,
+          "wordCount": 0,
+          "paragraphCount": 0
+        },
+        {
+          "id": "capitulo-003",
+          "number": "3",
+          "title": "Capitulo 003",
+          "name": "Capitulo 03",
+          "contentType": "images",
+          "url": "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo-imagens/2/",
+          "apiUrl": "https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo-imagens/chapters/capitulo-003.json",
+          "pageCount": 2,
+          "wordCount": 0,
+          "paragraphCount": 0
+        }
+      ]
+    }
+  ]
+}

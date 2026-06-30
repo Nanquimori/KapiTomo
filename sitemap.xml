@@ -68,13 +68,73 @@
   </url>
   <url>
     <loc>https://nanquimori.github.io/KapiTomo/api/catalog.json</loc>
-    <lastmod>2026-06-02</lastmod>
+    <lastmod>2026-06-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://nanquimori.github.io/KapiTomo/api/works/index.json</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo/index.json</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo/chapters/capitulo-001.json</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo/chapters/capitulo-002.json</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo/chapters/capitulo-003.json</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo-imagens/index.json</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo-imagens/chapters/capitulo-001.json</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo-imagens/chapters/capitulo-002.json</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo-imagens/chapters/capitulo-003.json</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://nanquimori.github.io/KapiTomo/plugins/catalog.json</loc>
+    <lastmod>2026-06-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://nanquimori.github.io/KapiTomo/downloads/plugins/kapitomo.zip</loc>
-    <lastmod>2026-06-02</lastmod>
+    <lastmod>2026-06-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>

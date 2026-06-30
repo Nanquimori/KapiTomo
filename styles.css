@@ -1019,16 +1019,6 @@ code {
   letter-spacing: 0;
 }
 
-.novel-meta {
-  margin: 10px 0 8px;
-  color: #b8adc8;
-  font-size: 0.82rem;
-}
-
-.novel-meta span {
-  margin-left: 16px;
-}
-
 .novel-reader {
   width: min(768px, calc(100% - 40px));
   margin: 8px auto 0;

@@ -45,11 +45,6 @@ function getChapterPreview(work, chapter) {
 }
 
 function getChapterReadingInfo(chapter) {
-  if (chapter.contentType === "novel") {
-    const wordCount = getWordCount(getChapterParagraphs(chapter));
-    return `${wordCount} palavras - ~${getReadingMinutes(wordCount)} min`;
-  }
-
   const imageCount = getChapterImages(chapter).length;
   return `${imageCount || 1} pagina${imageCount === 1 ? "" : "s"}`;
 }
@@ -100,19 +95,6 @@ function getChapterImages(chapter) {
   }
 
   return Array.isArray(chapter.pages) ? chapter.pages.filter((page) => typeof page === "object" && page.src) : [];
-}
-
-function getWordCount(textItems) {
-  return textItems
-    .join(" ")
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .length;
-}
-
-function getReadingMinutes(wordCount) {
-  return Math.max(1, Math.ceil(wordCount / 180));
 }
 
 function renderWorks() {
@@ -225,7 +207,7 @@ function renderChapterList(work) {
             <span class="chapter-main">
               <strong>${escapeHtml(getChapterNumberLabel(index))}</strong>
               <span class="chapter-editorial-title">${escapeHtml(chapter.title)}</span>
-              <small>${escapeHtml(chapter.date)} - ${escapeHtml(getChapterReadingInfo(chapter))}</small>
+              <small>${escapeHtml(chapter.contentType === "novel" ? chapter.date : `${chapter.date} - ${getChapterReadingInfo(chapter)}`)}</small>
             </span>
             <span class="chapter-meta">
               <span class="chapter-format-pill ${chapter.contentType === "novel" ? "is-novel" : ""}">${escapeHtml(typeLabel)}</span>
@@ -248,7 +230,6 @@ function renderChapterPage(work, chapterIndex = 0) {
   const paragraphs = getChapterParagraphs(chapter);
   const isNovel = chapter.contentType === "novel";
   const isImageChapter = chapter.contentType === "images";
-  const wordCount = getWordCount(paragraphs);
 
   fragment.querySelector(".back-link").href = workUrl(work);
   fragment.querySelector(".eyebrow").textContent = work.title;
@@ -261,10 +242,6 @@ function renderChapterPage(work, chapterIndex = 0) {
 
   if (isNovel) {
     page.classList.add("novel-page");
-    fragment.querySelector(".chapter-header").insertAdjacentHTML(
-      "beforeend",
-      `<p class="novel-meta">${wordCount} palavras <span>~${getReadingMinutes(wordCount)} min de leitura</span></p>`
-    );
     fragment.querySelector(".webtoon-strip").className = "novel-reader";
     fragment.querySelector(".novel-reader").innerHTML = paragraphs
       .map((paragraph) => `<p>${paragraph}</p>`)

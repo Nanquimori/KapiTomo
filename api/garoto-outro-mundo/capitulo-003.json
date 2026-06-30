@@ -1,17 +1,28 @@
 {
-    "mode":  "android-chapter",
-    "libraryId":  "kapitomo",
-    "workFolderName":  "garoto-outro-mundo",
-    "chapterFolderName":  "capitulo-003",
-    "contentType":  "novel",
-    "pages":  [
-
-              ],
-    "pageCount":  0,
-    "totalImagesExpected":  0,
-    "sourceUrl":  "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo/2/",
-    "textFileName":  "capitulo-003.txt",
-    "textSourceUrl":  "https://nanquimori.github.io/KapiTomo/api/garoto-outro-mundo/capitulo-003.txt",
-    "wordCount":  369,
-    "paragraphCount":  12
+  "mode": "android-chapter",
+  "libraryId": "kapitomo",
+  "workFolderName": "garoto-outro-mundo",
+  "chapterFolderName": "capitulo-003",
+  "contentType": "novel",
+  "pages": [],
+  "pageCount": 0,
+  "totalImagesExpected": 0,
+  "sourceUrl": "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo/2/",
+  "text": "Na manha seguinte, Caio encontrou marcas antigas na parede da caverna. Nao eram desenhos de animais. Eram setas, circulos e um simbolo repetido tres vezes: uma porta dentro de uma montanha.\r\n\r\nEle seguiu as marcas por um tunel estreito. A lanterna falhou duas vezes, e o escuro pareceu encostar em seu rosto. Quando saiu do outro lado, viu ruinas de pedra tomadas por raizes. No centro havia um arco quebrado, igual ao simbolo da parede.\r\n\r\nO problema era o dragao. Ele dormia enrolado ao redor das ruinas, soltando fumaca pelo nariz. Entre as escamas, havia cicatrizes de lancas e flechas. Ate os elfos e goblins tinham medo dele.\r\n\r\nCaio se escondeu e pensou. Nao podia lutar. Nao podia correr. Entao fez a unica coisa que ainda sabia fazer melhor que os monstros: improvisar.\r\n\r\nUsou a garrafa vazia, pedras pequenas e a ponta de flecha para montar um chocalho. Amarrou tudo em um cipo e jogou longe, contra uma coluna caida. O barulho ecoou pela ruina.\r\n\r\nO dragao abriu um olho. Depois o outro. Levantou a cabeca e foi ate o som, irritado. Caio correu baixo, quase rastejando, ate o arco de pedra.\r\n\r\nO portal nao acendeu. Faltava alguma coisa. Caio viu um buraco no centro da base, do tamanho exato da lanterna. Engoliu seco, colocou o objeto ali e apertou o botao.\r\n\r\nA luz fraca virou uma linha branca. O arco inteiro tremeu. O dragao percebeu e rugiu. Caio sentiu o calor chegando pelas costas, mas nao tirou a mao da lanterna.\r\n\r\nQuando o portal abriu, ele viu por um instante a rua perto de casa. O mesmo poste, o mesmo muro pichado, o mesmo mundo barulhento e humano que antes parecia comum demais.\r\n\r\nCaio pulou. Caiu no asfalto de joelhos, com a mochila rasgada e barro ate o pescoco. O portal fechou atras dele como um suspiro.\r\n\r\nNinguem acreditaria. Talvez nem ele acreditasse depois de alguns dias. Mas, dentro da mochila, ainda havia uma escama preta, quente como brasa.\r\n\r\nCaio guardou a escama no bolso e olhou para o ceu. Estava em casa. Mas agora sabia uma coisa que nunca esqueceria: sobreviver nao era vencer todos os monstros. Era continuar pensando quando o medo queria pensar por voce.",
+  "paragraphs": [
+    "Na manha seguinte, Caio encontrou marcas antigas na parede da caverna. Nao eram desenhos de animais. Eram setas, circulos e um simbolo repetido tres vezes: uma porta dentro de uma montanha.",
+    "Ele seguiu as marcas por um tunel estreito. A lanterna falhou duas vezes, e o escuro pareceu encostar em seu rosto. Quando saiu do outro lado, viu ruinas de pedra tomadas por raizes. No centro havia um arco quebrado, igual ao simbolo da parede.",
+    "O problema era o dragao. Ele dormia enrolado ao redor das ruinas, soltando fumaca pelo nariz. Entre as escamas, havia cicatrizes de lancas e flechas. Ate os elfos e goblins tinham medo dele.",
+    "Caio se escondeu e pensou. Nao podia lutar. Nao podia correr. Entao fez a unica coisa que ainda sabia fazer melhor que os monstros: improvisar.",
+    "Usou a garrafa vazia, pedras pequenas e a ponta de flecha para montar um chocalho. Amarrou tudo em um cipo e jogou longe, contra uma coluna caida. O barulho ecoou pela ruina.",
+    "O dragao abriu um olho. Depois o outro. Levantou a cabeca e foi ate o som, irritado. Caio correu baixo, quase rastejando, ate o arco de pedra.",
+    "O portal nao acendeu. Faltava alguma coisa. Caio viu um buraco no centro da base, do tamanho exato da lanterna. Engoliu seco, colocou o objeto ali e apertou o botao.",
+    "A luz fraca virou uma linha branca. O arco inteiro tremeu. O dragao percebeu e rugiu. Caio sentiu o calor chegando pelas costas, mas nao tirou a mao da lanterna.",
+    "Quando o portal abriu, ele viu por um instante a rua perto de casa. O mesmo poste, o mesmo muro pichado, o mesmo mundo barulhento e humano que antes parecia comum demais.",
+    "Caio pulou. Caiu no asfalto de joelhos, com a mochila rasgada e barro ate o pescoco. O portal fechou atras dele como um suspiro.",
+    "Ninguem acreditaria. Talvez nem ele acreditasse depois de alguns dias. Mas, dentro da mochila, ainda havia uma escama preta, quente como brasa.",
+    "Caio guardou a escama no bolso e olhou para o ceu. Estava em casa. Mas agora sabia uma coisa que nunca esqueceria: sobreviver nao era vencer todos os monstros. Era continuar pensando quando o medo queria pensar por voce."
+  ],
+  "wordCount": 369,
+  "paragraphCount": 12
 }

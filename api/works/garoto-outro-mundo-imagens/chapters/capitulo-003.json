@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "type": "nyxovira_chapter",
+  "source": {
+    "id": "kapitomo",
+    "name": "KapiTomo",
+    "url": "https://nanquimori.github.io/KapiTomo"
+  },
+  "chapter": {
+    "id": "capitulo-003",
+    "number": "3",
+    "title": "Capitulo 003",
+    "name": "Capitulo 03",
+    "contentType": "images",
+    "url": "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo-imagens/2/",
+    "text": "",
+    "paragraphs": [],
+    "pages": [
+      {
+        "number": 1,
+        "name": "page-001.png",
+        "image": "https://nanquimori.github.io/KapiTomo/assets/works/garoto-outro-mundo-imagens/capitulo-003/page-001.png",
+        "url": "https://nanquimori.github.io/KapiTomo/assets/works/garoto-outro-mundo-imagens/capitulo-003/page-001.png",
+        "lastModified": 1780372306550
+      },
+      {
+        "number": 2,
+        "name": "page-002.png",
+        "image": "https://nanquimori.github.io/KapiTomo/assets/works/garoto-outro-mundo-imagens/capitulo-003/page-002.png",
+        "url": "https://nanquimori.github.io/KapiTomo/assets/works/garoto-outro-mundo-imagens/capitulo-003/page-002.png",
+        "lastModified": 1780372306576
+      }
+    ],
+    "pageCount": 2,
+    "wordCount": 0,
+    "paragraphCount": 0
+  }
+}

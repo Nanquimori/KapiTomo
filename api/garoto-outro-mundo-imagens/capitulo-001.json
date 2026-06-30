@@ -1,21 +1,22 @@
 {
-    "mode":  "android-chapter",
-    "libraryId":  "kapitomo",
-    "workFolderName":  "garoto-outro-mundo-imagens",
-    "chapterFolderName":  "capitulo-001",
-    "pages":  [
-                  {
-                      "name":  "page-001.png",
-                      "sourceUrl":  "https://nanquimori.github.io/KapiTomo/assets/comic/garoto-outro-mundo-imagens/page-001.png",
-                      "lastModified":  1780358400000
-                  },
-                  {
-                      "name":  "page-002.png",
-                      "sourceUrl":  "https://nanquimori.github.io/KapiTomo/assets/comic/garoto-outro-mundo-imagens/page-002.png",
-                      "lastModified":  1780358400000
-                  }
-              ],
-    "pageCount":  2,
-    "totalImagesExpected":  2,
-    "sourceUrl":  "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo-imagens/0/"
+  "mode": "android-chapter",
+  "libraryId": "kapitomo",
+  "workFolderName": "garoto-outro-mundo-imagens",
+  "chapterFolderName": "capitulo-001",
+  "contentType": "images",
+  "pages": [
+    {
+      "name": "page-001.png",
+      "sourceUrl": "https://nanquimori.github.io/KapiTomo/assets/works/garoto-outro-mundo-imagens/capitulo-001/page-001.png",
+      "lastModified": 1780372306413
+    },
+    {
+      "name": "page-002.png",
+      "sourceUrl": "https://nanquimori.github.io/KapiTomo/assets/works/garoto-outro-mundo-imagens/capitulo-001/page-002.png",
+      "lastModified": 1780372306445
+    }
+  ],
+  "pageCount": 2,
+  "totalImagesExpected": 2,
+  "sourceUrl": "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo-imagens/0/"
 }
