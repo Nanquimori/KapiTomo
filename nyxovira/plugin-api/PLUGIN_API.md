@@ -1,8 +1,10 @@
 # Nyxovira Plugin API
 
-Este guia mostra como criar um addon para o Nyxovira.
+Este guia mostra como criar um addon de fonte para o Nyxovira.
 
-Um addon conecta o app a uma fonte online. Ele informa qual site abrir, como reconhecer uma obra, como listar capitulos e como baixar novels ou quadrinhos para leitura offline.
+Um addon adapta uma fonte online ao app. Ele informa qual pagina abrir, como reconhecer uma obra, como traduzir rotas e campos da fonte, como listar capitulos e como baixar novels ou quadrinhos para leitura offline.
+
+O KapiTomo e usado nesta documentacao como exemplo completo. A mesma estrutura serve para outras fontes quando o addon descreve manualmente o formato usado por cada uma.
 
 Ao final, o addon deve permitir este fluxo:
 
