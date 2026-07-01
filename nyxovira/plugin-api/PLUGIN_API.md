@@ -284,27 +284,27 @@ Se `window.__nyxoviraChapterPlan` ja existe e tem capitulos, o app abre a seleca
 
 Se o plano nao existe, esta vazio ou nao tem `chapters`, o app tenta preparar a lista por outros meios e pode mostrar a mensagem: `A fonte ainda esta preparando os dados dos capitulos. Tente baixar novamente em instantes.`
 
-Para o download tambem ser rapido depois da selecao, coloque o conteudo no proprio plano:
+Para o download tambem ser direto depois da selecao, coloque o conteudo no proprio plano ou prepare o plano no addon depois da confirmacao:
 
 | Tipo | Campo no capitulo | Resultado |
 | --- | --- | --- |
 | Novel | `paragraphs` | O app salva o JSON offline com paragrafos separados. |
 | Quadrinho | `pages` ou `images` | O app baixa as imagens diretamente. |
-| API por capitulo | `contentEndpoint`, `contentUrl` ou `apiPath` | O app mostra a lista agora e busca o conteudo do capitulo somente depois que o usuario confirma o download. |
+| Preparo no addon | `window.__nyxoviraPrepareDownloadPlan` | O app mostra a lista agora; depois que o usuario confirma, o addon preenche os capitulos selecionados. |
 
 Antes de preencher `window.__nyxoviraChapterPlan`, valide cada capitulo no addon:
 
 | Caso | O addon deve fazer |
 | --- | --- |
 | Novel sem `paragraphs` | Nao inclua o capitulo no plano e registre `console.error(...)`. |
-| Quadrinho sem `pages`/`images` e sem `contentEndpoint` | Nao inclua o capitulo no plano e registre `console.error(...)`. |
+| Quadrinho sem `pages`/`images` no plano final | Nao inicie o download desse capitulo e registre `console.error(...)`. |
 | Plano sem capitulos validos | Nao preencha `window.__nyxoviraChapterPlan`; retorne vazio ou a URL canonica para o app tentar outro parser. |
 
 Isso evita a lista aparecer com capitulos que somem na preparacao do download.
 
-## Conteudo por capitulo
+## Preparo apos confirmar
 
-Use `contentEndpoint` quando a obra tem a lista em um endpoint rapido, mas o conteudo real fica em outro endpoint por capitulo. Esse endpoint nao e chamado para abrir a selecao; ele roda durante a execucao do download, capitulo por capitulo.
+Use `window.__nyxoviraPrepareDownloadPlan` quando a obra tem a lista em um endpoint rapido, mas o conteudo real precisa ser carregado capitulo por capitulo. Essa funcao roda no WebView depois que o usuario confirma a selecao e antes do engine iniciar o pacote offline.
 
 Exemplo comum:
 
@@ -313,7 +313,7 @@ Exemplo comum:
 | `/api/manga/minha-obra` | Lista de capitulos, ids e titulos. |
 | `/api/chapter/123` | Paginas reais do capitulo. |
 
-Nesse caso, nao envie `pages: []`. Envie um `contentEndpoint` por capitulo:
+Nesse caso, o `chapterPlan` inicial pode ter somente metadados:
 
 ```json
 {
@@ -322,26 +322,30 @@ Nesse caso, nao envie `pages: []`. Envie um `contentEndpoint` por capitulo:
   "title": "Capitulo 12",
   "contentType": "images",
   "url": "https://example.com/manga/minha-obra/chapter/12/",
-  "contentEndpoint": {
-    "adapter": "aes_json_api",
-    "path": "/api/chapter/123"
-  }
+  "apiPath": "/api/chapter/123"
 }
 ```
 
-O app abre a selecao usando os metadados do `chapterPlan`. Depois que o usuario confirma a selecao e toca em baixar, o app chama o `contentEndpoint` daquele capitulo e baixa `pages`, `images`, `paragraphs`, `text` ou `content` retornados pelo endpoint.
+Depois, o addon prepara apenas os capitulos selecionados:
 
-Se o endpoint responder sem conteudo baixavel, o console do app registra o capitulo que falhou. No addon, use `console.error(...)` para incluir o `chapterId`, a URL do endpoint e o motivo da falha.
+```js
+window.__nyxoviraPrepareDownloadPlan = function (context) {
+  var selected = context.selectedChapterIds;
+  var plan = context.chapterPlan;
 
-Campos aceitos no capitulo:
+  plan.chapters.forEach(function (chapter) {
+    if (selected.indexOf(chapter.id) < 0) return;
+    var payload = carregarDadosDoCapitulo(chapter.apiPath);
+    chapter.pages = payload.pages;
+  });
 
-| Campo | Uso |
-| --- | --- |
-| `contentEndpoint.adapter` ou `contentEndpointAdapter` | Tipo do endpoint. Use `aes_json_api` para API criptografada configurada no `plugin.json`. |
-| `contentEndpoint.path`, `apiPath`, `contentPath` ou `pagesPath` | Caminho relativo ao `api_base` do plugin. |
-| `contentEndpoint.url`, `contentEndpointUrl`, `contentUrl`, `pagesUrl` ou `apiUrl` | URL absoluta ou relativa do endpoint do capitulo. |
+  return plan;
+};
+```
 
-`contentEndpoint` substitui a tentativa de atualizar `window.__nyxoviraChapterPlan` depois da selecao. O app copia o plano no clique inicial, entao lazy loading depois do modal nao altera o download em andamento.
+O app nao sabe como a fonte busca ou transforma esses dados. A API da fonte, criptografia, tokens e regras ficam no addon. O engine so recebe o `chapterPlan` final com `paragraphs`, `pages` ou `images`.
+
+Se a funcao responder vazio ou nao existir, o app usa o `chapterPlan` original. Por isso, para fontes que precisam preparar capitulo por capitulo, o addon deve retornar o plano final completo para os capitulos selecionados.
 
 ## chapterPlan
 
@@ -440,7 +444,7 @@ Antes de publicar:
 4. Teste `download_target.js` em uma pagina de obra.
 5. Confirme `chapterPlan.title`, `summary`, `canonicalUrl`, `coverUrl` e `chapters`.
 6. Em novel, confirme que `paragraphs` tem varios itens separados.
-7. Em quadrinho, confirme que `pages` tem URLs diretas de imagem ou que cada capitulo tem `contentEndpoint`.
+7. Em quadrinho, confirme que o plano final tem `pages` ou `images` nos capitulos selecionados.
 8. Gere o zip do addon.
 9. Atualize o `sha256` no catalogo de plugins.
 10. Teste download do primeiro, do meio e do ultimo capitulo.

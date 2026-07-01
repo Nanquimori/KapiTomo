@@ -680,7 +680,7 @@
       <a href="#rotas">Rotas e campos</a>
       <a href="#script">download_target.js</a>
       <a href="#fluxo">Fluxo do download</a>
-      <a href="#content-endpoint">Conteudo por capitulo</a>
+      <a href="#prepare-plan">Preparo apos confirmar</a>
       <a href="#plan">chapterPlan</a>
       <a href="#conteudo">Novel e quadrinho</a>
       <a href="#publicacao">Publicacao</a>
@@ -928,7 +928,7 @@
                 <tr><td>3</td><td>O script retorna a URL canonica da obra e preenche <code>window.__nyxoviraChapterPlan</code>.</td></tr>
                 <tr><td>4</td><td>Se o plano tem <code>chapters</code>, a selecao de capitulos abre imediatamente.</td></tr>
                 <tr><td>5</td><td>Se o plano tem <code>paragraphs</code>, <code>pages</code> ou <code>images</code>, o download usa esse conteudo direto.</td></tr>
-                <tr><td>6</td><td>Se o capitulo tem <code>contentEndpoint</code>, o app busca o conteudo desse capitulo somente depois que o usuario confirma o download.</td></tr>
+                <tr><td>6</td><td>Se o addon define <code>window.__nyxoviraPrepareDownloadPlan</code>, o app chama essa funcao depois que o usuario confirma o download.</td></tr>
               </tbody>
             </table>
           </div>
@@ -940,7 +940,7 @@
               </thead>
               <tbody>
                 <tr><td>Novel sem <code>paragraphs</code></td><td>Remova o capitulo do plano e registre <code>console.error(...)</code>.</td></tr>
-                <tr><td>Quadrinho sem <code>pages</code>, <code>images</code> ou <code>contentEndpoint</code></td><td>Remova o capitulo do plano e registre <code>console.error(...)</code>.</td></tr>
+                <tr><td>Quadrinho sem <code>pages</code> ou <code>images</code> no plano final</td><td>Remova o capitulo do plano e registre <code>console.error(...)</code>.</td></tr>
                 <tr><td>Plano sem capitulos validos</td><td>Nao preencha <code>window.__nyxoviraChapterPlan</code>; retorne vazio ou a URL canonica.</td></tr>
               </tbody>
             </table>
@@ -948,12 +948,12 @@
         </div>
       </section>
 
-      <section id="content-endpoint">
+      <section id="prepare-plan">
         <div class="section-head">
-          <div class="section-kicker">chapter.contentEndpoint</div>
+          <div class="section-kicker">browser.prepare</div>
           <div class="section-title">
-            <h2>Conteudo por capitulo</h2>
-            <p>Use quando a lista da obra vem rapido, mas as paginas ou paragrafos ficam em outro endpoint por capitulo. O endpoint roda durante a execucao do download.</p>
+            <h2>Preparo apos confirmar</h2>
+            <p>Use quando a lista da obra vem rapido, mas as paginas ou paragrafos precisam ser carregados pelo addon depois da selecao.</p>
           </div>
         </div>
         <div class="section-body">
@@ -969,21 +969,32 @@
             </table>
           </div>
           <div>
-            <div class="code-title"><span>capitulo com contentEndpoint</span></div>
+            <div class="code-title"><span>capitulo no plano inicial</span></div>
             <pre>{
   "id": "id:123",
   "number": "12",
   "title": "Capitulo 12",
   "contentType": "images",
   "url": "https://example.com/manga/minha-obra/chapter/12/",
-  "contentEndpoint": {
-    "adapter": "aes_json_api",
-    "path": "/api/chapter/123"
-  }
+  "apiPath": "/api/chapter/123"
 }</pre>
           </div>
-          <div class="note"><strong>Erro visivel no console:</strong> se o endpoint responder sem conteudo baixavel, o app registra o capitulo que falhou. No addon, use <code>console.error(...)</code> com o <code>chapterId</code>, a URL do endpoint e o motivo.</div>
-          <div class="note"><strong>Nao use <code>pages: []</code> como solucao final.</strong> Se as paginas ainda nao estao no plano, use <code>contentEndpoint</code>. O app copia o <code>chapterPlan</code> quando abre a selecao; atualizar <code>window.__nyxoviraChapterPlan</code> depois nao altera o download ja iniciado.</div>
+          <div>
+            <div class="code-title"><span>funcao chamada depois do botao Baixar</span></div>
+            <pre>window.__nyxoviraPrepareDownloadPlan = function (context) {
+  var selected = context.selectedChapterIds;
+  var plan = context.chapterPlan;
+
+  plan.chapters.forEach(function (chapter) {
+    if (selected.indexOf(chapter.id) &lt; 0) return;
+    var payload = carregarDadosDoCapitulo(chapter.apiPath);
+    chapter.pages = payload.pages;
+  });
+
+  return plan;
+};</pre>
+          </div>
+          <div class="note"><strong>Sem API externa no engine:</strong> tokens, criptografia e chamadas especificas da fonte ficam no addon. O app so recebe o plano final com <code>paragraphs</code>, <code>pages</code> ou <code>images</code>.</div>
         </div>
       </section>
 
@@ -1067,7 +1078,7 @@
             <div class="step"><strong>Navegador</strong><span>Teste a home, uma pagina de obra e o botao de baixar.</span></div>
             <div class="step"><strong>Plano</strong><span>Confirme <code>title</code>, <code>summary</code>, <code>coverUrl</code> e capitulos.</span></div>
             <div class="step"><strong>Novel</strong><span>Confirme que <code>paragraphs</code> tem varios itens separados.</span></div>
-            <div class="step"><strong>Quadrinho</strong><span>Confirme <code>pages</code> com imagens diretas ou <code>contentEndpoint</code> por capitulo.</span></div>
+            <div class="step"><strong>Quadrinho</strong><span>Confirme que o plano final tem <code>pages</code> ou <code>images</code> nos capitulos selecionados.</span></div>
             <div class="step"><strong>Catalogo</strong><span>Atualize o <code>sha256</code> do pacote no catalogo de plugins.</span></div>
           </div>
         </div>
