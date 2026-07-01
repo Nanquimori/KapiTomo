@@ -290,7 +290,7 @@ Para o download tambem ser rapido depois da selecao, coloque o conteudo no propr
 | --- | --- | --- |
 | Novel | `paragraphs` | O app salva o JSON offline com paragrafos separados. |
 | Quadrinho | `pages` ou `images` | O app baixa as imagens diretamente. |
-| API por capitulo | `contentEndpoint`, `contentUrl` ou `apiPath` | O app mostra a lista agora e busca o conteudo do capitulo no momento do download. |
+| API por capitulo | `contentEndpoint`, `contentUrl` ou `apiPath` | O app mostra a lista agora e busca o conteudo do capitulo somente depois que o usuario confirma o download. |
 
 Antes de preencher `window.__nyxoviraChapterPlan`, valide cada capitulo no addon:
 
@@ -304,7 +304,7 @@ Isso evita a lista aparecer com capitulos que somem na preparacao do download.
 
 ## Conteudo por capitulo
 
-Use `contentEndpoint` quando a obra tem a lista em um endpoint rapido, mas o conteudo real fica em outro endpoint por capitulo.
+Use `contentEndpoint` quando a obra tem a lista em um endpoint rapido, mas o conteudo real fica em outro endpoint por capitulo. Esse endpoint nao e chamado para abrir a selecao; ele roda durante a execucao do download, capitulo por capitulo.
 
 Exemplo comum:
 
@@ -329,7 +329,7 @@ Nesse caso, nao envie `pages: []`. Envie um `contentEndpoint` por capitulo:
 }
 ```
 
-O app abre a selecao usando os metadados do `chapterPlan`. Quando o usuario confirma o download, o app chama o `contentEndpoint` daquele capitulo e baixa `pages`, `images`, `paragraphs`, `text` ou `content` retornados pelo endpoint.
+O app abre a selecao usando os metadados do `chapterPlan`. Depois que o usuario confirma a selecao e toca em baixar, o app chama o `contentEndpoint` daquele capitulo e baixa `pages`, `images`, `paragraphs`, `text` ou `content` retornados pelo endpoint.
 
 Se o endpoint responder sem conteudo baixavel, o console do app registra o capitulo que falhou. No addon, use `console.error(...)` para incluir o `chapterId`, a URL do endpoint e o motivo da falha.
 

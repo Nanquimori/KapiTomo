@@ -928,7 +928,7 @@
                 <tr><td>3</td><td>O script retorna a URL canonica da obra e preenche <code>window.__nyxoviraChapterPlan</code>.</td></tr>
                 <tr><td>4</td><td>Se o plano tem <code>chapters</code>, a selecao de capitulos abre imediatamente.</td></tr>
                 <tr><td>5</td><td>Se o plano tem <code>paragraphs</code>, <code>pages</code> ou <code>images</code>, o download usa esse conteudo direto.</td></tr>
-                <tr><td>6</td><td>Se o capitulo tem <code>contentEndpoint</code>, o app busca o conteudo desse capitulo somente quando o download comecar.</td></tr>
+                <tr><td>6</td><td>Se o capitulo tem <code>contentEndpoint</code>, o app busca o conteudo desse capitulo somente depois que o usuario confirma o download.</td></tr>
               </tbody>
             </table>
           </div>
@@ -953,7 +953,7 @@
           <div class="section-kicker">chapter.contentEndpoint</div>
           <div class="section-title">
             <h2>Conteudo por capitulo</h2>
-            <p>Use quando a lista da obra vem rapido, mas as paginas ou paragrafos ficam em outro endpoint por capitulo.</p>
+            <p>Use quando a lista da obra vem rapido, mas as paginas ou paragrafos ficam em outro endpoint por capitulo. O endpoint roda durante a execucao do download.</p>
           </div>
         </div>
         <div class="section-body">
