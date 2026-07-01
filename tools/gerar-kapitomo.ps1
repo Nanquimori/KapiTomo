@@ -404,7 +404,7 @@ foreach ($workDir in $workDirs) {
     }
     if ($contentType -eq "novel") {
       $siteChapter.paragraphs = $paragraphs
-      $siteChapter.pages = $paragraphs
+      $siteChapter.pages = @()
     } else {
       $siteChapter.pages = $sitePages
       $siteChapter.images = @($pages | ForEach-Object {

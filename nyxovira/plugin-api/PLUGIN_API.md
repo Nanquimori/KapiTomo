@@ -291,6 +291,16 @@ Para o download tambem ser rapido depois da selecao, coloque o conteudo no propr
 | Novel | `paragraphs` | O app salva o JSON offline com paragrafos separados. |
 | Quadrinho | `pages` ou `images` | O app baixa as imagens diretamente. |
 
+Antes de preencher `window.__nyxoviraChapterPlan`, valide cada capitulo no addon:
+
+| Caso | O addon deve fazer |
+| --- | --- |
+| Novel sem `paragraphs` | Nao inclua o capitulo no plano e registre `console.error(...)`. |
+| Quadrinho sem `pages`/`images` | Nao inclua o capitulo no plano e registre `console.error(...)`. |
+| Plano sem capitulos validos | Nao preencha `window.__nyxoviraChapterPlan`; retorne vazio ou a URL canonica para o app tentar outro parser. |
+
+Isso evita a lista aparecer com capitulos que somem na preparacao do download.
+
 ## chapterPlan
 
 `chapterPlan` e a lista pronta que o app usa para abrir a selecao de capitulos.

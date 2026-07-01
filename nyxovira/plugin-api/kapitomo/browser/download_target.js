@@ -33,6 +33,14 @@
       return String(value == null ? "" : value).replace(/\s+/g, " ").trim();
     }
 
+    function warn(message) {
+      try {
+        if (typeof console !== "undefined" && console.error) {
+          console.error("[KapiTomo addon] " + message);
+        }
+      } catch (ignored) {}
+    }
+
     function field(object, name) {
       return object && name ? object[name] : "";
     }
@@ -40,6 +48,11 @@
     function numberFromTitle(title, fallback) {
       var match = text(title).match(/(\d+(?:[.,]\d+)?)/);
       return match ? match[1].replace(",", ".") : String(fallback);
+    }
+
+    function isImageContent(chapter) {
+      var type = text(field(chapter, addon.fields.chapterContentType)).toLowerCase();
+      return type === "images" || type === "image" || type === "comic" || type === "manga" || type === "quadrinho";
     }
 
     function imagePages(chapter) {
@@ -50,7 +63,7 @@
 
       function add(value) {
         var source = text(value);
-        if (source && !seen[source]) {
+        if (source && /^https?:\/\//i.test(source) && !seen[source]) {
           seen[source] = true;
           output.push(source);
         }
@@ -134,21 +147,35 @@
         chapters: chapters.map(function (chapter, index) {
           var title = text(field(chapter, addon.fields.chapterTitle)) || (addon.labels.chapter + " " + (index + 1));
           var number = numberFromTitle(title, index + 1);
-          var paragraphs = field(chapter, addon.fields.chapterParagraphs);
-          var pages = imagePages(chapter);
+          var type = text(field(chapter, addon.fields.chapterContentType));
+          var imageChapter = isImageContent(chapter);
+          var rawParagraphs = field(chapter, addon.fields.chapterParagraphs);
+          var paragraphs = !imageChapter && Array.isArray(rawParagraphs)
+            ? rawParagraphs.map(text).filter(Boolean)
+            : [];
+          var pages = imageChapter ? imagePages(chapter) : [];
+          if (!paragraphs.length && !pages.length) {
+            warn("Capitulo sem conteudo para download: " + title);
+            return null;
+          }
           return {
             id: "id:" + index,
             number: number,
             title: title,
-            contentType: text(field(chapter, addon.fields.chapterContentType)),
-            paragraphs: Array.isArray(paragraphs) ? paragraphs : [],
+            contentType: imageChapter ? "images" : (type || "novel"),
+            paragraphs: paragraphs,
             pages: pages,
             label: addon.labels.chapter + " " + number + " - " + title,
             url: publicChapterUrl(workId, index),
             index: index
           };
-        })
+        }).filter(Boolean)
       };
+
+      if (!plan.chapters.length) {
+        warn("Nenhum capitulo valido no chapterPlan da obra: " + workId);
+        return "";
+      }
 
       window.__nyxoviraChapterPlan = JSON.stringify(plan);
       if (location.pathname !== new URL(canonicalUrl).pathname && history && history.replaceState) {

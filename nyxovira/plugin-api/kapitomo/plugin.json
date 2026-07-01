@@ -2,7 +2,7 @@
     "schema_version":  1,
     "id":  "kapitomo",
     "name":  "KapiTomo",
-    "version":  "1.0.12",
+    "version":  "1.0.13",
     "match":  {
                   "hosts":  [
                                 "nanquimori.github.io"
@@ -18,7 +18,7 @@
     "parser":  {
                    "adapter":  "html_series",
                    "base_url":  "https://nanquimori.github.io/KapiTomo",
-                   "static_works_script":  "https://nanquimori.github.io/KapiTomo/data/works.js?v=20260616",
+                   "static_works_script":  "https://nanquimori.github.io/KapiTomo/data/works.js?v=20260701",
                    "base_path_prefix":  "KapiTomo",
                    "series_path_prefix":  "manga",
                    "hash_series_path_prefixes":  [

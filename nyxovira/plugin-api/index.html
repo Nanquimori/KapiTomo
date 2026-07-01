@@ -931,6 +931,18 @@
             </table>
           </div>
           <div class="note"><strong>Importante:</strong> se <code>window.__nyxoviraChapterPlan</code> nao existir ou vier sem <code>chapters</code>, o app tenta preparar a lista por outros meios e pode mostrar a mensagem <code>A lista de capitulos ainda esta sendo preparada pela pagina.</code></div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Validacao no addon</th><th>Acao esperada</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Novel sem <code>paragraphs</code></td><td>Remova o capitulo do plano e registre <code>console.error(...)</code>.</td></tr>
+                <tr><td>Quadrinho sem <code>pages</code> ou <code>images</code></td><td>Remova o capitulo do plano e registre <code>console.error(...)</code>.</td></tr>
+                <tr><td>Plano sem capitulos validos</td><td>Nao preencha <code>window.__nyxoviraChapterPlan</code>; retorne vazio ou a URL canonica.</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
