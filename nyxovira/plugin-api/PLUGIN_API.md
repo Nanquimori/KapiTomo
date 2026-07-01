@@ -79,7 +79,7 @@ Campos principais:
 | `browser.home_url` | Pagina inicial aberta no navegador do app. |
 | `browser.download_target_script_file` | Caminho do script que identifica a obra aberta. |
 | `parser.adapter` | Tipo de fonte. Para sites simples ou indice em JS, use `html_series`. |
-| `parser.base_url` | URL base usada para resolver links relativos. |
+| `parser.base_url` | URL base usada para montar links relativos. |
 | `parser.static_works_script` | Arquivo JavaScript publico que contem as obras, quando a fonte usa esse modelo. |
 
 ## Rotas e campos da fonte
@@ -290,21 +290,21 @@ Para o download tambem ser rapido depois da selecao, coloque o conteudo no propr
 | --- | --- | --- |
 | Novel | `paragraphs` | O app salva o JSON offline com paragrafos separados. |
 | Quadrinho | `pages` ou `images` | O app baixa as imagens diretamente. |
-| API por capitulo | `resolver`, `resolverUrl` ou `contentUrl` | O app mostra a lista agora e busca o conteudo do capitulo no momento do download. |
+| API por capitulo | `contentEndpoint`, `contentUrl` ou `apiPath` | O app mostra a lista agora e busca o conteudo do capitulo no momento do download. |
 
 Antes de preencher `window.__nyxoviraChapterPlan`, valide cada capitulo no addon:
 
 | Caso | O addon deve fazer |
 | --- | --- |
 | Novel sem `paragraphs` | Nao inclua o capitulo no plano e registre `console.error(...)`. |
-| Quadrinho sem `pages`/`images` e sem `resolver` | Nao inclua o capitulo no plano e registre `console.error(...)`. |
+| Quadrinho sem `pages`/`images` e sem `contentEndpoint` | Nao inclua o capitulo no plano e registre `console.error(...)`. |
 | Plano sem capitulos validos | Nao preencha `window.__nyxoviraChapterPlan`; retorne vazio ou a URL canonica para o app tentar outro parser. |
 
 Isso evita a lista aparecer com capitulos que somem na preparacao do download.
 
-## Resolvedor por capitulo
+## Conteudo por capitulo
 
-Use resolvedor quando a obra tem a lista em um endpoint rapido, mas o conteudo real fica em outro endpoint por capitulo.
+Use `contentEndpoint` quando a obra tem a lista em um endpoint rapido, mas o conteudo real fica em outro endpoint por capitulo.
 
 Exemplo comum:
 
@@ -313,7 +313,7 @@ Exemplo comum:
 | `/api/manga/minha-obra` | Lista de capitulos, ids e titulos. |
 | `/api/chapter/123` | Paginas reais do capitulo. |
 
-Nesse caso, nao envie `pages: []`. Envie um `resolver` por capitulo:
+Nesse caso, nao envie `pages: []`. Envie um `contentEndpoint` por capitulo:
 
 ```json
 {
@@ -322,26 +322,26 @@ Nesse caso, nao envie `pages: []`. Envie um `resolver` por capitulo:
   "title": "Capitulo 12",
   "contentType": "images",
   "url": "https://example.com/manga/minha-obra/chapter/12/",
-  "resolver": {
+  "contentEndpoint": {
     "adapter": "aes_json_api",
     "path": "/api/chapter/123"
   }
 }
 ```
 
-O app abre a selecao usando os metadados do `chapterPlan`. Quando o usuario confirma o download, o app chama o resolvedor daquele capitulo e baixa `pages`, `images`, `paragraphs`, `text` ou `content` retornados pelo endpoint.
+O app abre a selecao usando os metadados do `chapterPlan`. Quando o usuario confirma o download, o app chama o `contentEndpoint` daquele capitulo e baixa `pages`, `images`, `paragraphs`, `text` ou `content` retornados pelo endpoint.
 
-Se o endpoint do resolvedor responder sem conteudo baixavel, o console do app registra o capitulo que falhou. No addon, use `console.error(...)` para incluir o `chapterId`, a URL do endpoint e o motivo da falha.
+Se o endpoint responder sem conteudo baixavel, o console do app registra o capitulo que falhou. No addon, use `console.error(...)` para incluir o `chapterId`, a URL do endpoint e o motivo da falha.
 
 Campos aceitos no capitulo:
 
 | Campo | Uso |
 | --- | --- |
-| `resolver.adapter` ou `resolverAdapter` | Tipo do resolvedor. Use `aes_json_api` para API criptografada configurada no `plugin.json`. |
-| `resolver.path`, `apiPath`, `contentPath` ou `pagesPath` | Caminho relativo ao `api_base` do plugin. |
-| `resolver.url`, `resolverUrl`, `contentUrl`, `pagesUrl` ou `apiUrl` | URL absoluta ou relativa do endpoint do capitulo. |
+| `contentEndpoint.adapter` ou `contentEndpointAdapter` | Tipo do endpoint. Use `aes_json_api` para API criptografada configurada no `plugin.json`. |
+| `contentEndpoint.path`, `apiPath`, `contentPath` ou `pagesPath` | Caminho relativo ao `api_base` do plugin. |
+| `contentEndpoint.url`, `contentEndpointUrl`, `contentUrl`, `pagesUrl` ou `apiUrl` | URL absoluta ou relativa do endpoint do capitulo. |
 
-O resolvedor substitui a tentativa de atualizar `window.__nyxoviraChapterPlan` depois da selecao. O app copia o plano no clique inicial, entao lazy loading depois do modal nao altera o download em andamento.
+`contentEndpoint` substitui a tentativa de atualizar `window.__nyxoviraChapterPlan` depois da selecao. O app copia o plano no clique inicial, entao lazy loading depois do modal nao altera o download em andamento.
 
 ## chapterPlan
 
@@ -440,7 +440,7 @@ Antes de publicar:
 4. Teste `download_target.js` em uma pagina de obra.
 5. Confirme `chapterPlan.title`, `summary`, `canonicalUrl`, `coverUrl` e `chapters`.
 6. Em novel, confirme que `paragraphs` tem varios itens separados.
-7. Em quadrinho, confirme que `pages` tem URLs diretas de imagem ou que cada capitulo tem `resolver`.
+7. Em quadrinho, confirme que `pages` tem URLs diretas de imagem ou que cada capitulo tem `contentEndpoint`.
 8. Gere o zip do addon.
 9. Atualize o `sha256` no catalogo de plugins.
 10. Teste download do primeiro, do meio e do ultimo capitulo.
