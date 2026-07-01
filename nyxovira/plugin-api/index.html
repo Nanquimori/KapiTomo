@@ -281,21 +281,188 @@
       color: var(--text);
     }
 
-    .file-tree {
+    .structure-board {
       display: grid;
-      gap: 8px;
-      margin: 0;
-      padding: 16px;
+      grid-template-columns: minmax(0, 1.05fr) minmax(260px, 0.95fr);
+      gap: 16px;
       border: 1px solid var(--line);
       background:
-        linear-gradient(135deg, rgba(255, 183, 28, 0.08), transparent 34%),
-        rgba(255, 255, 255, 0.03);
+        radial-gradient(circle at 12% 0%, rgba(255, 183, 28, 0.16), transparent 32%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018));
+      padding: 16px;
+    }
+
+    .structure-map {
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      background: rgba(7, 6, 12, 0.58);
+      padding: 14px;
+    }
+
+    .structure-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 16px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .structure-title code {
+      color: var(--accent);
+      font-size: 0.82rem;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .tree-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .tree-children {
+      position: relative;
+      display: grid;
+      gap: 8px;
+      margin-left: 23px;
+      padding-left: 23px;
+    }
+
+    .tree-children::before {
+      content: "";
+      position: absolute;
+      inset-block: -4px 17px;
+      left: 0;
+      width: 1px;
+      background: linear-gradient(var(--accent), rgba(255, 255, 255, 0.16));
+    }
+
+    .tree-node {
+      position: relative;
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      min-height: 46px;
+      padding: 8px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.045);
+    }
+
+    .tree-children .tree-node::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: -23px;
+      width: 23px;
+      height: 1px;
+      background: rgba(255, 183, 28, 0.72);
+    }
+
+    .node-icon {
+      position: relative;
+      width: 24px;
+      height: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.26);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .node-icon.folder {
+      border-color: rgba(255, 183, 28, 0.62);
+      background: rgba(255, 183, 28, 0.16);
+    }
+
+    .node-icon.folder::before {
+      content: "";
+      position: absolute;
+      top: -5px;
+      left: 2px;
+      width: 11px;
+      height: 5px;
+      border: 1px solid rgba(255, 183, 28, 0.62);
+      border-bottom: 0;
+      background: rgba(255, 183, 28, 0.22);
+    }
+
+    .node-icon.file {
+      width: 19px;
+      height: 24px;
+      justify-self: center;
+    }
+
+    .node-icon.file::before {
+      content: "";
+      position: absolute;
+      top: -1px;
+      right: -1px;
+      border-top: 7px solid rgba(255, 255, 255, 0.24);
+      border-left: 7px solid transparent;
+    }
+
+    .node-main {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .node-name {
       color: var(--text);
       font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
-      font-size: 0.95rem;
-      line-height: 1.5;
-      white-space: pre;
-      overflow-x: auto;
+      font-weight: 900;
+    }
+
+    .node-help {
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .node-badge {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 4px 7px;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .structure-steps {
+      display: grid;
+      align-content: start;
+      gap: 10px;
+    }
+
+    .structure-step {
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      background: rgba(255, 255, 255, 0.032);
+    }
+
+    .structure-step strong {
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      color: #120d04;
+      background: var(--accent);
+      font-size: 0.82rem;
+    }
+
+    .structure-step span {
+      color: var(--text);
+      font-weight: 900;
+    }
+
+    .structure-step p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      line-height: 1.45;
     }
 
     .table-wrap {
@@ -431,6 +598,7 @@
 
       .topbar,
       .hero-inner,
+      .structure-board,
       .columns {
         grid-template-columns: 1fr;
       }
@@ -457,6 +625,15 @@
       .section-kicker {
         border-right: 0;
         border-bottom: 1px solid var(--line);
+      }
+
+      .tree-node {
+        grid-template-columns: 28px minmax(0, 1fr);
+      }
+
+      .node-badge {
+        justify-self: start;
+        grid-column: 2;
       }
 
       .steps {
@@ -516,11 +693,66 @@
           </div>
         </div>
         <div class="section-body">
-          <pre class="file-tree">minha-fonte/
-|-- plugin.json
-`-- browser/
-    `-- download_target.js</pre>
-          <div class="note"><strong>Nome da pasta:</strong> use o mesmo id do addon, por exemplo <code>minha-fonte</code>. O app procura o <code>plugin.json</code> nessa raiz e carrega o script em <code>browser/download_target.js</code>.</div>
+          <div class="structure-board" aria-label="Estrutura visual do addon">
+            <div class="structure-map">
+              <div class="structure-title">
+                <span>Pacote do addon</span>
+                <code>minha-fonte</code>
+              </div>
+              <div class="tree-list">
+                <div class="tree-node">
+                  <span class="node-icon folder" aria-hidden="true"></span>
+                  <span class="node-main">
+                    <span class="node-name">minha-fonte/</span>
+                    <span class="node-help">pasta raiz com o id da fonte</span>
+                  </span>
+                  <span class="node-badge">pasta</span>
+                </div>
+                <div class="tree-children">
+                  <div class="tree-node">
+                    <span class="node-icon file" aria-hidden="true"></span>
+                    <span class="node-main">
+                      <span class="node-name">plugin.json</span>
+                      <span class="node-help">manifesto lido primeiro pelo app</span>
+                    </span>
+                    <span class="node-badge">json</span>
+                  </div>
+                  <div class="tree-node">
+                    <span class="node-icon folder" aria-hidden="true"></span>
+                    <span class="node-main">
+                      <span class="node-name">browser/</span>
+                      <span class="node-help">scripts usados dentro do WebView</span>
+                    </span>
+                    <span class="node-badge">pasta</span>
+                  </div>
+                  <div class="tree-children">
+                    <div class="tree-node">
+                      <span class="node-icon file" aria-hidden="true"></span>
+                      <span class="node-main">
+                        <span class="node-name">download_target.js</span>
+                        <span class="node-help">encontra a obra e monta o plano de capitulos</span>
+                      </span>
+                      <span class="node-badge">js</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="structure-steps">
+              <div class="structure-step">
+                <strong>01</strong>
+                <div><span>Crie a pasta</span><p>O nome da pasta deve ser o id do addon, como <code>minha-fonte</code>.</p></div>
+              </div>
+              <div class="structure-step">
+                <strong>02</strong>
+                <div><span>Coloque o manifesto</span><p>O <code>plugin.json</code> fica na raiz e registra nome, dominio, icone, pagina inicial e parser.</p></div>
+              </div>
+              <div class="structure-step">
+                <strong>03</strong>
+                <div><span>Adicione o script</span><p>O <code>download_target.js</code> fica em <code>browser/</code> e roda quando o usuario toca em baixar.</p></div>
+              </div>
+            </div>
+          </div>
           <div class="table-wrap">
             <table>
               <thead>
