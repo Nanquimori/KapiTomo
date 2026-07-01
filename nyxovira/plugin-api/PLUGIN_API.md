@@ -17,19 +17,21 @@ Ao final, o addon deve permitir este fluxo:
 
 ## Arquivos do addon
 
-Um addon tem esta estrutura:
+Comece criando uma pasta com o id da fonte. Dentro dela ficam o manifesto e o script do navegador.
+
+```text
+minha-fonte/
+|-- plugin.json
+`-- browser/
+    `-- download_target.js
+```
+
+Use o mesmo id no nome da pasta e no campo `id` do manifesto. O app procura o `plugin.json` nessa raiz e carrega o script em `browser/download_target.js`.
 
 | Arquivo | Funcao |
 | --- | --- |
 | `plugin.json` | Define nome, versao, dominio, pagina inicial e parser da fonte. |
 | `browser/download_target.js` | Roda dentro da pagina aberta e informa ao app qual obra deve ser baixada. |
-
-Exemplo de pasta:
-
-| Caminho | Tipo |
-| --- | --- |
-| `minha-fonte/plugin.json` | Manifesto do addon |
-| `minha-fonte/browser/download_target.js` | Script executado no navegador |
 
 ## plugin.json
 

@@ -281,6 +281,23 @@
       color: var(--text);
     }
 
+    .file-tree {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 16px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(135deg, rgba(255, 183, 28, 0.08), transparent 34%),
+        rgba(255, 255, 255, 0.03);
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
     .table-wrap {
       overflow-x: auto;
       border: 1px solid var(--line);
@@ -495,10 +512,15 @@
           <div class="section-kicker">module.files</div>
           <div class="section-title">
             <h2>Arquivos do addon</h2>
-            <p>Um addon tem um manifesto e um script executado dentro da pagina aberta no navegador do app.</p>
+            <p>Comece criando uma pasta com o id da fonte. Dentro dela ficam o manifesto e o script do navegador.</p>
           </div>
         </div>
         <div class="section-body">
+          <pre class="file-tree">minha-fonte/
+|-- plugin.json
+`-- browser/
+    `-- download_target.js</pre>
+          <div class="note"><strong>Nome da pasta:</strong> use o mesmo id do addon, por exemplo <code>minha-fonte</code>. O app procura o <code>plugin.json</code> nessa raiz e carrega o script em <code>browser/download_target.js</code>.</div>
           <div class="table-wrap">
             <table>
               <thead>
@@ -510,7 +532,6 @@
               </tbody>
             </table>
           </div>
-          <div class="note"><strong>Estrutura esperada:</strong> coloque os dois arquivos dentro de uma pasta com o id da fonte, por exemplo <code>minha-fonte/plugin.json</code> e <code>minha-fonte/browser/download_target.js</code>.</div>
         </div>
       </section>
 
