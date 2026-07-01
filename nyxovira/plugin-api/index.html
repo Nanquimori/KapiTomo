@@ -669,7 +669,7 @@
         <div class="quick" aria-label="Resumo do fluxo">
           <div class="quick-row"><b>01</b><span>O addon abre uma fonte no navegador interno.</span></div>
           <div class="quick-row"><b>02</b><span>O script identifica a obra aberta e instala o plano de capitulos.</span></div>
-          <div class="quick-row"><b>03</b><span>O engine baixa paragraphs, pages ou usa um endpoint de conteudo por capitulo.</span></div>
+          <div class="quick-row"><b>03</b><span>O engine baixa paragraphs, pages ou chama o preparo do addon apos a selecao.</span></div>
         </div>
       </div>
     </header>
@@ -699,7 +699,7 @@
           <div class="structure-board" aria-label="Estrutura visual do addon">
             <div class="structure-map">
               <div class="structure-title">
-                <span>Pacote do addon</span>
+                <span>Pasta do addon</span>
                 <code>minha-fonte</code>
               </div>
               <div class="tree-list">
@@ -899,6 +899,7 @@
     summary: work.description,
     canonicalUrl: workUrl(work.id),
     coverUrl: work.cover,
+    remoteChapterCount: work.chapters.length,
     chapters: work.chapters.map(toChapter)
   });
 
@@ -1013,6 +1014,7 @@
   "summary": "Resumo curto da obra.",
   "canonicalUrl": "https://example.com/manga/minha-obra/",
   "coverUrl": "https://example.com/capas/minha-obra.png",
+  "remoteChapterCount": 1,
   "chapters": [
     {
       "id": "id:0",
@@ -1026,6 +1028,7 @@
     }
   ]
 }</pre>
+          <div class="note"><strong>Total remoto:</strong> use <code>remoteChapterCount</code> para informar o total da obra antes da selecao. Se a obra tem 100 capitulos e o usuario baixa 5, a biblioteca continua exibindo 100 remotos e 5 locais.</div>
         </div>
       </section>
 
@@ -1074,12 +1077,12 @@
         </div>
         <div class="section-body">
           <div class="steps">
-            <div class="step"><strong>Versao</strong><span>Aumente <code>plugin.json.version</code> e gere um novo zip do addon.</span></div>
+            <div class="step"><strong>Versao</strong><span>Aumente <code>plugin.json.version</code> e publique a pasta do addon.</span></div>
             <div class="step"><strong>Navegador</strong><span>Teste a home, uma pagina de obra e o botao de baixar.</span></div>
             <div class="step"><strong>Plano</strong><span>Confirme <code>title</code>, <code>summary</code>, <code>coverUrl</code> e capitulos.</span></div>
             <div class="step"><strong>Novel</strong><span>Confirme que <code>paragraphs</code> tem varios itens separados.</span></div>
             <div class="step"><strong>Quadrinho</strong><span>Confirme que o plano final tem <code>pages</code> ou <code>images</code> nos capitulos selecionados.</span></div>
-            <div class="step"><strong>Catalogo</strong><span>Atualize o <code>sha256</code> do pacote no catalogo de plugins.</span></div>
+            <div class="step"><strong>Catalogo</strong><span>Atualize <code>manifest_url</code>, <code>browser_script_url</code> e <code>documentation_url</code>.</span></div>
           </div>
         </div>
       </section>

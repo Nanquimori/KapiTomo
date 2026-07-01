@@ -240,6 +240,7 @@ Exemplo generico:
         summary: text(field(work, addon.fields.workSummary)),
         canonicalUrl: workUrl(workId),
         coverUrl: text(field(work, addon.fields.workCover)),
+        remoteChapterCount: chapters.length,
         chapters: chapters.map(function (chapter, index) {
           var title = text(field(chapter, addon.fields.chapterTitle)) || ("Capitulo " + (index + 1));
           var paragraphs = field(chapter, addon.fields.chapterParagraphs);
@@ -359,6 +360,7 @@ Formato:
   "summary": "Resumo curto da obra.",
   "canonicalUrl": "https://example.com/manga/minha-obra/",
   "coverUrl": "https://example.com/capas/minha-obra.png",
+  "remoteChapterCount": 1,
   "chapters": [
     {
       "id": "id:0",
@@ -373,6 +375,8 @@ Formato:
   ]
 }
 ```
+
+Use `remoteChapterCount` para informar quantos capitulos existem na fonte antes da selecao do usuario. Assim, se a obra tem 100 capitulos e o usuario baixa apenas 5, a biblioteca continua mostrando 100 capitulos remotos e 5 capitulos locais.
 
 ## Novel
 
@@ -443,8 +447,9 @@ Antes de publicar:
 3. Confirme `browser.home_url`.
 4. Teste `download_target.js` em uma pagina de obra.
 5. Confirme `chapterPlan.title`, `summary`, `canonicalUrl`, `coverUrl` e `chapters`.
-6. Em novel, confirme que `paragraphs` tem varios itens separados.
-7. Em quadrinho, confirme que o plano final tem `pages` ou `images` nos capitulos selecionados.
-8. Gere o zip do addon.
-9. Atualize o `sha256` no catalogo de plugins.
-10. Teste download do primeiro, do meio e do ultimo capitulo.
+6. Confirme `chapterPlan.remoteChapterCount` quando a fonte informar o total da obra.
+7. Em novel, confirme que `paragraphs` tem varios itens separados.
+8. Em quadrinho, confirme que o plano final tem `pages` ou `images` nos capitulos selecionados.
+9. Publique a pasta do addon com `plugin.json` e `browser/download_target.js`.
+10. Atualize o catalogo com `manifest_url`, `browser_script_url` e `documentation_url`.
+11. Teste download do primeiro, do meio e do ultimo capitulo.

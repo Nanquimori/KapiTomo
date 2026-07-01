@@ -6,7 +6,7 @@ KapiTomo e o site oficial para publicar obras autorais e entregar dados limpos p
 
 ```text
 Site: https://nanquimori.github.io/KapiTomo/
-Plugin: https://nanquimori.github.io/KapiTomo/downloads/plugins/kapitomo.zip
+Addon KapiTomo: https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/kapitomo/plugin.json
 Catalogo de plugins: https://nanquimori.github.io/KapiTomo/plugins/catalog.json
 API: https://nanquimori.github.io/KapiTomo/api/works/index.json
 ```
@@ -71,7 +71,6 @@ api/catalog.json
 api/works/
 assets/works/
 manga/
-downloads/plugins/kapitomo.zip
 plugins/catalog.json
 ```
 
