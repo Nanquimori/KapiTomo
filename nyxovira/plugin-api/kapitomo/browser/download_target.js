@@ -144,7 +144,6 @@
         summary: text(field(work, addon.fields.workSummary)),
         canonicalUrl: canonicalUrl,
         coverUrl: text(field(work, addon.fields.workCover)),
-        remoteChapterCount: chapters.length,
         chapters: chapters.map(function (chapter, index) {
           var title = text(field(chapter, addon.fields.chapterTitle)) || (addon.labels.chapter + " " + (index + 1));
           var number = numberFromTitle(title, index + 1);
