@@ -38,8 +38,8 @@ function setRemoveStatus(message) {
 
 function fetchCatalog() {
   const urls = [
-    "catalog-store.json?v=20260703-simple-hub",
-    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260703-simple-hub"
+    "catalog-store.json?v=20260703-auto-hub",
+    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260703-auto-hub"
   ];
   return urls.reduce((chain, url) => chain.catch(() => fetch(url, { cache: "no-store" })
     .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))), Promise.reject());
@@ -268,7 +268,7 @@ function openPublishRequest(plugin) {
   const clean = publicPlugin(plugin);
   const body = [
     "Solicitacao de publicacao de plugin para o catalogo do Nyxovira.",
-    "Este pedido nao publica automaticamente; ele precisa ser revisado e aprovado.",
+    "Depois que voce criar esta issue, o robo do catalogo valida o JSON e publica automaticamente se estiver tudo correto.",
     "",
     "Repositorio: " + (plugin.__repo || clean.homepage || clean.site_url || ""),
     "",
@@ -295,7 +295,7 @@ function openRemovalRequest() {
   }
   const body = [
     "Solicitacao de remocao de plugin publicado no catalogo do Nyxovira.",
-    "Este pedido nao remove automaticamente; ele precisa ser revisado e aprovado.",
+    "Depois que voce criar esta issue, o robo do catalogo valida o pedido e remove automaticamente se estiver tudo correto.",
     "",
     "Plugin ID: " + pluginId,
     "Repositorio: " + repoUrl,

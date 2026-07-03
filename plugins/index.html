@@ -408,8 +408,8 @@
       <section class="grid">
         <article class="panel">
           <p class="kicker">Publicar</p>
-          <h2>Solicite a publicacao de um addon</h2>
-          <p>Cole o repositorio GitHub que ja tem <code>plugin.json</code>. O Hub le o manifesto, procura uma Release <code>.zip</code> e prepara uma solicitacao no GitHub para revisao.</p>
+          <h2>Publique um addon pronto</h2>
+          <p>Cole o repositorio GitHub que ja tem <code>plugin.json</code>. O Hub le o manifesto, procura uma Release <code>.zip</code> e cria uma solicitacao no GitHub; ao confirmar, o robo valida e publica no catalogo.</p>
           <div class="publish-form">
             <label class="field-label" for="repoUrlInput">Repositorio GitHub</label>
             <input id="repoUrlInput" class="text-input" type="url" placeholder="https://github.com/usuario/meu-addon">
@@ -423,8 +423,8 @@
 
         <article class="panel">
           <p class="kicker">Remover</p>
-          <h2>Solicite a remocao de uma publicacao</h2>
-          <p>Informe o plugin publicado e abra uma solicitacao de remocao no GitHub. A remocao nao acontece automaticamente.</p>
+          <h2>Remova uma publicacao</h2>
+          <p>Informe o plugin publicado e confirme a solicitacao no GitHub. O robo valida, remove do catalogo e comenta o resultado.</p>
           <div class="publish-form">
             <label class="field-label" for="removePluginIdInput">ID do plugin</label>
             <input id="removePluginIdInput" class="text-input" type="text" placeholder="meu-addon">
@@ -448,11 +448,11 @@
           </article>
           <article>
             <h3>Adicione ao catalogo</h3>
-            <p>Use o botao Solicitar publicacao. O GitHub abre uma solicitacao; depois de aprovada, a entrada entra no catalogo publico.</p>
+            <p>Use o botao Solicitar publicacao e confirme no GitHub. A Action atualiza o catalogo e fecha a solicitacao quando terminar.</p>
           </article>
         </article>
       </section>
     </main>
-    <script src="store.js?v=20260703-simple-hub"></script>
+    <script src="store.js?v=20260703-auto-hub"></script>
   </body>
 </html>
