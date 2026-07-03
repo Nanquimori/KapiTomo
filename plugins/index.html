@@ -235,19 +235,22 @@
 
       .steps {
         counter-reset: step;
+        display: grid;
+        gap: 12px;
       }
 
       .steps article {
+        display: grid;
+        grid-template-columns: 32px minmax(0, 1fr);
+        column-gap: 16px;
+        align-items: start;
         position: relative;
-        padding-left: 48px;
+        padding-left: 0;
       }
 
       .steps article::before {
         counter-increment: step;
         content: counter(step);
-        position: absolute;
-        left: 0;
-        top: 18px;
         width: 32px;
         height: 32px;
         display: grid;
@@ -256,6 +259,20 @@
         background: var(--accent);
         color: #160a08;
         font-weight: 1000;
+      }
+
+      .steps article h3,
+      .steps article p {
+        grid-column: 2;
+      }
+
+      .steps article h3 {
+        margin: 1px 0 6px;
+        line-height: 1.1;
+      }
+
+      .steps article p {
+        margin-bottom: 0;
       }
 
       @media (max-width: 680px) {
@@ -311,10 +328,13 @@
         <article class="panel">
           <p class="kicker">Publicar</p>
           <h2>Use sua conta GitHub</h2>
-          <p>Hospede o pacote <code>.zip</code> do plugin no seu GitHub Releases, GitHub Pages ou outro servidor publico. O zip deve conter <code>plugin.json</code> na raiz e <code>browser/download_target.js</code>. A entrada do catalogo precisa ter <code>icon_url</code> com uma imagem publica.</p>
+          <p>Hospede o pacote <code>.zip</code> no GitHub Releases, GitHub Pages ou outro servidor publico do autor. O KapiTomo so le o <code>catalog.json</code> e usa o link em <code>package_url</code> para instalar direto no app.</p>
           <pre>{
   "id": "minha-fonte",
   "name": "Minha Fonte",
+  "author": "Joao",
+  "version": "1.0.0",
+  "description": "Fonte para minha biblioteca.",
   "icon_url": "https://usuario.github.io/repo/icon.png",
   "package_url": "https://github.com/usuario/repo/releases/download/v1/minha-fonte.zip",
   "sha256": "..."
@@ -330,11 +350,11 @@
           </article>
           <article>
             <h3>Publique no GitHub</h3>
-            <p>Use Releases ou Pages da sua propria conta como hospedagem do arquivo.</p>
+            <p>Use Releases ou Pages da sua propria conta. O arquivo nao precisa ficar armazenado no KapiTomo.</p>
           </article>
           <article>
             <h3>Adicione ao catalogo</h3>
-            <p>Inclua a entrada no <code>plugins/catalog.json</code>. O item so aparece no app quando tiver pacote, hash e imagem em <code>icon_url</code>.</p>
+            <p>Inclua a entrada no <code>plugins/catalog.json</code>. O Hub mostra nome, autor, versao, descricao e instala pelo link externo do pacote.</p>
           </article>
         </article>
       </section>
@@ -357,7 +377,7 @@
         return Boolean(plugin && String(plugin.icon_url || plugin.iconUrl || "").trim());
       }
 
-      fetch("catalog.json?v=20260703-plugin-layout-clean", { cache: "no-store" })
+      fetch("catalog.json?v=20260703-plugin-flow-align", { cache: "no-store" })
         .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))
         .then((catalog) => {
           const plugins = (Array.isArray(catalog.plugins) ? catalog.plugins : []).filter(hasRequiredPluginIcon);
