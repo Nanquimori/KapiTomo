@@ -23,21 +23,6 @@
         "novel",
         "quadrinho"
       ]
-    },
-    {
-      "id": "nexustoons",
-      "name": "NexusToons",
-      "description": "Fonte para baixar obras de NexusToons no Nyxovira.",
-      "author": "yxz0w0zxy",
-      "version": "1.0.7",
-      "site_url": "https://nexustoons.com/",
-      "homepage": "https://nexustoons.com/",
-      "icon_url": "https://nexustoons.com/icon.png",
-      "package_url": "https://github.com/yxz0w0zxy/teste_plugin/releases/download/v1.0.7/nexustoons.zip",
-      "tags": [
-        "comunidade"
-      ],
-      "sha256": "43ca7e9702a7772a07325a65fe69c905344fe8b01f33f03c5668ed7db88bbeeb"
     }
   ]
 }
