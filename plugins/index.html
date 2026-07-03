@@ -189,7 +189,7 @@
 
       .button-row {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 10px;
         min-width: 0;
       }
@@ -231,6 +231,43 @@
         border-radius: 8px;
         background: rgba(0, 0, 0, 0.24);
         color: #f9f4ff;
+      }
+
+      .publish-form {
+        display: grid;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .field-label {
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .text-input {
+        width: 100%;
+        min-height: 44px;
+        padding: 0 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.22);
+        color: var(--text);
+        font: inherit;
+      }
+
+      .text-input:focus {
+        border-color: rgba(255, 181, 31, 0.62);
+        outline: none;
+      }
+
+      .publish-status {
+        min-height: 22px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.9rem;
       }
 
       .steps {
@@ -333,18 +370,17 @@
       <section class="grid">
         <article class="panel">
           <p class="kicker">Publicar</p>
-          <h2>Use sua conta GitHub</h2>
-          <p>Hospede o pacote <code>.zip</code> no GitHub Releases, GitHub Pages ou outro servidor publico do autor. O KapiTomo so le o <code>catalog.json</code> e usa o link em <code>package_url</code> para instalar direto no app.</p>
-          <pre>{
-  "id": "minha-fonte",
-  "name": "Minha Fonte",
-  "author": "Joao",
-  "version": "1.0.0",
-  "description": "Fonte para minha biblioteca.",
-  "icon_url": "https://usuario.github.io/repo/icon.png",
-  "package_url": "https://github.com/usuario/repo/releases/download/v1/minha-fonte.zip",
-  "sha256": "..."
-}</pre>
+          <h2>Publique um addon pronto</h2>
+          <p>Cole o repositorio GitHub que ja tem <code>plugin.json</code>. O Hub le o manifesto, procura uma Release <code>.zip</code> e monta a publicacao para instalar no app.</p>
+          <div class="publish-form">
+            <label class="field-label" for="repoUrlInput">Repositorio GitHub</label>
+            <input id="repoUrlInput" class="text-input" type="url" placeholder="https://github.com/usuario/meu-addon">
+            <div class="button-row">
+              <button id="loadRepoPluginButton" class="button primary" type="button">Carregar addon</button>
+              <button id="clearDraftPluginsButton" class="button" type="button">Limpar rascunhos</button>
+            </div>
+            <p id="publishStatus" class="publish-status" aria-live="polite"></p>
+          </div>
         </article>
 
         <article class="panel steps">
@@ -360,7 +396,7 @@
           </article>
           <article>
             <h3>Adicione ao catalogo</h3>
-            <p>Inclua a entrada no <code>plugins/catalog.json</code>. O Hub mostra nome, autor, versao, descricao e instala pelo link externo do pacote.</p>
+            <p>Use o botao de publicacao gerado pelo Hub. Ele abre um pedido no GitHub com a entrada pronta para entrar no catalogo publico.</p>
           </article>
         </article>
       </section>
@@ -368,6 +404,12 @@
 
     <script>
       const list = document.getElementById("pluginList");
+      const repoUrlInput = document.getElementById("repoUrlInput");
+      const loadRepoPluginButton = document.getElementById("loadRepoPluginButton");
+      const clearDraftPluginsButton = document.getElementById("clearDraftPluginsButton");
+      const publishStatus = document.getElementById("publishStatus");
+      const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v1";
+      let renderedPlugins = [];
 
       function escapeHtml(value) {
         return String(value || "").replace(/[&<>"']/g, (char) => ({
@@ -392,10 +434,65 @@
           .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))), Promise.reject());
       }
 
-      fetchCatalog()
-        .then((catalog) => {
-          const plugins = (Array.isArray(catalog.plugins) ? catalog.plugins : []).filter(hasRequiredPluginIcon);
-          list.innerHTML = plugins.length ? plugins.map((plugin, index) => `
+      function setPublishStatus(message) {
+        if (publishStatus) {
+          publishStatus.textContent = message || "";
+        }
+      }
+
+      function publicPlugin(plugin) {
+        const clean = { ...plugin };
+        Object.keys(clean).forEach((key) => {
+          if (key.startsWith("__")) {
+            delete clean[key];
+          }
+        });
+        return clean;
+      }
+
+      function pluginKey(plugin) {
+        return String(plugin?.id || "") + "|" + String(plugin?.package_url || plugin?.packageUrl || "");
+      }
+
+      function uniquePlugins(groups) {
+        const seen = new Set();
+        const output = [];
+        groups.flat().forEach((plugin) => {
+          const key = pluginKey(plugin);
+          if (!key.trim() || seen.has(key)) {
+            return;
+          }
+          seen.add(key);
+          output.push(plugin);
+        });
+        return output;
+      }
+
+      function loadDraftPlugins() {
+        try {
+          return JSON.parse(localStorage.getItem(LOCAL_PLUGIN_KEY) || "[]").filter(hasRequiredPluginIcon);
+        } catch {
+          return [];
+        }
+      }
+
+      function saveDraftPlugin(plugin) {
+        const drafts = uniquePlugins([[{ ...plugin, __source: "draft" }], loadDraftPlugins()]);
+        localStorage.setItem(LOCAL_PLUGIN_KEY, JSON.stringify(drafts.map(publicPlugin)));
+      }
+
+      function renderPlugins(plugins) {
+        renderedPlugins = plugins;
+        list.innerHTML = plugins.length ? plugins.map((plugin, index) => {
+          const actions = [
+            `<button class="button primary" type="button" data-install-plugin="${index}">Instalar no Nyxovira</button>`
+          ];
+          if (plugin.__source === "draft") {
+            actions.push(`<button class="button" type="button" data-publish-plugin="${index}">Enviar publicacao</button>`);
+          } else if (plugin.homepage || plugin.site_url) {
+            actions.push(`<a class="button" href="${escapeHtml(plugin.homepage || plugin.site_url)}">Abrir site</a>`);
+          }
+          return `
             <article class="plugin-card">
               <div class="plugin-summary">
                 <img class="plugin-icon" src="${escapeHtml(plugin.icon_url || plugin.iconUrl)}" alt="">
@@ -410,18 +507,201 @@
                 </div>
               </div>
               <div class="button-row">
-                <button class="button primary" type="button" data-install-plugin="${index}">Instalar no Nyxovira</button>
-                ${plugin.homepage || plugin.site_url ? `<a class="button" href="${escapeHtml(plugin.homepage || plugin.site_url)}">Abrir site</a>` : ""}
+                ${actions.join("")}
               </div>
             </article>
-          `).join("") : "<p>Nenhum plugin publicado ainda.</p>";
-          document.querySelectorAll("[data-install-plugin]").forEach((button) => {
-            button.addEventListener("click", () => installPlugin(plugins[Number(button.dataset.installPlugin)]));
-          });
-        })
+          `;
+        }).join("") : "<p>Nenhum plugin publicado ainda.</p>";
+        document.querySelectorAll("[data-install-plugin]").forEach((button) => {
+          button.addEventListener("click", () => installPlugin(renderedPlugins[Number(button.dataset.installPlugin)]));
+        });
+        document.querySelectorAll("[data-publish-plugin]").forEach((button) => {
+          button.addEventListener("click", () => openPublishRequest(renderedPlugins[Number(button.dataset.publishPlugin)]));
+        });
+      }
+
+      function loadAllPlugins() {
+        Promise.all([
+          fetchCatalog().catch(() => ({ plugins: [] })),
+          fetchCommunityPlugins().catch(() => [])
+        ])
+          .then(([catalog, communityPlugins]) => {
+            const catalogPlugins = (Array.isArray(catalog.plugins) ? catalog.plugins : []).filter(hasRequiredPluginIcon);
+            const drafts = loadDraftPlugins().map((plugin) => ({ ...plugin, __source: "draft" }));
+            renderPlugins(uniquePlugins([drafts, catalogPlugins, communityPlugins]));
+          })
         .catch((error) => {
           list.innerHTML = `<p>Nao foi possivel carregar o catalogo: ${escapeHtml(error.message)}</p>`;
         });
+      }
+
+      function parseGitHubRepo(rawUrl) {
+        let url;
+        try {
+          url = new URL(String(rawUrl || "").trim());
+        } catch {
+          throw new Error("Cole uma URL valida do GitHub.");
+        }
+        if (!/^(www\.)?github\.com$/i.test(url.hostname)) {
+          throw new Error("Use um repositorio do github.com.");
+        }
+        const parts = url.pathname.split("/").filter(Boolean);
+        if (parts.length < 2) {
+          throw new Error("A URL precisa ter usuario e repositorio.");
+        }
+        return {
+          owner: parts[0],
+          repo: parts[1].replace(/\.git$/i, "")
+        };
+      }
+
+      function resolveUrl(baseUrl, maybeUrl) {
+        try {
+          return new URL(String(maybeUrl || ""), baseUrl || location.href).toString();
+        } catch {
+          return "";
+        }
+      }
+
+      async function fetchRepoManifest(repo) {
+        const branches = ["main", "master"];
+        let lastError;
+        for (const branch of branches) {
+          const url = `https://raw.githubusercontent.com/${repo.owner}/${repo.repo}/${branch}/plugin.json`;
+          try {
+            const response = await fetch(url, { cache: "no-store" });
+            if (!response.ok) {
+              throw new Error("HTTP " + response.status);
+            }
+            return {
+              branch,
+              manifest: await response.json()
+            };
+          } catch (error) {
+            lastError = error;
+          }
+        }
+        throw new Error("Nao encontrei plugin.json em main ou master. " + (lastError?.message || ""));
+      }
+
+      async function findRepoPackage(repo, branch, manifest) {
+        const releasesUrl = `https://api.github.com/repos/${repo.owner}/${repo.repo}/releases`;
+        try {
+          const response = await fetch(releasesUrl, { cache: "no-store" });
+          if (response.ok) {
+            const releases = await response.json();
+            for (const release of releases) {
+              const assets = Array.isArray(release.assets) ? release.assets : [];
+              const preferred = assets.find((asset) => /\.zip$/i.test(asset.name || "") && String(asset.name || "").toLowerCase().includes(String(manifest.id || repo.repo).toLowerCase()))
+                || assets.find((asset) => /\.zip$/i.test(asset.name || ""));
+              if (preferred?.browser_download_url) {
+                return {
+                  url: preferred.browser_download_url,
+                  version: manifest.version || String(release.tag_name || "").replace(/^v/i, "")
+                };
+              }
+            }
+          }
+        } catch {
+        }
+        return {
+          url: `https://github.com/${repo.owner}/${repo.repo}/archive/refs/heads/${branch}.zip`,
+          version: manifest.version || branch
+        };
+      }
+
+      async function sha256FromUrl(url) {
+        if (!crypto?.subtle) {
+          return "";
+        }
+        try {
+          const response = await fetch(url, { cache: "no-store" });
+          if (!response.ok) {
+            return "";
+          }
+          const buffer = await response.arrayBuffer();
+          const digest = await crypto.subtle.digest("SHA-256", buffer);
+          return Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+        } catch {
+          return "";
+        }
+      }
+
+      async function loadRepoPlugin() {
+        try {
+          const repo = parseGitHubRepo(repoUrlInput?.value || "");
+          setPublishStatus("Lendo plugin.json do repositorio...");
+          const { branch, manifest } = await fetchRepoManifest(repo);
+          const browser = manifest.browser || {};
+          const packageInfo = await findRepoPackage(repo, branch, manifest);
+          const iconUrl = resolveUrl(browser.home_url || `https://github.com/${repo.owner}/${repo.repo}/`, browser.icon_url || browser.iconUrl || "");
+          if (!iconUrl) {
+            throw new Error("O plugin precisa ter browser.icon_url.");
+          }
+          setPublishStatus("Montando publicacao...");
+          const plugin = {
+            id: manifest.id || repo.repo,
+            name: manifest.name || manifest.id || repo.repo,
+            description: manifest.description || `Fonte para baixar obras de ${manifest.name || repo.repo} no Nyxovira.`,
+            author: manifest.author || repo.owner,
+            version: packageInfo.version || manifest.version || "1.0.0",
+            site_url: browser.home_url || `https://github.com/${repo.owner}/${repo.repo}/`,
+            homepage: browser.home_url || `https://github.com/${repo.owner}/${repo.repo}/`,
+            icon_url: iconUrl,
+            package_url: packageInfo.url,
+            sha256: await sha256FromUrl(packageInfo.url),
+            tags: Array.isArray(manifest.tags) ? manifest.tags : ["comunidade"],
+            __source: "draft"
+          };
+          saveDraftPlugin(plugin);
+          setPublishStatus(plugin.sha256 ? "Addon carregado e hash calculado." : "Addon carregado. Hash nao calculado pelo navegador.");
+          loadAllPlugins();
+        } catch (error) {
+          setPublishStatus(error?.message || "Nao foi possivel carregar o addon.");
+        }
+      }
+
+      function pluginJsonFromIssueBody(body) {
+        const text = String(body || "");
+        const fenced = text.match(/```json\s*([\s\S]*?)```/i);
+        const raw = fenced ? fenced[1] : text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
+        if (!raw.trim()) {
+          return null;
+        }
+        try {
+          return JSON.parse(raw);
+        } catch {
+          return null;
+        }
+      }
+
+      async function fetchCommunityPlugins() {
+        const response = await fetch("https://api.github.com/repos/Nanquimori/KapiTomo/issues?state=open&per_page=100", { cache: "no-store" });
+        if (!response.ok) {
+          return [];
+        }
+        const issues = await response.json();
+        return issues
+          .filter((issue) => /^\[plugin\]/i.test(issue.title || ""))
+          .map((issue) => pluginJsonFromIssueBody(issue.body))
+          .filter(hasRequiredPluginIcon)
+          .map((plugin) => ({ ...plugin, __source: "community" }));
+      }
+
+      function openPublishRequest(plugin) {
+        const clean = publicPlugin(plugin);
+        const body = [
+          "Pedido de publicacao de plugin para o Nyxovira.",
+          "",
+          "```json",
+          JSON.stringify(clean, null, 2),
+          "```"
+        ].join("\n");
+        const url = "https://github.com/Nanquimori/KapiTomo/issues/new"
+          + "?title=" + encodeURIComponent("[plugin] " + (clean.name || clean.id || "novo-plugin"))
+          + "&body=" + encodeURIComponent(body);
+        window.open(url, "_blank", "noopener");
+      }
 
       function installPlugin(plugin) {
         const bridge = window.NyxoviraAndroidBridge || window.ArchiveInkAndroidBridge;
@@ -434,12 +714,26 @@
           return;
         }
         try {
-          const result = JSON.parse(bridge.installOnlinePlugin(JSON.stringify(plugin)) || "{}");
+          const result = JSON.parse(bridge.installOnlinePlugin(JSON.stringify(publicPlugin(plugin))) || "{}");
           alert(result.message || (result.success ? "Plugin instalado." : "Nao foi possivel instalar o plugin."));
         } catch (error) {
           alert("Nao foi possivel instalar o plugin: " + (error && error.message ? error.message : "erro desconhecido"));
         }
       }
+
+      loadRepoPluginButton?.addEventListener("click", loadRepoPlugin);
+      repoUrlInput?.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          loadRepoPlugin();
+        }
+      });
+      clearDraftPluginsButton?.addEventListener("click", () => {
+        localStorage.removeItem(LOCAL_PLUGIN_KEY);
+        setPublishStatus("Rascunhos removidos deste navegador.");
+        loadAllPlugins();
+      });
+      loadAllPlugins();
     </script>
   </body>
 </html>
