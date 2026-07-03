@@ -93,7 +93,7 @@ function renderPlugins(plugins) {
       `<button class="button primary" type="button" data-install-plugin="${index}">Instalar no Nyxovira</button>`
     ];
     if (plugin.__source === "draft") {
-      actions.push(`<button class="button" type="button" data-publish-plugin="${index}">Enviar publicacao</button>`);
+      actions.push(`<button class="button" type="button" data-publish-plugin="${index}">Solicitar publicacao</button>`);
     } else if (plugin.homepage || plugin.site_url) {
       actions.push(`<a class="button" href="${escapeHtml(plugin.homepage || plugin.site_url)}">Abrir site</a>`);
     }
@@ -267,7 +267,8 @@ async function loadRepoPlugin() {
 function openPublishRequest(plugin) {
   const clean = publicPlugin(plugin);
   const body = [
-    "Pedido de publicacao de plugin para o Nyxovira.",
+    "Solicitacao de publicacao de plugin para o catalogo do Nyxovira.",
+    "Este pedido nao publica automaticamente; ele precisa ser revisado e aprovado.",
     "",
     "Repositorio: " + (plugin.__repo || clean.homepage || clean.site_url || ""),
     "",
@@ -293,7 +294,8 @@ function openRemovalRequest() {
     return;
   }
   const body = [
-    "Pedido de remocao de plugin publicado no catalogo do Nyxovira.",
+    "Solicitacao de remocao de plugin publicado no catalogo do Nyxovira.",
+    "Este pedido nao remove automaticamente; ele precisa ser revisado e aprovado.",
     "",
     "Plugin ID: " + pluginId,
     "Repositorio: " + repoUrl,
