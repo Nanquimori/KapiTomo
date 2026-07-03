@@ -1,13 +1,13 @@
 # KapiTomo
 
-KapiTomo e o site oficial para publicar obras autorais e entregar dados limpos para Nyxalira, Nyxovira e plugins.
+KapiTomo é o site oficial para publicar obras autorais e entregar dados limpos para Nyxalira, Nyxovira e plugins.
 
 ## Links
 
 ```text
 Site: https://nanquimori.github.io/KapiTomo/
 Plugin: https://nanquimori.github.io/KapiTomo/downloads/plugins/kapitomo.zip
-Catalogo de plugins: https://nanquimori.github.io/KapiTomo/plugins/catalog.json
+Catálogo de plugins: https://nanquimori.github.io/KapiTomo/plugins/catalog.json
 API: https://nanquimori.github.io/KapiTomo/api/works/index.json
 ```
 
@@ -26,14 +26,14 @@ obras/minha-novel/
     \-- capitulo-002.json
 ```
 
-Capitulo novel:
+Capítulo novel:
 
 ```json
 {
-  "title": "Capitulo 01 - A Queda",
+  "title": "Capítulo 01 - A Queda",
   "paragraphs": [
-    "Primeiro paragrafo.",
-    "Segundo paragrafo."
+    "Primeiro parágrafo.",
+    "Segundo parágrafo."
   ]
 }
 ```
@@ -53,7 +53,7 @@ obras/meu-quadrinho/
         \-- page-002.png
 ```
 
-`obra.json` pode definir titulo, resumo, tipo e capa. Se ele nao existir, o gerador usa o nome da pasta e a primeira capa encontrada.
+`obra.json` pode definir título, resumo, tipo e capa. Se ele não existir, o gerador usa o nome da pasta e a primeira capa encontrada.
 
 ## Gerar site e API
 
@@ -75,12 +75,12 @@ downloads/plugins/kapitomo.zip
 plugins/catalog.json
 ```
 
-Nao edite essas saidas na mao. Edite `obras/` e gere de novo.
+Não edite essas saídas na mão. Edite `obras/` e gere de novo.
 
 ## Formato publicado
 
-Novel publica texto dentro do JSON do capitulo, com `text` e `paragraphs`.
+Novel publica texto dentro do JSON do capítulo, com `text` e `paragraphs`.
 
 Quadrinho publica imagens em `pages`.
 
-Novas integracoes devem usar `api/works/index.json`.
+Novas integrações devem usar `api/works/index.json`.

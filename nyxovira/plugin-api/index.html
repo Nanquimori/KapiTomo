@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Nyxovira Plugin API</title>
-  <meta name="description" content="Documentacao online da API de addons para conectar fontes de leitura ao Nyxovira.">
+  <meta name="description" content="Documentação online da API de addons para conectar fontes de leitura ao Nyxovira.">
   <link rel="icon" type="image/png" href="../../assets/kapitomo-logo.png?v=20260701-plugin-api">
   <link rel="apple-touch-icon" href="../../assets/kapitomo-logo.png?v=20260701-plugin-api">
   <style>
@@ -655,7 +655,7 @@
         </div>
       </div>
       <div class="actions">
-        <a class="button primary" href="PLUGIN_API.md" download>Baixar documentacao</a>
+        <a class="button primary" href="PLUGIN_API.md" download>Baixar documentação</a>
       </div>
     </div>
 
@@ -664,26 +664,26 @@
       <div class="hero-inner">
         <div>
           <h1>Conecte fontes de leitura ao app</h1>
-          <p>Uma referencia para criar addons que adaptam sites de novels ou quadrinhos ao Nyxovira: abrir a obra, mapear capitulos, baixar texto estruturado ou paginas de imagem. O KapiTomo aparece aqui apenas como exemplo completo.</p>
+          <p>Uma referência para criar addons que adaptam sites de novels ou quadrinhos ao Nyxovira: abrir a obra, mapear capítulos, baixar texto estruturado ou páginas de imagem. O KapiTomo aparece aqui apenas como exemplo completo.</p>
         </div>
         <div class="quick" aria-label="Resumo do fluxo">
           <div class="quick-row"><b>01</b><span>O addon abre uma fonte no navegador interno.</span></div>
-          <div class="quick-row"><b>02</b><span>O script identifica a obra aberta e instala o plano de capitulos.</span></div>
-          <div class="quick-row"><b>03</b><span>O engine baixa paragraphs, pages ou usa um endpoint de conteudo por capitulo.</span></div>
+          <div class="quick-row"><b>02</b><span>O script identifica a obra aberta e instala o plano de capítulos.</span></div>
+          <div class="quick-row"><b>03</b><span>O engine baixa paragraphs, pages ou usa um endpoint de conteúdo por capítulo.</span></div>
         </div>
       </div>
     </header>
 
-    <nav aria-label="Navegacao da documentacao">
+    <nav aria-label="Navegação da documentação">
       <a href="#arquivos">Arquivos</a>
       <a href="#manifesto">plugin.json</a>
       <a href="#rotas">Rotas e campos</a>
       <a href="#script">download_target.js</a>
       <a href="#fluxo">Fluxo do download</a>
-      <a href="#prepare-plan">Preparo apos confirmar</a>
+      <a href="#prepare-plan">Preparo após confirmar</a>
       <a href="#plan">chapterPlan</a>
       <a href="#conteudo">Novel e quadrinho</a>
-      <a href="#publicacao">Publicacao</a>
+      <a href="#publicacao">Publicação</a>
     </nav>
 
     <main>
@@ -733,7 +733,7 @@
                       <span class="node-icon file" aria-hidden="true"></span>
                       <span class="node-main">
                         <span class="node-name">download_target.js</span>
-                        <span class="node-help">encontra a obra e monta o plano de capitulos</span>
+                        <span class="node-help">encontra a obra e monta o plano de capítulos</span>
                       </span>
                       <span class="node-badge">js</span>
                     </div>
@@ -748,22 +748,22 @@
               </div>
               <div class="structure-step">
                 <strong>02</strong>
-                <div><span>Coloque o manifesto</span><p>O <code>plugin.json</code> fica na raiz e registra nome, dominio, icone, pagina inicial e parser.</p></div>
+                <div><span>Coloque o manifesto</span><p>O <code>plugin.json</code> fica na raiz e registra nome, domínio, ícone, página inicial e parser.</p></div>
               </div>
               <div class="structure-step">
                 <strong>03</strong>
-                <div><span>Adicione o script</span><p>O <code>download_target.js</code> fica em <code>browser/</code> e roda quando o usuario toca em baixar.</p></div>
+                <div><span>Adicione o script</span><p>O <code>download_target.js</code> fica em <code>browser/</code> e roda quando o usuário toca em baixar.</p></div>
               </div>
             </div>
           </div>
           <div class="table-wrap">
             <table>
               <thead>
-                <tr><th>Arquivo</th><th>Funcao</th></tr>
+                <tr><th>Arquivo</th><th>Função</th></tr>
               </thead>
               <tbody>
-                <tr><td><code>plugin.json</code></td><td>Define nome, versao, dominio, pagina inicial, icone e parser da fonte.</td></tr>
-                <tr><td><code>browser/download_target.js</code></td><td>Identifica a obra aberta e monta o plano de capitulos quando os dados ja existem na pagina.</td></tr>
+                <tr><td><code>plugin.json</code></td><td>Define nome, versão, domínio, página inicial, ícone e parser da fonte.</td></tr>
+                <tr><td><code>browser/download_target.js</code></td><td>Identifica a obra aberta e monta o plano de capítulos quando os dados já existem na página.</td></tr>
               </tbody>
             </table>
           </div>
@@ -811,11 +811,11 @@
                 <tr><th>Campo</th><th>Uso</th></tr>
               </thead>
               <tbody>
-                <tr><td><code>id</code></td><td>Identificador fixo do addon. Use letras minusculas, numeros e hifen.</td></tr>
-                <tr><td><code>version</code></td><td>Aumente sempre que publicar uma correcao.</td></tr>
-                <tr><td><code>match.hosts</code></td><td>Dominios aceitos por este addon.</td></tr>
-                <tr><td><code>browser.home_url</code></td><td>Pagina inicial aberta dentro do app.</td></tr>
-                <tr><td><code>parser.adapter</code></td><td>Use <code>html_series</code> para site HTML, indice publico ou arquivo JS com obras.</td></tr>
+                <tr><td><code>id</code></td><td>Identificador fixo do addon. Use letras minúsculas, números e hífen.</td></tr>
+                <tr><td><code>version</code></td><td>Aumente sempre que publicar uma correção.</td></tr>
+                <tr><td><code>match.hosts</code></td><td>Domínios aceitos por este addon.</td></tr>
+                <tr><td><code>browser.home_url</code></td><td>Página inicial aberta dentro do app.</td></tr>
+                <tr><td><code>parser.adapter</code></td><td>Use <code>html_series</code> para site HTML, índice público ou arquivo JS com obras.</td></tr>
               </tbody>
             </table>
           </div>
@@ -827,7 +827,7 @@
           <div class="section-kicker">routes.map</div>
           <div class="section-title">
             <h2>Rotas e campos da fonte</h2>
-            <p>Cada fonte tem nomes proprios. O addon traduz esses nomes para o formato que o Nyxovira entende.</p>
+            <p>Cada fonte tem nomes próprios. O addon traduz esses nomes para o formato que o Nyxovira entende.</p>
           </div>
         </div>
         <div class="section-body columns">
@@ -866,8 +866,8 @@
                 <tr><td><code>#obra/minha-obra</code></td><td><code>/manga/minha-obra/</code></td></tr>
                 <tr><td><code>#ler/minha-obra/0</code></td><td><code>/manga/minha-obra/chapter/0/</code></td></tr>
                 <tr><td><code>description</code></td><td><code>summary</code> da obra</td></tr>
-                <tr><td><code>paragraphs</code></td><td>Texto de novel preservado em paragrafo</td></tr>
-                <tr><td><code>pages</code> ou <code>images[].src</code></td><td>Paginas de quadrinho</td></tr>
+                <tr><td><code>paragraphs</code></td><td>Texto de novel preservado em parágrafo</td></tr>
+                <tr><td><code>pages</code> ou <code>images[].src</code></td><td>Páginas de quadrinho</td></tr>
               </tbody>
             </table>
           </div>
@@ -879,11 +879,11 @@
           <div class="section-kicker">browser.js</div>
           <div class="section-title">
             <h2>download_target.js</h2>
-            <p>Este script roda quando o usuario toca em baixar. Ele retorna a URL da obra e pode instalar o plano de capitulos imediatamente.</p>
+            <p>Este script roda quando o usuário toca em baixar. Ele retorna a URL da obra e pode instalar o plano de capítulos imediatamente.</p>
           </div>
         </div>
         <div class="section-body">
-          <div class="note"><strong>Quando usar chapterPlan:</strong> se a pagina ou um arquivo JS publico ja tem a lista de capitulos, preencha <code>window.__nyxoviraChapterPlan</code>. Assim o app abre a selecao sem procurar capitulos no HTML.</div>
+          <div class="note"><strong>Quando usar chapterPlan:</strong> se a página ou um arquivo JS público já tem a lista de capítulos, preencha <code>window.__nyxoviraChapterPlan</code>. Assim o app abre a seleção sem procurar capítulos no HTML.</div>
           <div>
             <div class="code-title"><span>download_target.js resumido</span></div>
             <pre>(function () {
@@ -913,7 +913,7 @@
           <div class="section-kicker">runtime.flow</div>
           <div class="section-title">
             <h2>Fluxo do download</h2>
-            <p>O caminho rapido acontece quando o addon entrega a lista pronta durante o clique em baixar.</p>
+            <p>O caminho rápido acontece quando o addon entrega a lista pronta durante o clique em baixar.</p>
           </div>
         </div>
         <div class="section-body">
@@ -923,25 +923,25 @@
                 <tr><th>Etapa</th><th>O que acontece no app</th></tr>
               </thead>
               <tbody>
-                <tr><td>1</td><td>O usuario toca em baixar no navegador interno.</td></tr>
+                <tr><td>1</td><td>O usuário toca em baixar no navegador interno.</td></tr>
                 <tr><td>2</td><td>O WebView executa o <code>download_target.js</code> da fonte.</td></tr>
-                <tr><td>3</td><td>O script retorna a URL canonica da obra e preenche <code>window.__nyxoviraChapterPlan</code>.</td></tr>
-                <tr><td>4</td><td>Se o plano tem <code>chapters</code>, a selecao de capitulos abre imediatamente.</td></tr>
-                <tr><td>5</td><td>Se o plano tem <code>paragraphs</code>, <code>pages</code> ou <code>images</code>, o download usa esse conteudo direto.</td></tr>
-                <tr><td>6</td><td>Se o addon define <code>window.__nyxoviraPrepareDownloadPlan</code>, o app chama essa funcao depois que o usuario confirma o download.</td></tr>
+                <tr><td>3</td><td>O script retorna a URL canônica da obra e preenche <code>window.__nyxoviraChapterPlan</code>.</td></tr>
+                <tr><td>4</td><td>Se o plano tem <code>chapters</code>, a seleção de capítulos abre imediatamente.</td></tr>
+                <tr><td>5</td><td>Se o plano tem <code>paragraphs</code>, <code>pages</code> ou <code>images</code>, o download usa esse conteúdo direto.</td></tr>
+                <tr><td>6</td><td>Se o addon define <code>window.__nyxoviraPrepareDownloadPlan</code>, o app chama essa função depois que o usuário confirma o download.</td></tr>
               </tbody>
             </table>
           </div>
-          <div class="note"><strong>Importante:</strong> se <code>window.__nyxoviraChapterPlan</code> nao existir ou vier sem <code>chapters</code>, o app tenta preparar a lista por outros meios e pode mostrar a mensagem <code>A fonte ainda esta preparando os dados dos capitulos. Tente baixar novamente em instantes.</code></div>
+          <div class="note"><strong>Importante:</strong> se <code>window.__nyxoviraChapterPlan</code> não existir ou vier sem <code>chapters</code>, o app tenta preparar a lista por outros meios e pode mostrar a mensagem <code>A fonte ainda está preparando os dados dos capítulos. Tente baixar novamente em instantes.</code></div>
           <div class="table-wrap">
             <table>
               <thead>
-                <tr><th>Validacao no addon</th><th>Acao esperada</th></tr>
+                <tr><th>Validação no addon</th><th>Ação esperada</th></tr>
               </thead>
               <tbody>
-                <tr><td>Novel sem <code>paragraphs</code></td><td>Remova o capitulo do plano e registre <code>console.error(...)</code>.</td></tr>
-                <tr><td>Quadrinho sem <code>pages</code> ou <code>images</code> no plano final</td><td>Remova o capitulo do plano e registre <code>console.error(...)</code>.</td></tr>
-                <tr><td>Plano sem capitulos validos</td><td>Nao preencha <code>window.__nyxoviraChapterPlan</code>; retorne vazio ou a URL canonica.</td></tr>
+                <tr><td>Novel sem <code>paragraphs</code></td><td>Remova o capítulo do plano e registre <code>console.error(...)</code>.</td></tr>
+                <tr><td>Quadrinho sem <code>pages</code> ou <code>images</code> no plano final</td><td>Remova o capítulo do plano e registre <code>console.error(...)</code>.</td></tr>
+                <tr><td>Plano sem capítulos válidos</td><td>Não preencha <code>window.__nyxoviraChapterPlan</code>; retorne vazio ou a URL canônica.</td></tr>
               </tbody>
             </table>
           </div>
@@ -952,8 +952,8 @@
         <div class="section-head">
           <div class="section-kicker">browser.prepare</div>
           <div class="section-title">
-            <h2>Preparo apos confirmar</h2>
-            <p>Use quando a lista da obra vem rapido, mas as paginas ou paragrafos precisam ser carregados pelo addon depois da selecao.</p>
+            <h2>Preparo após confirmar</h2>
+            <p>Use quando a lista da obra vem rápido, mas as páginas ou parágrafos precisam ser carregados pelo addon depois da seleção.</p>
           </div>
         </div>
         <div class="section-body">
@@ -963,24 +963,24 @@
                 <tr><th>Endpoint</th><th>O que ele entrega</th></tr>
               </thead>
               <tbody>
-                <tr><td><code>/api/manga/minha-obra</code></td><td>Metadados, ids, titulos e ordem dos capitulos.</td></tr>
-                <tr><td><code>/api/chapter/123</code></td><td><code>pages</code>, <code>images</code>, <code>paragraphs</code>, <code>text</code> ou <code>content</code> do capitulo.</td></tr>
+                <tr><td><code>/api/manga/minha-obra</code></td><td>Metadados, ids, títulos e ordem dos capítulos.</td></tr>
+                <tr><td><code>/api/chapter/123</code></td><td><code>pages</code>, <code>images</code>, <code>paragraphs</code>, <code>text</code> ou <code>content</code> do capítulo.</td></tr>
               </tbody>
             </table>
           </div>
           <div>
-            <div class="code-title"><span>capitulo no plano inicial</span></div>
+            <div class="code-title"><span>capítulo no plano inicial</span></div>
             <pre>{
   "id": "id:123",
   "number": "12",
-  "title": "Capitulo 12",
+  "title": "Capítulo 12",
   "contentType": "images",
   "url": "https://example.com/manga/minha-obra/chapter/12/",
   "apiPath": "/api/chapter/123"
 }</pre>
           </div>
           <div>
-            <div class="code-title"><span>funcao chamada depois do botao Baixar</span></div>
+            <div class="code-title"><span>função chamada depois do botão Baixar</span></div>
             <pre>window.__nyxoviraPrepareDownloadPlan = function (context) {
   var selected = context.selectedChapterIds;
   var plan = context.chapterPlan;
@@ -994,7 +994,7 @@
   return plan;
 };</pre>
           </div>
-          <div class="note"><strong>Sem API externa no engine:</strong> tokens, criptografia e chamadas especificas da fonte ficam no addon. O app so recebe o plano final com <code>paragraphs</code>, <code>pages</code> ou <code>images</code>.</div>
+          <div class="note"><strong>Sem API externa no engine:</strong> tokens, criptografia e chamadas específicas da fonte ficam no addon. O app só recebe o plano final com <code>paragraphs</code>, <code>pages</code> ou <code>images</code>.</div>
         </div>
       </section>
 
@@ -1002,8 +1002,8 @@
         <div class="section-head">
           <div class="section-kicker">chapterPlan</div>
           <div class="section-title">
-            <h2>Plano de capitulos</h2>
-            <p>O plano e a lista que o app mostra antes de baixar. Ele tambem pode levar o conteudo pronto para novels e quadrinhos.</p>
+            <h2>Plano de capítulos</h2>
+            <p>O plano é a lista que o app mostra antes de baixar. Ele também pode levar o conteúdo pronto para novels e quadrinhos.</p>
           </div>
         </div>
         <div class="section-body">
@@ -1017,9 +1017,9 @@
     {
       "id": "id:0",
       "number": "1",
-      "title": "Capitulo 01",
+      "title": "Capítulo 01",
       "contentType": "novel",
-      "paragraphs": ["Primeiro paragrafo.", "Segundo paragrafo."],
+      "paragraphs": ["Primeiro parágrafo.", "Segundo parágrafo."],
       "pages": [],
       "url": "https://example.com/manga/minha-obra/chapter/0/",
       "index": 0
@@ -1041,19 +1041,19 @@
           <div>
             <div class="code-title"><span>novel</span></div>
             <pre>{
-  "title": "Capitulo 01 - A Queda",
+  "title": "Capítulo 01 - A Queda",
   "contentType": "novel",
   "paragraphs": [
-    "Primeiro paragrafo.",
-    "Segundo paragrafo.",
-    "Terceiro paragrafo."
+    "Primeiro parágrafo.",
+    "Segundo parágrafo.",
+    "Terceiro parágrafo."
   ]
 }</pre>
           </div>
           <div>
             <div class="code-title"><span>quadrinho</span></div>
             <pre>{
-  "title": "Capitulo 001",
+  "title": "Capítulo 001",
   "contentType": "images",
   "pages": [
     "https://example.com/obra/capitulo-001/page-001.png",
@@ -1068,18 +1068,18 @@
         <div class="section-head">
           <div class="section-kicker">release</div>
           <div class="section-title">
-            <h2>Checklist de publicacao</h2>
+            <h2>Checklist de publicação</h2>
             <p>Antes de publicar um addon, valide o caminho inteiro de leitura e download.</p>
           </div>
         </div>
         <div class="section-body">
           <div class="steps">
-            <div class="step"><strong>Versao</strong><span>Aumente <code>plugin.json.version</code> e gere um novo zip do addon.</span></div>
-            <div class="step"><strong>Navegador</strong><span>Teste a home, uma pagina de obra e o botao de baixar.</span></div>
-            <div class="step"><strong>Plano</strong><span>Confirme <code>title</code>, <code>summary</code>, <code>coverUrl</code> e capitulos.</span></div>
-            <div class="step"><strong>Novel</strong><span>Confirme que <code>paragraphs</code> tem varios itens separados.</span></div>
-            <div class="step"><strong>Quadrinho</strong><span>Confirme que o plano final tem <code>pages</code> ou <code>images</code> nos capitulos selecionados.</span></div>
-            <div class="step"><strong>Catalogo</strong><span>Atualize o <code>sha256</code> do pacote no catalogo de plugins.</span></div>
+            <div class="step"><strong>Versão</strong><span>Aumente <code>plugin.json.version</code> e gere um novo pacote do addon.</span></div>
+            <div class="step"><strong>Navegador</strong><span>Teste a home, uma página de obra e o botão de baixar.</span></div>
+            <div class="step"><strong>Plano</strong><span>Confirme <code>title</code>, <code>summary</code>, <code>coverUrl</code> e capítulos.</span></div>
+            <div class="step"><strong>Novel</strong><span>Confirme que <code>paragraphs</code> tem vários itens separados.</span></div>
+            <div class="step"><strong>Quadrinho</strong><span>Confirme que o plano final tem <code>pages</code> ou <code>images</code> nos capítulos selecionados.</span></div>
+            <div class="step"><strong>Catálogo</strong><span>Atualize o <code>sha256</code> do pacote no catálogo de plugins.</span></div>
           </div>
         </div>
       </section>

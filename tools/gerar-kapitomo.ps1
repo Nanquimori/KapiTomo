@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$BaseUrl = "https://nanquimori.github.io/KapiTomo",
   [string]$LibraryId = "kapitomo",
   [string]$LibraryName = "KapiTomo"
@@ -24,6 +24,10 @@ function Write-Utf8([string]$Path, [string]$Content) {
   Ensure-Dir (Split-Path -Parent $Path)
   $encoding = New-Object System.Text.UTF8Encoding($false)
   [System.IO.File]::WriteAllText($Path, $Content, $encoding)
+}
+
+function Read-Utf8([string]$Path) {
+  return [System.IO.File]::ReadAllText($Path, [System.Text.Encoding]::UTF8)
 }
 
 function Escape-JsonString([string]$Value) {
@@ -121,10 +125,11 @@ function ConvertTo-Slug([string]$Value) {
 
 function ConvertTo-Title([string]$Slug) {
   $parts = ($Slug -replace "[-_]+", " ").Split(" ", [StringSplitOptions]::RemoveEmptyEntries)
-  if (-not $parts.Length) { return "Obra sem titulo" }
-  return (($parts | ForEach-Object {
+  if (-not $parts.Length) { return "Obra sem título" }
+  $title = (($parts | ForEach-Object {
     if ($_.Length -le 1) { $_.ToUpperInvariant() } else { $_.Substring(0, 1).ToUpperInvariant() + $_.Substring(1) }
   }) -join " ")
+  return ($title -replace "\bCapitulo\b", "Capítulo")
 }
 
 function Escape-Html([string]$Value) {
@@ -146,7 +151,7 @@ function Get-WordCount([string[]]$Paragraphs) {
 function Read-Metadata([System.IO.DirectoryInfo]$WorkDir) {
   $path = Join-Path $WorkDir.FullName "obra.json"
   if (Test-Path $path) {
-    return Get-Content $path -Raw | ConvertFrom-Json
+    return Read-Utf8 $path | ConvertFrom-Json
   }
   return [pscustomobject]@{}
 }
@@ -170,7 +175,7 @@ function Get-ChapterName([string]$Title, [int]$Index) {
   if ($Title -match "^\s*Chapter\s+\d+\s*[-:]\s*(.+)$") {
     return $Matches[1].Trim()
   }
-  return "Capitulo $($Index.ToString("00"))"
+  return "Capítulo $($Index.ToString("00"))"
 }
 
 function New-ChapterPage([string]$Title, [string]$BodyHtml, [string]$Background) {
@@ -249,8 +254,8 @@ foreach ($workDir in $workDirs) {
     $chapterId = ConvertTo-Slug $chapterItem.BaseName
     if ($chapterItem.PSIsContainer) { $chapterId = ConvertTo-Slug $chapterItem.Name }
     if (-not $chapterId) { $chapterId = "capitulo-$($chapterNumber.ToString("000"))" }
-    Write-Log "capitulo $slug/$chapterId"
-    Write-Host "  Capitulo: $chapterId"
+    Write-Log "capítulo $slug/$chapterId"
+    Write-Host "  Capítulo: $chapterId"
 
     $chapterTitle = ConvertTo-Title $chapterId
     $chapterName = Get-ChapterName $chapterTitle $chapterNumber
@@ -290,10 +295,10 @@ foreach ($workDir in $workDirs) {
       }
       Write-Log "  imagens fim"
     } else {
-      Write-Log "  novel le texto"
+      Write-Log "  novel lê texto"
       $contentType = "novel"
       if ($chapterItem.Extension -ieq ".json") {
-        $chapterJson = Get-Content $chapterItem.FullName -Raw | ConvertFrom-Json
+        $chapterJson = Read-Utf8 $chapterItem.FullName | ConvertFrom-Json
         if ($chapterJson.title) {
           $chapterTitle = [string]$chapterJson.title
           $chapterName = Get-ChapterName $chapterTitle $chapterNumber
@@ -312,16 +317,16 @@ foreach ($workDir in $workDirs) {
           $wordCount = [int]$chapterJson.wordCount
         }
       } else {
-        $text = Get-Content $chapterItem.FullName -Raw
+        $text = Read-Utf8 $chapterItem.FullName
         $paragraphs = @(Get-Paragraphs $text)
         if ($paragraphs.Count -gt 0) {
           $chapterTitle = $paragraphs[0]
           $chapterName = Get-ChapterName $chapterTitle $chapterNumber
         }
       }
-      Write-Log "  novel paragrafos"
+      Write-Log "  novel parágrafos"
       if (-not $paragraphs.Count) {
-        throw "Capitulo novel sem paragraphs/text/content: $($chapterItem.FullName)"
+        throw "Capítulo novel sem paragraphs/text/content: $($chapterItem.FullName)"
       }
       $text = ($paragraphs -join "`r`n`r`n")
       if (-not $wordCount) { $wordCount = Get-WordCount $paragraphs }
@@ -408,7 +413,7 @@ foreach ($workDir in $workDirs) {
     } else {
       $siteChapter.pages = $sitePages
       $siteChapter.images = @($pages | ForEach-Object {
-        [ordered]@{ src = $_.url; alt = "$title $chapterTitle pagina $($_.number)" }
+        [ordered]@{ src = $_.url; alt = "$title $chapterTitle página $($_.number)" }
       })
     }
     $siteChapters += $siteChapter
@@ -560,4 +565,4 @@ Write-Utf8 (Join-Path $Root "data\works.js") "window.KAPI_TOMO_WORKS = $siteWork
 
 Write-Host "KapiTomo gerado com $($worksForSite.Count) obra(s)."
 Write-Host "Entrada: $WorksRoot"
-Write-Host "Saida: data/works.js, api/, assets/works/ e manga/"
+Write-Host "Saída: data/works.js, api/, assets/works/ e manga/"

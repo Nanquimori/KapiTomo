@@ -2,17 +2,17 @@
 
 Este guia mostra como criar um addon de fonte para o Nyxovira.
 
-Um addon adapta uma fonte online ao app. Ele informa qual pagina abrir, como reconhecer uma obra, como traduzir rotas e campos da fonte, como listar capitulos e como baixar novels ou quadrinhos para leitura offline.
+Um addon adapta uma fonte online ao app. Ele informa qual página abrir, como reconhecer uma obra, como traduzir rotas e campos da fonte, como listar capítulos e como baixar novels ou quadrinhos para leitura offline.
 
-O KapiTomo e usado nesta documentacao como exemplo completo. A mesma estrutura serve para outras fontes quando o addon descreve manualmente o formato usado por cada uma.
+O KapiTomo é usado nesta documentação como exemplo completo. A mesma estrutura serve para outras fontes quando o addon descreve manualmente o formato usado por cada uma.
 
 Ao final, o addon deve permitir este fluxo:
 
-1. O usuario abre a fonte dentro do navegador do Nyxovira.
-2. O usuario entra em uma obra.
-3. O usuario toca em baixar.
+1. O usuário abre a fonte dentro do navegador do Nyxovira.
+2. O usuário entra em uma obra.
+3. O usuário toca em baixar.
 4. O addon identifica a obra aberta.
-5. O app mostra a lista de capitulos.
+5. O app mostra a lista de capítulos.
 6. O app baixa texto ou imagens e salva a obra offline.
 
 ## Arquivos do addon
@@ -28,10 +28,10 @@ minha-fonte/
 
 Use o mesmo id no nome da pasta e no campo `id` do manifesto. O app procura o `plugin.json` nessa raiz e carrega o script em `browser/download_target.js`.
 
-| Arquivo | Funcao |
+| Arquivo | Função |
 | --- | --- |
-| `plugin.json` | Define nome, versao, dominio, pagina inicial e parser da fonte. |
-| `browser/download_target.js` | Roda dentro da pagina aberta e informa ao app qual obra deve ser baixada. |
+| `plugin.json` | Define nome, versão, domínio, página inicial e parser da fonte. |
+| `browser/download_target.js` | Roda dentro da página aberta e informa ao app qual obra deve ser baixada. |
 
 ## plugin.json
 
@@ -72,15 +72,15 @@ Campos principais:
 
 | Campo | O que colocar |
 | --- | --- |
-| `id` | Identificador fixo do addon. Use letras minusculas, numeros e hifen. |
+| `id` | Identificador fixo do addon. Use letras minúsculas, números e hífen. |
 | `name` | Nome exibido no app. |
-| `version` | Versao do addon. Aumente quando publicar uma correcao. |
-| `match.hosts` | Dominios que este addon reconhece. |
-| `browser.home_url` | Pagina inicial aberta no navegador do app. |
+| `version` | Versão do addon. Aumente quando publicar uma correção. |
+| `match.hosts` | Domínios que este addon reconhece. |
+| `browser.home_url` | Página inicial aberta no navegador do app. |
 | `browser.download_target_script_file` | Caminho do script que identifica a obra aberta. |
-| `parser.adapter` | Tipo de fonte. Para sites simples ou indice em JS, use `html_series`. |
+| `parser.adapter` | Tipo de fonte. Para sites simples ou índice em JS, use `html_series`. |
 | `parser.base_url` | URL base usada para montar links relativos. |
-| `parser.static_works_script` | Arquivo JavaScript publico que contem as obras, quando a fonte usa esse modelo. |
+| `parser.static_works_script` | Arquivo JavaScript público que contem as obras, quando a fonte usa esse modelo. |
 
 ## Rotas e campos da fonte
 
@@ -124,15 +124,15 @@ Neste exemplo:
 | `#ler/minha-obra/0` | `https://example.com/manga/minha-obra/chapter/0/` |
 | `description` | `summary` da obra |
 | `paragraphs` | texto de novel |
-| `pages` ou `images[].src` | paginas de quadrinho |
+| `pages` ou `images[].src` | páginas de quadrinho |
 
 ## download_target.js
 
-Este script e executado quando o usuario toca em baixar no navegador do Nyxovira.
+Este script é executado quando o usuário toca em baixar no navegador do Nyxovira.
 
-Ele deve retornar a URL da obra. Se a pagina ja tem os capitulos disponiveis, ele tambem deve preencher `window.__nyxoviraChapterPlan`.
+Ele deve retornar a URL da obra. Se a página já tem os capítulos disponíveis, ele também deve preencher `window.__nyxoviraChapterPlan`.
 
-Exemplo generico:
+Exemplo genérico:
 
 ```js
 (function () {
@@ -241,7 +241,7 @@ Exemplo generico:
         canonicalUrl: workUrl(workId),
         coverUrl: text(field(work, addon.fields.workCover)),
         chapters: chapters.map(function (chapter, index) {
-          var title = text(field(chapter, addon.fields.chapterTitle)) || ("Capitulo " + (index + 1));
+          var title = text(field(chapter, addon.fields.chapterTitle)) || ("Capítulo " + (index + 1));
           var paragraphs = field(chapter, addon.fields.chapterParagraphs);
           return {
             id: "id:" + index,
@@ -273,45 +273,45 @@ Exemplo generico:
 
 ## Fluxo do download no app
 
-Quando o usuario toca em baixar, o Nyxovira executa o `download_target.js` da fonte dentro da pagina aberta no WebView.
+Quando o usuário toca em baixar, o Nyxovira executa o `download_target.js` da fonte dentro da página aberta no WebView.
 
 O script deve fazer duas coisas:
 
-1. Retornar a URL canonica da obra.
+1. Retornar a URL canônica da obra.
 2. Preencher `window.__nyxoviraChapterPlan` com um JSON valido contendo `chapters`.
 
-Se `window.__nyxoviraChapterPlan` ja existe e tem capitulos, o app abre a selecao de download imediatamente, sem esperar uma busca no HTML ou uma chamada extra da engine.
+Se `window.__nyxoviraChapterPlan` já existe e tem capítulos, o app abre a seleção de download imediatamente, sem esperar uma busca no HTML ou uma chamada extra da engine.
 
-Se o plano nao existe, esta vazio ou nao tem `chapters`, o app tenta preparar a lista por outros meios e pode mostrar a mensagem: `A fonte ainda esta preparando os dados dos capitulos. Tente baixar novamente em instantes.`
+Se o plano não existe, está vazio ou não tem `chapters`, o app tenta preparar a lista por outros meios e pode mostrar a mensagem: `A fonte ainda está preparando os dados dos capítulos. Tente baixar novamente em instantes.`
 
-Para o download tambem ser direto depois da selecao, coloque o conteudo no proprio plano ou prepare o plano no addon depois da confirmacao:
+Para o download também ser direto depois da seleção, coloque o conteúdo no próprio plano ou prepare o plano no addon depois da confirmação:
 
-| Tipo | Campo no capitulo | Resultado |
+| Tipo | Campo no capítulo | Resultado |
 | --- | --- | --- |
-| Novel | `paragraphs` | O app salva o JSON offline com paragrafos separados. |
+| Novel | `paragraphs` | O app salva o JSON offline com parágrafos separados. |
 | Quadrinho | `pages` ou `images` | O app baixa as imagens diretamente. |
-| Preparo no addon | `window.__nyxoviraPrepareDownloadPlan` | O app mostra a lista agora; depois que o usuario confirma, o addon preenche os capitulos selecionados. |
+| Preparo no addon | `window.__nyxoviraPrepareDownloadPlan` | O app mostra a lista agora; depois que o usuário confirma, o addon preenche os capítulos selecionados. |
 
-Antes de preencher `window.__nyxoviraChapterPlan`, valide cada capitulo no addon:
+Antes de preencher `window.__nyxoviraChapterPlan`, valide cada capítulo no addon:
 
 | Caso | O addon deve fazer |
 | --- | --- |
-| Novel sem `paragraphs` | Nao inclua o capitulo no plano e registre `console.error(...)`. |
-| Quadrinho sem `pages`/`images` no plano final | Nao inicie o download desse capitulo e registre `console.error(...)`. |
-| Plano sem capitulos validos | Nao preencha `window.__nyxoviraChapterPlan`; retorne vazio ou a URL canonica para o app tentar outro parser. |
+| Novel sem `paragraphs` | Não inclua o capítulo no plano e registre `console.error(...)`. |
+| Quadrinho sem `pages`/`images` no plano final | Não inicie o download desse capítulo e registre `console.error(...)`. |
+| Plano sem capítulos válidos | Não preencha `window.__nyxoviraChapterPlan`; retorne vazio ou a URL canônica para o app tentar outro parser. |
 
-Isso evita a lista aparecer com capitulos que somem na preparacao do download.
+Isso evita a lista aparecer com capítulos que somem na preparação do download.
 
-## Preparo apos confirmar
+## Preparo após confirmar
 
-Use `window.__nyxoviraPrepareDownloadPlan` quando a obra tem a lista em um endpoint rapido, mas o conteudo real precisa ser carregado capitulo por capitulo. Essa funcao roda no WebView depois que o usuario confirma a selecao e antes do engine iniciar o pacote offline.
+Use `window.__nyxoviraPrepareDownloadPlan` quando a obra tem a lista em um endpoint rápido, mas o conteúdo real precisa ser carregado capítulo por capítulo. Essa função roda no WebView depois que o usuário confirma a seleção e antes do engine iniciar o pacote offline.
 
 Exemplo comum:
 
-| Endpoint | Conteudo |
+| Endpoint | Conteúdo |
 | --- | --- |
-| `/api/manga/minha-obra` | Lista de capitulos, ids e titulos. |
-| `/api/chapter/123` | Paginas reais do capitulo. |
+| `/api/manga/minha-obra` | Lista de capítulos, ids e títulos. |
+| `/api/chapter/123` | Páginas reais do capítulo. |
 
 Nesse caso, o `chapterPlan` inicial pode ter somente metadados:
 
@@ -319,14 +319,14 @@ Nesse caso, o `chapterPlan` inicial pode ter somente metadados:
 {
   "id": "id:123",
   "number": "12",
-  "title": "Capitulo 12",
+  "title": "Capítulo 12",
   "contentType": "images",
   "url": "https://example.com/manga/minha-obra/chapter/12/",
   "apiPath": "/api/chapter/123"
 }
 ```
 
-Depois, o addon prepara apenas os capitulos selecionados:
+Depois, o addon prepara apenas os capítulos selecionados:
 
 ```js
 window.__nyxoviraPrepareDownloadPlan = function (context) {
@@ -343,13 +343,13 @@ window.__nyxoviraPrepareDownloadPlan = function (context) {
 };
 ```
 
-O app nao sabe como a fonte busca ou transforma esses dados. A API da fonte, criptografia, tokens e regras ficam no addon. O engine so recebe o `chapterPlan` final com `paragraphs`, `pages` ou `images`.
+O app não sabe como a fonte busca ou transforma esses dados. A API da fonte, criptografia, tokens e regras ficam no addon. O engine só recebe o `chapterPlan` final com `paragraphs`, `pages` ou `images`.
 
-Se a funcao responder vazio ou nao existir, o app usa o `chapterPlan` original. Por isso, para fontes que precisam preparar capitulo por capitulo, o addon deve retornar o plano final completo para os capitulos selecionados.
+Se a função responder vazio ou não existir, o app usa o `chapterPlan` original. Por isso, para fontes que precisam preparar capítulo por capítulo, o addon deve retornar o plano final completo para os capítulos selecionados.
 
 ## chapterPlan
 
-`chapterPlan` e a lista pronta que o app usa para abrir a selecao de capitulos.
+`chapterPlan` é a lista pronta que o app usa para abrir a seleção de capítulos.
 
 Formato:
 
@@ -363,9 +363,9 @@ Formato:
     {
       "id": "id:0",
       "number": "1",
-      "title": "Capitulo 01",
+      "title": "Capítulo 01",
       "contentType": "novel",
-      "paragraphs": ["Primeiro paragrafo.", "Segundo paragrafo."],
+      "paragraphs": ["Primeiro parágrafo.", "Segundo parágrafo."],
       "pages": [],
       "url": "https://example.com/manga/minha-obra/chapter/0/",
       "index": 0
@@ -382,12 +382,12 @@ Para novel, envie `contentType: "novel"` e `paragraphs`.
 {
   "id": "id:0",
   "number": "1",
-  "title": "Capitulo 01 - A Queda",
+  "title": "Capítulo 01 - A Queda",
   "contentType": "novel",
   "paragraphs": [
-    "Primeiro paragrafo.",
-    "Segundo paragrafo.",
-    "Terceiro paragrafo."
+    "Primeiro parágrafo.",
+    "Segundo parágrafo.",
+    "Terceiro parágrafo."
   ],
   "url": "https://example.com/manga/minha-obra/chapter/0/"
 }
@@ -397,11 +397,11 @@ O app salva offline assim:
 
 ```json
 {
-  "title": "Capitulo 01 - A Queda",
+  "title": "Capítulo 01 - A Queda",
   "paragraphs": [
-    "Primeiro paragrafo.",
-    "Segundo paragrafo.",
-    "Terceiro paragrafo."
+    "Primeiro parágrafo.",
+    "Segundo parágrafo.",
+    "Terceiro parágrafo."
   ]
 }
 ```
@@ -414,7 +414,7 @@ Para quadrinho, envie `contentType: "images"` e `pages` com URLs diretas das ima
 {
   "id": "id:0",
   "number": "1",
-  "title": "Capitulo 001",
+  "title": "Capítulo 001",
   "contentType": "images",
   "pages": [
     "https://example.com/obra/capitulo-001/page-001.png",
@@ -424,27 +424,27 @@ Para quadrinho, envie `contentType: "images"` e `pages` com URLs diretas das ima
 }
 ```
 
-Quando `pages` esta no `chapterPlan`, o Nyxovira baixa essas imagens diretamente.
+Quando `pages` está no `chapterPlan`, o Nyxovira baixa essas imagens diretamente.
 
 ## Adaptadores
 
 | Adapter | Quando usar |
 | --- | --- |
-| `html_series` | Fonte com paginas HTML, indice publico ou arquivo JS com obras. |
-| `aes_json_api` | Fonte com API JSON e rotas configuraveis. |
-| `next_payload` | Fonte que expoe dados em payload Next.js. |
+| `html_series` | Fonte com páginas HTML, índice público ou arquivo JS com obras. |
+| `aes_json_api` | Fonte com API JSON e rotas configuráveis. |
+| `next_payload` | Fonte que expõe dados em payload Next.js. |
 
-## Publicacao
+## Publicação
 
 Antes de publicar:
 
 1. Aumente `plugin.json.version`.
 2. Confirme `match.hosts`.
 3. Confirme `browser.home_url`.
-4. Teste `download_target.js` em uma pagina de obra.
+4. Teste `download_target.js` em uma página de obra.
 5. Confirme `chapterPlan.title`, `summary`, `canonicalUrl`, `coverUrl` e `chapters`.
-6. Em novel, confirme que `paragraphs` tem varios itens separados.
-7. Em quadrinho, confirme que o plano final tem `pages` ou `images` nos capitulos selecionados.
-8. Gere o zip do addon.
-9. Atualize o `sha256` no catalogo de plugins.
-10. Teste download do primeiro, do meio e do ultimo capitulo.
+6. Em novel, confirme que `paragraphs` tem vários itens separados.
+7. Em quadrinho, confirme que o plano final tem `pages` ou `images` nos capítulos selecionados.
+8. Publique o pacote do addon em uma Release ou em um repositório público compatível com o Hub.
+9. Atualize o `sha256` no catálogo de plugins.
+10. Teste download do primeiro, do meio e do último capítulo.
