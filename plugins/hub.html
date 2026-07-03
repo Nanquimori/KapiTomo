@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8">
@@ -427,8 +427,8 @@
 
       function fetchCatalog() {
         const urls = [
-          "catalog-store.json?v=20260703-nexustoons-release",
-          "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260703-nexustoons-release"
+          "catalog-store.json?v=20260703-pluginhub-pruned",
+          "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260703-pluginhub-pruned"
         ];
         return urls.reduce((chain, url) => chain.catch(() => fetch(url, { cache: "no-store" })
           .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))), Promise.reject());
