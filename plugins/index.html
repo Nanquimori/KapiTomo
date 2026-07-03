@@ -4,12 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Catalogo publico de plugins para instalar fontes no Nyxovira.">
-    <link rel="canonical" href="https://nanquimori.github.io/KapiTomo/plugins/">
+    <link rel="canonical" href="https://nanquimori.github.io/KapiTomo/plugins/store.html">
     <meta property="og:site_name" content="KapiTomo">
     <meta property="og:title" content="KapiTomo Plugin Hub">
     <meta property="og:description" content="Plugins online para o Nyxovira, com pacotes hospedados em GitHub Pages, Releases ou outro servidor publico.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://nanquimori.github.io/KapiTomo/plugins/">
+    <meta property="og:url" content="https://nanquimori.github.io/KapiTomo/plugins/store.html">
     <meta property="og:image" content="https://nanquimori.github.io/KapiTomo/assets/kapitomo-logo.png">
     <title>KapiTomo Plugin Hub</title>
     <link rel="icon" type="image/png" href="../assets/kapitomo-logo.png?v=20260703-plugin-hub">
@@ -369,9 +369,25 @@
 
       <section class="grid">
         <article class="panel">
+          <p class="kicker">Conta</p>
+          <h2>Conta do publicador</h2>
+          <p>Use sua conta GitHub para publicar. O email e a senha ficam no GitHub; o KapiTomo nao guarda login nem senha.</p>
+          <div class="publish-form">
+            <label class="field-label" for="publisherUserInput">Usuario GitHub</label>
+            <input id="publisherUserInput" class="text-input" type="text" autocomplete="username" placeholder="seu-usuario">
+            <div class="button-row">
+              <a class="button primary" href="https://github.com/login" target="_blank" rel="noopener">Entrar no GitHub</a>
+              <a class="button" href="https://github.com/signup" target="_blank" rel="noopener">Criar conta</a>
+            </div>
+            <button id="savePublisherButton" class="button" type="button">Salvar usuario</button>
+            <p id="publisherStatus" class="publish-status" aria-live="polite"></p>
+          </div>
+        </article>
+
+        <article class="panel">
           <p class="kicker">Publicar</p>
           <h2>Publique um addon pronto</h2>
-          <p>Cole o repositorio GitHub que ja tem <code>plugin.json</code>. O Hub le o manifesto, procura uma Release <code>.zip</code> e monta a publicacao para instalar no app.</p>
+          <p>Cole o repositorio GitHub que ja tem <code>plugin.json</code>. O Hub le o manifesto, procura uma Release <code>.zip</code> e abre um pedido de publicacao na sua conta.</p>
           <div class="publish-form">
             <label class="field-label" for="repoUrlInput">Repositorio GitHub</label>
             <input id="repoUrlInput" class="text-input" type="url" placeholder="https://github.com/usuario/meu-addon">
@@ -380,6 +396,20 @@
               <button id="clearDraftPluginsButton" class="button" type="button">Limpar rascunhos</button>
             </div>
             <p id="publishStatus" class="publish-status" aria-live="polite"></p>
+          </div>
+        </article>
+
+        <article class="panel">
+          <p class="kicker">Remover</p>
+          <h2>Remova uma publicacao</h2>
+          <p>Informe o plugin publicado e abra um pedido de remocao. A solicitacao fica registrada na sua conta GitHub.</p>
+          <div class="publish-form">
+            <label class="field-label" for="removePluginIdInput">ID do plugin</label>
+            <input id="removePluginIdInput" class="text-input" type="text" placeholder="meu-addon">
+            <label class="field-label" for="removeRepoUrlInput">Repositorio GitHub</label>
+            <input id="removeRepoUrlInput" class="text-input" type="url" placeholder="https://github.com/usuario/meu-addon">
+            <button id="requestRemovePluginButton" class="button primary" type="button">Solicitar remocao</button>
+            <p id="removeStatus" class="publish-status" aria-live="polite"></p>
           </div>
         </article>
 
@@ -404,11 +434,19 @@
 
     <script>
       const list = document.getElementById("pluginList");
+      const publisherUserInput = document.getElementById("publisherUserInput");
+      const savePublisherButton = document.getElementById("savePublisherButton");
+      const publisherStatus = document.getElementById("publisherStatus");
       const repoUrlInput = document.getElementById("repoUrlInput");
       const loadRepoPluginButton = document.getElementById("loadRepoPluginButton");
       const clearDraftPluginsButton = document.getElementById("clearDraftPluginsButton");
       const publishStatus = document.getElementById("publishStatus");
+      const removePluginIdInput = document.getElementById("removePluginIdInput");
+      const removeRepoUrlInput = document.getElementById("removeRepoUrlInput");
+      const requestRemovePluginButton = document.getElementById("requestRemovePluginButton");
+      const removeStatus = document.getElementById("removeStatus");
       const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v1";
+      const LOCAL_PUBLISHER_KEY = "kapitomo.publisherUser.v1";
       let renderedPlugins = [];
 
       function escapeHtml(value) {
@@ -438,6 +476,40 @@
         if (publishStatus) {
           publishStatus.textContent = message || "";
         }
+      }
+
+      function setPublisherStatus(message) {
+        if (publisherStatus) {
+          publisherStatus.textContent = message || "";
+        }
+      }
+
+      function setRemoveStatus(message) {
+        if (removeStatus) {
+          removeStatus.textContent = message || "";
+        }
+      }
+
+      function normalizeGitHubUser(value) {
+        return String(value || "").trim().replace(/^@+/, "");
+      }
+
+      function getPublisherUser() {
+        return normalizeGitHubUser(publisherUserInput?.value || localStorage.getItem(LOCAL_PUBLISHER_KEY) || "");
+      }
+
+      function savePublisherUser() {
+        const user = getPublisherUser();
+        if (!/^[a-zA-Z0-9-]{1,39}$/.test(user)) {
+          setPublisherStatus("Informe um usuario GitHub valido.");
+          return "";
+        }
+        localStorage.setItem(LOCAL_PUBLISHER_KEY, user);
+        if (publisherUserInput) {
+          publisherUserInput.value = user;
+        }
+        setPublisherStatus("Usuario salvo. Entre no GitHub antes de enviar publicacao ou remocao.");
+        return user;
       }
 
       function publicPlugin(plugin) {
@@ -629,7 +701,14 @@
 
       async function loadRepoPlugin() {
         try {
+          const publisherUser = savePublisherUser();
+          if (!publisherUser) {
+            return;
+          }
           const repo = parseGitHubRepo(repoUrlInput?.value || "");
+          if (repo.owner.toLowerCase() !== publisherUser.toLowerCase()) {
+            setPublishStatus("Aviso: o repositorio pertence a outro usuario. Continue apenas se voce tiver acesso nele.");
+          }
           setPublishStatus("Lendo plugin.json do repositorio...");
           const { branch, manifest } = await fetchRepoManifest(repo);
           const browser = manifest.browser || {};
@@ -651,6 +730,8 @@
             package_url: packageInfo.url,
             sha256: await sha256FromUrl(packageInfo.url),
             tags: Array.isArray(manifest.tags) ? manifest.tags : ["comunidade"],
+            __publisher: publisherUser,
+            __repo: `https://github.com/${repo.owner}/${repo.repo}`,
             __source: "draft"
           };
           saveDraftPlugin(plugin);
@@ -689,9 +770,16 @@
       }
 
       function openPublishRequest(plugin) {
+        const publisherUser = savePublisherUser();
+        if (!publisherUser) {
+          return;
+        }
         const clean = publicPlugin(plugin);
         const body = [
           "Pedido de publicacao de plugin para o Nyxovira.",
+          "",
+          "Conta GitHub do publicador: @" + publisherUser,
+          "Repositorio: " + (plugin.__repo || clean.homepage || clean.site_url || ""),
           "",
           "```json",
           JSON.stringify(clean, null, 2),
@@ -700,6 +788,37 @@
         const url = "https://github.com/Nanquimori/KapiTomo/issues/new"
           + "?title=" + encodeURIComponent("[plugin] " + (clean.name || clean.id || "novo-plugin"))
           + "&body=" + encodeURIComponent(body);
+        window.open(url, "_blank", "noopener");
+      }
+
+      function openRemovalRequest() {
+        const publisherUser = savePublisherUser();
+        if (!publisherUser) {
+          return;
+        }
+        const pluginId = String(removePluginIdInput?.value || "").trim();
+        const repoUrl = String(removeRepoUrlInput?.value || "").trim();
+        if (!pluginId) {
+          setRemoveStatus("Informe o ID do plugin publicado.");
+          return;
+        }
+        if (!repoUrl) {
+          setRemoveStatus("Informe o repositorio GitHub do plugin.");
+          return;
+        }
+        const body = [
+          "Pedido de remocao de plugin publicado no catalogo do Nyxovira.",
+          "",
+          "Conta GitHub do solicitante: @" + publisherUser,
+          "Plugin ID: " + pluginId,
+          "Repositorio: " + repoUrl,
+          "",
+          "Confirmo que quero remover esta publicacao do catalogo online."
+        ].join("\n");
+        const url = "https://github.com/Nanquimori/KapiTomo/issues/new"
+          + "?title=" + encodeURIComponent("[plugin-remover] " + pluginId)
+          + "&body=" + encodeURIComponent(body);
+        setRemoveStatus("Abrindo pedido de remocao no GitHub...");
         window.open(url, "_blank", "noopener");
       }
 
@@ -722,10 +841,21 @@
       }
 
       loadRepoPluginButton?.addEventListener("click", loadRepoPlugin);
+      savePublisherButton?.addEventListener("click", savePublisherUser);
+      requestRemovePluginButton?.addEventListener("click", openRemovalRequest);
+      if (publisherUserInput) {
+        publisherUserInput.value = normalizeGitHubUser(localStorage.getItem(LOCAL_PUBLISHER_KEY) || "");
+      }
       repoUrlInput?.addEventListener("keydown", (event) => {
         if (event.key === "Enter") {
           event.preventDefault();
           loadRepoPlugin();
+        }
+      });
+      publisherUserInput?.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          savePublisherUser();
         }
       });
       clearDraftPluginsButton?.addEventListener("click", () => {
