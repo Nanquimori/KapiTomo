@@ -38,8 +38,8 @@ function setRemoveStatus(message) {
 
 function fetchCatalog() {
   const urls = [
-    "catalog-store.json?v=20260703-auto-hub",
-    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260703-auto-hub"
+    "catalog-store.json?v=20260703-auto-hub2",
+    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260703-auto-hub2"
   ];
   return urls.reduce((chain, url) => chain.catch(() => fetch(url, { cache: "no-store" })
     .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))), Promise.reject());
@@ -212,23 +212,6 @@ async function findRepoPackage(repo, branch, manifest) {
   };
 }
 
-async function sha256FromUrl(url) {
-  if (!crypto?.subtle) {
-    return "";
-  }
-  try {
-    const response = await fetch(url, { cache: "no-store" });
-    if (!response.ok) {
-      return "";
-    }
-    const buffer = await response.arrayBuffer();
-    const digest = await crypto.subtle.digest("SHA-256", buffer);
-    return Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
-  } catch {
-    return "";
-  }
-}
-
 async function loadRepoPlugin() {
   try {
     const repo = parseGitHubRepo(repoUrlInput?.value || "");
@@ -251,13 +234,12 @@ async function loadRepoPlugin() {
       homepage: browser.home_url || `https://github.com/${repo.owner}/${repo.repo}/`,
       icon_url: iconUrl,
       package_url: packageInfo.url,
-      sha256: await sha256FromUrl(packageInfo.url),
       tags: Array.isArray(manifest.tags) ? manifest.tags : ["comunidade"],
       __repo: `https://github.com/${repo.owner}/${repo.repo}`,
       __source: "draft"
     };
     saveDraftPlugin(plugin);
-    setPublishStatus(plugin.sha256 ? "Addon carregado e hash calculado." : "Addon carregado. Hash nao calculado pelo navegador.");
+    setPublishStatus("Addon carregado. Ao confirmar no GitHub, o robo calcula o SHA-256 e publica.");
     loadAllPlugins();
   } catch (error) {
     setPublishStatus(error?.message || "Nao foi possivel carregar o addon.");
