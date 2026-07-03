@@ -3,6 +3,9 @@
   "name": "KapiTomo Plugin Hub",
   "description": "Catalogo publico de plugins para instalar fontes no Nyxovira.",
   "publish_model": "github-hosted-package",
+  "requirements": {
+    "icon_url": "Obrigatorio. Todo plugin online precisa apontar para uma imagem publica de icone."
+  },
   "plugins": [
     {
       "id": "kapitomo",

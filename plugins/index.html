@@ -152,9 +152,18 @@
 
       .plugin-card {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-columns: 58px minmax(0, 1fr) auto;
         gap: 16px;
         align-items: center;
+      }
+
+      .plugin-icon {
+        width: 58px;
+        height: 58px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        object-fit: cover;
+        background: rgba(0, 0, 0, 0.22);
       }
 
       .plugin-card h3 {
@@ -243,6 +252,11 @@
           grid-template-columns: 1fr;
         }
 
+        .plugin-icon {
+          width: 64px;
+          height: 64px;
+        }
+
         .topbar,
         .plugin-card,
         .button-row {
@@ -270,7 +284,7 @@
       <section class="hero">
         <p class="kicker">Nyxovira</p>
         <h1>Plugin Hub</h1>
-        <p>Um catalogo publico para instalar fontes no Nyxovira. O app le este catalogo direto, baixa o pacote, confere o hash e instala sem abrir navegador externo.</p>
+        <p>Um catalogo publico para instalar fontes no Nyxovira. O app le este catalogo direto, baixa o pacote, confere o hash e instala sem abrir navegador externo. Todo plugin publicado precisa ter uma imagem em <code>icon_url</code>.</p>
       </section>
 
       <section class="panel" style="margin-top: 18px;">
@@ -285,10 +299,11 @@
         <article class="panel">
           <p class="kicker">Publicar</p>
           <h2>Use sua conta GitHub</h2>
-          <p>Hospede o pacote <code>.zip</code> do plugin no seu GitHub Releases, GitHub Pages ou outro servidor publico. O zip deve conter <code>plugin.json</code> na raiz e <code>browser/download_target.js</code>.</p>
+          <p>Hospede o pacote <code>.zip</code> do plugin no seu GitHub Releases, GitHub Pages ou outro servidor publico. O zip deve conter <code>plugin.json</code> na raiz e <code>browser/download_target.js</code>. A entrada do catalogo precisa ter <code>icon_url</code> com uma imagem publica.</p>
           <pre>{
   "id": "minha-fonte",
   "name": "Minha Fonte",
+  "icon_url": "https://usuario.github.io/repo/icon.png",
   "package_url": "https://github.com/usuario/repo/releases/download/v1/minha-fonte.zip",
   "sha256": "..."
 }</pre>
@@ -307,7 +322,7 @@
           </article>
           <article>
             <h3>Adicione ao catalogo</h3>
-            <p>Inclua a entrada no <code>plugins/catalog.json</code>. Depois disso, o plugin aparece no app em Plugins online.</p>
+            <p>Inclua a entrada no <code>plugins/catalog.json</code>. O item so aparece no app quando tiver pacote, hash e imagem em <code>icon_url</code>.</p>
           </article>
         </article>
       </section>
@@ -326,12 +341,17 @@
         }[char]));
       }
 
-      fetch("catalog.json?v=20260703-online-plugins", { cache: "no-store" })
+      function hasRequiredPluginIcon(plugin) {
+        return Boolean(plugin && String(plugin.icon_url || plugin.iconUrl || "").trim());
+      }
+
+      fetch("catalog.json?v=20260703-plugin-icons-required", { cache: "no-store" })
         .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))
         .then((catalog) => {
-          const plugins = Array.isArray(catalog.plugins) ? catalog.plugins : [];
+          const plugins = (Array.isArray(catalog.plugins) ? catalog.plugins : []).filter(hasRequiredPluginIcon);
           list.innerHTML = plugins.length ? plugins.map((plugin, index) => `
             <article class="plugin-card">
+              <img class="plugin-icon" src="${escapeHtml(plugin.icon_url || plugin.iconUrl)}" alt="">
               <div>
                 <h3>${escapeHtml(plugin.name || plugin.id || "Plugin")}</h3>
                 <p>${escapeHtml(plugin.description || plugin.package_url || "")}</p>
@@ -358,6 +378,10 @@
 
       function installPlugin(plugin) {
         const bridge = window.NyxoviraAndroidBridge || window.ArchiveInkAndroidBridge;
+        if (!hasRequiredPluginIcon(plugin)) {
+          alert("Este plugin nao tem icon_url e nao pode ser instalado pelo catalogo online.");
+          return;
+        }
         if (!plugin || !bridge || typeof bridge.installOnlinePlugin !== "function") {
           alert("Abra esta pagina pelo botao Plugins online dentro do Nyxovira para instalar direto no app.");
           return;
