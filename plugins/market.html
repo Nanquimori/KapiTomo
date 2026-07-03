@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Catalogo publico de plugins para instalar fontes no Nyxovira.">
+    <link rel="canonical" href="https://nanquimori.github.io/KapiTomo/plugins/market.html">
+    <meta property="og:site_name" content="KapiTomo">
+    <meta property="og:title" content="KapiTomo Plugin Hub">
+    <meta property="og:description" content="Plugins online para o Nyxovira, com pacotes hospedados em GitHub Pages, Releases ou outro servidor publico.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nanquimori.github.io/KapiTomo/plugins/market.html">
+    <meta property="og:image" content="https://nanquimori.github.io/KapiTomo/assets/kapitomo-logo.png">
+    <title>KapiTomo Plugin Hub</title>
+    <link rel="icon" type="image/png" href="../assets/kapitomo-logo.png?v=20260703-plugin-hub">
+    <link rel="apple-touch-icon" href="../assets/kapitomo-logo.png?v=20260703-plugin-hub">
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #070411;
+        --panel: #120a22;
+        --panel-soft: #1a0f31;
+        --line: rgba(212, 196, 255, 0.2);
+        --text: #f7f2ff;
+        --muted: #b8abc9;
+        --accent: #ffb51f;
+        --accent-2: #8b5cf6;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background:
+          radial-gradient(circle at 18% 10%, rgba(255, 181, 31, 0.14), transparent 32%),
+          radial-gradient(circle at 88% 18%, rgba(139, 92, 246, 0.18), transparent 30%),
+          linear-gradient(180deg, #0a0614, var(--bg));
+        color: var(--text);
+        font-family: "Segoe UI", Arial, sans-serif;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .page {
+        width: min(1040px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 22px 0 44px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 26px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .brand img {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+      }
+
+      .nav-link {
+        min-height: 38px;
+        display: inline-flex;
+        align-items: center;
+        padding: 0 13px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        text-decoration: none;
+        color: var(--muted);
+      }
+
+      .hero,
+      .panel,
+      .plugin-card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background:
+          linear-gradient(140deg, rgba(255, 181, 31, 0.08), transparent 42%),
+          linear-gradient(220deg, rgba(139, 92, 246, 0.12), transparent 52%),
+          rgba(18, 10, 34, 0.94);
+        box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+      }
+
+      .hero {
+        padding: clamp(24px, 5vw, 46px);
+      }
+
+      .kicker {
+        margin: 0 0 10px;
+        color: var(--accent);
+        font-size: 0.72rem;
+        font-weight: 900;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        max-width: 760px;
+        margin-bottom: 14px;
+        font-size: clamp(2rem, 7vw, 4.8rem);
+        line-height: 0.92;
+      }
+
+      .hero p,
+      .panel p,
+      .plugin-card p {
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+      }
+
+      .panel,
+      .plugin-card {
+        padding: 18px;
+      }
+
+      .plugin-list {
+        display: grid;
+        gap: 12px;
+        margin-top: 18px;
+      }
+
+      .plugin-card {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+        align-items: stretch;
+      }
+
+      .plugin-summary {
+        display: grid;
+        grid-template-columns: 72px minmax(0, 1fr);
+        gap: 16px;
+        align-items: start;
+        min-width: 0;
+      }
+
+      .plugin-icon {
+        width: 72px;
+        height: 72px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        object-fit: cover;
+        background: rgba(0, 0, 0, 0.22);
+      }
+
+      .plugin-card h3 {
+        margin-bottom: 6px;
+        overflow-wrap: anywhere;
+      }
+
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 0.84rem;
+      }
+
+      .button-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .button {
+        width: 100%;
+        min-width: 0;
+        min-height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel-soft);
+        color: var(--text);
+        text-decoration: none;
+        text-align: center;
+        font-weight: 800;
+        line-height: 1.12;
+      }
+
+      .button.primary {
+        border-color: rgba(255, 181, 31, 0.42);
+        background: linear-gradient(135deg, #ffb51f, #f06d2f);
+        color: #160a08;
+      }
+
+      code,
+      pre {
+        font-family: "Cascadia Mono", "Consolas", monospace;
+      }
+
+      pre {
+        margin: 12px 0 0;
+        padding: 14px;
+        overflow: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.24);
+        color: #f9f4ff;
+      }
+
+      .steps {
+        counter-reset: step;
+        display: grid;
+        gap: 12px;
+      }
+
+      .steps article {
+        display: grid;
+        grid-template-columns: 32px minmax(0, 1fr);
+        column-gap: 16px;
+        align-items: start;
+        position: relative;
+        padding-left: 0;
+      }
+
+      .steps article::before {
+        counter-increment: step;
+        content: counter(step);
+        width: 32px;
+        height: 32px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        background: var(--accent);
+        color: #160a08;
+        font-weight: 1000;
+      }
+
+      .steps article h3,
+      .steps article p {
+        grid-column: 2;
+      }
+
+      .steps article h3 {
+        margin: 1px 0 6px;
+        line-height: 1.1;
+      }
+
+      .steps article p {
+        margin-bottom: 0;
+      }
+
+      @media (max-width: 680px) {
+        .topbar {
+          grid-template-columns: 1fr;
+        }
+
+        .plugin-summary {
+          grid-template-columns: 70px minmax(0, 1fr);
+          gap: 14px;
+        }
+
+        .plugin-icon {
+          width: 70px;
+          height: 70px;
+        }
+
+        .topbar {
+          align-items: stretch;
+        }
+
+        .button {
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="topbar">
+        <a class="brand" href="../">
+          <img src="../assets/kapitomo-logo.png" alt="">
+          <span>KapiTomo</span>
+        </a>
+        <a class="nav-link" href="../nyxovira/plugin-api/">API de plugins</a>
+      </header>
+
+      <section class="hero">
+        <p class="kicker">Nyxovira</p>
+        <h1>Plugin Hub</h1>
+        <p>Um catalogo publico para instalar fontes no Nyxovira. O app le este catalogo direto, baixa o pacote, confere o hash e instala sem abrir navegador externo.</p>
+      </section>
+
+      <section class="panel" style="margin-top: 18px;">
+        <p class="kicker">Catalogo</p>
+        <h2>Plugins publicados</h2>
+        <div id="pluginList" class="plugin-list" aria-live="polite">
+          <p>Carregando catalogo...</p>
+        </div>
+      </section>
+
+      <section class="grid">
+        <article class="panel">
+          <p class="kicker">Publicar</p>
+          <h2>Use sua conta GitHub</h2>
+          <p>Hospede o pacote <code>.zip</code> no GitHub Releases, GitHub Pages ou outro servidor publico do autor. O KapiTomo so le o <code>catalog.json</code> e usa o link em <code>package_url</code> para instalar direto no app.</p>
+          <pre>{
+  "id": "minha-fonte",
+  "name": "Minha Fonte",
+  "author": "Joao",
+  "version": "1.0.0",
+  "description": "Fonte para minha biblioteca.",
+  "icon_url": "https://usuario.github.io/repo/icon.png",
+  "package_url": "https://github.com/usuario/repo/releases/download/v1/minha-fonte.zip",
+  "sha256": "..."
+}</pre>
+        </article>
+
+        <article class="panel steps">
+          <p class="kicker">Fluxo</p>
+          <h2>Como entrar no catalogo</h2>
+          <article>
+            <h3>Empacote o addon</h3>
+            <p>Crie um zip limpo com manifesto e script da fonte.</p>
+          </article>
+          <article>
+            <h3>Publique no GitHub</h3>
+            <p>Use Releases ou Pages da sua propria conta. O arquivo nao precisa ficar armazenado no KapiTomo.</p>
+          </article>
+          <article>
+            <h3>Adicione ao catalogo</h3>
+            <p>Inclua a entrada no <code>plugins/catalog.json</code>. O Hub mostra nome, autor, versao, descricao e instala pelo link externo do pacote.</p>
+          </article>
+        </article>
+      </section>
+    </main>
+
+    <script>
+      const list = document.getElementById("pluginList");
+
+      function escapeHtml(value) {
+        return String(value || "").replace(/[&<>"']/g, (char) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        }[char]));
+      }
+
+      function hasRequiredPluginIcon(plugin) {
+        return Boolean(plugin && String(plugin.icon_url || plugin.iconUrl || "").trim());
+      }
+
+      fetch("catalog.json?v=20260703-plugin-flow-align", { cache: "no-store" })
+        .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))
+        .then((catalog) => {
+          const plugins = (Array.isArray(catalog.plugins) ? catalog.plugins : []).filter(hasRequiredPluginIcon);
+          list.innerHTML = plugins.length ? plugins.map((plugin, index) => `
+            <article class="plugin-card">
+              <div class="plugin-summary">
+                <img class="plugin-icon" src="${escapeHtml(plugin.icon_url || plugin.iconUrl)}" alt="">
+                <div>
+                  <h3>${escapeHtml(plugin.name || plugin.id || "Plugin")}</h3>
+                  <p>${escapeHtml(plugin.description || plugin.package_url || "")}</p>
+                  <div class="meta">
+                    ${plugin.author ? `<span>${escapeHtml(plugin.author)}</span>` : ""}
+                    ${plugin.version ? `<span>v${escapeHtml(plugin.version)}</span>` : ""}
+                    ${plugin.id ? `<span>${escapeHtml(plugin.id)}</span>` : ""}
+                  </div>
+                </div>
+              </div>
+              <div class="button-row">
+                <button class="button primary" type="button" data-install-plugin="${index}">Instalar no Nyxovira</button>
+                ${plugin.homepage || plugin.site_url ? `<a class="button" href="${escapeHtml(plugin.homepage || plugin.site_url)}">Abrir site</a>` : ""}
+              </div>
+            </article>
+          `).join("") : "<p>Nenhum plugin publicado ainda.</p>";
+          document.querySelectorAll("[data-install-plugin]").forEach((button) => {
+            button.addEventListener("click", () => installPlugin(plugins[Number(button.dataset.installPlugin)]));
+          });
+        })
+        .catch((error) => {
+          list.innerHTML = `<p>Nao foi possivel carregar o catalogo: ${escapeHtml(error.message)}</p>`;
+        });
+
+      function installPlugin(plugin) {
+        const bridge = window.NyxoviraAndroidBridge || window.ArchiveInkAndroidBridge;
+        if (!hasRequiredPluginIcon(plugin)) {
+          alert("Este plugin nao tem icon_url e nao pode ser instalado pelo catalogo online.");
+          return;
+        }
+        if (!plugin || !bridge || typeof bridge.installOnlinePlugin !== "function") {
+          alert("Abra esta pagina pelo botao Plugins online dentro do Nyxovira para instalar direto no app.");
+          return;
+        }
+        try {
+          const result = JSON.parse(bridge.installOnlinePlugin(JSON.stringify(plugin)) || "{}");
+          alert(result.message || (result.success ? "Plugin instalado." : "Nao foi possivel instalar o plugin."));
+        } catch (error) {
+          alert("Nao foi possivel instalar o plugin: " + (error && error.message ? error.message : "erro desconhecido"));
+        }
+      }
+    </script>
+  </body>
+</html>
