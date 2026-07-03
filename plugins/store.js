@@ -38,8 +38,8 @@ function setRemoveStatus(message) {
 
 function fetchCatalog() {
   const urls = [
-    "catalog-store.json?v=20260703-auto-hub3",
-    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260703-auto-hub3"
+    "catalog-store.json?v=20260703-auto-hub4",
+    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260703-auto-hub4"
   ];
   return urls.reduce((chain, url) => chain.catch(() => fetch(url, { cache: "no-store" })
     .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))), Promise.reject());
@@ -208,10 +208,16 @@ async function findRepoPackage(repo, branch, manifest) {
       for (const release of releases) {
         const assets = Array.isArray(release.assets) ? release.assets : [];
         const preferred = assets.find((asset) => /\.zip$/i.test(asset.name || "") && String(asset.name || "").toLowerCase().includes(String(manifest.id || repo.repo).toLowerCase()))
-          || assets.find((asset) => /\.zip$/i.test(asset.name || ""));
+          || assets.find((asset) => /\.zip$/i.test(asset.name || "") || /zip/i.test(asset.content_type || ""));
         if (preferred?.browser_download_url) {
           return {
             url: preferred.browser_download_url,
+            version: manifest.version || String(release.tag_name || "").replace(/^v/i, "")
+          };
+        }
+        if (release.zipball_url) {
+          return {
+            url: release.zipball_url,
             version: manifest.version || String(release.tag_name || "").replace(/^v/i, "")
           };
         }
@@ -220,7 +226,7 @@ async function findRepoPackage(repo, branch, manifest) {
   } catch {
   }
   return {
-    url: `https://github.com/${repo.owner}/${repo.repo}/archive/refs/heads/${branch}.zip`,
+    url: `https://api.github.com/repos/${repo.owner}/${repo.repo}/zipball/${branch}`,
     version: manifest.version || branch
   };
 }
