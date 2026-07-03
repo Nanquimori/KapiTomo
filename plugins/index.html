@@ -330,7 +330,7 @@
         .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))
         .then((catalog) => {
           const plugins = Array.isArray(catalog.plugins) ? catalog.plugins : [];
-          list.innerHTML = plugins.length ? plugins.map((plugin) => `
+          list.innerHTML = plugins.length ? plugins.map((plugin, index) => `
             <article class="plugin-card">
               <div>
                 <h3>${escapeHtml(plugin.name || plugin.id || "Plugin")}</h3>
@@ -342,15 +342,33 @@
                 </div>
               </div>
               <div class="button-row">
-                ${plugin.package_url ? `<a class="button primary" href="${escapeHtml(plugin.package_url)}" download>Baixar pacote</a>` : ""}
+                <button class="button primary" type="button" data-install-plugin="${index}">Instalar no Nyxovira</button>
+                ${plugin.package_url ? `<a class="button" href="${escapeHtml(plugin.package_url)}" download>Baixar pacote</a>` : ""}
                 ${plugin.homepage || plugin.site_url ? `<a class="button" href="${escapeHtml(plugin.homepage || plugin.site_url)}">Abrir site</a>` : ""}
               </div>
             </article>
           `).join("") : "<p>Nenhum plugin publicado ainda.</p>";
+          document.querySelectorAll("[data-install-plugin]").forEach((button) => {
+            button.addEventListener("click", () => installPlugin(plugins[Number(button.dataset.installPlugin)]));
+          });
         })
         .catch((error) => {
           list.innerHTML = `<p>Nao foi possivel carregar o catalogo: ${escapeHtml(error.message)}</p>`;
         });
+
+      function installPlugin(plugin) {
+        const bridge = window.NyxoviraAndroidBridge || window.ArchiveInkAndroidBridge;
+        if (!plugin || !bridge || typeof bridge.installOnlinePlugin !== "function") {
+          alert("Abra esta pagina pelo botao Plugins online dentro do Nyxovira para instalar direto no app.");
+          return;
+        }
+        try {
+          const result = JSON.parse(bridge.installOnlinePlugin(JSON.stringify(plugin)) || "{}");
+          alert(result.message || (result.success ? "Plugin instalado." : "Nao foi possivel instalar o plugin."));
+        } catch (error) {
+          alert("Nao foi possivel instalar o plugin: " + (error && error.message ? error.message : "erro desconhecido"));
+        }
+      }
     </script>
   </body>
 </html>
