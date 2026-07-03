@@ -1,0 +1,37 @@
+{
+  "schema_version": 2,
+  "name": "KapiTomo Plugin Hub",
+  "description": "Catalogo publico de plugins para instalar fontes no Nyxovira.",
+  "publish_model": "github-hosted-package",
+  "requirements": {
+    "icon_url": "Obrigatorio. Todo plugin online precisa apontar para uma imagem publica de icone."
+  },
+  "plugins": [
+    {
+      "id": "kapitomo",
+      "name": "KapiTomo",
+      "description": "Fonte oficial para baixar obras e capitulos publicados no KapiTomo.",
+      "author": "Nanquimori",
+      "version": "1.0.13",
+      "site_url": "https://nanquimori.github.io/KapiTomo/",
+      "homepage": "https://nanquimori.github.io/KapiTomo/",
+      "icon_url": "https://nanquimori.github.io/KapiTomo/assets/kapitomo-logo.png?v=20260626",
+      "package_url": "https://nanquimori.github.io/KapiTomo/downloads/plugins/kapitomo.zip",
+      "sha256": "4cb16b659212afa09d15e5bb1f2584dd2fa80ca47382f6580659fe178110cbe0",
+      "tags": ["oficial", "novel", "quadrinho"]
+    },
+    {
+      "id": "nexustoons",
+      "name": "NexusToons",
+      "description": "Fonte para baixar obras do NexusToons no Nyxovira.",
+      "author": "yxz0w0zxy",
+      "version": "1.0.7",
+      "site_url": "https://nexustoons.com/",
+      "homepage": "https://nexustoons.com/",
+      "icon_url": "https://nexustoons.com/icon.png",
+      "package_url": "https://github.com/yxz0w0zxy/teste_plugin/releases/download/v1.0.7/nexustoons.zip",
+      "sha256": "43ca7e9702a7772a07325a65fe69c905344fe8b01f33f03c5668ed7db88bbeeb",
+      "tags": ["manga", "quadrinho"]
+    }
+  ]
+}

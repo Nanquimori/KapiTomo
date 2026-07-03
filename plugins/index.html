@@ -383,7 +383,7 @@
         return Boolean(plugin && String(plugin.icon_url || plugin.iconUrl || "").trim());
       }
 
-      fetch("catalog.json?v=20260703-nexustoons-plugin", { cache: "no-store" })
+      fetch("catalog-store.json?v=20260703-nexustoons-release", { cache: "no-store" })
         .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))
         .then((catalog) => {
           const plugins = (Array.isArray(catalog.plugins) ? catalog.plugins : []).filter(hasRequiredPluginIcon);
