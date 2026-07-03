@@ -1,4 +1,6 @@
 const fs = require("fs");
+const os = require("os");
+const path = require("path");
 const crypto = require("crypto");
 const { execFileSync } = require("child_process");
 
@@ -19,8 +21,8 @@ function readEvent() {
   return JSON.parse(fs.readFileSync(env.GITHUB_EVENT_PATH, "utf8"));
 }
 
-function run(command, args) {
-  execFileSync(command, args, { stdio: "inherit" });
+function run(command, args, options = {}) {
+  execFileSync(command, args, { stdio: "inherit", ...options });
 }
 
 function cleanText(value, field, maxLength) {
@@ -217,12 +219,51 @@ async function removePlugin(issue) {
   };
 }
 
-function hasStagedChanges() {
+function hasStagedChanges(cwd = process.cwd()) {
   try {
-    execFileSync("git", ["diff", "--cached", "--quiet"]);
+    execFileSync("git", ["diff", "--cached", "--quiet"], { cwd });
     return false;
   } catch {
     return true;
+  }
+}
+
+function copyCatalogsTo(targetRoot) {
+  for (const catalogPath of CATALOG_PATHS) {
+    const target = path.join(targetRoot, catalogPath);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.copyFileSync(catalogPath, target);
+  }
+}
+
+function syncPagesBranch(title, issueNumber) {
+  const pagesBranch = env.PLUGIN_HUB_PAGES_BRANCH || "gh-pages";
+  const tempRoot = path.join(os.tmpdir(), `kapitomo-plugin-pages-${process.pid}`);
+  const workBranch = `plugin-hub-pages-sync-${process.pid}`;
+  try {
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+    run("git", ["fetch", "origin", pagesBranch]);
+    run("git", ["worktree", "add", "-B", workBranch, tempRoot, `origin/${pagesBranch}`]);
+    copyCatalogsTo(tempRoot);
+    run("git", ["config", "user.name", "KapiTomo Plugin Hub"], { cwd: tempRoot });
+    run("git", ["config", "user.email", "actions@github.com"], { cwd: tempRoot });
+    run("git", ["add", ...CATALOG_PATHS], { cwd: tempRoot });
+    if (!hasStagedChanges(tempRoot)) {
+      return false;
+    }
+    run("git", ["commit", "-m", `${title} no site (#${issueNumber})`], { cwd: tempRoot });
+    run("git", ["push", "origin", `HEAD:${pagesBranch}`], { cwd: tempRoot });
+    return true;
+  } finally {
+    try {
+      run("git", ["worktree", "remove", "--force", tempRoot]);
+    } catch {
+      fs.rmSync(tempRoot, { recursive: true, force: true });
+    }
+    try {
+      run("git", ["branch", "-D", workBranch]);
+    } catch {
+    }
   }
 }
 
@@ -235,9 +276,8 @@ function commitAndPush(title, issueNumber) {
   }
   run("git", ["commit", "-m", `${title} (#${issueNumber})`]);
   const mainBranch = env.PLUGIN_HUB_MAIN_BRANCH || "main";
-  const pagesBranch = env.PLUGIN_HUB_PAGES_BRANCH || "gh-pages";
   run("git", ["push", "origin", `HEAD:${mainBranch}`]);
-  run("git", ["push", "origin", `HEAD:${pagesBranch}`]);
+  syncPagesBranch(title, issueNumber);
   return true;
 }
 
