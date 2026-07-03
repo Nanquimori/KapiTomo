@@ -9,8 +9,8 @@
   "chapter": {
     "id": "capitulo-002",
     "number": "2",
-    "title": "Capitulo 002",
-    "name": "Capitulo 02",
+    "title": "Capítulo 002",
+    "name": "Capítulo 02",
     "contentType": "images",
     "url": "https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo-imagens/1/",
     "text": "",
@@ -21,14 +21,14 @@
         "name": "page-001.png",
         "image": "https://nanquimori.github.io/KapiTomo/assets/works/garoto-outro-mundo-imagens/capitulo-002/page-001.png",
         "url": "https://nanquimori.github.io/KapiTomo/assets/works/garoto-outro-mundo-imagens/capitulo-002/page-001.png",
-        "lastModified": 1780372306471
+        "lastModified": 1782951398046
       },
       {
         "number": 2,
         "name": "page-002.png",
         "image": "https://nanquimori.github.io/KapiTomo/assets/works/garoto-outro-mundo-imagens/capitulo-002/page-002.png",
         "url": "https://nanquimori.github.io/KapiTomo/assets/works/garoto-outro-mundo-imagens/capitulo-002/page-002.png",
-        "lastModified": 1780372306501
+        "lastModified": 1782951398126
       }
     ],
     "pageCount": 2,

@@ -18,14 +18,14 @@ obras/minha-obra/
     \-- capitulo-003.json
 ```
 
-Capitulo:
+Capítulo:
 
 ```json
 {
-  "title": "Capitulo 01 - A Queda",
+  "title": "Capítulo 01 - A Queda",
   "paragraphs": [
-    "Primeiro paragrafo.",
-    "Segundo paragrafo."
+    "Primeiro parágrafo.",
+    "Segundo parágrafo."
   ]
 }
 ```
@@ -47,7 +47,7 @@ obras/minha-obra/
 
 ## Metadados da obra
 
-`obra.json` e opcional.
+`obra.json` é opcional.
 
 ```json
 {
@@ -58,4 +58,4 @@ obras/minha-obra/
 }
 ```
 
-Se `obra.json` nao existir, o gerador usa o nome da pasta, encontra uma capa e cria o resto automaticamente.
+Se `obra.json` não existir, o gerador usa o nome da pasta, encontra uma capa e cria o resto automaticamente.

@@ -1,6 +1,6 @@
 # KapiTomo API
 
-A API publica fica em `api/works/` e usa JSON para obras e capitulos.
+A API pública fica em `api/works/` e usa JSON para obras e capítulos.
 
 ## Arquivos
 
@@ -27,17 +27,17 @@ api/
 
 `works/index.json` lista todas as obras.
 
-`works/{obra}/index.json` descreve a obra, capa, resumo e capitulos.
+`works/{obra}/index.json` descreve a obra, capa, resumo e capítulos.
 
-`works/{obra}/chapters/{capitulo}.json` descreve um capitulo.
+`works/{obra}/chapters/{capitulo}.json` descreve um capítulo.
 
 Novel:
 
 ```json
 {
   "contentType": "novel",
-  "text": "Texto completo do capitulo.",
-  "paragraphs": ["Primeiro paragrafo.", "Segundo paragrafo."]
+  "text": "Texto completo do capítulo.",
+  "paragraphs": ["Primeiro parágrafo.", "Segundo parágrafo."]
 }
 ```
 
@@ -55,4 +55,4 @@ Quadrinho:
 }
 ```
 
-`catalog.json` existe para compatibilidade. O formato principal e `works/index.json`.
+`catalog.json` existe para compatibilidade. O formato principal é `works/index.json`.

@@ -32,7 +32,7 @@ function getChapterId(chapter, index) {
 }
 
 function getChapterNumberLabel(index) {
-  return `Capitulo ${String(index + 1).padStart(2, "0")}`;
+  return `Capítulo ${String(index + 1).padStart(2, "0")}`;
 }
 
 function getChapterTypeLabel(chapter) {
@@ -46,7 +46,7 @@ function getChapterPreview(work, chapter) {
 
 function getChapterReadingInfo(chapter) {
   const imageCount = getChapterImages(chapter).length;
-  return `${imageCount || 1} pagina${imageCount === 1 ? "" : "s"}`;
+  return `${imageCount || 1} página${imageCount === 1 ? "" : "s"}`;
 }
 
 function getWork(workId) {
@@ -138,27 +138,27 @@ function renderWorkPage(work) {
   fragment.querySelector(".manga-test-note").textContent = work.testNote || "";
   fragment.querySelector(".manga-test-note").hidden = !work.testNote;
   fragment.querySelector(".manga-description").textContent = work.description;
-  fragment.querySelector(".chapter-count").textContent = `${work.chapters.length} capitulo${work.chapters.length === 1 ? "" : "s"}`;
+  fragment.querySelector(".chapter-count").textContent = `${work.chapters.length} capítulo${work.chapters.length === 1 ? "" : "s"}`;
 
   fragment.querySelector(".manga-badges").innerHTML = `
     <span>${escapeHtml(work.status)}</span>
     <span>${escapeHtml(work.rating)}</span>
-    <span>${work.chapters.length} capitulo${work.chapters.length === 1 ? "" : "s"}</span>
+    <span>${work.chapters.length} capítulo${work.chapters.length === 1 ? "" : "s"}</span>
   `;
 
   fragment.querySelector(".manga-actions").innerHTML = `
-    <a class="button primary" href="${chapterUrl(work, 0)}">Ler primeiro capitulo</a>
-    <a class="button secondary" href="${chapterUrl(work, work.chapters.length - 1)}">Ultimo capitulo</a>
+    <a class="button primary" href="${chapterUrl(work, 0)}">Ler primeiro capítulo</a>
+    <a class="button secondary" href="${chapterUrl(work, work.chapters.length - 1)}">Último capítulo</a>
   `;
 
   fragment.querySelector(".manga-facts").innerHTML = `
-    <h2>Informacoes</h2>
+    <h2>Informações</h2>
     <dl>
       <div class="fact-author"><dt>Autor</dt><dd>KapiTomo</dd></div>
-      <div class="fact-genre"><dt>Genero</dt><dd>${escapeHtml(work.genre)}</dd></div>
+      <div class="fact-genre"><dt>Gênero</dt><dd>${escapeHtml(work.genre)}</dd></div>
       <div class="fact-status"><dt>Status</dt><dd>${escapeHtml(work.status)}</dd></div>
-      <div class="fact-rating"><dt>Classificacao</dt><dd>${escapeHtml(work.rating)}</dd></div>
-      <div class="fact-publish"><dt>Publicacao</dt><dd>Obras oficiais do KapiTomo</dd></div>
+      <div class="fact-rating"><dt>Classificação</dt><dd>${escapeHtml(work.rating)}</dd></div>
+      <div class="fact-publish"><dt>Publicação</dt><dd>Obras oficiais do KapiTomo</dd></div>
     </dl>
   `;
 
@@ -186,12 +186,12 @@ function renderChapterList(work) {
 
   const sortToggle = workView.querySelector("[data-chapter-sort-toggle]");
   if (sortToggle) {
-    sortToggle.textContent = chapterUiState.sort === "desc" ? "Recentes" : "Inicio";
-    sortToggle.setAttribute("aria-label", chapterUiState.sort === "desc" ? "Ordenado pelos capitulos recentes" : "Ordenado pelo inicio");
+    sortToggle.textContent = chapterUiState.sort === "desc" ? "Recentes" : "Início";
+    sortToggle.setAttribute("aria-label", chapterUiState.sort === "desc" ? "Ordenado pelos capítulos recentes" : "Ordenado pelo início");
   }
 
   if (!chapterItems.length) {
-    list.innerHTML = '<p class="chapter-search-empty">Nenhum capitulo encontrado.</p>';
+    list.innerHTML = '<p class="chapter-search-empty">Nenhum capítulo encontrado.</p>';
     return;
   }
 
@@ -233,11 +233,11 @@ function renderChapterPage(work, chapterIndex = 0) {
 
   fragment.querySelector(".back-link").href = workUrl(work);
   fragment.querySelector(".eyebrow").textContent = work.title;
-  fragment.querySelector("h1").textContent = isNovel ? `Capitulo ${String(safeIndex + 1)}` : chapter.title;
+  fragment.querySelector("h1").textContent = isNovel ? `Capítulo ${String(safeIndex + 1)}` : chapter.title;
   fragment.querySelector(".chapter-tools").innerHTML = `
     ${previousIndex === null ? '<span class="button ghost disabled">Anterior</span>' : `<a class="button secondary" href="${chapterUrl(work, previousIndex)}">Anterior</a>`}
-    <a class="button secondary" href="${workUrl(work)}">Lista de capitulos</a>
-    ${nextIndex === null ? '<span class="button ghost disabled">Proximo</span>' : `<a class="button primary" href="${chapterUrl(work, nextIndex)}">Proximo</a>`}
+    <a class="button secondary" href="${workUrl(work)}">Lista de capítulos</a>
+    ${nextIndex === null ? '<span class="button ghost disabled">Próximo</span>' : `<a class="button primary" href="${chapterUrl(work, nextIndex)}">Próximo</a>`}
   `;
 
   if (isNovel) {
@@ -251,7 +251,7 @@ function renderChapterPage(work, chapterIndex = 0) {
     page.classList.add("image-chapter-page");
     fragment.querySelector(".webtoon-strip").className = "image-reader";
     fragment.querySelector(".image-reader").innerHTML = imagePages
-      .map((image, index) => `<img src="${image.src}" alt="${image.alt || `${chapter.title} pagina ${index + 1}`}" loading="lazy">`)
+      .map((image, index) => `<img src="${image.src}" alt="${image.alt || `${chapter.title} página ${index + 1}`}" loading="lazy">`)
       .join("");
   } else {
     fragment.querySelector(".webtoon-strip").innerHTML = [
@@ -269,7 +269,7 @@ function renderChapterPage(work, chapterIndex = 0) {
 
   fragment.querySelector(".chapter-footer").innerHTML = `
     <a class="button secondary" href="${workUrl(work)}">Voltar para ${work.title}</a>
-    ${nextIndex === null ? "" : `<a class="button primary" href="${chapterUrl(work, nextIndex)}">Ler proximo capitulo</a>`}
+    ${nextIndex === null ? "" : `<a class="button primary" href="${chapterUrl(work, nextIndex)}">Ler próximo capítulo</a>`}
   `;
 
   chapterView.innerHTML = "";
