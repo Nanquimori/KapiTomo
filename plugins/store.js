@@ -1,6 +1,10 @@
 const list = document.getElementById("pluginList");
-const connectGitHubButton = document.getElementById("connectGitHubButton");
-const disconnectGitHubButton = document.getElementById("disconnectGitHubButton");
+const emailInput = document.getElementById("emailInput");
+const usernameInput = document.getElementById("usernameInput");
+const passwordInput = document.getElementById("passwordInput");
+const signInButton = document.getElementById("signInButton");
+const signUpButton = document.getElementById("signUpButton");
+const signOutButton = document.getElementById("signOutButton");
 const profileCard = document.getElementById("profileCard");
 const profileAvatar = document.getElementById("profileAvatar");
 const profileName = document.getElementById("profileName");
@@ -11,22 +15,16 @@ const loadRepoPluginButton = document.getElementById("loadRepoPluginButton");
 const clearDraftPluginsButton = document.getElementById("clearDraftPluginsButton");
 const publishStatus = document.getElementById("publishStatus");
 const removePluginIdInput = document.getElementById("removePluginIdInput");
-const removeRepoUrlInput = document.getElementById("removeRepoUrlInput");
 const requestRemovePluginButton = document.getElementById("requestRemovePluginButton");
 const removeStatus = document.getElementById("removeStatus");
 const authPanels = Array.from(document.querySelectorAll("[data-auth-panel]"));
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v1";
-const AUTH_API_BASE = (window.KAPITOMO_AUTH_API || localStorage.getItem("kapitomo.authApi") || "").replace(/\/$/, "");
+const FIREBASE_CONFIG = window.KAPITOMO_FIREBASE_CONFIG || null;
+
 let renderedPlugins = [];
+let currentUser = null;
 let currentProfile = null;
-
-function authUrl(path) {
-  return (AUTH_API_BASE || location.origin) + path;
-}
-
-function hasAuthBackend() {
-  return Boolean(AUTH_API_BASE) || !/github\.io$/i.test(location.hostname);
-}
+let firebaseApi = null;
 
 function escapeHtml(value) {
   return String(value || "").replace(/[&<>"']/g, (char) => ({
@@ -60,34 +58,16 @@ function setRemoveStatus(message) {
   }
 }
 
-async function apiFetch(path, options = {}) {
-  return fetch(authUrl(path), {
-    ...options,
-    credentials: "include",
-    headers: {
-      "Accept": "application/json",
-      ...(options.body ? { "Content-Type": "application/json" } : {}),
-      ...(options.headers || {})
-    }
-  });
+function avatarFor(name) {
+  const label = String(name || "?").trim().slice(0, 2).toUpperCase();
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" rx="48" fill="#ffb51f"/><text x="50%" y="55%" text-anchor="middle" dominant-baseline="middle" fill="#160a08" font-family="Arial" font-size="34" font-weight="800">${escapeHtml(label)}</text></svg>`;
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
 }
 
-async function apiJson(path, options = {}) {
-  const response = await apiFetch(path, options);
-  let data = {};
-  try {
-    data = await response.json();
-  } catch {
-  }
-  if (!response.ok) {
-    throw new Error(data.error || data.message || ("HTTP " + response.status));
-  }
-  return data;
-}
-
-function renderProfile(profile, message) {
+function renderProfile(user, profile, message) {
+  currentUser = user || null;
   currentProfile = profile || null;
-  const enabled = Boolean(currentProfile);
+  const enabled = Boolean(currentUser);
   authPanels.forEach((panel) => {
     panel.hidden = !enabled;
   });
@@ -95,62 +75,163 @@ function renderProfile(profile, message) {
     profileCard.hidden = !enabled;
   }
   if (profileAvatar) {
-    profileAvatar.src = enabled ? (currentProfile.avatar_url || "") : "";
+    profileAvatar.src = enabled ? avatarFor(profile?.username || user.email || "U") : "";
   }
   if (profileName) {
-    profileName.textContent = enabled ? (currentProfile.name || currentProfile.login) : "";
+    profileName.textContent = enabled ? (profile?.username || user.displayName || "Usuario") : "";
   }
   if (profileLogin) {
-    profileLogin.textContent = enabled ? ("@" + currentProfile.login) : "";
+    profileLogin.textContent = enabled ? (user.email || "") : "";
   }
-  if (connectGitHubButton) {
-    connectGitHubButton.hidden = enabled;
+  if (signInButton) {
+    signInButton.hidden = enabled;
   }
-  if (disconnectGitHubButton) {
-    disconnectGitHubButton.hidden = !enabled;
+  if (signUpButton) {
+    signUpButton.hidden = enabled;
+  }
+  if (signOutButton) {
+    signOutButton.hidden = !enabled;
   }
   setPublisherStatus(message || (enabled
-    ? `Logado como @${currentProfile.login}.`
-    : "Entre com GitHub para publicar ou remover plugins."));
+    ? `Logado como ${profile?.username || user.email}.`
+    : "Crie conta ou entre para publicar e remover plugins."));
 }
 
-async function loadSession() {
-  if (!hasAuthBackend()) {
-    renderProfile(null, "Login real precisa do backend OAuth publicado e configurado.");
+function ensureFirebaseConfig() {
+  if (!FIREBASE_CONFIG || !FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey === "SUA_API_KEY") {
+    renderProfile(null, null, "Firebase ainda nao configurado. Configure plugins/firebase-config.js para ativar contas online.");
+    return false;
+  }
+  return true;
+}
+
+async function initFirebase() {
+  if (!ensureFirebaseConfig()) {
+    loadAllPlugins();
+    return;
+  }
+  const [
+    appModule,
+    authModule,
+    firestoreModule
+  ] = await Promise.all([
+    import("https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js"),
+    import("https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js"),
+    import("https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js")
+  ]);
+  const app = appModule.initializeApp(FIREBASE_CONFIG);
+  const auth = authModule.getAuth(app);
+  const db = firestoreModule.getFirestore(app);
+  firebaseApi = {
+    auth,
+    db,
+    ...authModule,
+    ...firestoreModule
+  };
+  authModule.onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      renderProfile(null, null);
+      loadAllPlugins();
+      return;
+    }
+    const profile = await loadUserProfile(user);
+    renderProfile(user, profile);
+    loadAllPlugins();
+  });
+}
+
+async function loadUserProfile(user) {
+  const ref = firebaseApi.doc(firebaseApi.db, "users", user.uid);
+  const snap = await firebaseApi.getDoc(ref);
+  if (snap.exists()) {
+    return snap.data();
+  }
+  const profile = {
+    uid: user.uid,
+    username: user.displayName || (user.email || "usuario").split("@")[0],
+    email: user.email || "",
+    created_at: firebaseApi.serverTimestamp()
+  };
+  await firebaseApi.setDoc(ref, profile, { merge: true });
+  return profile;
+}
+
+function cleanUsername() {
+  return String(usernameInput?.value || "").trim().replace(/^@+/, "");
+}
+
+function cleanEmail() {
+  return String(emailInput?.value || "").trim();
+}
+
+function cleanPassword() {
+  return String(passwordInput?.value || "");
+}
+
+async function signUp() {
+  if (!firebaseApi) {
+    setPublisherStatus("Firebase nao configurado.");
+    return;
+  }
+  const username = cleanUsername();
+  const email = cleanEmail();
+  const password = cleanPassword();
+  if (!username || !email || password.length < 6) {
+    setPublisherStatus("Informe nome de usuario, email e senha com pelo menos 6 caracteres.");
     return;
   }
   try {
-    const session = await apiJson("/auth/me");
-    renderProfile(session.user || null);
-  } catch {
-    renderProfile(null);
+    const credential = await firebaseApi.createUserWithEmailAndPassword(firebaseApi.auth, email, password);
+    await firebaseApi.updateProfile(credential.user, { displayName: username });
+    await firebaseApi.setDoc(firebaseApi.doc(firebaseApi.db, "users", credential.user.uid), {
+      uid: credential.user.uid,
+      username,
+      email,
+      created_at: firebaseApi.serverTimestamp(),
+      updated_at: firebaseApi.serverTimestamp()
+    }, { merge: true });
+    setPublisherStatus("Conta criada.");
+  } catch (error) {
+    setPublisherStatus(error?.message || "Nao foi possivel criar conta.");
   }
 }
 
-function connectGitHub() {
-  if (!hasAuthBackend()) {
-    setPublisherStatus("Backend OAuth nao configurado. Publique o backend e defina window.KAPITOMO_AUTH_API ou localStorage kapitomo.authApi.");
+async function signIn() {
+  if (!firebaseApi) {
+    setPublisherStatus("Firebase nao configurado.");
     return;
   }
-  const returnTo = location.href.replace(/[?&]auth=(ok|error)[^#]*/g, "");
-  location.href = authUrl("/auth/github/login?return_to=" + encodeURIComponent(returnTo));
-}
-
-async function disconnectGitHub() {
   try {
-    await apiJson("/auth/logout", { method: "POST" });
-  } catch {
+    await firebaseApi.signInWithEmailAndPassword(firebaseApi.auth, cleanEmail(), cleanPassword());
+    setPublisherStatus("Login concluido.");
+  } catch (error) {
+    setPublisherStatus(error?.message || "Nao foi possivel entrar.");
   }
-  renderProfile(null, "Voce saiu do Hub.");
 }
 
-function fetchCatalog() {
+async function signOut() {
+  if (!firebaseApi) {
+    return;
+  }
+  await firebaseApi.signOut(firebaseApi.auth);
+  renderProfile(null, null, "Voce saiu.");
+}
+
+function fetchStaticCatalog() {
   const urls = [
     "catalog-store.json?v=20260703-pluginhub-pruned",
     "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260703-pluginhub-pruned"
   ];
   return urls.reduce((chain, url) => chain.catch(() => fetch(url, { cache: "no-store" })
     .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))), Promise.reject());
+}
+
+async function fetchPublishedPlugins() {
+  if (!firebaseApi) {
+    return [];
+  }
+  const snap = await firebaseApi.getDocs(firebaseApi.collection(firebaseApi.db, "plugins"));
+  return snap.docs.map((item) => ({ ...item.data(), __source: "published" })).filter(hasRequiredPluginIcon);
 }
 
 function publicPlugin(plugin) {
@@ -197,11 +278,14 @@ function saveDraftPlugin(plugin) {
 function renderPlugins(plugins) {
   renderedPlugins = plugins;
   list.innerHTML = plugins.length ? plugins.map((plugin, index) => {
+    const canDelete = currentUser && plugin.owner_uid === currentUser.uid;
     const actions = [
       `<button class="button primary" type="button" data-install-plugin="${index}">Instalar no Nyxovira</button>`
     ];
     if (plugin.__source === "draft") {
-      actions.push(`<button class="button" type="button" data-publish-plugin="${index}">Enviar publicacao</button>`);
+      actions.push(`<button class="button" type="button" data-publish-plugin="${index}">Publicar</button>`);
+    } else if (canDelete) {
+      actions.push(`<button class="button" type="button" data-delete-plugin="${index}">Excluir</button>`);
     } else if (plugin.homepage || plugin.site_url) {
       actions.push(`<a class="button" href="${escapeHtml(plugin.homepage || plugin.site_url)}">Abrir site</a>`);
     }
@@ -231,18 +315,23 @@ function renderPlugins(plugins) {
   document.querySelectorAll("[data-publish-plugin]").forEach((button) => {
     button.addEventListener("click", () => publishPlugin(renderedPlugins[Number(button.dataset.publishPlugin)]));
   });
+  document.querySelectorAll("[data-delete-plugin]").forEach((button) => {
+    button.addEventListener("click", () => deletePlugin(renderedPlugins[Number(button.dataset.deletePlugin)]));
+  });
 }
 
-function loadAllPlugins() {
-  fetchCatalog()
-    .then((catalog) => {
-      const catalogPlugins = (Array.isArray(catalog.plugins) ? catalog.plugins : []).filter(hasRequiredPluginIcon);
-      const drafts = loadDraftPlugins().map((plugin) => ({ ...plugin, __source: "draft" }));
-      renderPlugins(uniquePlugins([drafts, catalogPlugins]));
-    })
-    .catch((error) => {
-      list.innerHTML = `<p>Nao foi possivel carregar o catalogo: ${escapeHtml(error.message)}</p>`;
-    });
+async function loadAllPlugins() {
+  try {
+    const [catalog, published] = await Promise.all([
+      fetchStaticCatalog().catch(() => ({ plugins: [] })),
+      fetchPublishedPlugins().catch(() => [])
+    ]);
+    const catalogPlugins = (Array.isArray(catalog.plugins) ? catalog.plugins : []).filter(hasRequiredPluginIcon);
+    const drafts = loadDraftPlugins().map((plugin) => ({ ...plugin, __source: "draft" }));
+    renderPlugins(uniquePlugins([drafts, published, catalogPlugins]));
+  } catch (error) {
+    list.innerHTML = `<p>Nao foi possivel carregar o catalogo: ${escapeHtml(error.message)}</p>`;
+  }
 }
 
 function parseGitHubRepo(rawUrl) {
@@ -339,14 +428,11 @@ async function sha256FromUrl(url) {
 
 async function loadRepoPlugin() {
   try {
-    if (!currentProfile) {
-      setPublishStatus("Entre com GitHub antes de publicar.");
+    if (!currentUser) {
+      setPublishStatus("Entre ou crie conta antes de publicar.");
       return;
     }
     const repo = parseGitHubRepo(repoUrlInput?.value || "");
-    if (repo.owner.toLowerCase() !== currentProfile.login.toLowerCase()) {
-      setPublishStatus("Aviso: o repositorio pertence a outro usuario ou organizacao.");
-    }
     setPublishStatus("Lendo plugin.json do repositorio...");
     const { branch, manifest } = await fetchRepoManifest(repo);
     const browser = manifest.browser || {};
@@ -360,7 +446,7 @@ async function loadRepoPlugin() {
       id: manifest.id || repo.repo,
       name: manifest.name || manifest.id || repo.repo,
       description: manifest.description || `Fonte para baixar obras de ${manifest.name || repo.repo} no Nyxovira.`,
-      author: manifest.author || repo.owner,
+      author: manifest.author || currentProfile?.username || repo.owner,
       version: packageInfo.version || manifest.version || "1.0.0",
       site_url: browser.home_url || `https://github.com/${repo.owner}/${repo.repo}/`,
       homepage: browser.home_url || `https://github.com/${repo.owner}/${repo.repo}/`,
@@ -368,7 +454,9 @@ async function loadRepoPlugin() {
       package_url: packageInfo.url,
       sha256: await sha256FromUrl(packageInfo.url),
       tags: Array.isArray(manifest.tags) ? manifest.tags : ["comunidade"],
-      __repo: `https://github.com/${repo.owner}/${repo.repo}`,
+      owner_uid: currentUser.uid,
+      owner_username: currentProfile?.username || currentUser.email,
+      repo_url: `https://github.com/${repo.owner}/${repo.repo}`,
       __source: "draft"
     };
     saveDraftPlugin(plugin);
@@ -380,59 +468,56 @@ async function loadRepoPlugin() {
 }
 
 async function publishPlugin(plugin) {
-  if (!currentProfile) {
-    setPublishStatus("Entre com GitHub antes de enviar a publicacao.");
+  if (!currentUser || !firebaseApi) {
+    setPublishStatus("Entre ou crie conta antes de publicar.");
     return;
   }
   try {
-    setPublishStatus("Enviando publicacao...");
-    const result = await apiJson("/plugins/publish", {
-      method: "POST",
-      body: JSON.stringify({
-        plugin: publicPlugin(plugin),
-        repository: plugin.__repo || plugin.homepage || plugin.site_url || ""
-      })
-    });
-    setPublishStatus("Publicacao enviada.");
-    if (result.url) {
-      window.open(result.url, "_blank", "noopener");
-    }
+    const clean = publicPlugin(plugin);
+    clean.owner_uid = currentUser.uid;
+    clean.owner_username = currentProfile?.username || currentUser.email;
+    clean.updated_at = firebaseApi.serverTimestamp();
+    clean.created_at = clean.created_at || firebaseApi.serverTimestamp();
+    setPublishStatus("Publicando...");
+    await firebaseApi.setDoc(firebaseApi.doc(firebaseApi.db, "plugins", clean.id), clean, { merge: true });
+    localStorage.setItem(LOCAL_PLUGIN_KEY, JSON.stringify(loadDraftPlugins().filter((draft) => draft.id !== clean.id)));
+    setPublishStatus("Plugin publicado.");
+    loadAllPlugins();
   } catch (error) {
-    setPublishStatus(error?.message || "Nao foi possivel enviar a publicacao.");
+    setPublishStatus(error?.message || "Nao foi possivel publicar.");
+  }
+}
+
+async function deletePlugin(plugin) {
+  if (!currentUser || !firebaseApi) {
+    setRemoveStatus("Entre antes de excluir.");
+    return;
+  }
+  if (!plugin || plugin.owner_uid !== currentUser.uid) {
+    setRemoveStatus("Voce so pode excluir plugins publicados pela sua conta.");
+    return;
+  }
+  try {
+    await firebaseApi.deleteDoc(firebaseApi.doc(firebaseApi.db, "plugins", plugin.id));
+    setRemoveStatus("Plugin excluido.");
+    loadAllPlugins();
+  } catch (error) {
+    setRemoveStatus(error?.message || "Nao foi possivel excluir.");
   }
 }
 
 async function requestRemovePlugin() {
-  if (!currentProfile) {
-    setRemoveStatus("Entre com GitHub antes de solicitar remocao.");
-    return;
-  }
   const pluginId = String(removePluginIdInput?.value || "").trim();
-  const repoUrl = String(removeRepoUrlInput?.value || "").trim();
   if (!pluginId) {
     setRemoveStatus("Informe o ID do plugin publicado.");
     return;
   }
-  if (!repoUrl) {
-    setRemoveStatus("Informe o repositorio GitHub do plugin.");
+  const plugin = renderedPlugins.find((item) => item.id === pluginId);
+  if (!plugin) {
+    setRemoveStatus("Plugin nao encontrado na lista carregada.");
     return;
   }
-  try {
-    setRemoveStatus("Enviando pedido de remocao...");
-    const result = await apiJson("/plugins/remove", {
-      method: "POST",
-      body: JSON.stringify({
-        plugin_id: pluginId,
-        repository: repoUrl
-      })
-    });
-    setRemoveStatus("Pedido de remocao enviado.");
-    if (result.url) {
-      window.open(result.url, "_blank", "noopener");
-    }
-  } catch (error) {
-    setRemoveStatus(error?.message || "Nao foi possivel solicitar remocao.");
-  }
+  await deletePlugin(plugin);
 }
 
 function installPlugin(plugin) {
@@ -453,9 +538,10 @@ function installPlugin(plugin) {
   }
 }
 
+signInButton?.addEventListener("click", signIn);
+signUpButton?.addEventListener("click", signUp);
+signOutButton?.addEventListener("click", signOut);
 loadRepoPluginButton?.addEventListener("click", loadRepoPlugin);
-connectGitHubButton?.addEventListener("click", connectGitHub);
-disconnectGitHubButton?.addEventListener("click", disconnectGitHub);
 requestRemovePluginButton?.addEventListener("click", requestRemovePlugin);
 repoUrlInput?.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
@@ -468,5 +554,4 @@ clearDraftPluginsButton?.addEventListener("click", () => {
   setPublishStatus("Rascunhos removidos deste navegador.");
   loadAllPlugins();
 });
-loadSession();
-loadAllPlugins();
+initFirebase();

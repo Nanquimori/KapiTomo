@@ -408,8 +408,8 @@
       <section class="grid">
         <article class="panel">
           <p class="kicker">Acesso</p>
-          <h2>Entrar com GitHub</h2>
-          <p>Entre com GitHub para publicar ou remover plugins. O Hub mostra seu perfil real antes de liberar as acoes.</p>
+          <h2>Conta do publicador</h2>
+          <p>Crie uma conta ou entre com email e senha. O Hub mostra seu perfil antes de liberar publicacao e exclusao.</p>
           <div class="publish-form">
             <div id="profileCard" class="profile-card" hidden>
               <img id="profileAvatar" class="profile-avatar" src="" alt="">
@@ -418,9 +418,16 @@
                 <span id="profileLogin"></span>
               </div>
             </div>
+            <label class="field-label" for="usernameInput">Nome de usuario</label>
+            <input id="usernameInput" class="text-input" type="text" autocomplete="username" placeholder="seu-nome">
+            <label class="field-label" for="emailInput">Email</label>
+            <input id="emailInput" class="text-input" type="email" autocomplete="email" placeholder="voce@email.com">
+            <label class="field-label" for="passwordInput">Senha</label>
+            <input id="passwordInput" class="text-input" type="password" autocomplete="current-password" placeholder="minimo 6 caracteres">
             <div class="button-row">
-              <button id="connectGitHubButton" class="button primary" type="button">Entrar no GitHub</button>
-              <button id="disconnectGitHubButton" class="button" type="button" hidden>Sair do Hub</button>
+              <button id="signInButton" class="button primary" type="button">Entrar</button>
+              <button id="signUpButton" class="button" type="button">Criar conta</button>
+              <button id="signOutButton" class="button" type="button" hidden>Sair</button>
             </div>
             <p id="publisherStatus" class="publish-status" aria-live="polite"></p>
           </div>
@@ -444,13 +451,11 @@
         <article class="panel" data-auth-panel hidden>
           <p class="kicker">Remover</p>
           <h2>Remova uma publicacao</h2>
-          <p>Informe o plugin publicado e abra um pedido de remocao. A solicitacao fica registrada na sua conta GitHub.</p>
+          <p>Informe o ID do plugin publicado pela sua conta para excluir do catalogo online.</p>
           <div class="publish-form">
             <label class="field-label" for="removePluginIdInput">ID do plugin</label>
             <input id="removePluginIdInput" class="text-input" type="text" placeholder="meu-addon">
-            <label class="field-label" for="removeRepoUrlInput">Repositorio GitHub</label>
-            <input id="removeRepoUrlInput" class="text-input" type="url" placeholder="https://github.com/usuario/meu-addon">
-            <button id="requestRemovePluginButton" class="button primary" type="button">Solicitar remocao</button>
+            <button id="requestRemovePluginButton" class="button primary" type="button">Excluir plugin</button>
             <p id="removeStatus" class="publish-status" aria-live="polite"></p>
           </div>
         </article>
@@ -468,12 +473,13 @@
           </article>
           <article>
             <h3>Adicione ao catalogo</h3>
-            <p>Use o botao de publicacao gerado pelo Hub. Ele abre um pedido no GitHub com a entrada pronta para entrar no catalogo publico.</p>
+            <p>Use o botao publicar no Hub. O plugin entra no catalogo online vinculado a sua conta.</p>
           </article>
         </article>
       </section>
     </main>
 
-    <script src="store.js?v=20260703-real-oauth"></script>
+    <script src="firebase-config.js?v=20260703-firebase-auth"></script>
+    <script src="store.js?v=20260703-firebase-auth"></script>
   </body>
 </html>
