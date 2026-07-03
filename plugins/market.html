@@ -251,6 +251,9 @@
       .steps article::before {
         counter-increment: step;
         content: counter(step);
+        grid-column: 1;
+        grid-row: 1 / span 2;
+        align-self: start;
         width: 32px;
         height: 32px;
         display: grid;
@@ -267,7 +270,10 @@
       }
 
       .steps article h3 {
-        margin: 1px 0 6px;
+        min-height: 32px;
+        display: flex;
+        align-items: center;
+        margin: 0 0 6px;
         line-height: 1.1;
       }
 
