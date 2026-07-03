@@ -137,19 +137,6 @@ function isMaintainer(actor) {
   return MAINTAINERS.has(String(actor || "").toLowerCase());
 }
 
-async function assertReachable(url, field) {
-  const response = await fetch(url, { method: "HEAD", redirect: "follow" }).catch(() => null);
-  if (response && response.ok) {
-    return;
-  }
-  const fallback = await fetch(url, { method: "GET", redirect: "follow" }).catch((error) => {
-    throw new Error(`${field} nao respondeu: ${error.message}`);
-  });
-  if (!fallback.ok) {
-    throw new Error(`${field} respondeu HTTP ${fallback.status}.`);
-  }
-}
-
 async function calculatePackageHash(url) {
   const response = await fetch(url, { method: "GET", redirect: "follow" });
   if (!response.ok) {
@@ -168,7 +155,6 @@ async function calculatePackageHash(url) {
 
 async function publishPlugin(issue) {
   const plugin = normalizePlugin(extractJson(issue.body));
-  await assertReachable(plugin.icon_url, "icon_url");
   plugin.sha256 = await calculatePackageHash(plugin.package_url);
 
   const catalog = loadCatalog();
