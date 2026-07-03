@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8">
@@ -383,8 +383,16 @@
         return Boolean(plugin && String(plugin.icon_url || plugin.iconUrl || "").trim());
       }
 
-      fetch("catalog-store.json?v=20260703-nexustoons-release", { cache: "no-store" })
-        .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))
+      function fetchCatalog() {
+        const urls = [
+          "catalog-store.json?v=20260703-nexustoons-release",
+          "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260703-nexustoons-release"
+        ];
+        return urls.reduce((chain, url) => chain.catch(() => fetch(url, { cache: "no-store" })
+          .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))), Promise.reject());
+      }
+
+      fetchCatalog()
         .then((catalog) => {
           const plugins = (Array.isArray(catalog.plugins) ? catalog.plugins : []).filter(hasRequiredPluginIcon);
           list.innerHTML = plugins.length ? plugins.map((plugin, index) => `
