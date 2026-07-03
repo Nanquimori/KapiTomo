@@ -19,6 +19,19 @@
       "package_url": "https://nanquimori.github.io/KapiTomo/downloads/plugins/kapitomo.zip",
       "sha256": "4cb16b659212afa09d15e5bb1f2584dd2fa80ca47382f6580659fe178110cbe0",
       "tags": ["oficial", "novel", "quadrinho"]
+    },
+    {
+      "id": "nexustoons",
+      "name": "NexusToons",
+      "description": "Fonte para baixar obras do NexusToons no Nyxovira.",
+      "author": "yxz0w0zxy",
+      "version": "1.0.7",
+      "site_url": "https://nexustoons.com/",
+      "homepage": "https://nexustoons.com/",
+      "icon_url": "https://nexustoons.com/icon.png",
+      "package_url": "https://github.com/yxz0w0zxy/teste_plugin/archive/refs/tags/v1.0.7.zip",
+      "sha256": "37564ec22351c1f25ea776aa0dfc85ae9945ccfa45d05cb20764f337e13d2141",
+      "tags": ["manga", "quadrinho"]
     }
   ]
 }
