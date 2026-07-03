@@ -1,1 +1,0 @@
-window.KAPITOMO_FIREBASE_CONFIG = null;
