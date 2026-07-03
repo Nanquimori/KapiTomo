@@ -152,22 +152,22 @@
 
       .plugin-card {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(236px, 320px);
-        gap: 16px;
-        align-items: center;
+        grid-template-columns: 1fr;
+        gap: 14px;
+        align-items: stretch;
       }
 
       .plugin-summary {
         display: grid;
-        grid-template-columns: 58px minmax(0, 1fr);
+        grid-template-columns: 72px minmax(0, 1fr);
         gap: 16px;
-        align-items: center;
+        align-items: start;
         min-width: 0;
       }
 
       .plugin-icon {
-        width: 58px;
-        height: 58px;
+        width: 72px;
+        height: 72px;
         border: 1px solid var(--line);
         border-radius: 14px;
         object-fit: cover;
@@ -188,15 +188,14 @@
       }
 
       .button-row {
-        display: flex;
-        flex-wrap: nowrap;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 10px;
-        justify-content: flex-end;
         min-width: 0;
       }
 
       .button {
-        flex: 1 1 0;
+        width: 100%;
         min-width: 0;
         min-height: 40px;
         display: inline-flex;
@@ -260,37 +259,26 @@
       }
 
       @media (max-width: 680px) {
-        .topbar,
-        .plugin-card {
+        .topbar {
           grid-template-columns: 1fr;
         }
 
         .plugin-summary {
-          grid-template-columns: 64px minmax(0, 1fr);
+          grid-template-columns: 70px minmax(0, 1fr);
+          gap: 14px;
         }
 
         .plugin-icon {
-          width: 64px;
-          height: 64px;
+          width: 70px;
+          height: 70px;
         }
 
-        .topbar,
-        .plugin-card,
-        .button-row {
+        .topbar {
           align-items: stretch;
-        }
-
-        .button-row {
-          justify-content: center;
-          width: 100%;
         }
 
         .button {
           justify-content: center;
-        }
-
-        .button-row .button {
-          width: auto;
         }
       }
     </style>
@@ -308,7 +296,7 @@
       <section class="hero">
         <p class="kicker">Nyxovira</p>
         <h1>Plugin Hub</h1>
-        <p>Um catalogo publico para instalar fontes no Nyxovira. O app le este catalogo direto, baixa o pacote, confere o hash e instala sem abrir navegador externo. Todo plugin publicado precisa ter uma imagem em <code>icon_url</code>.</p>
+        <p>Um catalogo publico para instalar fontes no Nyxovira. O app le este catalogo direto, baixa o pacote, confere o hash e instala sem abrir navegador externo.</p>
       </section>
 
       <section class="panel" style="margin-top: 18px;">
@@ -369,7 +357,7 @@
         return Boolean(plugin && String(plugin.icon_url || plugin.iconUrl || "").trim());
       }
 
-      fetch("catalog.json?v=20260703-plugin-actions-clean", { cache: "no-store" })
+      fetch("catalog.json?v=20260703-plugin-layout-clean", { cache: "no-store" })
         .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))
         .then((catalog) => {
           const plugins = (Array.isArray(catalog.plugins) ? catalog.plugins : []).filter(hasRequiredPluginIcon);
