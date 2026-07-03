@@ -38,8 +38,8 @@ function setRemoveStatus(message) {
 
 function fetchCatalog() {
   const urls = [
-    "catalog-store.json?v=20260703-auto-hub2",
-    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260703-auto-hub2"
+    "catalog-store.json?v=20260703-auto-hub3",
+    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260703-auto-hub3"
   ];
   return urls.reduce((chain, url) => chain.catch(() => fetch(url, { cache: "no-store" })
     .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))), Promise.reject());
@@ -81,9 +81,17 @@ function loadDraftPlugins() {
   }
 }
 
+function saveDraftPlugins(drafts) {
+  if (drafts.length) {
+    localStorage.setItem(LOCAL_PLUGIN_KEY, JSON.stringify(drafts.map(publicPlugin)));
+  } else {
+    localStorage.removeItem(LOCAL_PLUGIN_KEY);
+  }
+}
+
 function saveDraftPlugin(plugin) {
   const drafts = uniquePlugins([[{ ...plugin, __source: "draft" }], loadDraftPlugins()]);
-  localStorage.setItem(LOCAL_PLUGIN_KEY, JSON.stringify(drafts.map(publicPlugin)));
+  saveDraftPlugins(drafts);
 }
 
 function renderPlugins(plugins) {
@@ -129,8 +137,13 @@ function loadAllPlugins() {
   fetchCatalog()
     .then((catalog) => {
       const catalogPlugins = (Array.isArray(catalog.plugins) ? catalog.plugins : []).filter(hasRequiredPluginIcon);
-      const drafts = loadDraftPlugins().map((plugin) => ({ ...plugin, __source: "draft" }));
-      renderPlugins(uniquePlugins([drafts, catalogPlugins]));
+      const publishedKeys = new Set(catalogPlugins.map(pluginKey));
+      const savedDrafts = loadDraftPlugins();
+      const drafts = savedDrafts.filter((plugin) => !publishedKeys.has(pluginKey(plugin)));
+      if (drafts.length !== savedDrafts.length) {
+        saveDraftPlugins(drafts);
+      }
+      renderPlugins(uniquePlugins([catalogPlugins, drafts.map((plugin) => ({ ...plugin, __source: "draft" }))]));
     })
     .catch((error) => {
       list.innerHTML = `<p>Nao foi possivel carregar o catalogo: ${escapeHtml(error.message)}</p>`;
