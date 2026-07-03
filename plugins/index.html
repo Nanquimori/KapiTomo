@@ -152,9 +152,17 @@
 
       .plugin-card {
         display: grid;
-        grid-template-columns: 58px minmax(0, 1fr) auto;
+        grid-template-columns: minmax(0, 1fr) minmax(236px, 320px);
         gap: 16px;
         align-items: center;
+      }
+
+      .plugin-summary {
+        display: grid;
+        grid-template-columns: 58px minmax(0, 1fr);
+        gap: 16px;
+        align-items: center;
+        min-width: 0;
       }
 
       .plugin-icon {
@@ -181,12 +189,15 @@
 
       .button-row {
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         gap: 10px;
         justify-content: flex-end;
+        min-width: 0;
       }
 
       .button {
+        flex: 1 1 0;
+        min-width: 0;
         min-height: 40px;
         display: inline-flex;
         align-items: center;
@@ -197,7 +208,9 @@
         background: var(--panel-soft);
         color: var(--text);
         text-decoration: none;
+        text-align: center;
         font-weight: 800;
+        line-height: 1.12;
       }
 
       .button.primary {
@@ -252,6 +265,10 @@
           grid-template-columns: 1fr;
         }
 
+        .plugin-summary {
+          grid-template-columns: 64px minmax(0, 1fr);
+        }
+
         .plugin-icon {
           width: 64px;
           height: 64px;
@@ -263,10 +280,17 @@
           align-items: stretch;
         }
 
-        .button-row,
-        .button {
+        .button-row {
           justify-content: center;
           width: 100%;
+        }
+
+        .button {
+          justify-content: center;
+        }
+
+        .button-row .button {
+          width: auto;
         }
       }
     </style>
@@ -345,25 +369,26 @@
         return Boolean(plugin && String(plugin.icon_url || plugin.iconUrl || "").trim());
       }
 
-      fetch("catalog.json?v=20260703-plugin-icons-required", { cache: "no-store" })
+      fetch("catalog.json?v=20260703-plugin-actions-clean", { cache: "no-store" })
         .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))
         .then((catalog) => {
           const plugins = (Array.isArray(catalog.plugins) ? catalog.plugins : []).filter(hasRequiredPluginIcon);
           list.innerHTML = plugins.length ? plugins.map((plugin, index) => `
             <article class="plugin-card">
-              <img class="plugin-icon" src="${escapeHtml(plugin.icon_url || plugin.iconUrl)}" alt="">
-              <div>
-                <h3>${escapeHtml(plugin.name || plugin.id || "Plugin")}</h3>
-                <p>${escapeHtml(plugin.description || plugin.package_url || "")}</p>
-                <div class="meta">
-                  ${plugin.author ? `<span>${escapeHtml(plugin.author)}</span>` : ""}
-                  ${plugin.version ? `<span>v${escapeHtml(plugin.version)}</span>` : ""}
-                  ${plugin.id ? `<span>${escapeHtml(plugin.id)}</span>` : ""}
+              <div class="plugin-summary">
+                <img class="plugin-icon" src="${escapeHtml(plugin.icon_url || plugin.iconUrl)}" alt="">
+                <div>
+                  <h3>${escapeHtml(plugin.name || plugin.id || "Plugin")}</h3>
+                  <p>${escapeHtml(plugin.description || plugin.package_url || "")}</p>
+                  <div class="meta">
+                    ${plugin.author ? `<span>${escapeHtml(plugin.author)}</span>` : ""}
+                    ${plugin.version ? `<span>v${escapeHtml(plugin.version)}</span>` : ""}
+                    ${plugin.id ? `<span>${escapeHtml(plugin.id)}</span>` : ""}
+                  </div>
                 </div>
               </div>
               <div class="button-row">
                 <button class="button primary" type="button" data-install-plugin="${index}">Instalar no Nyxovira</button>
-                ${plugin.package_url ? `<a class="button" href="${escapeHtml(plugin.package_url)}" download>Baixar pacote</a>` : ""}
                 ${plugin.homepage || plugin.site_url ? `<a class="button" href="${escapeHtml(plugin.homepage || plugin.site_url)}">Abrir site</a>` : ""}
               </div>
             </article>
