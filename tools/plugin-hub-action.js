@@ -45,7 +45,7 @@ function normalizeId(value) {
   return id;
 }
 
-function validateHttpUrl(value, field, options = {}) {
+function validateHttpUrl(value, field) {
   const raw = cleanText(value, field, 500);
   let url;
   try {
@@ -55,9 +55,6 @@ function validateHttpUrl(value, field, options = {}) {
   }
   if (!["http:", "https:"].includes(url.protocol)) {
     throw new Error(`${field} precisa comecar com http ou https.`);
-  }
-  if (options.zip && !/\.zip$/i.test(url.pathname)) {
-    throw new Error(`${field} precisa apontar para um arquivo .zip.`);
   }
   return url.toString();
 }
@@ -88,7 +85,7 @@ function normalizePlugin(input) {
     site_url: validateHttpUrl(siteUrl, "site_url"),
     homepage: validateHttpUrl(homepage, "homepage"),
     icon_url: validateHttpUrl(input.icon_url || input.iconUrl, "icon_url"),
-    package_url: validateHttpUrl(input.package_url || input.packageUrl || input.download, "package_url", { zip: true }),
+    package_url: validateHttpUrl(input.package_url || input.packageUrl || input.download, "package_url"),
     tags: Array.isArray(input.tags) ? input.tags.map((tag) => optionalText(tag, 30)).filter(Boolean).slice(0, 8) : ["comunidade"]
   };
 
