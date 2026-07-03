@@ -270,6 +270,10 @@
         font-size: 0.9rem;
       }
 
+      [hidden] {
+        display: none !important;
+      }
+
       .steps {
         counter-reset: step;
         display: grid;
@@ -369,22 +373,19 @@
 
       <section class="grid">
         <article class="panel">
-          <p class="kicker">Conta</p>
-          <h2>Conta do publicador</h2>
-          <p>Use sua conta GitHub para publicar. O email e a senha ficam no GitHub; o KapiTomo nao guarda login nem senha.</p>
+          <p class="kicker">Acesso</p>
+          <h2>Entrar com GitHub</h2>
+          <p>Entre no GitHub para publicar ou remover plugins. O Hub nao recebe email nem senha; o GitHub confirma a conta quando voce envia o pedido.</p>
           <div class="publish-form">
-            <label class="field-label" for="publisherUserInput">Usuario GitHub</label>
-            <input id="publisherUserInput" class="text-input" type="text" autocomplete="username" placeholder="seu-usuario">
             <div class="button-row">
-              <a class="button primary" href="https://github.com/login" target="_blank" rel="noopener">Entrar no GitHub</a>
-              <a class="button" href="https://github.com/signup" target="_blank" rel="noopener">Criar conta</a>
+              <button id="connectGitHubButton" class="button primary" type="button">Entrar no GitHub</button>
+              <button id="disconnectGitHubButton" class="button" type="button" hidden>Sair do Hub</button>
             </div>
-            <button id="savePublisherButton" class="button" type="button">Salvar usuario</button>
             <p id="publisherStatus" class="publish-status" aria-live="polite"></p>
           </div>
         </article>
 
-        <article class="panel">
+        <article class="panel" data-auth-panel hidden>
           <p class="kicker">Publicar</p>
           <h2>Publique um addon pronto</h2>
           <p>Cole o repositorio GitHub que ja tem <code>plugin.json</code>. O Hub le o manifesto, procura uma Release <code>.zip</code> e abre um pedido de publicacao na sua conta.</p>
@@ -399,7 +400,7 @@
           </div>
         </article>
 
-        <article class="panel">
+        <article class="panel" data-auth-panel hidden>
           <p class="kicker">Remover</p>
           <h2>Remova uma publicacao</h2>
           <p>Informe o plugin publicado e abra um pedido de remocao. A solicitacao fica registrada na sua conta GitHub.</p>
@@ -434,8 +435,8 @@
 
     <script>
       const list = document.getElementById("pluginList");
-      const publisherUserInput = document.getElementById("publisherUserInput");
-      const savePublisherButton = document.getElementById("savePublisherButton");
+      const connectGitHubButton = document.getElementById("connectGitHubButton");
+      const disconnectGitHubButton = document.getElementById("disconnectGitHubButton");
       const publisherStatus = document.getElementById("publisherStatus");
       const repoUrlInput = document.getElementById("repoUrlInput");
       const loadRepoPluginButton = document.getElementById("loadRepoPluginButton");
@@ -445,8 +446,9 @@
       const removeRepoUrlInput = document.getElementById("removeRepoUrlInput");
       const requestRemovePluginButton = document.getElementById("requestRemovePluginButton");
       const removeStatus = document.getElementById("removeStatus");
+      const authPanels = Array.from(document.querySelectorAll("[data-auth-panel]"));
       const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v1";
-      const LOCAL_PUBLISHER_KEY = "kapitomo.publisherUser.v1";
+      const LOCAL_GITHUB_ACCESS_KEY = "kapitomo.githubAccess.v1";
       let renderedPlugins = [];
 
       function escapeHtml(value) {
@@ -490,26 +492,38 @@
         }
       }
 
-      function normalizeGitHubUser(value) {
-        return String(value || "").trim().replace(/^@+/, "");
+      function isGitHubAccessEnabled() {
+        return localStorage.getItem(LOCAL_GITHUB_ACCESS_KEY) === "connected";
       }
 
-      function getPublisherUser() {
-        return normalizeGitHubUser(publisherUserInput?.value || localStorage.getItem(LOCAL_PUBLISHER_KEY) || "");
+      function setGitHubAccess(enabled, message) {
+        if (enabled) {
+          localStorage.setItem(LOCAL_GITHUB_ACCESS_KEY, "connected");
+        } else {
+          localStorage.removeItem(LOCAL_GITHUB_ACCESS_KEY);
+        }
+        authPanels.forEach((panel) => {
+          panel.hidden = !enabled;
+        });
+        if (connectGitHubButton) {
+          connectGitHubButton.hidden = enabled;
+        }
+        if (disconnectGitHubButton) {
+          disconnectGitHubButton.hidden = !enabled;
+        }
+        setPublisherStatus(message || (enabled
+          ? "Acoes liberadas. O GitHub confirma sua conta ao enviar o pedido."
+          : "Entre no GitHub para publicar ou remover plugins."));
       }
 
-      function savePublisherUser() {
-        const user = getPublisherUser();
-        if (!/^[a-zA-Z0-9-]{1,39}$/.test(user)) {
-          setPublisherStatus("Informe um usuario GitHub valido.");
-          return "";
-        }
-        localStorage.setItem(LOCAL_PUBLISHER_KEY, user);
-        if (publisherUserInput) {
-          publisherUserInput.value = user;
-        }
-        setPublisherStatus("Usuario salvo. Entre no GitHub antes de enviar publicacao ou remocao.");
-        return user;
+      function connectGitHub() {
+        setPublisherStatus("Abrindo login do GitHub...");
+        window.open("https://github.com/login", "_blank", "noopener,noreferrer");
+        setGitHubAccess(true, "Conclua o login na aba do GitHub. Publicar e remover ja estao liberados aqui.");
+      }
+
+      function disconnectGitHub() {
+        setGitHubAccess(false, "Sessao removida deste Hub.");
       }
 
       function publicPlugin(plugin) {
@@ -701,14 +715,11 @@
 
       async function loadRepoPlugin() {
         try {
-          const publisherUser = savePublisherUser();
-          if (!publisherUser) {
+          if (!isGitHubAccessEnabled()) {
+            setPublishStatus("Entre no GitHub antes de publicar.");
             return;
           }
           const repo = parseGitHubRepo(repoUrlInput?.value || "");
-          if (repo.owner.toLowerCase() !== publisherUser.toLowerCase()) {
-            setPublishStatus("Aviso: o repositorio pertence a outro usuario. Continue apenas se voce tiver acesso nele.");
-          }
           setPublishStatus("Lendo plugin.json do repositorio...");
           const { branch, manifest } = await fetchRepoManifest(repo);
           const browser = manifest.browser || {};
@@ -730,7 +741,6 @@
             package_url: packageInfo.url,
             sha256: await sha256FromUrl(packageInfo.url),
             tags: Array.isArray(manifest.tags) ? manifest.tags : ["comunidade"],
-            __publisher: publisherUser,
             __repo: `https://github.com/${repo.owner}/${repo.repo}`,
             __source: "draft"
           };
@@ -770,15 +780,15 @@
       }
 
       function openPublishRequest(plugin) {
-        const publisherUser = savePublisherUser();
-        if (!publisherUser) {
+        if (!isGitHubAccessEnabled()) {
+          setPublishStatus("Entre no GitHub antes de enviar a publicacao.");
           return;
         }
         const clean = publicPlugin(plugin);
         const body = [
           "Pedido de publicacao de plugin para o Nyxovira.",
           "",
-          "Conta GitHub do publicador: @" + publisherUser,
+          "Conta GitHub: confirmada pelo usuario logado ao criar esta issue.",
           "Repositorio: " + (plugin.__repo || clean.homepage || clean.site_url || ""),
           "",
           "```json",
@@ -792,8 +802,8 @@
       }
 
       function openRemovalRequest() {
-        const publisherUser = savePublisherUser();
-        if (!publisherUser) {
+        if (!isGitHubAccessEnabled()) {
+          setRemoveStatus("Entre no GitHub antes de solicitar remocao.");
           return;
         }
         const pluginId = String(removePluginIdInput?.value || "").trim();
@@ -809,7 +819,7 @@
         const body = [
           "Pedido de remocao de plugin publicado no catalogo do Nyxovira.",
           "",
-          "Conta GitHub do solicitante: @" + publisherUser,
+          "Conta GitHub: confirmada pelo usuario logado ao criar esta issue.",
           "Plugin ID: " + pluginId,
           "Repositorio: " + repoUrl,
           "",
@@ -841,21 +851,14 @@
       }
 
       loadRepoPluginButton?.addEventListener("click", loadRepoPlugin);
-      savePublisherButton?.addEventListener("click", savePublisherUser);
+      connectGitHubButton?.addEventListener("click", connectGitHub);
+      disconnectGitHubButton?.addEventListener("click", disconnectGitHub);
       requestRemovePluginButton?.addEventListener("click", openRemovalRequest);
-      if (publisherUserInput) {
-        publisherUserInput.value = normalizeGitHubUser(localStorage.getItem(LOCAL_PUBLISHER_KEY) || "");
-      }
+      setGitHubAccess(isGitHubAccessEnabled());
       repoUrlInput?.addEventListener("keydown", (event) => {
         if (event.key === "Enter") {
           event.preventDefault();
           loadRepoPlugin();
-        }
-      });
-      publisherUserInput?.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          savePublisherUser();
         }
       });
       clearDraftPluginsButton?.addEventListener("click", () => {
