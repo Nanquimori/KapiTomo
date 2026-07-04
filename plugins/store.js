@@ -12,8 +12,29 @@ const tagFilterStatus = document.getElementById("tagFilterStatus");
 const viewButtons = Array.from(document.querySelectorAll("[data-view-target]"));
 const viewPanels = Array.from(document.querySelectorAll("[data-view-panel]"));
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
-const CATALOG_VERSION = "20260704-mobile-catalog-left";
+const CATALOG_VERSION = "20260704-split-tag-groups";
 const MAX_SELECTED_TAGS = 4;
+const LANGUAGE_TAGS = new Set([
+  "portugues",
+  "portuguese",
+  "pt",
+  "pt-br",
+  "english",
+  "ingles",
+  "en",
+  "spanish",
+  "espanol",
+  "es",
+  "japanese",
+  "japones",
+  "ja",
+  "korean",
+  "coreano",
+  "ko",
+  "chinese",
+  "chines",
+  "zh"
+]);
 let renderedPlugins = [];
 let allPlugins = [];
 let availableTags = [];
@@ -122,17 +143,42 @@ function pluginMatchesSelectedTags(plugin) {
   return selectedTags.every((tag) => tags.has(tag));
 }
 
+function isLanguageTag(tag) {
+  return LANGUAGE_TAGS.has(String(tag || "").trim().toLowerCase());
+}
+
+function renderTagButton(tag) {
+  const active = selectedTags.includes(tag);
+  const disabled = !active && selectedTags.length >= MAX_SELECTED_TAGS;
+  return `<button class="filter-chip${active ? " is-active" : ""}" type="button" data-filter-tag="${escapeHtml(tag)}"${disabled ? " disabled" : ""}>${escapeHtml(tag)}</button>`;
+}
+
+function renderTagGroup(title, tags) {
+  if (!tags.length) {
+    return "";
+  }
+  return `
+    <div class="tag-group">
+      <p class="tag-group-title">${escapeHtml(title)}</p>
+      <div class="tag-row">${tags.map(renderTagButton).join("")}</div>
+    </div>
+  `;
+}
+
 function renderTagFilters(tags) {
   availableTags = tags;
   selectedTags = selectedTags.filter((tag) => availableTags.includes(tag));
   if (!tagFilter) {
     return;
   }
-  tagFilter.innerHTML = availableTags.length ? availableTags.map((tag) => {
-    const active = selectedTags.includes(tag);
-    const disabled = !active && selectedTags.length >= MAX_SELECTED_TAGS;
-    return `<button class="filter-chip${active ? " is-active" : ""}" type="button" data-filter-tag="${escapeHtml(tag)}"${disabled ? " disabled" : ""}>${escapeHtml(tag)}</button>`;
-  }).join("") : "<p class=\"filter-status\">No tags available yet.</p>";
+  const languageTags = availableTags.filter(isLanguageTag);
+  const contentTags = availableTags.filter((tag) => !isLanguageTag(tag));
+  tagFilter.innerHTML = availableTags.length
+    ? [
+      renderTagGroup("Language", languageTags),
+      renderTagGroup("Type", contentTags)
+    ].join("")
+    : "<p class=\"filter-status\">No tags available yet.</p>";
   tagFilter.querySelectorAll("[data-filter-tag]").forEach((button) => {
     button.addEventListener("click", () => toggleTagFilter(button.dataset.filterTag));
   });
