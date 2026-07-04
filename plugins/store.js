@@ -13,42 +13,14 @@ const pluginSearchInput = document.getElementById("pluginSearchInput");
 const viewButtons = Array.from(document.querySelectorAll("[data-view-target]"));
 const viewPanels = Array.from(document.querySelectorAll("[data-view-panel]"));
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
-const CATALOG_VERSION = "20260704-governed-hub";
+const CATALOG_VERSION = "20260704-official-tags";
 const MAX_SELECTED_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
-const LANGUAGE_TAGS = new Set([
-  "portugues",
-  "portuguese",
-  "pt",
-  "pt-br",
-  "english",
-  "ingles",
-  "en",
-  "spanish",
-  "espanol",
-  "es",
-  "japanese",
-  "japones",
-  "ja",
-  "korean",
-  "coreano",
-  "ko",
-  "chinese",
-  "chines",
-  "zh"
-]);
-const TYPE_TAGS = new Set([
-  "manga",
-  "manhua",
-  "manhwa",
-  "novel",
-  "comic",
-  "webtoon",
-  "webcomic",
-  "oneshot",
-  "one-shot",
-  "doujinshi"
-]);
+const OFFICIAL_LANGUAGE_TAGS = ["portuguese", "english"];
+const OFFICIAL_TYPE_TAGS = ["manga", "manhua", "manhwa", "novel"];
+const LANGUAGE_TAGS = new Set(OFFICIAL_LANGUAGE_TAGS);
+const TYPE_TAGS = new Set(OFFICIAL_TYPE_TAGS);
+const PUBLIC_TAGS = new Set([...OFFICIAL_LANGUAGE_TAGS, ...OFFICIAL_TYPE_TAGS]);
 let renderedPlugins = [];
 let allPlugins = [];
 let availableTags = [];
@@ -125,14 +97,14 @@ function pluginKey(plugin) {
 function displayTags(tags) {
   return (Array.isArray(tags) ? tags : [])
     .map((tag) => String(tag || "").trim().toLowerCase())
-    .filter((tag) => tag && tag !== "official" && tag !== "community")
+    .filter((tag) => PUBLIC_TAGS.has(tag))
     .slice(0, 4);
 }
 
 function filterTags(tags) {
   return (Array.isArray(tags) ? tags : [])
     .map((tag) => String(tag || "").trim().toLowerCase())
-    .filter((tag) => tag && tag !== "official" && tag !== "community");
+    .filter((tag) => PUBLIC_TAGS.has(tag));
 }
 
 function normalizePublicationTags(tags) {
@@ -145,6 +117,9 @@ function normalizePublicationTags(tags) {
       return;
     }
     if (clean !== "official" && clean !== "community") {
+      if (!PUBLIC_TAGS.has(clean)) {
+        return;
+      }
       const publicCount = output.filter((item) => item !== "official" && item !== "community").length;
       if (publicCount >= MAX_SELECTED_TAGS) {
         return;
@@ -158,11 +133,11 @@ function normalizePublicationTags(tags) {
     throw new Error("plugin.json must declare at least 2 tags: language first, then type.");
   }
   if (!isLanguageTag(publicTags[0])) {
-    throw new Error("The first public tag must be the language, for example english or portuguese.");
+    throw new Error(`The first public tag must be one of: ${OFFICIAL_LANGUAGE_TAGS.join(", ")}.`);
   }
   const invalidType = publicTags.slice(1).find((tag) => !TYPE_TAGS.has(tag));
   if (invalidType) {
-    throw new Error("After the language tag, every public tag must be a content type.");
+    throw new Error(`After the language tag, every public tag must be one of: ${OFFICIAL_TYPE_TAGS.join(", ")}.`);
   }
   return output;
 }
@@ -239,13 +214,13 @@ function renderTagGroup(title, tags) {
 }
 
 function renderTagFilters(tags) {
-  availableTags = tags;
+  availableTags = uniqueTags([OFFICIAL_LANGUAGE_TAGS, OFFICIAL_TYPE_TAGS, tags]);
   selectedTags = selectedTags.filter((tag) => availableTags.includes(tag));
   if (!tagFilter) {
     return;
   }
-  const languageTags = availableTags.filter(isLanguageTag);
-  const contentTags = availableTags.filter((tag) => !isLanguageTag(tag));
+  const languageTags = OFFICIAL_LANGUAGE_TAGS;
+  const contentTags = OFFICIAL_TYPE_TAGS;
   tagFilter.innerHTML = availableTags.length
     ? [
       renderTagGroup("Language", languageTags),

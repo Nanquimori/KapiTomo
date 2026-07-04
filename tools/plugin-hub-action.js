@@ -9,39 +9,11 @@ const APPROVAL_LABELS = new Set(["approved", "plugin-approved"]);
 const BROKEN_AFTER_FAILURES = 2;
 const MAX_PUBLIC_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
-const LANGUAGE_TAGS = new Set([
-  "portugues",
-  "portuguese",
-  "pt",
-  "pt-br",
-  "english",
-  "ingles",
-  "en",
-  "spanish",
-  "espanol",
-  "es",
-  "japanese",
-  "japones",
-  "ja",
-  "korean",
-  "coreano",
-  "ko",
-  "chinese",
-  "chines",
-  "zh"
-]);
-const TYPE_TAGS = new Set([
-  "manga",
-  "manhua",
-  "manhwa",
-  "novel",
-  "comic",
-  "webtoon",
-  "webcomic",
-  "oneshot",
-  "one-shot",
-  "doujinshi"
-]);
+const OFFICIAL_LANGUAGE_TAGS = ["portuguese", "english"];
+const OFFICIAL_TYPE_TAGS = ["manga", "manhua", "manhwa", "novel"];
+const LANGUAGE_TAGS = new Set(OFFICIAL_LANGUAGE_TAGS);
+const TYPE_TAGS = new Set(OFFICIAL_TYPE_TAGS);
+const PUBLIC_TAGS = new Set([...OFFICIAL_LANGUAGE_TAGS, ...OFFICIAL_TYPE_TAGS]);
 
 const env = process.env;
 const dryRun = env.PLUGIN_HUB_DRY_RUN === "1";
@@ -166,6 +138,9 @@ function normalizeTags(value) {
       throw new Error("tags must use lowercase letters, numbers, dots, dashes, or underscores.");
     }
     if (tag !== "official" && tag !== "community") {
+      if (!PUBLIC_TAGS.has(tag)) {
+        continue;
+      }
       const publicCount = output.filter((item) => item !== "official" && item !== "community").length;
       if (publicCount >= MAX_PUBLIC_TAGS) {
         continue;
@@ -179,11 +154,11 @@ function normalizeTags(value) {
     throw new Error("tags must include at least 2 public tags: language first, then type.");
   }
   if (!LANGUAGE_TAGS.has(publicTags[0])) {
-    throw new Error("the first public tag must be the language, for example english or portuguese.");
+    throw new Error(`the first public tag must be one of: ${OFFICIAL_LANGUAGE_TAGS.join(", ")}.`);
   }
   const invalidType = publicTags.slice(1).find((tag) => !TYPE_TAGS.has(tag));
   if (invalidType) {
-    throw new Error(`invalid type tag after language: ${invalidType}.`);
+    throw new Error(`invalid type tag after language: ${invalidType}. Allowed types: ${OFFICIAL_TYPE_TAGS.join(", ")}.`);
   }
   return output;
 }
