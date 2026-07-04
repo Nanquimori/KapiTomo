@@ -13,13 +13,14 @@
         color-scheme: dark;
         --bg: #05030b;
         --panel: rgba(18, 10, 36, 0.9);
-        --panel-soft: rgba(12, 6, 26, 0.82);
+        --panel-soft: rgba(14, 7, 28, 0.9);
         --line: rgba(255, 255, 255, 0.14);
         --text: #fff8f1;
-        --muted: #c8bdd4;
-        --faint: #9486a8;
+        --muted: #bcaecc;
+        --faint: #80708f;
         --accent: #ffb21f;
         --accent-2: #ff6b2c;
+        --accent-soft: #ffd37a;
       }
 
       * {
@@ -53,7 +54,7 @@
       .page {
         width: min(1060px, 100%);
         margin: 0 auto;
-        padding: 6px 14px 44px;
+        padding: 6px 12px 44px;
       }
 
       .panel,
@@ -67,9 +68,9 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 18px;
+        gap: 16px;
         padding: 0;
-        margin-bottom: 6px;
+        margin-bottom: 5px;
       }
 
       .brand {
@@ -78,9 +79,10 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        font-size: 0.82rem;
+        color: var(--text);
+        font-size: 0.78rem;
         font-weight: 900;
-        letter-spacing: 0.06em;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
       }
 
@@ -91,8 +93,8 @@
       }
 
       .brand img {
-        width: 24px;
-        height: 24px;
+        width: 22px;
+        height: 22px;
         border-radius: 6px;
       }
 
@@ -117,7 +119,7 @@
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        gap: 18px;
+        gap: 15px;
       }
 
       .menu-tab {
@@ -131,7 +133,7 @@
         background: transparent;
         color: var(--muted);
         font: inherit;
-        font-size: 0.82rem;
+        font-size: 0.72rem;
         font-weight: 850;
         line-height: 1;
         white-space: nowrap;
@@ -161,41 +163,41 @@
       }
 
       .hub-head {
-        display: flex;
+        display: grid;
+        grid-template-columns: minmax(0, auto) minmax(12rem, 1fr);
         align-items: end;
-        justify-content: space-between;
-        gap: 22px;
-        padding: 0 0 7px;
-        margin-bottom: 8px;
+        gap: 16px;
+        padding: 0 0 4px;
+        margin-bottom: 9px;
       }
 
       .hub-head p:not(.kicker) {
         max-width: 500px;
         margin-bottom: 0;
-        color: var(--muted);
-        font-size: 0.82rem;
-        line-height: 1.35;
+        color: #a899b8;
+        font-size: 0.72rem;
+        line-height: 1.25;
       }
 
       .kicker {
         margin: 0 0 3px;
-        color: var(--muted);
-        font-size: 0.68rem;
+        color: var(--accent-soft);
+        font-size: 0.58rem;
         font-weight: 900;
-        letter-spacing: 0.22em;
+        letter-spacing: 0.2em;
         text-transform: uppercase;
       }
 
       h1 {
         margin-bottom: 0;
-        font-size: 2rem;
-        line-height: 0.95;
+        font-size: 1.22rem;
+        line-height: 1;
       }
 
       h2 {
         margin-bottom: 0;
-        font-size: 1.22rem;
-        line-height: 1.08;
+        font-size: 1rem;
+        line-height: 1.05;
       }
 
       h3 {
@@ -219,7 +221,7 @@
         align-items: end;
         justify-content: space-between;
         gap: 10px;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
       }
 
       .panel > p,
@@ -230,6 +232,10 @@
       }
 
       .catalog-panel {
+        display: grid;
+        grid-template-columns: minmax(8rem, 0.55fr) minmax(0, 1.45fr);
+        align-items: start;
+        gap: 14px;
         margin-top: 0;
         padding: 0;
         border: 0;
@@ -239,8 +245,8 @@
 
       .catalog-tools {
         display: grid;
-        gap: 7px;
-        margin-bottom: 12px;
+        gap: 5px;
+        margin: 0;
       }
 
       .filter-head {
@@ -249,13 +255,14 @@
 
       .filter-head .kicker {
         margin-bottom: 0;
+        color: #b68fff;
       }
 
       .filter-help,
       .filter-status {
         margin: 0;
-        color: var(--faint);
-        font-size: 0.76rem;
+        color: #9b8baa;
+        font-size: 0.68rem;
         line-height: 1.25;
       }
 
@@ -274,9 +281,9 @@
         border-radius: 0;
         padding: 0 1px;
         background: transparent;
-        color: var(--muted);
+        color: #d5c4e6;
         font: inherit;
-        font-size: 0.7rem;
+        font-size: 0.66rem;
         font-weight: 900;
         cursor: pointer;
       }
@@ -292,20 +299,26 @@
       }
 
       .plugin-list {
+        grid-column: 1 / -1;
+        min-width: 0;
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 8px;
       }
 
       .plugin-card {
-        min-height: 76px;
+        min-width: 0;
+        max-width: 100%;
+        min-height: 74px;
         display: grid;
         grid-template-columns: 34px minmax(0, 1fr);
         align-items: start;
         gap: 5px 7px;
         border-radius: 8px;
         padding: 7px;
-        background: var(--panel-soft);
+        background:
+          linear-gradient(145deg, rgba(255, 178, 31, 0.055), transparent 44%),
+          var(--panel-soft);
       }
 
       .plugin-icon {
@@ -332,7 +345,7 @@
 
       .plugin-copy p {
         margin: 2px 0 0;
-        color: var(--muted);
+        color: #a798b6;
         font-size: 0.72rem;
         line-height: 1.22;
       }
@@ -342,7 +355,7 @@
         display: flex;
         gap: 6px;
         margin-top: 2px;
-        color: var(--faint);
+        color: #ad9bc0;
         font-size: 0.68rem;
         font-weight: 800;
       }
@@ -369,13 +382,14 @@
         border: 1px solid rgba(255, 178, 31, 0.32);
         border-radius: 999px;
         padding: 1px 5px;
-        color: #ffd990;
-        background: rgba(255, 178, 31, 0.08);
+        color: #120700;
+        background: linear-gradient(135deg, #ffc247, #ff9630);
         font-size: 0.56rem;
         font-weight: 850;
       }
 
       .plugin-actions {
+        min-width: 0;
         grid-column: 1 / -1;
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -383,6 +397,10 @@
       }
 
       .plugin-actions .button {
+        width: 100%;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
         min-height: 24px;
         border-radius: 7px;
         padding: 0 6px;
@@ -478,7 +496,7 @@
         }
 
         .page {
-          padding: 4px 7px 40px;
+          padding: 4px 10px 40px;
         }
 
         .topbar {
@@ -502,7 +520,7 @@
         .hub-menu {
           width: 100%;
           justify-content: flex-start;
-          gap: 14px;
+          gap: 13px;
           overflow-x: auto;
           scrollbar-width: none;
         }
@@ -512,19 +530,21 @@
         }
 
         .menu-tab {
-          font-size: 0.66rem;
+          font-size: 0.63rem;
         }
 
         .hub-head {
-          display: block;
-          padding: 0 0 6px;
-          margin-bottom: 7px;
+          display: grid;
+          grid-template-columns: minmax(0, 1fr);
+          gap: 4px;
+          padding: 0 0 5px;
+          margin-bottom: 8px;
         }
 
         .hub-head p:not(.kicker) {
           max-width: none;
-          margin-top: 8px;
-          font-size: 0.78rem;
+          margin-top: 0;
+          font-size: 0.68rem;
         }
 
         .kicker {
@@ -533,11 +553,11 @@
         }
 
         h1 {
-          font-size: 1.4rem;
+          font-size: 1.08rem;
         }
 
         h2 {
-          font-size: 1rem;
+          font-size: 0.95rem;
         }
 
         .panel {
@@ -547,15 +567,21 @@
         }
 
         .panel-head {
-          margin-bottom: 6px;
+          margin-bottom: 5px;
+        }
+
+        .catalog-panel {
+          grid-template-columns: minmax(0, 1fr);
+          gap: 7px;
         }
 
         .plugin-list {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+          grid-template-columns: minmax(0, min(100%, 320px));
           gap: 5px;
         }
 
-      .plugin-card {
+        .plugin-card {
+          width: min(100%, 320px);
           min-height: 72px;
           grid-template-columns: 30px minmax(0, 1fr);
           gap: 4px 6px;
@@ -652,7 +678,7 @@
           <p class="kicker">Nyxovira</p>
           <h1>Plugin Hub</h1>
         </div>
-        <p>Install source plugins published from GitHub repositories.</p>
+        <p>Source plugins for Nyxovira.</p>
       </section>
 
       <section id="catalogPanel" class="panel catalog-panel view-panel" data-view-panel="catalog">
@@ -730,6 +756,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260704-tight-site"></script>
+    <script src="store.js?v=20260704-compact-hub"></script>
   </body>
 </html>
