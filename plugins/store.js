@@ -42,8 +42,8 @@ function setRemoveStatus(message) {
 
 function fetchCatalog() {
   const urls = [
-    "catalog-store.json?v=20260704-compact-verified-grid",
-    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260704-compact-verified-grid"
+    "catalog-store.json?v=20260704-tag-chips",
+    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260704-tag-chips"
   ];
   return urls.reduce((chain, url) => chain.catch(() => fetch(url, { cache: "no-store" })
     .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))), Promise.reject());
@@ -66,6 +66,13 @@ function pluginKey(plugin) {
     String(plugin?.repository_ref || ""),
     String(plugin?.plugin_path || "")
   ].join("|");
+}
+
+function displayTags(tags) {
+  return (Array.isArray(tags) ? tags : [])
+    .map((tag) => String(tag || "").trim().toLowerCase())
+    .filter((tag) => tag && tag !== "official" && tag !== "community")
+    .slice(0, 4);
 }
 
 function pluginManifestUrl(plugin) {
@@ -145,6 +152,7 @@ function saveDraftPlugin(plugin) {
 function renderPlugins(plugins) {
   renderedPlugins = plugins;
   list.innerHTML = plugins.length ? plugins.map((plugin, index) => {
+    const tags = displayTags(plugin.tags);
     const actions = [
       `<button class="button primary" type="button" data-install-plugin="${index}">Install</button>`
     ];
@@ -162,6 +170,7 @@ function renderPlugins(plugins) {
             ${plugin.author ? `<span>${escapeHtml(plugin.author)}</span>` : ""}
             ${plugin.version ? `<span>v${escapeHtml(plugin.version)}</span>` : ""}
           </div>
+          ${tags.length ? `<div class="tag-list">${tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>` : ""}
         </div>
         <div class="plugin-actions">
           ${actions.join("")}

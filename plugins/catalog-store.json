@@ -2,8 +2,17 @@
   "schema_version": 3,
   "name": "KapiTomo Plugin Hub",
   "description": "Public plugin catalog for installing source plugins in Nyxovira.",
-  "catalog_revision": "20260704-compact-verified-grid",
+  "catalog_revision": "20260704-tag-chips",
   "publish_model": "github-repository",
+  "suggested_tags": [
+    "portugues",
+    "english",
+    "manga",
+    "manhua",
+    "manhwa",
+    "novel",
+    "porn"
+  ],
   "requirements": {
     "icon_url": "Required. Every online plugin must point to a public icon image.",
     "repository_url": "Required. Every online plugin must be hosted in a public GitHub repository."
@@ -22,8 +31,10 @@
       "plugin_path": "nyxovira/plugin-api/kapitomo",
       "tags": [
         "official",
-        "novel",
-        "comic"
+        "portugues",
+        "english",
+        "manga",
+        "novel"
       ]
     }
   ]
