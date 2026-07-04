@@ -238,7 +238,7 @@ The catalog entry uses:
 | `repository_url` | Public GitHub repository containing `plugin.json`. |
 | `repository_ref` | Branch or ref to install from. Usually `main`. |
 | `plugin_path` | Folder containing `plugin.json`. Use `.` when the manifest is at the repository root. |
-| `tags` | Short lowercase labels for language and content type, such as `portugues`, `english`, `manga`, `manhua`, `manhwa`, `novel`, or `porn`. |
+| `tags` | Short lowercase labels for language and content type, such as `portugues`, `english`, `manga`, `manhua`, `manhwa`, `novel`, or another source-specific category. |
 
 There is no package URL in the public contract. The repository is the source of the addon.
 

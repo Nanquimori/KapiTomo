@@ -10,8 +10,7 @@
     "manga",
     "manhua",
     "manhwa",
-    "novel",
-    "porn"
+    "novel"
   ],
   "requirements": {
     "icon_url": "Required. Every online plugin must point to a public icon image.",
