@@ -53,7 +53,7 @@
       .page {
         width: min(1060px, 100%);
         margin: 0 auto;
-        padding: 18px 14px 44px;
+        padding: 6px 14px 44px;
       }
 
       .panel,
@@ -63,14 +63,13 @@
       }
 
       .topbar {
-        min-height: 38px;
+        min-height: 30px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 18px;
-        padding: 0 0 12px;
-        margin-bottom: 18px;
-        border-bottom: 1px solid var(--line);
+        padding: 0;
+        margin-bottom: 6px;
       }
 
       .brand {
@@ -128,7 +127,7 @@
         appearance: none;
         border: 0;
         border-radius: 0;
-        padding: 6px 0;
+        padding: 1px 0 3px;
         background: transparent;
         color: var(--muted);
         font: inherit;
@@ -149,7 +148,7 @@
         position: absolute;
         left: 0;
         right: 0;
-        bottom: -7px;
+        bottom: 1px;
         height: 2px;
         border-radius: 999px;
         background: linear-gradient(90deg, var(--accent), var(--accent-2));
@@ -166,9 +165,8 @@
         align-items: end;
         justify-content: space-between;
         gap: 22px;
-        padding: 6px 0 18px;
-        margin-bottom: 14px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 0 0 7px;
+        margin-bottom: 8px;
       }
 
       .hub-head p:not(.kicker) {
@@ -232,7 +230,11 @@
       }
 
       .catalog-panel {
-        padding: 16px;
+        margin-top: 0;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
       }
 
       .catalog-tools {
@@ -264,7 +266,9 @@
       }
 
       .filter-chip {
-        min-height: 24px;
+        min-height: 12px;
+        display: inline-flex;
+        align-items: center;
         border: 0;
         border-bottom: 1px solid rgba(255, 178, 31, 0.36);
         border-radius: 0;
@@ -474,16 +478,16 @@
         }
 
         .page {
-          padding: 10px 7px 40px;
+          padding: 4px 7px 40px;
         }
 
         .topbar {
-          min-height: 32px;
+          min-height: 28px;
           flex-wrap: wrap;
           align-items: flex-start;
-          gap: 10px;
-          padding-bottom: 10px;
-          margin-bottom: 12px;
+          gap: 6px;
+          padding-bottom: 0;
+          margin-bottom: 6px;
         }
 
         .brand {
@@ -513,8 +517,8 @@
 
         .hub-head {
           display: block;
-          padding: 2px 0 12px;
-          margin-bottom: 8px;
+          padding: 0 0 6px;
+          margin-bottom: 7px;
         }
 
         .hub-head p:not(.kicker) {
@@ -615,7 +619,7 @@
         }
 
         .filter-chip {
-          min-height: 21px;
+          min-height: 12px;
           padding: 0 1px;
           font-size: 0.58rem;
         }
@@ -726,6 +730,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260704-site-nav"></script>
+    <script src="store.js?v=20260704-tight-site"></script>
   </body>
 </html>
