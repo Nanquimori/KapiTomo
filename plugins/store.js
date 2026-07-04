@@ -12,7 +12,7 @@ const tagFilterStatus = document.getElementById("tagFilterStatus");
 const viewButtons = Array.from(document.querySelectorAll("[data-view-target]"));
 const viewPanels = Array.from(document.querySelectorAll("[data-view-panel]"));
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
-const CATALOG_VERSION = "20260704-docs-clean-mapping";
+const CATALOG_VERSION = "20260704-tag-limit-contract";
 const MAX_SELECTED_TAGS = 4;
 const LANGUAGE_TAGS = new Set([
   "portugues",
@@ -109,6 +109,25 @@ function filterTags(tags) {
   return (Array.isArray(tags) ? tags : [])
     .map((tag) => String(tag || "").trim().toLowerCase())
     .filter((tag) => tag && tag !== "official" && tag !== "community");
+}
+
+function normalizePublicationTags(tags) {
+  const rawTags = Array.isArray(tags) ? tags : ["community"];
+  const output = [];
+  const seen = new Set();
+  rawTags.forEach((tag) => {
+    const clean = String(tag || "").trim().toLowerCase();
+    if (!clean || seen.has(clean)) {
+      return;
+    }
+    seen.add(clean);
+    output.push(clean);
+  });
+  const publicTags = output.filter((tag) => tag !== "official" && tag !== "community");
+  if (publicTags.length > MAX_SELECTED_TAGS) {
+    throw new Error(`Use at most ${MAX_SELECTED_TAGS} public tags in plugin.json.`);
+  }
+  return output.length ? output : ["community"];
 }
 
 function uniqueTags(groups) {
@@ -445,7 +464,7 @@ async function loadRepoPlugin() {
       repository_url: repositoryUrl,
       repository_ref: branch,
       plugin_path: pluginPath,
-      tags: Array.isArray(manifest.tags) ? manifest.tags : ["community"],
+      tags: normalizePublicationTags(manifest.tags),
       __source: "draft"
     };
     saveDraftPlugin(plugin);
@@ -459,6 +478,12 @@ async function loadRepoPlugin() {
 
 function openPublishRequest(plugin) {
   const clean = publicPlugin(plugin);
+  try {
+    clean.tags = normalizePublicationTags(clean.tags);
+  } catch (error) {
+    setPublishStatus(error?.message || "The plugin has too many tags.");
+    return;
+  }
   if (!clean.repository_url) {
     setPublishStatus("This draft is outdated. Load the GitHub repository again before requesting publication.");
     return;

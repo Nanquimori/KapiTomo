@@ -5,6 +5,7 @@ const { execFileSync } = require("child_process");
 
 const CATALOG_PATHS = ["plugins/catalog-store.json", "plugins/catalog.json"];
 const MAINTAINERS = new Set(["nanquimori"]);
+const MAX_PUBLIC_TAGS = 4;
 
 const env = process.env;
 const dryRun = env.PLUGIN_HUB_DRY_RUN === "1";
@@ -90,6 +91,28 @@ function normalizePluginPath(value) {
   return normalized;
 }
 
+function normalizeTags(value) {
+  const rawTags = Array.isArray(value) ? value : ["community"];
+  const output = [];
+  const seen = new Set();
+  for (const rawTag of rawTags) {
+    const tag = optionalText(rawTag, 30).toLowerCase();
+    if (!tag || seen.has(tag)) {
+      continue;
+    }
+    if (!/^[a-z0-9._-]+$/.test(tag)) {
+      throw new Error("tags must use lowercase letters, numbers, dots, dashes, or underscores.");
+    }
+    seen.add(tag);
+    output.push(tag);
+  }
+  const publicTags = output.filter((tag) => tag !== "official" && tag !== "community");
+  if (publicTags.length > MAX_PUBLIC_TAGS) {
+    throw new Error(`tags can include at most ${MAX_PUBLIC_TAGS} public tags.`);
+  }
+  return output.length ? output : ["community"];
+}
+
 function extractJson(body) {
   const text = String(body || "");
   const fenced = text.match(/```json\s*([\s\S]*?)```/i) || text.match(/```\s*([\s\S]*?)```/);
@@ -142,7 +165,7 @@ function normalizePlugin(input) {
     repository_url: validateGitHubRepository(input.repository_url),
     repository_ref: normalizeRef(input.repository_ref),
     plugin_path: normalizePluginPath(input.plugin_path),
-    tags: Array.isArray(input.tags) ? input.tags.map((tag) => optionalText(tag, 30)).filter(Boolean).slice(0, 8) : ["community"]
+    tags: normalizeTags(input.tags)
   };
 }
 
@@ -157,6 +180,7 @@ async function validateRepositoryPlugin(plugin) {
   if (!manifest.browser || !manifest.browser.icon_url) {
     throw new Error("plugin.json must declare browser.icon_url.");
   }
+  normalizeTags(manifest.tags);
 }
 
 function loadCatalog() {
