@@ -1,84 +1,70 @@
 # KapiTomo
 
-KapiTomo é o site oficial para publicar obras autorais e entregar dados limpos para Nyxalira, Nyxovira e plugins.
+KapiTomo is the official site for publishing original works and serving clean data to Nyxalira, Nyxovira, and source plugins.
 
-## Links
+Website: https://nanquimori.github.io/KapiTomo/
+Plugin catalog: https://nanquimori.github.io/KapiTomo/plugins/catalog.json
+Plugin API: https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/
 
-```text
-Site: https://nanquimori.github.io/KapiTomo/
-Catálogo de plugins: https://nanquimori.github.io/KapiTomo/plugins/catalog.json
-API: https://nanquimori.github.io/KapiTomo/api/works/index.json
-```
-
-## Onde colocar obras
-
-Use somente a pasta `obras/` como entrada.
+## Work Structure
 
 Novel:
 
 ```text
-obras/minha-novel/
-|-- capa.png
-|-- obra.json
-\-- capitulos/
-    |-- capitulo-001.json
-    \-- capitulo-002.json
+works/my-novel/
+|-- work.json
+|-- cover.png
+`-- chapters/
+    |-- chapter-001.json
+    `-- chapter-002.json
 ```
 
-Capítulo novel:
+Novel chapter:
 
 ```json
 {
-  "title": "Capítulo 01 - A Queda",
+  "title": "Chapter 01 - The Fall",
   "paragraphs": [
-    "Primeiro parágrafo.",
-    "Segundo parágrafo."
+    "First paragraph.",
+    "Second paragraph."
   ]
 }
 ```
 
-Quadrinho por imagens:
+Comic:
 
 ```text
-obras/meu-quadrinho/
-|-- capa.png
-|-- obra.json
-\-- capitulos/
-    |-- capitulo-001/
-    |   |-- page-001.png
-    |   \-- page-002.png
-    \-- capitulo-002/
+works/my-comic/
+|-- work.json
+|-- cover.png
+`-- chapters/
+    `-- chapter-001/
         |-- page-001.png
-        \-- page-002.png
+        `-- page-002.png
 ```
 
-`obra.json` pode definir título, resumo, tipo e capa. Se ele não existir, o gerador usa o nome da pasta e a primeira capa encontrada.
+`work.json` can define title, summary, type, and cover. If it does not exist, the generator uses the folder name and the first cover it finds.
 
-## Gerar site e API
+## Generated Output
 
-Depois de colar ou alterar uma obra, rode:
-
-```powershell
-.\gerar-kapitomo.cmd
-```
-
-Saidas geradas:
+The generator publishes:
 
 ```text
 data/works.js
-api/catalog.json
-api/works/
+api/works/index.json
+api/works/{work}/index.json
+api/works/{work}/chapters/{chapter}.json
 assets/works/
 manga/
 plugins/catalog.json
 ```
 
-Não edite essas saídas na mão. Edite `obras/` e gere de novo.
+Do not edit generated output by hand. Edit `works/` and run the generator again.
 
-## Formato publicado
+## Published Format
 
-Novel publica texto dentro do JSON do capítulo, com `text` e `paragraphs`.
+Novel content is published inside chapter JSON with `text` and `paragraphs`.
 
-Quadrinho publica imagens em `pages`.
+Comic content is published with `pages` and image metadata.
 
-Novas integrações devem usar `api/works/index.json`.
+New integrations should use `api/works/index.json`.

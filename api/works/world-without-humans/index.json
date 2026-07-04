@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "type": "nyxovira_work",
+  "source": {
+    "id": "kapitomo",
+    "name": "KapiTomo",
+    "url": "https://nanquimori.github.io/KapiTomo"
+  },
+  "work": {
+    "id": "world-without-humans",
+    "slug": "world-without-humans",
+    "title": "The World Without Humans",
+    "author": "KapiTomo",
+    "format": "Novel",
+    "status": "Complete",
+    "summary": "At 14, Caio wakes up in a world without humans, where dragons, goblins, and elves attack any stranger. To return alive, he must learn to survive without pretending to be a hero.",
+    "description": "At 14, Caio wakes up in a world without humans, where dragons, goblins, and elves attack any stranger. To return alive, he must learn to survive without pretending to be a hero.",
+    "cover": "https://nanquimori.github.io/KapiTomo/assets/works/world-without-humans/cover.png",
+    "url": "https://nanquimori.github.io/KapiTomo/manga/world-without-humans/",
+    "apiUrl": "https://nanquimori.github.io/KapiTomo/api/works/world-without-humans/index.json",
+    "chapters": [
+      {
+        "id": "chapter-001",
+        "number": "1",
+        "title": "Chapter 01 - The Fall",
+        "name": "The Fall",
+        "contentType": "novel",
+        "url": "https://nanquimori.github.io/KapiTomo/manga/world-without-humans/0/",
+        "apiUrl": "https://nanquimori.github.io/KapiTomo/api/works/world-without-humans/chapters/chapter-001.json",
+        "pageCount": 0,
+        "wordCount": 367,
+        "paragraphCount": 9
+      },
+      {
+        "id": "chapter-002",
+        "number": "2",
+        "title": "Chapter 02 - The Hunting Forest",
+        "name": "The Hunting Forest",
+        "contentType": "novel",
+        "url": "https://nanquimori.github.io/KapiTomo/manga/world-without-humans/1/",
+        "apiUrl": "https://nanquimori.github.io/KapiTomo/api/works/world-without-humans/chapters/chapter-002.json",
+        "pageCount": 0,
+        "wordCount": 381,
+        "paragraphCount": 10
+      },
+      {
+        "id": "chapter-003",
+        "number": "3",
+        "title": "Chapter 03 - The Stone Exit",
+        "name": "The Stone Exit",
+        "contentType": "novel",
+        "url": "https://nanquimori.github.io/KapiTomo/manga/world-without-humans/2/",
+        "apiUrl": "https://nanquimori.github.io/KapiTomo/api/works/world-without-humans/chapters/chapter-003.json",
+        "pageCount": 0,
+        "wordCount": 407,
+        "paragraphCount": 12
+      }
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "type": "nyxovira_chapter",
+  "source": {
+    "id": "kapitomo",
+    "name": "KapiTomo",
+    "url": "https://nanquimori.github.io/KapiTomo"
+  },
+  "chapter": {
+    "id": "chapter-002",
+    "number": "2",
+    "title": "Chapter 002",
+    "name": "Chapter 02",
+    "contentType": "images",
+    "url": "https://nanquimori.github.io/KapiTomo/manga/world-without-humans-comics/1/",
+    "text": "",
+    "paragraphs": [],
+    "pages": [
+      {
+        "number": 1,
+        "name": "page-001.png",
+        "image": "https://nanquimori.github.io/KapiTomo/assets/works/world-without-humans-comics/chapter-002/page-001.png",
+        "url": "https://nanquimori.github.io/KapiTomo/assets/works/world-without-humans-comics/chapter-002/page-001.png",
+        "lastModified": 1782951398046
+      },
+      {
+        "number": 2,
+        "name": "page-002.png",
+        "image": "https://nanquimori.github.io/KapiTomo/assets/works/world-without-humans-comics/chapter-002/page-002.png",
+        "url": "https://nanquimori.github.io/KapiTomo/assets/works/world-without-humans-comics/chapter-002/page-002.png",
+        "lastModified": 1782951398126
+      }
+    ],
+    "pageCount": 2,
+    "wordCount": 0,
+    "paragraphCount": 0
+  }
+}

@@ -4,8 +4,8 @@
       siteBaseUrl: "https://nanquimori.github.io/KapiTomo",
       sourceVariable: "KAPI_TOMO_WORKS",
       sourceRoutes: {
-        work: "obra",
-        read: "ler"
+        work: "work",
+        read: "read"
       },
       nyxoviraRoutes: {
         series: "manga",
@@ -25,7 +25,7 @@
         imageSource: "src"
       },
       labels: {
-        chapter: "Capitulo"
+        chapter: "Chapter"
       }
     };
 
@@ -52,7 +52,7 @@
 
     function isImageContent(chapter) {
       var type = text(field(chapter, addon.fields.chapterContentType)).toLowerCase();
-      return type === "images" || type === "image" || type === "comic" || type === "manga" || type === "quadrinho";
+      return type === "images" || type === "image" || type === "comic" || type === "manga";
     }
 
     function imagePages(chapter) {
@@ -155,7 +155,7 @@
             : [];
           var pages = imageChapter ? imagePages(chapter) : [];
           if (!paragraphs.length && !pages.length) {
-            warn("Capitulo sem conteudo para download: " + title);
+            warn("Chapter without downloadable content: " + title);
             return null;
           }
           return {
@@ -173,7 +173,7 @@
       };
 
       if (!plan.chapters.length) {
-        warn("Nenhum capitulo valido no chapterPlan da obra: " + workId);
+        warn("No valid chapters in chapterPlan for work: " + workId);
         return "";
       }
 

@@ -6,7 +6,7 @@
 
 $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent $PSScriptRoot
-$WorksRoot = Join-Path $Root "obras"
+$WorksRoot = Join-Path $Root "works"
 $GeneratedAssetsRoot = Join-Path $Root "assets\works"
 $ApiRoot = Join-Path $Root "api"
 $ApiWorksRoot = Join-Path $ApiRoot "works"
@@ -119,17 +119,17 @@ function ConvertTo-Slug([string]$Value) {
   }
   $slug = $builder.ToString().ToLowerInvariant() -replace "[^a-z0-9]+", "-"
   $slug = $slug.Trim("-")
-  if (-not $slug) { return "obra" }
+  if (-not $slug) { return "work" }
   return $slug
 }
 
 function ConvertTo-Title([string]$Slug) {
   $parts = ($Slug -replace "[-_]+", " ").Split(" ", [StringSplitOptions]::RemoveEmptyEntries)
-  if (-not $parts.Length) { return "Obra sem título" }
+  if (-not $parts.Length) { return "Untitled Work" }
   $title = (($parts | ForEach-Object {
     if ($_.Length -le 1) { $_.ToUpperInvariant() } else { $_.Substring(0, 1).ToUpperInvariant() + $_.Substring(1) }
   }) -join " ")
-  return ($title -replace "\bCapitulo\b", "Capítulo")
+  return $title
 }
 
 function Escape-Html([string]$Value) {
@@ -149,7 +149,7 @@ function Get-WordCount([string[]]$Paragraphs) {
 }
 
 function Read-Metadata([System.IO.DirectoryInfo]$WorkDir) {
-  $path = Join-Path $WorkDir.FullName "obra.json"
+  $path = Join-Path $WorkDir.FullName "work.json"
   if (Test-Path $path) {
     return Read-Utf8 $path | ConvertFrom-Json
   }
@@ -157,7 +157,7 @@ function Read-Metadata([System.IO.DirectoryInfo]$WorkDir) {
 }
 
 function Find-Cover([System.IO.DirectoryInfo]$WorkDir) {
-  $names = @("capa.png", "cover.png", "capa.jpg", "cover.jpg", "capa.jpeg", "cover.jpeg", "capa.webp", "cover.webp")
+  $names = @("cover.png", "cover.jpg", "cover.jpeg", "cover.webp")
   foreach ($name in $names) {
     $path = Join-Path $WorkDir.FullName $name
     if (Test-Path $path) { return Get-Item $path }
@@ -169,19 +169,16 @@ function Find-Cover([System.IO.DirectoryInfo]$WorkDir) {
 }
 
 function Get-ChapterName([string]$Title, [int]$Index) {
-  if ($Title -match "^\s*Cap[ií]tulo\s+\d+\s*[-:]\s*(.+)$") {
-    return $Matches[1].Trim()
-  }
   if ($Title -match "^\s*Chapter\s+\d+\s*[-:]\s*(.+)$") {
     return $Matches[1].Trim()
   }
-  return "Capítulo $($Index.ToString("00"))"
+  return "Chapter $($Index.ToString("00"))"
 }
 
 function New-ChapterPage([string]$Title, [string]$BodyHtml, [string]$Background) {
   return @"
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -208,15 +205,15 @@ $legacyWorks = @()
 $workDirs = Get-ChildItem -Path $WorksRoot -Directory | Where-Object { $_.Name -notmatch "^_" } | Sort-Object Name
 foreach ($workDir in $workDirs) {
   $slug = ConvertTo-Slug $workDir.Name
-  Write-Log "obra $slug"
-  Write-Host "Gerando obra: $slug"
+  Write-Log "work $slug"
+  Write-Host "Generating work: $slug"
   $metadata = Read-Metadata $workDir
   $title = if ($metadata.title) { [string]$metadata.title } else { ConvertTo-Title $workDir.Name }
   $author = if ($metadata.author) { [string]$metadata.author } else { $LibraryName }
   $format = if ($metadata.format) { [string]$metadata.format } else { "Novel" }
   $genre = if ($metadata.genre) { [string]$metadata.genre } else { "Geral" }
   $status = if ($metadata.status) { [string]$metadata.status } else { "Em andamento" }
-  $rating = if ($metadata.rating) { [string]$metadata.rating } else { "Livre" }
+  $rating = if ($metadata.rating) { [string]$metadata.rating } else { "All ages" }
   $summary = if ($metadata.summary) { [string]$metadata.summary } else { "" }
   $description = if ($metadata.description) { [string]$metadata.description } else { $summary }
   $notice = if ($metadata.notice) { [string]$metadata.notice } else { "" }
@@ -237,7 +234,7 @@ foreach ($workDir in $workDirs) {
     $coverLastModified = Get-UnixMs $cover
   }
 
-  $chaptersRoot = Join-Path $workDir.FullName "capitulos"
+  $chaptersRoot = Join-Path $workDir.FullName "chapters"
   $chapterItems = @()
   if (Test-Path $chaptersRoot) {
     $chapterItems = @(Get-ChildItem -Path $chaptersRoot | Where-Object {
@@ -253,9 +250,9 @@ foreach ($workDir in $workDirs) {
     $chapterNumber += 1
     $chapterId = ConvertTo-Slug $chapterItem.BaseName
     if ($chapterItem.PSIsContainer) { $chapterId = ConvertTo-Slug $chapterItem.Name }
-    if (-not $chapterId) { $chapterId = "capitulo-$($chapterNumber.ToString("000"))" }
-    Write-Log "capítulo $slug/$chapterId"
-    Write-Host "  Capítulo: $chapterId"
+    if (-not $chapterId) { $chapterId = "chapter-$($chapterNumber.ToString("000"))" }
+    Write-Log "chapter $slug/$chapterId"
+    Write-Host "  Chapter: $chapterId"
 
     $chapterTitle = ConvertTo-Title $chapterId
     $chapterName = Get-ChapterName $chapterTitle $chapterNumber
@@ -271,9 +268,9 @@ foreach ($workDir in $workDirs) {
     $paragraphCount = 0
 
     if ($chapterItem.PSIsContainer) {
-      Write-Log "  imagens inicio"
+      Write-Log "  images start"
       $contentType = "images"
-      $format = if ($metadata.format) { $format } else { "Quadrinho" }
+      $format = if ($metadata.format) { $format } else { "Comic" }
       $imageFiles = @(Get-ChildItem -Path $chapterItem.FullName -File | Where-Object { $_.Extension -match "^\.(png|jpe?g|webp|gif)$" } | Sort-Object Name)
       $chapterAssetDir = Join-Path $assetWorkDir $chapterId
       Ensure-Dir $chapterAssetDir
@@ -293,9 +290,9 @@ foreach ($workDir in $workDirs) {
         }
         $sitePages += $pageUrl
       }
-      Write-Log "  imagens fim"
+      Write-Log "  images end"
     } else {
-      Write-Log "  novel lê texto"
+      Write-Log "  novel reads text"
       $contentType = "novel"
       if ($chapterItem.Extension -ieq ".json") {
         $chapterJson = Read-Utf8 $chapterItem.FullName | ConvertFrom-Json
@@ -324,9 +321,9 @@ foreach ($workDir in $workDirs) {
           $chapterName = Get-ChapterName $chapterTitle $chapterNumber
         }
       }
-      Write-Log "  novel parágrafos"
+      Write-Log "  novel paragraphs"
       if (-not $paragraphs.Count) {
-        throw "Capítulo novel sem paragraphs/text/content: $($chapterItem.FullName)"
+        throw "Novel chapter without paragraphs/text/content: $($chapterItem.FullName)"
       }
       $text = ($paragraphs -join "`r`n`r`n")
       if (-not $wordCount) { $wordCount = Get-WordCount $paragraphs }
@@ -413,7 +410,7 @@ foreach ($workDir in $workDirs) {
     } else {
       $siteChapter.pages = $sitePages
       $siteChapter.images = @($pages | ForEach-Object {
-        [ordered]@{ src = $_.url; alt = "$title $chapterTitle página $($_.number)" }
+        [ordered]@{ src = $_.url; alt = "$title $chapterTitle page $($_.number)" }
       })
     }
     $siteChapters += $siteChapter
@@ -563,6 +560,6 @@ Write-Utf8 (Join-Path $ApiRoot "catalog.json") (To-JsonText $legacyCatalog)
 $siteWorksJson = To-JsonText $worksForSite
 Write-Utf8 (Join-Path $Root "data\works.js") "window.KAPI_TOMO_WORKS = $siteWorksJson;`r`n"
 
-Write-Host "KapiTomo gerado com $($worksForSite.Count) obra(s)."
-Write-Host "Entrada: $WorksRoot"
-Write-Host "Saída: data/works.js, api/, assets/works/ e manga/"
+Write-Host "KapiTomo generated with $($worksForSite.Count) work(s)."
+Write-Host "Input: $WorksRoot"
+Write-Host "Output: data/works.js, api/, assets/works/, and manga/"

@@ -1,0 +1,22 @@
+{
+  "mode": "android-chapter",
+  "libraryId": "kapitomo",
+  "workFolderName": "world-without-humans-comics",
+  "chapterFolderName": "chapter-002",
+  "contentType": "images",
+  "pages": [
+    {
+      "name": "page-001.png",
+      "sourceUrl": "https://nanquimori.github.io/KapiTomo/assets/works/world-without-humans-comics/chapter-002/page-001.png",
+      "lastModified": 1782951398046
+    },
+    {
+      "name": "page-002.png",
+      "sourceUrl": "https://nanquimori.github.io/KapiTomo/assets/works/world-without-humans-comics/chapter-002/page-002.png",
+      "lastModified": 1782951398126
+    }
+  ],
+  "pageCount": 2,
+  "totalImagesExpected": 2,
+  "sourceUrl": "https://nanquimori.github.io/KapiTomo/manga/world-without-humans-comics/1/"
+}
