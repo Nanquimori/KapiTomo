@@ -226,6 +226,14 @@
         margin: 0;
       }
 
+      .catalog-search {
+        min-height: 24px;
+        max-width: 260px;
+        border-radius: 7px;
+        padding: 0 8px;
+        font-size: 0.72rem;
+      }
+
       .filter-head {
         display: block;
       }
@@ -394,6 +402,26 @@
         font-size: 0.52rem;
         font-weight: 850;
         line-height: 1.05;
+      }
+
+      .status-badge {
+        grid-column: 1 / -1;
+        justify-self: start;
+        border: 1px solid rgba(255, 178, 31, 0.34);
+        border-radius: 999px;
+        padding: 1px 6px;
+        color: #ffd990;
+        background: rgba(255, 178, 31, 0.08);
+        font-size: 0.54rem;
+        font-weight: 900;
+        line-height: 1.15;
+        text-transform: uppercase;
+      }
+
+      .status-broken {
+        border-color: rgba(255, 107, 44, 0.45);
+        color: #ffb08f;
+        background: rgba(255, 107, 44, 0.12);
       }
 
       .plugin-actions {
@@ -643,6 +671,10 @@
           margin-bottom: 8px;
         }
 
+        .catalog-search {
+          max-width: 100%;
+        }
+
         .filter-chip {
           min-height: 12px;
           padding: 0 1px;
@@ -684,6 +716,7 @@
           </div>
         </div>
         <div class="catalog-tools">
+          <input id="pluginSearchInput" class="text-input catalog-search" type="search" placeholder="Search plugins" aria-label="Search plugins">
           <div class="filter-head">
             <div>
               <p class="kicker">Categories</p>
@@ -700,7 +733,7 @@
       <section id="publishPanel" class="panel view-panel" data-view-panel="publish" hidden>
         <p class="kicker">Publish</p>
         <h2>Publish a ready addon</h2>
-        <p>Paste the GitHub repository that already contains <code>plugin.json</code>. The Hub reads the manifest and opens a GitHub request; after confirmation, automation validates the repository and publishes it to the catalog.</p>
+        <p>Paste the GitHub repository that already contains <code>plugin.json</code>. The Hub reads the manifest and opens a GitHub request; after validation, a maintainer approves it before it appears in the catalog.</p>
         <div class="publish-form">
           <label class="field-label" for="repoUrlInput">GitHub repository</label>
           <input id="repoUrlInput" class="text-input" type="url" placeholder="https://github.com/user/my-addon">
@@ -739,7 +772,7 @@
       <section id="removePanel" class="panel view-panel" data-view-panel="remove" hidden>
         <p class="kicker">Remove</p>
         <h2>Remove a publication</h2>
-        <p>Enter the published plugin and confirm the GitHub request. Automation validates it, removes it from the catalog, and posts the result.</p>
+        <p>Enter the published plugin and confirm the GitHub request. Automation validates it, then a maintainer approves hiding it from the public catalog.</p>
         <div class="publish-form">
           <label class="field-label" for="removePluginIdInput">Plugin ID</label>
           <input id="removePluginIdInput" class="text-input" type="text" placeholder="my-addon">
@@ -750,6 +783,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260704-required-tags"></script>
+    <script src="store.js?v=20260704-governed-hub"></script>
   </body>
 </html>

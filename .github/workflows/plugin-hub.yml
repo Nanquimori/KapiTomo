@@ -2,7 +2,7 @@ name: Plugin Hub
 
 on:
   issues:
-    types: [opened, edited, reopened]
+    types: [opened, edited, reopened, labeled]
   schedule:
     - cron: "*/30 * * * *"
   workflow_dispatch:
@@ -12,7 +12,7 @@ permissions:
   issues: write
 
 concurrency:
-  group: plugin-hub-${{ github.event.issue.number }}
+  group: plugin-hub-${{ github.event.issue.number || github.event_name }}
   cancel-in-progress: true
 
 jobs:

@@ -218,6 +218,8 @@ For image chapters, `pages` is the preferred field. Nyxovira also reads `images`
 
 The Plugin Hub installs addons directly from public GitHub repositories.
 
+The public catalog is reviewed. A publication request is validated automatically, but it only appears online after a maintainer approves it. This prevents duplicate plugins for the same site and avoids filling the catalog with sources that do not work.
+
 The catalog entry uses:
 
 ```json
@@ -233,6 +235,8 @@ The catalog entry uses:
   "repository_url": "https://github.com/user/my-source",
   "repository_ref": "main",
   "plugin_path": ".",
+  "hosts": ["example.com"],
+  "status": "active",
   "tags": ["english", "manga", "novel"]
 }
 ```
@@ -242,9 +246,22 @@ The catalog entry uses:
 | `repository_url` | Public GitHub repository containing `plugin.json`. |
 | `repository_ref` | Branch or ref to install from. Usually `main`. |
 | `plugin_path` | Folder containing `plugin.json`. Use `.` when the manifest is at the repository root. |
+| `hosts` | Domains covered by the plugin. The Hub derives this from `match.hosts`, `browser.home_url`, `site_url`, and `homepage`. A host can only have one visible plugin in the catalog. |
+| `status` | Catalog state. Only `active` appears in the public catalog. `broken`, `hidden`, and `removed` stay in the catalog file for history but do not appear in the public storefront. |
 | `tags` | Required. Use at least 2 public lowercase tags: the first tag must be the language, and the remaining public tags must be content types such as `manga`, `manhua`, `manhwa`, or `novel`. Nyxovira publishes the first 4 public tags and ignores extra ones. |
 
 There is no package URL in the public contract. The repository is the source of the addon.
+
+Publishing flow:
+
+1. Paste the public GitHub repository in the Plugin Hub.
+2. Confirm the generated GitHub request.
+3. Automation validates `plugin.json`, the public icon, tags, repository, and covered hosts.
+4. If another visible plugin already covers the same host, the request is rejected.
+5. A maintainer adds the approval label.
+6. Automation publishes the catalog entry.
+
+The Hub also runs a light health check every 30 minutes. If a plugin fails validation twice in a row, it is marked as `broken`. Broken, removed, and hidden plugins stay in the catalog file for history, but they do not appear in the public storefront.
 
 ## Checklist
 
@@ -258,4 +275,5 @@ Before publishing:
 6. Novel chapters use `paragraphs`.
 7. Comic chapters use `pages`; `images` is accepted for compatibility.
 8. The addon works from a clean public GitHub repository.
-9. The repository is submitted through the online Plugin Hub.
+9. No visible plugin in the public catalog already covers the same source host.
+10. The repository is submitted through the online Plugin Hub.

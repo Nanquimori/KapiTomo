@@ -5,6 +5,8 @@ const { execFileSync } = require("child_process");
 
 const CATALOG_PATHS = ["plugins/catalog-store.json", "plugins/catalog.json"];
 const MAINTAINERS = new Set(["nanquimori"]);
+const APPROVAL_LABELS = new Set(["approved", "plugin-approved"]);
+const BROKEN_AFTER_FAILURES = 2;
 const MAX_PUBLIC_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
 const LANGUAGE_TAGS = new Set([
@@ -43,6 +45,10 @@ const TYPE_TAGS = new Set([
 
 const env = process.env;
 const dryRun = env.PLUGIN_HUB_DRY_RUN === "1";
+
+function nowIso() {
+  return new Date().toISOString();
+}
 
 function readEvent() {
   if (env.PLUGIN_HUB_EVENT_JSON) {
@@ -105,6 +111,19 @@ function validateGitHubRepository(value) {
   return `https://github.com/${parts[0]}/${parts[1].replace(/\.git$/i, "")}`;
 }
 
+function normalizeHost(value) {
+  const host = String(value || "").trim().toLowerCase().replace(/^www\./, "");
+  return host.replace(/:\d+$/, "");
+}
+
+function hostFromUrl(value) {
+  try {
+    return normalizeHost(new URL(String(value || "")).hostname);
+  } catch {
+    return "";
+  }
+}
+
 function normalizeRef(value) {
   const ref = optionalText(value || "main", 120) || "main";
   if (!/^[A-Za-z0-9._/-]+$/.test(ref) || ref.includes("..")) {
@@ -123,6 +142,11 @@ function normalizePluginPath(value) {
     throw new Error("Invalid plugin_path.");
   }
   return normalized;
+}
+
+function normalizeStatus(value) {
+  const status = optionalText(value || "active", 20).toLowerCase();
+  return ["active", "broken", "hidden", "removed"].includes(status) ? status : "active";
 }
 
 function normalizeTags(value) {
@@ -181,6 +205,28 @@ function rawPluginJsonUrl(repositoryUrl, ref, pluginPath) {
   return `https://raw.githubusercontent.com/${owner}/${repo}/${encodeURIComponent(ref)}/${manifestPath}`;
 }
 
+function pluginHostsFromManifest(plugin, manifest) {
+  const hosts = new Set();
+  const matchHosts = manifest && manifest.match && Array.isArray(manifest.match.hosts) ? manifest.match.hosts : [];
+  for (const host of matchHosts) {
+    const clean = normalizeHost(host);
+    if (clean) {
+      hosts.add(clean);
+    }
+  }
+  [
+    manifest && manifest.browser && manifest.browser.home_url,
+    plugin.homepage,
+    plugin.site_url
+  ].forEach((url) => {
+    const host = hostFromUrl(url);
+    if (host) {
+      hosts.add(host);
+    }
+  });
+  return Array.from(hosts).sort();
+}
+
 async function fetchRepositoryManifest(plugin) {
   const response = await fetch(rawPluginJsonUrl(plugin.repository_url, plugin.repository_ref, plugin.plugin_path), {
     headers: { "User-Agent": "kapitomo-plugin-hub" }
@@ -212,7 +258,9 @@ function normalizePlugin(input) {
     repository_url: validateGitHubRepository(input.repository_url),
     repository_ref: normalizeRef(input.repository_ref),
     plugin_path: normalizePluginPath(input.plugin_path),
-    tags: normalizeTags(input.tags)
+    tags: normalizeTags(input.tags),
+    hosts: Array.isArray(input.hosts) ? input.hosts.map(normalizeHost).filter(Boolean).sort() : [],
+    status: normalizeStatus(input.status)
   };
 }
 
@@ -233,6 +281,11 @@ async function validateRepositoryPlugin(plugin) {
   if (requestTags.join("|") !== repositoryTags.join("|")) {
     plugin.tags = manifestTags;
   }
+  plugin.hosts = pluginHostsFromManifest(plugin, manifest);
+  if (!plugin.hosts.length) {
+    throw new Error("plugin.json must declare match.hosts or browser.home_url.");
+  }
+  return manifest;
 }
 
 function loadCatalog() {
@@ -256,6 +309,36 @@ function writeCatalogs(catalog) {
   }
 }
 
+async function hostsForCatalogPlugin(plugin) {
+  const stored = Array.isArray(plugin.hosts) ? plugin.hosts.map(normalizeHost).filter(Boolean) : [];
+  if (stored.length) {
+    return stored;
+  }
+  try {
+    return pluginHostsFromManifest(plugin, await fetchRepositoryManifest(plugin));
+  } catch {
+    return [hostFromUrl(plugin.homepage), hostFromUrl(plugin.site_url)].filter(Boolean);
+  }
+}
+
+async function findDuplicateHost(catalog, plugin) {
+  const newHosts = new Set(plugin.hosts || []);
+  for (const existing of catalog.plugins) {
+    if (String(existing.id || "").toLowerCase() === plugin.id) {
+      continue;
+    }
+    if (["broken", "hidden", "removed"].includes(normalizeStatus(existing.status))) {
+      continue;
+    }
+    const existingHosts = await hostsForCatalogPlugin(existing);
+    const shared = existingHosts.find((host) => newHosts.has(host));
+    if (shared) {
+      return { plugin: existing, host: shared };
+    }
+  }
+  return null;
+}
+
 function sortPlugins(plugins) {
   return plugins.slice().sort((a, b) => {
     const ao = Array.isArray(a.tags) && a.tags.includes("official") ? 0 : 1;
@@ -271,6 +354,21 @@ function isMaintainer(actor) {
   return MAINTAINERS.has(String(actor || "").toLowerCase());
 }
 
+function issueHasApproval(issue) {
+  const labels = Array.isArray(issue.labels) ? issue.labels : [];
+  return labels.some((label) => APPROVAL_LABELS.has(String(label.name || label).toLowerCase()));
+}
+
+function approvalMessage(action) {
+  return [
+    `${action} request validated.`,
+    "",
+    "Status: waiting for maintainer approval.",
+    "",
+    "Add the `approved` label to finish this request."
+  ].join("\n");
+}
+
 async function publishPlugin(issue) {
   const plugin = normalizePlugin(extractJson(issue.body));
   await validateRepositoryPlugin(plugin);
@@ -280,6 +378,26 @@ async function publishPlugin(issue) {
   if (existing && Array.isArray(existing.tags) && existing.tags.includes("official") && !isMaintainer(issue.user && issue.user.login)) {
     throw new Error("Official plugins can only be changed by a maintainer.");
   }
+  const duplicate = await findDuplicateHost(catalog, plugin);
+  if (duplicate) {
+    throw new Error(`Host ${duplicate.host} is already covered by plugin ${duplicate.plugin.id || duplicate.plugin.name}.`);
+  }
+
+  if (!issueHasApproval(issue)) {
+    return {
+      pending: true,
+      title: `Validate plugin ${plugin.id}`,
+      message: approvalMessage(`Plugin **${plugin.name}**`)
+    };
+  }
+
+  if (existing && Array.isArray(existing.tags) && existing.tags.includes("official") && !plugin.tags.includes("official")) {
+    plugin.tags = ["official", ...plugin.tags.filter((tag) => tag !== "official")];
+  }
+  plugin.status = "active";
+  plugin.consecutive_failures = 0;
+  plugin.last_error = "";
+  plugin.last_checked_at = nowIso();
 
   catalog.plugins = sortPlugins([
     ...catalog.plugins.filter((item) => String(item.id || "").toLowerCase() !== plugin.id),
@@ -313,43 +431,95 @@ async function removePlugin(issue) {
   if (Array.isArray(existing.tags) && existing.tags.includes("official") && !isMaintainer(issue.user && issue.user.login)) {
     throw new Error("Official plugins can only be removed by a maintainer.");
   }
-  catalog.plugins = catalog.plugins.filter((item) => String(item.id || "").toLowerCase() !== id);
+
+  if (!issueHasApproval(issue)) {
+    return {
+      pending: true,
+      title: `Validate removal ${id}`,
+      message: approvalMessage(`Removal for **${existing.name || id}**`)
+    };
+  }
+
+  catalog.plugins = catalog.plugins.map((item) => {
+    if (String(item.id || "").toLowerCase() !== id) {
+      return item;
+    }
+    return {
+      ...item,
+      status: "removed",
+      removed_at: nowIso()
+    };
+  });
   if (!dryRun) {
     writeCatalogs(catalog);
   }
   return {
     title: `Remove plugin ${id}`,
-    message: `Plugin **${existing.name || id}** was removed from the catalog.`
+    message: `Plugin **${existing.name || id}** was marked as removed from the catalog.`
   };
 }
 
-async function pruneUnavailablePlugins() {
+async function checkUrl(url, field) {
+  const target = validateHttpUrl(url, field);
+  const response = await fetch(target, {
+    method: "GET",
+    headers: { "User-Agent": "kapitomo-plugin-hub" },
+    redirect: "follow"
+  });
+  if (!response.ok) {
+    throw new Error(`${field} HTTP ${response.status}`);
+  }
+}
+
+async function validatePluginHealth(plugin) {
+  const manifest = await fetchRepositoryManifest(plugin);
+  if (!manifest.browser || !manifest.browser.icon_url) {
+    throw new Error("plugin.json is missing browser.icon_url.");
+  }
+  const homeUrl = manifest.browser.home_url || plugin.homepage || plugin.site_url;
+  await checkUrl(homeUrl, "browser.home_url");
+  await checkUrl(manifest.browser.icon_url, "browser.icon_url");
+  return {
+    manifest,
+    hosts: pluginHostsFromManifest(plugin, manifest)
+  };
+}
+
+async function checkPluginHealth() {
   const catalog = loadCatalog();
-  const kept = [];
-  const removed = [];
+  let changed = false;
   for (const plugin of catalog.plugins) {
+    if (["hidden", "removed"].includes(normalizeStatus(plugin.status))) {
+      continue;
+    }
     try {
-      await fetchRepositoryManifest(plugin);
-      kept.push(plugin);
+      const health = await validatePluginHealth(plugin);
+      plugin.status = "active";
+      plugin.consecutive_failures = 0;
+      plugin.last_error = "";
+      plugin.last_checked_at = nowIso();
+      plugin.hosts = health.hosts;
+      changed = true;
     } catch (error) {
-      if (error && error.status === 404) {
-        removed.push(plugin);
-      } else {
-        console.warn(`Skipped pruning ${plugin.id || plugin.name}: ${error.message}`);
-        kept.push(plugin);
+      plugin.consecutive_failures = Number(plugin.consecutive_failures || 0) + 1;
+      plugin.last_error = error.message;
+      plugin.last_checked_at = nowIso();
+      if (plugin.consecutive_failures >= BROKEN_AFTER_FAILURES) {
+        plugin.status = "broken";
       }
+      changed = true;
     }
   }
-  catalog.plugins = sortPlugins(kept);
-  if (removed.length && !dryRun) {
+  catalog.plugins = sortPlugins(catalog.plugins);
+  if (changed && !dryRun) {
     writeCatalogs(catalog);
   }
-  const names = removed.map((plugin) => plugin.name || plugin.id).join(", ");
+  const broken = catalog.plugins.filter((plugin) => normalizeStatus(plugin.status) === "broken");
   return {
-    title: "Prune unavailable plugins",
-    message: removed.length
-      ? `Removed unavailable plugins from the catalog: ${names}.`
-      : "No unavailable plugins were found."
+    title: "Check plugin health",
+    message: broken.length
+      ? `Plugin health check finished. Broken plugins: ${broken.map((plugin) => plugin.name || plugin.id).join(", ")}.`
+      : "Plugin health check finished. No broken plugins."
   };
 }
 
@@ -452,7 +622,7 @@ async function main() {
   const event = readEvent();
   const issue = event.issue;
   if (!issue) {
-    const result = await pruneUnavailablePlugins();
+    const result = await checkPluginHealth();
     const changed = dryRun ? true : commitAndPush(result.title);
     console.log(`${result.message}\nStatus: ${changed ? "catalog updated" : "catalog was already up to date"}.`);
     return;
@@ -466,6 +636,10 @@ async function main() {
     const result = title.startsWith("[plugin-remove]")
       ? await removePlugin(issue)
       : await publishPlugin(issue);
+    if (result.pending) {
+      await comment(issue.number, result.message);
+      return;
+    }
     const changed = dryRun ? true : commitAndPush(result.title, issue.number);
     await comment(issue.number, `${result.message}\n\nStatus: ${changed ? "catalog updated" : "catalog was already up to date"}.`);
     await closeIssue(issue.number);

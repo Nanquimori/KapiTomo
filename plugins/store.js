@@ -9,10 +9,11 @@ const requestRemovePluginButton = document.getElementById("requestRemovePluginBu
 const removeStatus = document.getElementById("removeStatus");
 const tagFilter = document.getElementById("tagFilter");
 const tagFilterStatus = document.getElementById("tagFilterStatus");
+const pluginSearchInput = document.getElementById("pluginSearchInput");
 const viewButtons = Array.from(document.querySelectorAll("[data-view-target]"));
 const viewPanels = Array.from(document.querySelectorAll("[data-view-panel]"));
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
-const CATALOG_VERSION = "20260704-required-tags";
+const CATALOG_VERSION = "20260704-governed-hub";
 const MAX_SELECTED_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
 const LANGUAGE_TAGS = new Set([
@@ -52,6 +53,7 @@ let renderedPlugins = [];
 let allPlugins = [];
 let availableTags = [];
 let selectedTags = [];
+let searchQuery = "";
 
 function escapeHtml(value) {
   return String(value || "").replace(/[&<>"']/g, (char) => ({
@@ -69,6 +71,15 @@ function hasRequiredPluginIcon(plugin) {
 
 function hasRepository(plugin) {
   return Boolean(plugin && String(plugin.repository_url || "").trim());
+}
+
+function pluginStatus(plugin) {
+  const status = String(plugin?.status || "active").trim().toLowerCase();
+  return ["active", "broken", "hidden", "removed"].includes(status) ? status : "active";
+}
+
+function isVisiblePlugin(plugin) {
+  return !["broken", "hidden", "removed"].includes(pluginStatus(plugin));
 }
 
 function setPublishStatus(message) {
@@ -188,6 +199,23 @@ function pluginMatchesSelectedTags(plugin) {
   return selectedTags.every((tag) => tags.has(tag));
 }
 
+function pluginMatchesSearch(plugin) {
+  const query = searchQuery.trim().toLowerCase();
+  if (!query) {
+    return true;
+  }
+  return [
+    plugin.name,
+    plugin.id,
+    plugin.author,
+    plugin.site_url,
+    plugin.homepage,
+    plugin.repository_url,
+    ...(Array.isArray(plugin.hosts) ? plugin.hosts : []),
+    ...(Array.isArray(plugin.tags) ? plugin.tags : [])
+  ].some((value) => String(value || "").toLowerCase().includes(query));
+}
+
 function isLanguageTag(tag) {
   return LANGUAGE_TAGS.has(String(tag || "").trim().toLowerCase());
 }
@@ -237,15 +265,22 @@ function setTagStatus(filteredCount) {
     tagFilterStatus.textContent = "No plugins published yet.";
     return;
   }
-  if (!selectedTags.length) {
+  if (!selectedTags.length && !searchQuery.trim()) {
     tagFilterStatus.textContent = "";
     return;
   }
-  tagFilterStatus.textContent = `${filteredCount} plugin${filteredCount === 1 ? "" : "s"} matching ${selectedTags.join(", ")}.`;
+  const pieces = [];
+  if (selectedTags.length) {
+    pieces.push(selectedTags.join(", "));
+  }
+  if (searchQuery.trim()) {
+    pieces.push(`"${searchQuery.trim()}"`);
+  }
+  tagFilterStatus.textContent = `${filteredCount} plugin${filteredCount === 1 ? "" : "s"} matching ${pieces.join(" + ")}.`;
 }
 
 function applyTagFilters() {
-  const filtered = allPlugins.filter(pluginMatchesSelectedTags);
+  const filtered = allPlugins.filter((plugin) => pluginMatchesSelectedTags(plugin) && pluginMatchesSearch(plugin));
   renderTagFilters(availableTags);
   renderPlugins(filtered);
   setTagStatus(filtered.length);
@@ -342,6 +377,7 @@ function renderPlugins(plugins) {
   renderedPlugins = plugins;
   list.innerHTML = plugins.length ? plugins.map((plugin, index) => {
     const tags = displayTags(plugin.tags);
+    const status = pluginStatus(plugin);
     const actions = [
       `<button class="button primary" type="button" data-install-plugin="${index}">Install</button>`
     ];
@@ -360,6 +396,7 @@ function renderPlugins(plugins) {
             ${plugin.version ? `<span>v${escapeHtml(plugin.version)}</span>` : ""}
           </div>
         </div>
+        ${status !== "active" ? `<span class="status-badge status-${escapeHtml(status)}">${escapeHtml(status)}</span>` : ""}
         ${tags.length ? `<div class="tag-list">${tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>` : ""}
         <div class="plugin-actions">
           ${actions.join("")}
@@ -379,18 +416,17 @@ function loadAllPlugins() {
   fetchCatalog()
     .then((catalog) => {
       const catalogPlugins = (Array.isArray(catalog.plugins) ? catalog.plugins : [])
-        .filter((plugin) => hasRequiredPluginIcon(plugin) && hasRepository(plugin));
+        .filter((plugin) => hasRequiredPluginIcon(plugin) && hasRepository(plugin) && isVisiblePlugin(plugin));
       const savedDrafts = loadDraftPlugins();
       return Promise.all([
-        filterAvailablePlugins(catalogPlugins),
         filterAvailablePlugins(savedDrafts)
-      ]).then(([availableCatalogPlugins, availableDrafts]) => {
-        const publishedKeys = new Set(availableCatalogPlugins.map(pluginKey));
+      ]).then(([availableDrafts]) => {
+        const publishedKeys = new Set(catalogPlugins.map(pluginKey));
         const drafts = availableDrafts.filter((plugin) => !publishedKeys.has(pluginKey(plugin)));
         if (drafts.length !== savedDrafts.length) {
           saveDraftPlugins(drafts);
         }
-        allPlugins = uniquePlugins([availableCatalogPlugins, drafts.map((plugin) => ({ ...plugin, __source: "draft" }))]);
+        allPlugins = uniquePlugins([catalogPlugins, drafts.map((plugin) => ({ ...plugin, __source: "draft" }))]);
         const catalogTags = uniqueTags([
           allPlugins.flatMap((plugin) => filterTags(plugin.tags))
         ]);
@@ -511,7 +547,7 @@ function openPublishRequest(plugin) {
   }
   const body = [
     "Plugin publication request for the Nyxovira catalog.",
-    "After you submit this request, the catalog automation validates the repository and publishes it automatically when everything is correct.",
+    "After you submit this request, the catalog automation validates the repository. A maintainer approves valid requests before they appear in the public catalog.",
     "",
     "Repository: " + clean.repository_url,
     "",
@@ -538,7 +574,7 @@ function openRemovalRequest() {
   }
   const body = [
     "Plugin removal request for the Nyxovira catalog.",
-    "After you submit this request, the catalog automation validates it and removes the plugin automatically when everything is correct.",
+    "After you submit this request, the catalog automation validates it. A maintainer approves valid requests before they are hidden from the public catalog.",
     "",
     "Plugin ID: " + pluginId,
     "Repository: " + repoUrl,
@@ -584,6 +620,10 @@ repoUrlInput?.addEventListener("keydown", (event) => {
     event.preventDefault();
     loadRepoPlugin();
   }
+});
+pluginSearchInput?.addEventListener("input", () => {
+  searchQuery = String(pluginSearchInput.value || "");
+  applyTagFilters();
 });
 discardDraftPluginsButton?.addEventListener("click", () => {
   localStorage.removeItem(LOCAL_PLUGIN_KEY);
