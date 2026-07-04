@@ -34,6 +34,22 @@
         "manhwa",
         "novel"
       ]
+    },
+    {
+      "id": "nexustoons",
+      "name": "NexusToons",
+      "description": "Source plugin for downloading works from NexusToons in Nyxovira.",
+      "author": "Testador",
+      "version": "1.0.7",
+      "site_url": "https://nexustoons.com/",
+      "homepage": "https://nexustoons.com/",
+      "icon_url": "https://nexustoons.com/icon.png",
+      "repository_url": "https://github.com/Nanquimori/NexusToons",
+      "repository_ref": "main",
+      "plugin_path": "",
+      "tags": [
+        "community"
+      ]
     }
   ]
 }
