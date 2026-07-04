@@ -2,7 +2,7 @@
   "schema_version": 3,
   "name": "KapiTomo Plugin Hub",
   "description": "Public plugin catalog for installing source plugins in Nyxovira.",
-  "catalog_revision": "20260704-remove-nexustoons",
+  "catalog_revision": "20260704-stale-plugin-cleanup",
   "publish_model": "github-repository",
   "requirements": {
     "icon_url": "Required. Every online plugin must point to a public icon image.",
