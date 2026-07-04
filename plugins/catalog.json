@@ -57,10 +57,10 @@
       "hosts": [
         "nexustoons.com"
       ],
-      "status": "broken",
-      "consecutive_failures": 2,
-      "last_error": "browser.icon_url HTTP 403",
-      "last_checked_at": "2026-07-04T19:21:25.138Z",
+      "status": "active",
+      "consecutive_failures": 0,
+      "last_error": "",
+      "last_checked_at": "2026-07-04T19:22:40.794Z",
       "tags": [
         "portuguese",
         "manga",
