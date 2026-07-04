@@ -242,7 +242,7 @@ The catalog entry uses:
 | `repository_url` | Public GitHub repository containing `plugin.json`. |
 | `repository_ref` | Branch or ref to install from. Usually `main`. |
 | `plugin_path` | Folder containing `plugin.json`. Use `.` when the manifest is at the repository root. |
-| `tags` | Up to 4 public lowercase labels. Use one language tag first, then content tags such as `manga`, `manhua`, `manhwa`, or `novel`. |
+| `tags` | Public lowercase labels. Nyxovira publishes the first 4 public tags and ignores extra ones. Use one language tag first, then content tags such as `manga`, `manhua`, `manhwa`, or `novel`. |
 
 There is no package URL in the public contract. The repository is the source of the addon.
 

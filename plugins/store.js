@@ -12,7 +12,7 @@ const tagFilterStatus = document.getElementById("tagFilterStatus");
 const viewButtons = Array.from(document.querySelectorAll("[data-view-target]"));
 const viewPanels = Array.from(document.querySelectorAll("[data-view-panel]"));
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
-const CATALOG_VERSION = "20260704-tag-limit-contract";
+const CATALOG_VERSION = "20260704-tag-limit-truncate";
 const MAX_SELECTED_TAGS = 4;
 const LANGUAGE_TAGS = new Set([
   "portugues",
@@ -120,13 +120,15 @@ function normalizePublicationTags(tags) {
     if (!clean || seen.has(clean)) {
       return;
     }
+    if (clean !== "official" && clean !== "community") {
+      const publicCount = output.filter((item) => item !== "official" && item !== "community").length;
+      if (publicCount >= MAX_SELECTED_TAGS) {
+        return;
+      }
+    }
     seen.add(clean);
     output.push(clean);
   });
-  const publicTags = output.filter((tag) => tag !== "official" && tag !== "community");
-  if (publicTags.length > MAX_SELECTED_TAGS) {
-    throw new Error(`Use at most ${MAX_SELECTED_TAGS} public tags in plugin.json.`);
-  }
   return output.length ? output : ["community"];
 }
 
@@ -478,12 +480,7 @@ async function loadRepoPlugin() {
 
 function openPublishRequest(plugin) {
   const clean = publicPlugin(plugin);
-  try {
-    clean.tags = normalizePublicationTags(clean.tags);
-  } catch (error) {
-    setPublishStatus(error?.message || "The plugin has too many tags.");
-    return;
-  }
+  clean.tags = normalizePublicationTags(clean.tags);
   if (!clean.repository_url) {
     setPublishStatus("This draft is outdated. Load the GitHub repository again before requesting publication.");
     return;
