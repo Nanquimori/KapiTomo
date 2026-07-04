@@ -62,8 +62,7 @@
       }
 
       .topbar,
-      .actions,
-      nav {
+      .actions {
         display: flex;
         align-items: center;
         gap: 10px;
@@ -99,8 +98,7 @@
         font-size: 12px;
       }
 
-      .button,
-      nav a {
+      .button {
         min-height: 34px;
         display: inline-flex;
         align-items: center;
@@ -206,17 +204,6 @@
 
       .quick-row span {
         transform: translateY(4px);
-      }
-
-      nav {
-        flex-wrap: nowrap;
-        margin: 16px 0;
-        overflow-x: auto;
-        scrollbar-width: none;
-      }
-
-      nav::-webkit-scrollbar {
-        display: none;
       }
 
       .grid {
@@ -341,7 +328,6 @@
 
         .topbar,
         .hero,
-        nav,
         .grid,
         .content,
         .panel {
@@ -357,8 +343,7 @@
           overflow: hidden;
         }
 
-        .button,
-        nav a {
+        .button {
           min-height: 30px;
           padding: 0 8px;
           overflow: hidden;
@@ -438,20 +423,6 @@
           font-size: 13px;
         }
 
-        nav {
-          display: flex;
-          flex-wrap: nowrap;
-          gap: 6px;
-          margin: 10px 0;
-          overflow-x: auto;
-        }
-
-        nav a {
-          flex: 0 0 auto;
-          width: auto;
-          min-width: 0;
-        }
-
         .content {
           gap: 10px;
         }
@@ -511,8 +482,7 @@
           font-size: 21px;
         }
 
-        .button,
-        nav a {
+        .button {
           white-space: normal;
         }
       }
@@ -551,16 +521,6 @@
           </div>
         </div>
       </section>
-
-      <nav aria-label="Documentation sections">
-        <a href="#files">Addon files</a>
-        <a href="#manifest">plugin.json</a>
-        <a href="#mapping">Routes and fields</a>
-        <a href="#chapter-plan">Instant chapter list</a>
-        <a href="#prepare">Prepare after selection</a>
-        <a href="#formats">Chapter formats</a>
-        <a href="#publishing">Plugin Hub</a>
-      </nav>
 
       <main class="grid">
         <div class="content">
