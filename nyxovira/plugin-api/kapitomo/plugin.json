@@ -3,6 +3,12 @@
     "id":  "kapitomo",
     "name":  "KapiTomo",
     "version":  "1.0.14",
+    "tags":  [
+                 "portugues",
+                 "english",
+                 "manga",
+                 "novel"
+             ],
     "match":  {
                   "hosts":  [
                                 "nanquimori.github.io"
