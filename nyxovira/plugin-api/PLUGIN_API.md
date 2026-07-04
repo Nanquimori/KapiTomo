@@ -6,6 +6,21 @@ A source addon connects one reading site to the app. It tells Nyxovira which pag
 
 The app stays generic. Source-specific routes, field names, and download rules live inside the addon.
 
+## Contract Map
+
+```text
+Plugin Hub
+  -> public GitHub repository
+  -> plugin.json
+  -> browser/download_target.js
+  -> window.__nyxoviraChapterPlan
+  -> user selects chapters
+  -> window.__nyxoviraPrepareDownloadPlan
+  -> Nyxovira saves selected chapters offline
+```
+
+Nyxovira does not need site-specific route names in the app. The addon maps source routes and fields manually, then returns Nyxovira's expected work and chapter format.
+
 ## Addon Files
 
 Create one folder named after the source id:

@@ -2,7 +2,9 @@
 
 The public API lives in `api/works/` and uses JSON for works and chapters.
 
-Main index:
+## Endpoints
+
+Main work index:
 
 ```text
 api/works/index.json
@@ -19,6 +21,36 @@ Chapter details:
 ```text
 api/works/{work}/chapters/{chapter}.json
 ```
+
+Legacy catalog:
+
+```text
+api/catalog.json
+```
+
+Use `api/works/index.json` for new integrations.
+
+## Work Object
+
+Work indexes expose the reading metadata used by the site and apps:
+
+```json
+{
+  "id": "work-id",
+  "slug": "work-id",
+  "title": "Work title",
+  "summary": "Short summary",
+  "contentType": "novel",
+  "cover": "https://example.com/cover.png",
+  "url": "https://example.com/manga/work-id/",
+  "apiUrl": "https://example.com/api/works/work-id/index.json",
+  "chapters": []
+}
+```
+
+`contentType` is `novel` for text chapters and `images` for image chapters.
+
+## Chapter Objects
 
 Novel chapter example:
 
@@ -45,4 +77,17 @@ Comic chapter example:
 }
 ```
 
-`catalog.json` exists only as a published catalog file. The primary work API is `works/index.json`.
+Novel chapters should use `paragraphs`. The `text` field is a generated convenience field made from those paragraphs.
+
+Image chapters should use `pages`; each page can include an image URL and page metadata.
+
+## Plugin Catalog
+
+The plugin catalog is separate from the work API:
+
+```text
+plugins/catalog-store.json
+plugins/catalog.json
+```
+
+The Plugin Hub validates public GitHub repositories, official tags, source hosts, and health status before a plugin appears in the storefront.
