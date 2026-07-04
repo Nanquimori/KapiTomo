@@ -210,9 +210,9 @@
 
       .catalog-panel {
         display: grid;
-        grid-template-columns: minmax(8rem, 0.55fr) minmax(0, 1.45fr);
+        grid-template-columns: minmax(0, 1fr);
         align-items: start;
-        gap: 14px;
+        gap: 7px;
         margin-top: 0;
         padding: 0;
         border: 0;
@@ -279,7 +279,7 @@
         grid-column: 1 / -1;
         min-width: 0;
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(260px, 320px));
+        grid-template-columns: repeat(auto-fill, minmax(240px, 280px));
         justify-content: start;
         gap: 8px;
       }
@@ -536,12 +536,12 @@
         }
 
         .plugin-list {
-          grid-template-columns: minmax(0, min(100%, 320px));
+          grid-template-columns: minmax(0, min(100%, 280px));
           gap: 5px;
         }
 
         .plugin-card {
-          width: min(100%, 320px);
+          width: min(100%, 280px);
           min-height: 72px;
           grid-template-columns: 30px minmax(0, 1fr);
           gap: 4px 6px;
@@ -707,6 +707,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260704-plugin-grid"></script>
+    <script src="store.js?v=20260704-tags-under-catalog"></script>
   </body>
 </html>
