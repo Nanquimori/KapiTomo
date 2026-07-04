@@ -279,7 +279,8 @@
         grid-column: 1 / -1;
         min-width: 0;
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(260px, 320px));
+        justify-content: start;
         gap: 8px;
       }
 
@@ -643,7 +644,6 @@
           <div class="filter-head">
             <div>
               <p class="kicker">Tags</p>
-              <p class="filter-help">Choose up to 4 tags to filter the catalog.</p>
             </div>
           </div>
           <div id="tagFilter" class="tag-filter" aria-label="Catalog tag filters"></div>
@@ -707,6 +707,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260704-no-hero-scale"></script>
+    <script src="store.js?v=20260704-plugin-grid"></script>
   </body>
 </html>
