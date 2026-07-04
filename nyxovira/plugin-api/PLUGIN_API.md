@@ -445,6 +445,6 @@ Antes de publicar:
 5. Confirme `chapterPlan.title`, `summary`, `canonicalUrl`, `coverUrl` e `chapters`.
 6. Em novel, confirme que `paragraphs` tem vários itens separados.
 7. Em quadrinho, confirme que o plano final tem `pages` ou `images` nos capítulos selecionados.
-8. Publique o pacote do addon em uma Release ou em um repositório público compatível com o Hub.
-9. Atualize o `sha256` no catálogo de plugins.
+8. Publique o addon em um repositório público do GitHub.
+9. Publique pelo Plugin Hub usando a URL do repositório.
 10. Teste download do primeiro, do meio e do último capítulo.

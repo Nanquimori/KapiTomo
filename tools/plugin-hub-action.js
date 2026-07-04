@@ -1,11 +1,9 @@
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
-const crypto = require("crypto");
 const { execFileSync } = require("child_process");
 
 const CATALOG_PATHS = ["plugins/catalog-store.json", "plugins/catalog.json"];
-const MAX_PACKAGE_BYTES = 250 * 1024 * 1024;
 const MAINTAINERS = new Set(["nanquimori"]);
 
 const env = process.env;
@@ -59,6 +57,38 @@ function validateHttpUrl(value, field) {
   return url.toString();
 }
 
+function validateGitHubRepository(value) {
+  const raw = validateHttpUrl(value, "repository_url");
+  const url = new URL(raw);
+  if (!/^(www\.)?github\.com$/i.test(url.hostname)) {
+    throw new Error("repository_url precisa apontar para github.com.");
+  }
+  const parts = url.pathname.split("/").filter(Boolean);
+  if (parts.length < 2) {
+    throw new Error("repository_url precisa ter usuario e repositorio.");
+  }
+  return `https://github.com/${parts[0]}/${parts[1].replace(/\.git$/i, "")}`;
+}
+
+function normalizeRef(value) {
+  const ref = optionalText(value || "main", 120) || "main";
+  if (!/^[A-Za-z0-9._/-]+$/.test(ref) || ref.includes("..")) {
+    throw new Error("repository_ref invalido.");
+  }
+  return ref;
+}
+
+function normalizePluginPath(value) {
+  const clean = optionalText(value, 240)
+    .replace(/\\/g, "/")
+    .replace(/^\/+|\/+$/g, "")
+    .replace(/\/plugin\.json$/i, "");
+  if (clean.includes("..")) {
+    throw new Error("plugin_path invalido.");
+  }
+  return clean;
+}
+
 function extractJson(body) {
   const text = String(body || "");
   const fenced = text.match(/```json\s*([\s\S]*?)```/i) || text.match(/```\s*([\s\S]*?)```/);
@@ -73,10 +103,31 @@ function extractJson(body) {
   }
 }
 
+function rawPluginJsonUrl(repositoryUrl, ref, pluginPath) {
+  const url = new URL(repositoryUrl);
+  const [owner, repo] = url.pathname.split("/").filter(Boolean);
+  const manifestPath = [pluginPath, "plugin.json"].filter(Boolean).join("/");
+  return `https://raw.githubusercontent.com/${owner}/${repo}/${encodeURIComponent(ref)}/${manifestPath}`;
+}
+
+async function fetchRepositoryManifest(plugin) {
+  const response = await fetch(rawPluginJsonUrl(plugin.repository_url, plugin.repository_ref, plugin.plugin_path), {
+    headers: { "User-Agent": "kapitomo-plugin-hub" }
+  });
+  if (!response.ok) {
+    throw new Error(`Nao foi possivel ler plugin.json no repositorio: HTTP ${response.status}.`);
+  }
+  try {
+    return await response.json();
+  } catch (error) {
+    throw new Error("plugin.json do repositorio esta invalido: " + error.message);
+  }
+}
+
 function normalizePlugin(input) {
-  const siteUrl = input.site_url || input.siteUrl || input.homepage || input.home_url || input.homeUrl;
+  const siteUrl = input.site_url || input.homepage;
   const homepage = input.homepage || siteUrl;
-  const plugin = {
+  return {
     id: normalizeId(input.id),
     name: cleanText(input.name || input.id, "name", 80),
     description: cleanText(input.description, "description", 220),
@@ -84,24 +135,29 @@ function normalizePlugin(input) {
     version: cleanText(input.version, "version", 40),
     site_url: validateHttpUrl(siteUrl, "site_url"),
     homepage: validateHttpUrl(homepage, "homepage"),
-    icon_url: validateHttpUrl(input.icon_url || input.iconUrl, "icon_url"),
-    package_url: validateHttpUrl(input.package_url || input.packageUrl || input.download, "package_url"),
+    icon_url: validateHttpUrl(input.icon_url, "icon_url"),
+    repository_url: validateGitHubRepository(input.repository_url),
+    repository_ref: normalizeRef(input.repository_ref),
+    plugin_path: normalizePluginPath(input.plugin_path),
     tags: Array.isArray(input.tags) ? input.tags.map((tag) => optionalText(tag, 30)).filter(Boolean).slice(0, 8) : ["comunidade"]
   };
+}
 
-  const sha256 = optionalText(input.sha256, 80).toLowerCase();
-  if (sha256) {
-    if (!/^[a-f0-9]{64}$/.test(sha256)) {
-      throw new Error("sha256 precisa ter 64 caracteres hexadecimais.");
-    }
-    plugin.sha256 = sha256;
+async function validateRepositoryPlugin(plugin) {
+  const manifest = await fetchRepositoryManifest(plugin);
+  if (normalizeId(manifest.id || plugin.id) !== plugin.id) {
+    throw new Error("O id do plugin.json nao confere com o id da solicitacao.");
   }
-
-  return plugin;
+  if (manifest.version && String(manifest.version).trim() !== plugin.version) {
+    throw new Error("A versao da solicitacao nao confere com plugin.json.");
+  }
+  if (!manifest.browser || !manifest.browser.icon_url) {
+    throw new Error("plugin.json precisa declarar browser.icon_url.");
+  }
 }
 
 function loadCatalog() {
-  const source = CATALOG_PATHS.find((path) => fs.existsSync(path));
+  const source = CATALOG_PATHS.find((catalogPath) => fs.existsSync(catalogPath));
   if (!source) {
     throw new Error("Catalogo de plugins nao encontrado.");
   }
@@ -113,9 +169,11 @@ function loadCatalog() {
 }
 
 function writeCatalogs(catalog) {
+  catalog.schema_version = 3;
+  catalog.publish_model = "github-repository";
   const text = JSON.stringify(catalog, null, 2) + "\n";
-  for (const path of CATALOG_PATHS) {
-    fs.writeFileSync(path, text, "utf8");
+  for (const catalogPath of CATALOG_PATHS) {
+    fs.writeFileSync(catalogPath, text, "utf8");
   }
 }
 
@@ -134,25 +192,9 @@ function isMaintainer(actor) {
   return MAINTAINERS.has(String(actor || "").toLowerCase());
 }
 
-async function calculatePackageHash(url) {
-  const response = await fetch(url, { method: "GET", redirect: "follow" });
-  if (!response.ok) {
-    throw new Error(`package_url respondeu HTTP ${response.status}.`);
-  }
-  const length = Number(response.headers.get("content-length") || "0");
-  if (length > MAX_PACKAGE_BYTES) {
-    throw new Error("package_url excede o limite de 250 MB.");
-  }
-  const buffer = Buffer.from(await response.arrayBuffer());
-  if (buffer.byteLength > MAX_PACKAGE_BYTES) {
-    throw new Error("package_url excede o limite de 250 MB.");
-  }
-  return crypto.createHash("sha256").update(buffer).digest("hex");
-}
-
 async function publishPlugin(issue) {
   const plugin = normalizePlugin(extractJson(issue.body));
-  plugin.sha256 = await calculatePackageHash(plugin.package_url);
+  await validateRepositoryPlugin(plugin);
 
   const catalog = loadCatalog();
   const existing = catalog.plugins.find((item) => String(item.id || "").toLowerCase() === plugin.id);
@@ -169,7 +211,7 @@ async function publishPlugin(issue) {
   }
   return {
     title: `Publica plugin ${plugin.id}`,
-    message: `Plugin **${plugin.name}** publicado no catalogo.\n\nVersao: \`${plugin.version}\`\nSHA-256: \`${plugin.sha256}\``
+    message: `Plugin **${plugin.name}** publicado no catalogo.\n\nVersao: \`${plugin.version}\`\nRepositorio: ${plugin.repository_url}`
   };
 }
 
@@ -264,11 +306,11 @@ function commitAndPush(title, issueNumber) {
   return true;
 }
 
-async function githubRequest(path, method, body) {
+async function githubRequest(requestPath, method, body) {
   if (!env.GITHUB_TOKEN || !env.GITHUB_REPOSITORY) {
     return;
   }
-  const response = await fetch(`https://api.github.com/repos/${env.GITHUB_REPOSITORY}${path}`, {
+  const response = await fetch(`https://api.github.com/repos/${env.GITHUB_REPOSITORY}${requestPath}`, {
     method,
     headers: {
       "Accept": "application/vnd.github+json",

@@ -7,7 +7,7 @@ const removePluginIdInput = document.getElementById("removePluginIdInput");
 const removeRepoUrlInput = document.getElementById("removeRepoUrlInput");
 const requestRemovePluginButton = document.getElementById("requestRemovePluginButton");
 const removeStatus = document.getElementById("removeStatus");
-const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v1";
+const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v2";
 let renderedPlugins = [];
 
 function escapeHtml(value) {
@@ -21,7 +21,11 @@ function escapeHtml(value) {
 }
 
 function hasRequiredPluginIcon(plugin) {
-  return Boolean(plugin && String(plugin.icon_url || plugin.iconUrl || "").trim());
+  return Boolean(plugin && String(plugin.icon_url || "").trim());
+}
+
+function hasRepository(plugin) {
+  return Boolean(plugin && String(plugin.repository_url || "").trim());
 }
 
 function setPublishStatus(message) {
@@ -38,8 +42,8 @@ function setRemoveStatus(message) {
 
 function fetchCatalog() {
   const urls = [
-    "catalog-store.json?v=20260703-auto-hub5",
-    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260703-auto-hub5"
+    "catalog-store.json?v=20260704-repository-hub",
+    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260704-repository-hub"
   ];
   return urls.reduce((chain, url) => chain.catch(() => fetch(url, { cache: "no-store" })
     .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))), Promise.reject());
@@ -48,7 +52,7 @@ function fetchCatalog() {
 function publicPlugin(plugin) {
   const clean = { ...plugin };
   Object.keys(clean).forEach((key) => {
-    if (key.startsWith("__")) {
+    if (key.startsWith("__") || clean[key] === "" || clean[key] == null) {
       delete clean[key];
     }
   });
@@ -56,7 +60,20 @@ function publicPlugin(plugin) {
 }
 
 function pluginKey(plugin) {
-  return String(plugin?.id || "") + "|" + String(plugin?.package_url || plugin?.packageUrl || "");
+  return [
+    String(plugin?.id || ""),
+    String(plugin?.repository_url || ""),
+    String(plugin?.repository_ref || ""),
+    String(plugin?.plugin_path || "")
+  ].join("|");
+}
+
+function repositoryLabel(repositoryUrl) {
+  try {
+    return new URL(repositoryUrl).pathname.replace(/^\//, "");
+  } catch {
+    return "";
+  }
 }
 
 function uniquePlugins(groups) {
@@ -75,7 +92,8 @@ function uniquePlugins(groups) {
 
 function loadDraftPlugins() {
   try {
-    return JSON.parse(localStorage.getItem(LOCAL_PLUGIN_KEY) || "[]").filter(hasRequiredPluginIcon);
+    return JSON.parse(localStorage.getItem(LOCAL_PLUGIN_KEY) || "[]")
+      .filter((plugin) => hasRequiredPluginIcon(plugin) && hasRepository(plugin));
   } catch {
     return [];
   }
@@ -108,14 +126,15 @@ function renderPlugins(plugins) {
     return `
       <article class="plugin-card">
         <div class="plugin-summary">
-          <img class="plugin-icon" src="${escapeHtml(plugin.icon_url || plugin.iconUrl)}" alt="">
+          <img class="plugin-icon" src="${escapeHtml(plugin.icon_url)}" alt="">
           <div>
             <h3>${escapeHtml(plugin.name || plugin.id || "Plugin")}</h3>
-            <p>${escapeHtml(plugin.description || plugin.package_url || "")}</p>
+            <p>${escapeHtml(plugin.description || "")}</p>
             <div class="meta">
               ${plugin.author ? `<span>${escapeHtml(plugin.author)}</span>` : ""}
               ${plugin.version ? `<span>v${escapeHtml(plugin.version)}</span>` : ""}
               ${plugin.id ? `<span>${escapeHtml(plugin.id)}</span>` : ""}
+              ${plugin.repository_url ? `<span>${escapeHtml(repositoryLabel(plugin.repository_url))}</span>` : ""}
             </div>
           </div>
         </div>
@@ -136,7 +155,8 @@ function renderPlugins(plugins) {
 function loadAllPlugins() {
   fetchCatalog()
     .then((catalog) => {
-      const catalogPlugins = (Array.isArray(catalog.plugins) ? catalog.plugins : []).filter(hasRequiredPluginIcon);
+      const catalogPlugins = (Array.isArray(catalog.plugins) ? catalog.plugins : [])
+        .filter((plugin) => hasRequiredPluginIcon(plugin) && hasRepository(plugin));
       const publishedKeys = new Set(catalogPlugins.map(pluginKey));
       const savedDrafts = loadDraftPlugins();
       const drafts = savedDrafts.filter((plugin) => !publishedKeys.has(pluginKey(plugin)));
@@ -164,10 +184,20 @@ function parseGitHubRepo(rawUrl) {
   if (parts.length < 2) {
     throw new Error("A URL precisa ter usuário e repositório.");
   }
+  const treeIndex = parts.indexOf("tree");
   return {
     owner: parts[0],
-    repo: parts[1].replace(/\.git$/i, "")
+    repo: parts[1].replace(/\.git$/i, ""),
+    branch: treeIndex >= 0 && parts[treeIndex + 1] ? parts[treeIndex + 1] : "",
+    pluginPath: treeIndex >= 0 && parts.length > treeIndex + 2 ? parts.slice(treeIndex + 2).join("/") : ""
   };
+}
+
+function normalizePluginPath(rawPath) {
+  return String(rawPath || "")
+    .replace(/\\/g, "/")
+    .replace(/^\/+|\/+$/g, "")
+    .replace(/\/plugin\.json$/i, "");
 }
 
 function resolveUrl(baseUrl, maybeUrl) {
@@ -179,10 +209,12 @@ function resolveUrl(baseUrl, maybeUrl) {
 }
 
 async function fetchRepoManifest(repo) {
-  const branches = ["main", "master"];
+  const branches = repo.branch ? [repo.branch] : ["main", "master"];
+  const pluginPath = normalizePluginPath(repo.pluginPath);
   let lastError;
   for (const branch of branches) {
-    const url = `https://raw.githubusercontent.com/${repo.owner}/${repo.repo}/${branch}/plugin.json`;
+    const path = [pluginPath, "plugin.json"].filter(Boolean).join("/");
+    const url = `https://raw.githubusercontent.com/${repo.owner}/${repo.repo}/${branch}/${path}`;
     try {
       const response = await fetch(url, { cache: "no-store" });
       if (!response.ok) {
@@ -190,55 +222,24 @@ async function fetchRepoManifest(repo) {
       }
       return {
         branch,
+        pluginPath,
         manifest: await response.json()
       };
     } catch (error) {
       lastError = error;
     }
   }
-  throw new Error("Não encontrei plugin.json em main ou master. " + (lastError?.message || ""));
-}
-
-async function findRepoPackage(repo, branch, manifest) {
-  const releasesUrl = `https://api.github.com/repos/${repo.owner}/${repo.repo}/releases`;
-  try {
-    const response = await fetch(releasesUrl, { cache: "no-store" });
-    if (response.ok) {
-      const releases = await response.json();
-      for (const release of releases) {
-        const assets = Array.isArray(release.assets) ? release.assets : [];
-        const preferred = assets.find((asset) => /\.zip$/i.test(asset.name || "") && String(asset.name || "").toLowerCase().includes(String(manifest.id || repo.repo).toLowerCase()))
-          || assets.find((asset) => /\.zip$/i.test(asset.name || "") || /zip/i.test(asset.content_type || ""));
-        if (preferred?.browser_download_url) {
-          return {
-            url: preferred.browser_download_url,
-            version: manifest.version || String(release.tag_name || "").replace(/^v/i, "")
-          };
-        }
-        if (release.zipball_url) {
-          return {
-            url: release.zipball_url,
-            version: manifest.version || String(release.tag_name || "").replace(/^v/i, "")
-          };
-        }
-      }
-    }
-  } catch {
-  }
-  return {
-    url: `https://api.github.com/repos/${repo.owner}/${repo.repo}/zipball/${branch}`,
-    version: manifest.version || branch
-  };
+  throw new Error("Não encontrei plugin.json no repositório. " + (lastError?.message || ""));
 }
 
 async function loadRepoPlugin() {
   try {
     const repo = parseGitHubRepo(repoUrlInput?.value || "");
     setPublishStatus("Lendo plugin.json do repositório...");
-    const { branch, manifest } = await fetchRepoManifest(repo);
+    const { branch, pluginPath, manifest } = await fetchRepoManifest(repo);
     const browser = manifest.browser || {};
-    const packageInfo = await findRepoPackage(repo, branch, manifest);
-    const iconUrl = resolveUrl(browser.home_url || `https://github.com/${repo.owner}/${repo.repo}/`, browser.icon_url || browser.iconUrl || "");
+    const repositoryUrl = `https://github.com/${repo.owner}/${repo.repo}`;
+    const iconUrl = resolveUrl(browser.home_url || repositoryUrl + "/", browser.icon_url || "");
     if (!iconUrl) {
       throw new Error("O plugin precisa ter browser.icon_url.");
     }
@@ -248,17 +249,18 @@ async function loadRepoPlugin() {
       name: manifest.name || manifest.id || repo.repo,
       description: manifest.description || `Fonte para baixar obras de ${manifest.name || repo.repo} no Nyxovira.`,
       author: manifest.author || repo.owner,
-      version: packageInfo.version || manifest.version || "1.0.0",
-      site_url: browser.home_url || `https://github.com/${repo.owner}/${repo.repo}/`,
-      homepage: browser.home_url || `https://github.com/${repo.owner}/${repo.repo}/`,
+      version: manifest.version || "1.0.0",
+      site_url: browser.home_url || repositoryUrl + "/",
+      homepage: browser.home_url || repositoryUrl + "/",
       icon_url: iconUrl,
-      package_url: packageInfo.url,
+      repository_url: repositoryUrl,
+      repository_ref: branch,
+      plugin_path: pluginPath,
       tags: Array.isArray(manifest.tags) ? manifest.tags : ["comunidade"],
-      __repo: `https://github.com/${repo.owner}/${repo.repo}`,
       __source: "draft"
     };
     saveDraftPlugin(plugin);
-    setPublishStatus("Addon carregado. Ao confirmar no GitHub, o robô calcula o SHA-256 e publica.");
+    setPublishStatus("Addon carregado. Ao confirmar no GitHub, o robô valida o repositório e publica.");
     loadAllPlugins();
   } catch (error) {
     setPublishStatus(error?.message || "Não foi possível carregar o addon.");
@@ -269,9 +271,9 @@ function openPublishRequest(plugin) {
   const clean = publicPlugin(plugin);
   const body = [
     "Solicitação de publicação de plugin para o catálogo do Nyxovira.",
-    "Depois que você criar esta issue, o robô do catálogo valida o JSON e publica automaticamente se estiver tudo correto.",
+    "Depois que você criar esta issue, o robô valida o repositório e publica automaticamente se estiver tudo correto.",
     "",
-    "Repositório: " + (plugin.__repo || clean.homepage || clean.site_url || ""),
+    "Repositório: " + (clean.repository_url || ""),
     "",
     "```json",
     JSON.stringify(clean, null, 2),
@@ -296,7 +298,7 @@ function openRemovalRequest() {
   }
   const body = [
     "Solicitação de remoção de plugin publicado no catálogo do Nyxovira.",
-    "Depois que você criar esta issue, o robô do catálogo valida o pedido e remove automaticamente se estiver tudo correto.",
+    "Depois que você criar esta issue, o robô valida o pedido e remove automaticamente se estiver tudo correto.",
     "",
     "Plugin ID: " + pluginId,
     "Repositório: " + repoUrl,
@@ -314,6 +316,10 @@ function installPlugin(plugin) {
   const bridge = window.NyxoviraAndroidBridge || window.ArchiveInkAndroidBridge;
   if (!hasRequiredPluginIcon(plugin)) {
     alert("Este plugin não tem icon_url e não pode ser instalado pelo catálogo online.");
+    return;
+  }
+  if (!hasRepository(plugin)) {
+    alert("Este plugin não tem repository_url e não pode ser instalado pelo catálogo online.");
     return;
   }
   if (!plugin || !bridge || typeof bridge.installOnlinePlugin !== "function") {
