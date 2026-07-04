@@ -98,7 +98,8 @@
       }
 
       .nav-link,
-      .button {
+      .button,
+      .menu-tab {
         min-height: 32px;
         display: inline-flex;
         align-items: center;
@@ -112,6 +113,16 @@
         font-weight: 850;
         white-space: nowrap;
         cursor: pointer;
+      }
+
+      .menu-tab {
+        width: 100%;
+      }
+
+      .menu-tab.is-active {
+        border-color: rgba(255, 178, 31, 0.48);
+        background: linear-gradient(135deg, rgba(255, 178, 31, 0.2), rgba(255, 107, 44, 0.13));
+        color: #ffe2a3;
       }
 
       .button.primary {
@@ -171,6 +182,17 @@
         margin-top: 8px;
       }
 
+      .hub-menu {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+        margin-bottom: 8px;
+      }
+
+      .view-panel[hidden] {
+        display: none !important;
+      }
+
       .panel-head {
         display: flex;
         align-items: end;
@@ -188,6 +210,68 @@
 
       .catalog-panel {
         padding: 8px;
+      }
+
+      .catalog-tools {
+        display: grid;
+        gap: 6px;
+        margin-bottom: 8px;
+      }
+
+      .filter-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .filter-head .kicker {
+        margin-bottom: 0;
+      }
+
+      .filter-help,
+      .filter-status {
+        margin: 0;
+        color: var(--faint);
+        font-size: 0.72rem;
+        line-height: 1.25;
+      }
+
+      .filter-clear {
+        min-height: 24px;
+        border-radius: 999px;
+        padding-inline: 9px;
+        font-size: 0.66rem;
+      }
+
+      .tag-filter {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+
+      .filter-chip {
+        min-height: 23px;
+        border: 1px solid rgba(255, 178, 31, 0.24);
+        border-radius: 999px;
+        padding: 0 8px;
+        background: rgba(255, 178, 31, 0.07);
+        color: #ffd990;
+        font: inherit;
+        font-size: 0.66rem;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      .filter-chip.is-active {
+        border-color: transparent;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        color: #150700;
+      }
+
+      .filter-chip:disabled {
+        opacity: 0.36;
+        cursor: default;
       }
 
       .plugin-list {
@@ -288,16 +372,6 @@
         font-size: 0.68rem;
       }
 
-      .forms-grid {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        gap: 8px;
-      }
-
-      .forms-grid .steps {
-        grid-column: 1 / -1;
-      }
-
       .button-row {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -339,7 +413,8 @@
         counter-reset: step;
       }
 
-      details.panel {
+      details.steps {
+        margin-top: 10px;
         padding: 0;
         overflow: hidden;
       }
@@ -498,9 +573,32 @@
           font-size: 0.62rem;
         }
 
-        .forms-grid,
         .button-row {
           grid-template-columns: 1fr;
+        }
+
+        .hub-menu {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 4px;
+          margin-bottom: 6px;
+        }
+
+        .menu-tab {
+          min-height: 28px;
+          border-radius: 8px;
+          padding: 0 5px;
+          font-size: 0.62rem;
+        }
+
+        .catalog-tools {
+          gap: 5px;
+          margin-bottom: 6px;
+        }
+
+        .filter-chip {
+          min-height: 21px;
+          padding: 0 6px;
+          font-size: 0.58rem;
         }
       }
 
@@ -518,7 +616,6 @@
           <img src="../assets/kapitomo-logo.png" alt="">
           <span>KapiTomo</span>
         </a>
-        <a class="nav-link" href="../nyxovira/plugin-api/">Plugin API</a>
       </header>
 
       <section class="hub-head">
@@ -526,52 +623,54 @@
           <p class="kicker">Nyxovira</p>
           <h1>Plugin Hub</h1>
         </div>
-        <p>Install source plugins from GitHub repositories without opening an external browser.</p>
+        <p>Install source plugins published from GitHub repositories.</p>
       </section>
 
-      <section class="panel catalog-panel">
+      <nav class="hub-menu" aria-label="Plugin Hub sections">
+        <button class="menu-tab is-active" type="button" data-view-target="catalog">Catalog</button>
+        <button class="menu-tab" type="button" data-view-target="publish">Publish</button>
+        <button class="menu-tab" type="button" data-view-target="remove">Remove</button>
+        <a class="menu-tab" href="../nyxovira/plugin-api/">Plugin API</a>
+      </nav>
+
+      <section id="catalogPanel" class="panel catalog-panel view-panel" data-view-panel="catalog">
         <div class="panel-head">
           <div>
             <p class="kicker">Catalog</p>
             <h2>Published plugins</h2>
           </div>
         </div>
+        <div class="catalog-tools">
+          <div class="filter-head">
+            <div>
+              <p class="kicker">Tags</p>
+              <p class="filter-help">Choose up to 4 tags to filter the catalog.</p>
+            </div>
+            <button id="clearTagFilterButton" class="button filter-clear" type="button">Clear</button>
+          </div>
+          <div id="tagFilter" class="tag-filter" aria-label="Catalog tag filters"></div>
+          <p id="tagFilterStatus" class="filter-status" aria-live="polite"></p>
+        </div>
         <div id="pluginList" class="plugin-list" aria-live="polite">
           <p>Loading catalog...</p>
         </div>
       </section>
 
-      <section class="forms-grid">
-        <article class="panel">
-          <p class="kicker">Publish</p>
-          <h2>Publish a ready addon</h2>
-          <p>Paste the GitHub repository that already contains <code>plugin.json</code>. The Hub reads the manifest and opens a GitHub request; after confirmation, automation validates the repository and publishes it to the catalog.</p>
-          <div class="publish-form">
-            <label class="field-label" for="repoUrlInput">GitHub repository</label>
-            <input id="repoUrlInput" class="text-input" type="url" placeholder="https://github.com/user/my-addon">
-            <div class="button-row">
-              <button id="loadRepoPluginButton" class="button primary" type="button">Load addon</button>
-              <button id="clearDraftPluginsButton" class="button" type="button">Clear drafts</button>
-            </div>
-            <p id="publishStatus" class="publish-status" aria-live="polite"></p>
+      <section id="publishPanel" class="panel view-panel" data-view-panel="publish" hidden>
+        <p class="kicker">Publish</p>
+        <h2>Publish a ready addon</h2>
+        <p>Paste the GitHub repository that already contains <code>plugin.json</code>. The Hub reads the manifest and opens a GitHub request; after confirmation, automation validates the repository and publishes it to the catalog.</p>
+        <div class="publish-form">
+          <label class="field-label" for="repoUrlInput">GitHub repository</label>
+          <input id="repoUrlInput" class="text-input" type="url" placeholder="https://github.com/user/my-addon">
+          <div class="button-row">
+            <button id="loadRepoPluginButton" class="button primary" type="button">Load addon</button>
+            <button id="clearDraftPluginsButton" class="button" type="button">Clear drafts</button>
           </div>
-        </article>
+          <p id="publishStatus" class="publish-status" aria-live="polite"></p>
+        </div>
 
-        <article class="panel">
-          <p class="kicker">Remove</p>
-          <h2>Remove a publication</h2>
-          <p>Enter the published plugin and confirm the GitHub request. Automation validates it, removes it from the catalog, and posts the result.</p>
-          <div class="publish-form">
-            <label class="field-label" for="removePluginIdInput">Plugin ID</label>
-            <input id="removePluginIdInput" class="text-input" type="text" placeholder="my-addon">
-            <label class="field-label" for="removeRepoUrlInput">GitHub repository</label>
-            <input id="removeRepoUrlInput" class="text-input" type="url" placeholder="https://github.com/user/my-addon">
-            <button id="requestRemovePluginButton" class="button primary" type="button">Request removal</button>
-            <p id="removeStatus" class="publish-status" aria-live="polite"></p>
-          </div>
-        </article>
-
-        <details class="panel steps">
+        <details class="steps">
           <summary>How publishing works</summary>
           <div class="step-list">
             <article>
@@ -595,7 +694,21 @@
           </div>
         </details>
       </section>
+
+      <section id="removePanel" class="panel view-panel" data-view-panel="remove" hidden>
+        <p class="kicker">Remove</p>
+        <h2>Remove a publication</h2>
+        <p>Enter the published plugin and confirm the GitHub request. Automation validates it, removes it from the catalog, and posts the result.</p>
+        <div class="publish-form">
+          <label class="field-label" for="removePluginIdInput">Plugin ID</label>
+          <input id="removePluginIdInput" class="text-input" type="text" placeholder="my-addon">
+          <label class="field-label" for="removeRepoUrlInput">GitHub repository</label>
+          <input id="removeRepoUrlInput" class="text-input" type="url" placeholder="https://github.com/user/my-addon">
+          <button id="requestRemovePluginButton" class="button primary" type="button">Request removal</button>
+          <p id="removeStatus" class="publish-status" aria-live="polite"></p>
+        </div>
+      </section>
     </main>
-    <script src="store.js?v=20260704-tag-row"></script>
+    <script src="store.js?v=20260704-filter-menu"></script>
   </body>
 </html>

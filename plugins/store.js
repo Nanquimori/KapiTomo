@@ -7,8 +7,18 @@ const removePluginIdInput = document.getElementById("removePluginIdInput");
 const removeRepoUrlInput = document.getElementById("removeRepoUrlInput");
 const requestRemovePluginButton = document.getElementById("requestRemovePluginButton");
 const removeStatus = document.getElementById("removeStatus");
+const tagFilter = document.getElementById("tagFilter");
+const tagFilterStatus = document.getElementById("tagFilterStatus");
+const clearTagFilterButton = document.getElementById("clearTagFilterButton");
+const viewButtons = Array.from(document.querySelectorAll("[data-view-target]"));
+const viewPanels = Array.from(document.querySelectorAll("[data-view-panel]"));
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
+const CATALOG_VERSION = "20260704-filter-menu";
+const MAX_SELECTED_TAGS = 4;
 let renderedPlugins = [];
+let allPlugins = [];
+let availableTags = [];
+let selectedTags = [];
 
 function escapeHtml(value) {
   return String(value || "").replace(/[&<>"']/g, (char) => ({
@@ -42,8 +52,8 @@ function setRemoveStatus(message) {
 
 function fetchCatalog() {
   const urls = [
-    "catalog-store.json?v=20260704-tag-row",
-    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260704-tag-row"
+    `catalog-store.json?v=${CATALOG_VERSION}`,
+    `https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=${CATALOG_VERSION}`
   ];
   return urls.reduce((chain, url) => chain.catch(() => fetch(url, { cache: "no-store" })
     .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))), Promise.reject());
@@ -73,6 +83,100 @@ function displayTags(tags) {
     .map((tag) => String(tag || "").trim().toLowerCase())
     .filter((tag) => tag && tag !== "official" && tag !== "community")
     .slice(0, 4);
+}
+
+function filterTags(tags) {
+  return (Array.isArray(tags) ? tags : [])
+    .map((tag) => String(tag || "").trim().toLowerCase())
+    .filter((tag) => tag && tag !== "official" && tag !== "community");
+}
+
+function uniqueTags(groups) {
+  const seen = new Set();
+  const output = [];
+  groups.flat().forEach((tag) => {
+    const clean = String(tag || "").trim().toLowerCase();
+    if (!clean || clean === "official" || clean === "community" || seen.has(clean)) {
+      return;
+    }
+    seen.add(clean);
+    output.push(clean);
+  });
+  return output;
+}
+
+function setActiveView(view) {
+  const activeView = viewPanels.some((panel) => panel.dataset.viewPanel === view) ? view : "catalog";
+  viewPanels.forEach((panel) => {
+    panel.hidden = panel.dataset.viewPanel !== activeView;
+  });
+  viewButtons.forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.viewTarget === activeView);
+  });
+}
+
+function pluginMatchesSelectedTags(plugin) {
+  if (!selectedTags.length) {
+    return true;
+  }
+  const tags = new Set(filterTags(plugin.tags));
+  return selectedTags.every((tag) => tags.has(tag));
+}
+
+function renderTagFilters(tags) {
+  availableTags = tags;
+  selectedTags = selectedTags.filter((tag) => availableTags.includes(tag));
+  if (!tagFilter) {
+    return;
+  }
+  tagFilter.innerHTML = availableTags.length ? availableTags.map((tag) => {
+    const active = selectedTags.includes(tag);
+    const disabled = !active && selectedTags.length >= MAX_SELECTED_TAGS;
+    return `<button class="filter-chip${active ? " is-active" : ""}" type="button" data-filter-tag="${escapeHtml(tag)}"${disabled ? " disabled" : ""}>${escapeHtml(tag)}</button>`;
+  }).join("") : "<p class=\"filter-status\">No tags available yet.</p>";
+  tagFilter.querySelectorAll("[data-filter-tag]").forEach((button) => {
+    button.addEventListener("click", () => toggleTagFilter(button.dataset.filterTag));
+  });
+}
+
+function setTagStatus(filteredCount) {
+  if (!tagFilterStatus) {
+    return;
+  }
+  if (!allPlugins.length) {
+    tagFilterStatus.textContent = "No plugins published yet.";
+    return;
+  }
+  if (!selectedTags.length) {
+    tagFilterStatus.textContent = `${allPlugins.length} plugin${allPlugins.length === 1 ? "" : "s"} in the catalog.`;
+    return;
+  }
+  tagFilterStatus.textContent = `${filteredCount} plugin${filteredCount === 1 ? "" : "s"} matching ${selectedTags.join(", ")}.`;
+}
+
+function applyTagFilters() {
+  const filtered = allPlugins.filter(pluginMatchesSelectedTags);
+  renderTagFilters(availableTags);
+  renderPlugins(filtered);
+  setTagStatus(filtered.length);
+}
+
+function toggleTagFilter(tag) {
+  const clean = String(tag || "").trim().toLowerCase();
+  if (!clean) {
+    return;
+  }
+  if (selectedTags.includes(clean)) {
+    selectedTags = selectedTags.filter((selected) => selected !== clean);
+  } else if (selectedTags.length < MAX_SELECTED_TAGS) {
+    selectedTags = [...selectedTags, clean];
+  }
+  applyTagFilters();
+}
+
+function clearTagFilters() {
+  selectedTags = [];
+  applyTagFilters();
 }
 
 function pluginManifestUrl(plugin) {
@@ -177,7 +281,7 @@ function renderPlugins(plugins) {
         </div>
       </article>
     `;
-  }).join("") : "<p>No plugins published yet.</p>";
+  }).join("") : `<p>${selectedTags.length ? "No plugins match the selected tags." : "No plugins published yet."}</p>`;
   document.querySelectorAll("[data-install-plugin]").forEach((button) => {
     button.addEventListener("click", () => installPlugin(renderedPlugins[Number(button.dataset.installPlugin)]));
   });
@@ -201,7 +305,12 @@ function loadAllPlugins() {
         if (drafts.length !== savedDrafts.length) {
           saveDraftPlugins(drafts);
         }
-        renderPlugins(uniquePlugins([availableCatalogPlugins, drafts.map((plugin) => ({ ...plugin, __source: "draft" }))]));
+        allPlugins = uniquePlugins([availableCatalogPlugins, drafts.map((plugin) => ({ ...plugin, __source: "draft" }))]);
+        const catalogTags = uniqueTags([
+          allPlugins.flatMap((plugin) => filterTags(plugin.tags))
+        ]);
+        renderTagFilters(catalogTags);
+        applyTagFilters();
       });
     })
     .catch((error) => {
@@ -302,6 +411,7 @@ async function loadRepoPlugin() {
     saveDraftPlugin(plugin);
     setPublishStatus("Addon loaded. Confirm the GitHub request and the catalog automation will validate the repository before publishing.");
     loadAllPlugins();
+    setActiveView("catalog");
   } catch (error) {
     setPublishStatus(error?.message || "Could not load the addon.");
   }
@@ -380,6 +490,10 @@ function installPlugin(plugin) {
 
 loadRepoPluginButton?.addEventListener("click", loadRepoPlugin);
 requestRemovePluginButton?.addEventListener("click", openRemovalRequest);
+clearTagFilterButton?.addEventListener("click", clearTagFilters);
+viewButtons.forEach((button) => {
+  button.addEventListener("click", () => setActiveView(button.dataset.viewTarget));
+});
 repoUrlInput?.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
     event.preventDefault();
@@ -391,4 +505,5 @@ clearDraftPluginsButton?.addEventListener("click", () => {
   setPublishStatus("Drafts removed from this browser.");
   loadAllPlugins();
 });
+setActiveView("catalog");
 loadAllPlugins();
