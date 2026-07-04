@@ -29,6 +29,7 @@
       body {
         margin: 0;
         min-height: 100vh;
+        overflow-x: hidden;
         background:
           radial-gradient(circle at 18% 0%, rgba(125, 69, 255, 0.2), transparent 22rem),
           linear-gradient(135deg, #06020d 0%, #160926 54%, #090512 100%);
@@ -50,13 +51,11 @@
       }
 
       .page {
-        width: min(980px, 100%);
+        width: min(1060px, 100%);
         margin: 0 auto;
-        padding: 10px;
+        padding: 18px 14px 44px;
       }
 
-      .topbar,
-      .hub-head,
       .panel,
       .plugin-card {
         border: 1px solid var(--line);
@@ -68,14 +67,15 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 8px;
-        border-radius: 12px;
-        padding: 5px 8px;
-        margin-bottom: 8px;
+        gap: 18px;
+        padding: 0 0 12px;
+        margin-bottom: 18px;
+        border-bottom: 1px solid var(--line);
       }
 
       .brand {
         min-width: 0;
+        flex: 0 0 auto;
         display: inline-flex;
         align-items: center;
         gap: 8px;
@@ -92,14 +92,12 @@
       }
 
       .brand img {
-        width: 26px;
-        height: 26px;
-        border-radius: 7px;
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
       }
 
-      .nav-link,
-      .button,
-      .menu-tab {
+      .button {
         min-height: 32px;
         display: inline-flex;
         align-items: center;
@@ -115,14 +113,46 @@
         cursor: pointer;
       }
 
-      .menu-tab {
-        width: 100%;
+      .hub-menu {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 18px;
       }
 
+      .menu-tab {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        appearance: none;
+        border: 0;
+        border-radius: 0;
+        padding: 6px 0;
+        background: transparent;
+        color: var(--muted);
+        font: inherit;
+        font-size: 0.82rem;
+        font-weight: 850;
+        line-height: 1;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+
+      .menu-tab:hover,
       .menu-tab.is-active {
-        border-color: rgba(255, 178, 31, 0.48);
-        background: linear-gradient(135deg, rgba(255, 178, 31, 0.2), rgba(255, 107, 44, 0.13));
-        color: #ffe2a3;
+        color: var(--text);
+      }
+
+      .menu-tab.is-active::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -7px;
+        height: 2px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
       }
 
       .button.primary {
@@ -135,10 +165,10 @@
         display: flex;
         align-items: end;
         justify-content: space-between;
-        gap: 12px;
-        border-radius: 14px;
-        padding: 10px 12px;
-        margin-bottom: 8px;
+        gap: 22px;
+        padding: 6px 0 18px;
+        margin-bottom: 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       }
 
       .hub-head p:not(.kicker) {
@@ -160,13 +190,13 @@
 
       h1 {
         margin-bottom: 0;
-        font-size: 1.45rem;
-        line-height: 1;
+        font-size: 2rem;
+        line-height: 0.95;
       }
 
       h2 {
         margin-bottom: 0;
-        font-size: 1.12rem;
+        font-size: 1.22rem;
         line-height: 1.08;
       }
 
@@ -177,16 +207,9 @@
       }
 
       .panel {
-        border-radius: 14px;
-        padding: 10px;
-        margin-top: 8px;
-      }
-
-      .hub-menu {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 6px;
-        margin-bottom: 8px;
+        border-radius: 10px;
+        padding: 16px;
+        margin-top: 12px;
       }
 
       .view-panel[hidden] {
@@ -209,20 +232,17 @@
       }
 
       .catalog-panel {
-        padding: 8px;
+        padding: 16px;
       }
 
       .catalog-tools {
         display: grid;
-        gap: 6px;
-        margin-bottom: 8px;
+        gap: 7px;
+        margin-bottom: 12px;
       }
 
       .filter-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 8px;
+        display: block;
       }
 
       .filter-head .kicker {
@@ -233,15 +253,8 @@
       .filter-status {
         margin: 0;
         color: var(--faint);
-        font-size: 0.72rem;
+        font-size: 0.76rem;
         line-height: 1.25;
-      }
-
-      .filter-clear {
-        min-height: 24px;
-        border-radius: 999px;
-        padding-inline: 9px;
-        font-size: 0.66rem;
       }
 
       .tag-filter {
@@ -251,22 +264,22 @@
       }
 
       .filter-chip {
-        min-height: 23px;
-        border: 1px solid rgba(255, 178, 31, 0.24);
-        border-radius: 999px;
-        padding: 0 8px;
-        background: rgba(255, 178, 31, 0.07);
-        color: #ffd990;
+        min-height: 24px;
+        border: 0;
+        border-bottom: 1px solid rgba(255, 178, 31, 0.36);
+        border-radius: 0;
+        padding: 0 1px;
+        background: transparent;
+        color: var(--muted);
         font: inherit;
-        font-size: 0.66rem;
+        font-size: 0.7rem;
         font-weight: 900;
         cursor: pointer;
       }
 
       .filter-chip.is-active {
-        border-color: transparent;
-        background: linear-gradient(135deg, var(--accent), var(--accent-2));
-        color: #150700;
+        border-color: var(--accent);
+        color: #ffd990;
       }
 
       .filter-chip:disabled {
@@ -277,7 +290,7 @@
       .plugin-list {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 6px;
+        gap: 8px;
       }
 
       .plugin-card {
@@ -286,8 +299,8 @@
         grid-template-columns: 34px minmax(0, 1fr);
         align-items: start;
         gap: 5px 7px;
-        border-radius: 10px;
-        padding: 6px;
+        border-radius: 8px;
+        padding: 7px;
         background: var(--panel-soft);
       }
 
@@ -461,12 +474,20 @@
         }
 
         .page {
-          padding: 6px;
+          padding: 10px 7px 40px;
         }
 
         .topbar {
-          min-height: 34px;
-          margin-bottom: 6px;
+          min-height: 32px;
+          flex-wrap: wrap;
+          align-items: flex-start;
+          gap: 10px;
+          padding-bottom: 10px;
+          margin-bottom: 12px;
+        }
+
+        .brand {
+          width: 100%;
         }
 
         .brand img {
@@ -474,21 +495,32 @@
           height: 22px;
         }
 
-        .nav-link {
-          min-height: 28px;
-          padding-inline: 8px;
-          font-size: 0.74rem;
+        .hub-menu {
+          width: 100%;
+          justify-content: flex-start;
+          gap: 14px;
+          overflow-x: auto;
+          scrollbar-width: none;
+        }
+
+        .hub-menu::-webkit-scrollbar {
+          display: none;
+        }
+
+        .menu-tab {
+          font-size: 0.66rem;
         }
 
         .hub-head {
-          min-height: 40px;
-          align-items: center;
-          padding: 7px 9px;
-          margin-bottom: 6px;
+          display: block;
+          padding: 2px 0 12px;
+          margin-bottom: 8px;
         }
 
         .hub-head p:not(.kicker) {
-          display: none;
+          max-width: none;
+          margin-top: 8px;
+          font-size: 0.78rem;
         }
 
         .kicker {
@@ -497,7 +529,7 @@
         }
 
         h1 {
-          font-size: 1.18rem;
+          font-size: 1.4rem;
         }
 
         h2 {
@@ -505,9 +537,9 @@
         }
 
         .panel {
-          margin-top: 6px;
-          border-radius: 11px;
-          padding: 8px;
+          margin-top: 8px;
+          border-radius: 9px;
+          padding: 10px;
         }
 
         .panel-head {
@@ -577,27 +609,14 @@
           grid-template-columns: 1fr;
         }
 
-        .hub-menu {
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 4px;
-          margin-bottom: 6px;
-        }
-
-        .menu-tab {
-          min-height: 28px;
-          border-radius: 8px;
-          padding: 0 5px;
-          font-size: 0.62rem;
-        }
-
         .catalog-tools {
           gap: 5px;
-          margin-bottom: 6px;
+          margin-bottom: 8px;
         }
 
         .filter-chip {
           min-height: 21px;
-          padding: 0 6px;
+          padding: 0 1px;
           font-size: 0.58rem;
         }
       }
@@ -616,6 +635,12 @@
           <img src="../assets/kapitomo-logo.png" alt="">
           <span>KapiTomo</span>
         </a>
+        <nav class="hub-menu" aria-label="Plugin Hub sections">
+          <button class="menu-tab is-active" type="button" data-view-target="catalog">Catalog</button>
+          <button class="menu-tab" type="button" data-view-target="publish">Publish</button>
+          <button class="menu-tab" type="button" data-view-target="remove">Remove</button>
+          <a class="menu-tab" href="../nyxovira/plugin-api/">Plugin API</a>
+        </nav>
       </header>
 
       <section class="hub-head">
@@ -625,13 +650,6 @@
         </div>
         <p>Install source plugins published from GitHub repositories.</p>
       </section>
-
-      <nav class="hub-menu" aria-label="Plugin Hub sections">
-        <button class="menu-tab is-active" type="button" data-view-target="catalog">Catalog</button>
-        <button class="menu-tab" type="button" data-view-target="publish">Publish</button>
-        <button class="menu-tab" type="button" data-view-target="remove">Remove</button>
-        <a class="menu-tab" href="../nyxovira/plugin-api/">Plugin API</a>
-      </nav>
 
       <section id="catalogPanel" class="panel catalog-panel view-panel" data-view-panel="catalog">
         <div class="panel-head">
@@ -646,7 +664,6 @@
               <p class="kicker">Tags</p>
               <p class="filter-help">Choose up to 4 tags to filter the catalog.</p>
             </div>
-            <button id="clearTagFilterButton" class="button filter-clear" type="button">Clear</button>
           </div>
           <div id="tagFilter" class="tag-filter" aria-label="Catalog tag filters"></div>
           <p id="tagFilterStatus" class="filter-status" aria-live="polite"></p>
@@ -665,7 +682,7 @@
           <input id="repoUrlInput" class="text-input" type="url" placeholder="https://github.com/user/my-addon">
           <div class="button-row">
             <button id="loadRepoPluginButton" class="button primary" type="button">Load addon</button>
-            <button id="clearDraftPluginsButton" class="button" type="button">Clear drafts</button>
+            <button id="discardDraftPluginsButton" class="button" type="button">Discard drafts</button>
           </div>
           <p id="publishStatus" class="publish-status" aria-live="polite"></p>
         </div>
@@ -709,6 +726,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260704-filter-menu"></script>
+    <script src="store.js?v=20260704-site-nav"></script>
   </body>
 </html>
