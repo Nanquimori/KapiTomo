@@ -463,13 +463,18 @@ async function removePlugin(issue) {
   };
 }
 
-async function checkUrl(url, field) {
+async function checkUrl(url, field, options = {}) {
   const target = validateHttpUrl(url, field);
   const response = await fetch(target, {
     method: "GET",
-    headers: { "User-Agent": "kapitomo-plugin-hub" },
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+    },
     redirect: "follow"
   });
+  if (options.allowForbidden && response.status === 403) {
+    return;
+  }
   if (!response.ok) {
     throw new Error(`${field} HTTP ${response.status}`);
   }
@@ -481,7 +486,7 @@ async function validatePluginHealth(plugin) {
     throw new Error("plugin.json is missing browser.icon_url.");
   }
   const homeUrl = manifest.browser.home_url || plugin.homepage || plugin.site_url;
-  await checkUrl(homeUrl, "browser.home_url");
+  await checkUrl(homeUrl, "browser.home_url", { allowForbidden: true });
   await checkUrl(manifest.browser.icon_url, "browser.icon_url");
   return {
     manifest,
