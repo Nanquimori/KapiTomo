@@ -254,8 +254,8 @@ Official public tags:
 
 | Group | Allowed tags |
 | --- | --- |
-| Language | `portuguese`, `english` |
-| Type | `manga`, `manhua`, `manhwa`, `novel` |
+| Language | `portuguese`, `english`, `spanish`, `japanese`, `korean`, `chinese`, `indonesian`, `thai`, `vietnamese`, `french`, `german`, `italian`, `russian`, `arabic` |
+| Type | `manga`, `manhua`, `manhwa`, `novel`, `webtoon`, `comic`, `doujinshi`, `yaoi`, `yuri`, `porn`, `adult` |
 
 There is no package URL in the public contract. The repository is the source of the addon.
 

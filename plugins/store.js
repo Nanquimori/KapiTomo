@@ -13,11 +13,38 @@ const pluginSearchInput = document.getElementById("pluginSearchInput");
 const viewButtons = Array.from(document.querySelectorAll("[data-view-target]"));
 const viewPanels = Array.from(document.querySelectorAll("[data-view-panel]"));
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
-const CATALOG_VERSION = "20260704-official-tags";
+const CATALOG_VERSION = "20260704-expanded-tags";
 const MAX_SELECTED_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
-const OFFICIAL_LANGUAGE_TAGS = ["portuguese", "english"];
-const OFFICIAL_TYPE_TAGS = ["manga", "manhua", "manhwa", "novel"];
+const OFFICIAL_LANGUAGE_TAGS = [
+  "portuguese",
+  "english",
+  "spanish",
+  "japanese",
+  "korean",
+  "chinese",
+  "indonesian",
+  "thai",
+  "vietnamese",
+  "french",
+  "german",
+  "italian",
+  "russian",
+  "arabic"
+];
+const OFFICIAL_TYPE_TAGS = [
+  "manga",
+  "manhua",
+  "manhwa",
+  "novel",
+  "webtoon",
+  "comic",
+  "doujinshi",
+  "yaoi",
+  "yuri",
+  "porn",
+  "adult"
+];
 const LANGUAGE_TAGS = new Set(OFFICIAL_LANGUAGE_TAGS);
 const TYPE_TAGS = new Set(OFFICIAL_TYPE_TAGS);
 const PUBLIC_TAGS = new Set([...OFFICIAL_LANGUAGE_TAGS, ...OFFICIAL_TYPE_TAGS]);
