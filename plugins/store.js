@@ -42,8 +42,8 @@ function setRemoveStatus(message) {
 
 function fetchCatalog() {
   const urls = [
-    "catalog-store.json?v=20260704-tag-chips",
-    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260704-tag-chips"
+    "catalog-store.json?v=20260704-tag-row",
+    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260704-tag-row"
   ];
   return urls.reduce((chain, url) => chain.catch(() => fetch(url, { cache: "no-store" })
     .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))), Promise.reject());
@@ -170,8 +170,8 @@ function renderPlugins(plugins) {
             ${plugin.author ? `<span>${escapeHtml(plugin.author)}</span>` : ""}
             ${plugin.version ? `<span>v${escapeHtml(plugin.version)}</span>` : ""}
           </div>
-          ${tags.length ? `<div class="tag-list">${tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>` : ""}
         </div>
+        ${tags.length ? `<div class="tag-list">${tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>` : ""}
         <div class="plugin-actions">
           ${actions.join("")}
         </div>
