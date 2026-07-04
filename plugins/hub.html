@@ -199,7 +199,7 @@
 
       .panel-head {
         display: flex;
-        align-items: start;
+        align-items: end;
         justify-content: space-between;
         gap: 10px;
         margin-bottom: 6px;
@@ -232,8 +232,8 @@
 
       .catalog-search {
         min-height: 24px;
-        width: min(320px, 42vw);
-        max-width: 320px;
+        width: min(260px, 100%);
+        max-width: 260px;
         border-radius: 7px;
         padding: 0 8px;
         font-size: 0.72rem;
@@ -313,7 +313,7 @@
         width: 100%;
         min-width: 0;
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 280px));
+        grid-template-columns: repeat(auto-fill, minmax(min(190px, 100%), 230px));
         justify-content: start;
         gap: 7px;
       }
@@ -723,9 +723,9 @@
             <p class="kicker">Catalog</p>
             <h2>Published plugins</h2>
           </div>
-          <input id="pluginSearchInput" class="text-input catalog-search" type="search" placeholder="Search plugins" aria-label="Search plugins">
         </div>
         <div class="catalog-tools">
+          <input id="pluginSearchInput" class="text-input catalog-search" type="search" placeholder="Search plugins" aria-label="Search plugins">
           <div class="filter-head">
             <div>
               <p class="kicker">Categories</p>
