@@ -2,7 +2,7 @@
   "schema_version": 3,
   "name": "KapiTomo Plugin Hub",
   "description": "Public plugin catalog for installing source plugins in Nyxovira.",
-  "catalog_revision": "20260704-tag-chips",
+  "catalog_revision": "20260704-tag-row",
   "publish_model": "github-repository",
   "suggested_tags": [
     "portugues",
@@ -30,9 +30,8 @@
       "plugin_path": "nyxovira/plugin-api/kapitomo",
       "tags": [
         "official",
-        "portugues",
         "english",
-        "manga",
+        "manhwa",
         "novel"
       ]
     }
