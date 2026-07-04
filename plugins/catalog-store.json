@@ -58,9 +58,9 @@
         "nexustoons.com"
       ],
       "status": "active",
-      "consecutive_failures": 0,
-      "last_error": "",
-      "last_checked_at": "2026-07-04T18:55:00.000Z",
+      "consecutive_failures": 1,
+      "last_error": "browser.home_url HTTP 403",
+      "last_checked_at": "2026-07-04T19:19:46.377Z",
       "tags": [
         "portuguese",
         "manga",
