@@ -10,6 +10,21 @@ const chapterView = document.querySelector("#chapterView");
 const workTemplate = document.querySelector("#workTemplate");
 const chapterTemplate = document.querySelector("#chapterTemplate");
 
+const DISPLAY_VALUES = {};
+
+const WORK_COPY = {
+  "world-without-humans-comics": {
+    title: "The World Without Humans: Comics",
+    description: "Comic version of The World Without Humans, told only through illustrated pages."
+  }
+};
+
+const NOVEL_CHAPTER_TITLES = [
+  "Chapter 01 - The Fall",
+  "Chapter 02 - The Hunting Forest",
+  "Chapter 03 - The Stone Exit"
+];
+
 let activeFilter = "All";
 let query = new URLSearchParams(window.location.search).get("q") || "";
 let chapterUiState = {
@@ -27,16 +42,45 @@ function escapeHtml(value) {
     .replace(/'/g, "&#039;");
 }
 
+function displayValue(value) {
+  return DISPLAY_VALUES[value] || value || "";
+}
+
+function displayTitle(work) {
+  return WORK_COPY[work.id]?.title || displayValue(work.title);
+}
+
+function displayDescription(work) {
+  return WORK_COPY[work.id]?.description || work.description || "";
+}
+
+function displayTestNote(work) {
+  return work.testNote ? "Test work only." : "";
+}
+
 function getChapterId(chapter, index) {
   return String(chapter.id || chapter.slug || `chapter-${index + 1}`);
 }
 
 function getChapterNumberLabel(index) {
-  return `Capítulo ${String(index + 1).padStart(2, "0")}`;
+  return `Chapter ${String(index + 1).padStart(2, "0")}`;
+}
+
+function displayChapterTitle(chapter, index) {
+  if (!chapter?.title) {
+    return getChapterNumberLabel(index);
+  }
+  if (chapter.contentType === "novel" && NOVEL_CHAPTER_TITLES[index]) {
+    return NOVEL_CHAPTER_TITLES[index];
+  }
+  if (chapter.contentType === "images") {
+    return `Chapter ${String(index + 1).padStart(3, "0")}`;
+  }
+  return getChapterNumberLabel(index);
 }
 
 function getChapterTypeLabel(chapter) {
-  return chapter.contentType === "novel" ? "Novel" : "Quadrinho";
+  return chapter.contentType === "novel" ? "Novel" : "Comic";
 }
 
 function getChapterPreview(work, chapter) {
@@ -46,7 +90,7 @@ function getChapterPreview(work, chapter) {
 
 function getChapterReadingInfo(chapter) {
   const imageCount = getChapterImages(chapter).length;
-  return `${imageCount || 1} página${imageCount === 1 ? "" : "s"}`;
+  return `${imageCount || 1} page${imageCount === 1 ? "" : "s"}`;
 }
 
 function getWork(workId) {
@@ -68,17 +112,17 @@ function showRoute(view) {
 }
 
 function matchesWork(work) {
-  const searchable = `${work.title} ${work.genre} ${work.status} ${work.description}`.toLowerCase();
-  const genreMatch = activeFilter === "All" || work.genre === activeFilter;
+  const searchable = `${displayTitle(work)} ${displayValue(work.genre)} ${displayValue(work.status)} ${displayDescription(work)}`.toLowerCase();
+  const genreMatch = activeFilter === "All" || displayValue(work.genre) === activeFilter || work.genre === activeFilter;
   return genreMatch && searchable.includes(query.toLowerCase());
 }
 
 function chapterUrl(work, chapterIndex = 0) {
-  return `#ler/${work.id}/${chapterIndex}`;
+  return `#read/${work.id}/${chapterIndex}`;
 }
 
 function workUrl(work) {
-  return `#obra/${work.id}`;
+  return `#work/${work.id}`;
 }
 
 function getChapterParagraphs(chapter) {
@@ -102,20 +146,21 @@ function renderWorks() {
   worksGrid.innerHTML = "";
 
   if (!visibleWorks.length) {
-    worksGrid.innerHTML = '<p class="empty-state">Nenhuma obra encontrada.</p>';
+    worksGrid.innerHTML = '<p class="empty-state">No works found.</p>';
     return;
   }
 
   visibleWorks.forEach((work) => {
+    const title = displayTitle(work);
     const card = document.createElement("article");
     card.className = "work-card";
     card.innerHTML = `
-      <a class="work-cover-link" href="${workUrl(work)}" aria-label="Abrir ${work.title}">
-        <img src="${work.cover}" alt="Capa de ${work.title}">
-        <span class="work-cover-badge">${work.format || "Obra"}</span>
+      <a class="work-cover-link" href="${workUrl(work)}" aria-label="Open ${escapeHtml(title)}">
+        <img src="${work.cover}" alt="Cover of ${escapeHtml(title)}">
+        <span class="work-cover-badge">${escapeHtml(displayValue(work.format) || "Work")}</span>
       </a>
       <div class="work-card-body">
-        <h3><a href="${workUrl(work)}">${work.title}</a></h3>
+        <h3><a href="${workUrl(work)}">${escapeHtml(title)}</a></h3>
       </div>
     `;
     worksGrid.appendChild(card);
@@ -123,6 +168,7 @@ function renderWorks() {
 }
 
 function renderWorkPage(work) {
+  const title = displayTitle(work);
   const fragment = workTemplate.content.cloneNode(true);
   const page = fragment.querySelector(".manga-page");
   chapterUiState = {
@@ -132,33 +178,33 @@ function renderWorkPage(work) {
   };
 
   fragment.querySelector(".manga-cover").src = work.cover;
-  fragment.querySelector(".manga-cover").alt = `Capa de ${work.title}`;
+  fragment.querySelector(".manga-cover").alt = `Cover of ${title}`;
   fragment.querySelector(".manga-genre").textContent = "";
-  fragment.querySelector("h1").textContent = work.title;
-  fragment.querySelector(".manga-test-note").textContent = work.testNote || "";
+  fragment.querySelector("h1").textContent = title;
+  fragment.querySelector(".manga-test-note").textContent = displayTestNote(work);
   fragment.querySelector(".manga-test-note").hidden = !work.testNote;
-  fragment.querySelector(".manga-description").textContent = work.description;
-  fragment.querySelector(".chapter-count").textContent = `${work.chapters.length} capítulo${work.chapters.length === 1 ? "" : "s"}`;
+  fragment.querySelector(".manga-description").textContent = displayDescription(work);
+  fragment.querySelector(".chapter-count").textContent = `${work.chapters.length} chapter${work.chapters.length === 1 ? "" : "s"}`;
 
   fragment.querySelector(".manga-badges").innerHTML = `
-    <span>${escapeHtml(work.status)}</span>
-    <span>${escapeHtml(work.rating)}</span>
-    <span>${work.chapters.length} capítulo${work.chapters.length === 1 ? "" : "s"}</span>
+    <span>${escapeHtml(displayValue(work.status))}</span>
+    <span>${escapeHtml(displayValue(work.rating))}</span>
+    <span>${work.chapters.length} chapter${work.chapters.length === 1 ? "" : "s"}</span>
   `;
 
   fragment.querySelector(".manga-actions").innerHTML = `
-    <a class="button primary" href="${chapterUrl(work, 0)}">Ler primeiro capítulo</a>
-    <a class="button secondary" href="${chapterUrl(work, work.chapters.length - 1)}">Último capítulo</a>
+    <a class="button primary" href="${chapterUrl(work, 0)}">Read first chapter</a>
+    <a class="button secondary" href="${chapterUrl(work, work.chapters.length - 1)}">Latest chapter</a>
   `;
 
   fragment.querySelector(".manga-facts").innerHTML = `
-    <h2>Informações</h2>
+    <h2>Information</h2>
     <dl>
-      <div class="fact-author"><dt>Autor</dt><dd>KapiTomo</dd></div>
-      <div class="fact-genre"><dt>Gênero</dt><dd>${escapeHtml(work.genre)}</dd></div>
-      <div class="fact-status"><dt>Status</dt><dd>${escapeHtml(work.status)}</dd></div>
-      <div class="fact-rating"><dt>Classificação</dt><dd>${escapeHtml(work.rating)}</dd></div>
-      <div class="fact-publish"><dt>Publicação</dt><dd>Obras oficiais do KapiTomo</dd></div>
+      <div class="fact-author"><dt>Author</dt><dd>KapiTomo</dd></div>
+      <div class="fact-genre"><dt>Genre</dt><dd>${escapeHtml(displayValue(work.genre))}</dd></div>
+      <div class="fact-status"><dt>Status</dt><dd>${escapeHtml(displayValue(work.status))}</dd></div>
+      <div class="fact-rating"><dt>Rating</dt><dd>${escapeHtml(displayValue(work.rating))}</dd></div>
+      <div class="fact-publish"><dt>Publication</dt><dd>Official KapiTomo works</dd></div>
     </dl>
   `;
 
@@ -175,28 +221,28 @@ function renderChapterList(work) {
   const chapterItems = work.chapters
     .map((chapter, index) => ({ chapter, index, id: getChapterId(chapter, index) }))
     .filter((item) => {
-      const searchable = `${item.chapter.title} ${item.chapter.date} ${getChapterNumberLabel(item.index)} ${getChapterTypeLabel(item.chapter)}`.toLowerCase();
+      const searchable = `${displayChapterTitle(item.chapter, item.index)} ${item.chapter.date} ${getChapterNumberLabel(item.index)} ${getChapterTypeLabel(item.chapter)}`.toLowerCase();
       return !queryValue || searchable.includes(queryValue);
     })
     .sort((left, right) => chapterUiState.sort === "desc" ? right.index - left.index : left.index - right.index);
 
   if (count) {
-    count.textContent = `${chapterItems.length} de ${work.chapters.length}`;
+    count.textContent = `${chapterItems.length} of ${work.chapters.length}`;
   }
 
   const sortToggle = workView.querySelector("[data-chapter-sort-toggle]");
   if (sortToggle) {
-    sortToggle.textContent = chapterUiState.sort === "desc" ? "Recentes" : "Início";
-    sortToggle.setAttribute("aria-label", chapterUiState.sort === "desc" ? "Ordenado pelos capítulos recentes" : "Ordenado pelo início");
+    sortToggle.textContent = chapterUiState.sort === "desc" ? "Latest" : "Start";
+    sortToggle.setAttribute("aria-label", chapterUiState.sort === "desc" ? "Sorted by latest chapters" : "Sorted from the start");
   }
 
   if (!chapterItems.length) {
-    list.innerHTML = '<p class="chapter-search-empty">Nenhum capítulo encontrado.</p>';
+    list.innerHTML = '<p class="chapter-search-empty">No chapters found.</p>';
     return;
   }
 
   list.innerHTML = chapterItems
-    .map(({ chapter, index, id }) => {
+    .map(({ chapter, index }) => {
       const typeLabel = getChapterTypeLabel(chapter);
       return `
         <article class="chapter-list-entry">
@@ -206,7 +252,7 @@ function renderChapterList(work) {
             </span>
             <span class="chapter-main">
               <strong>${escapeHtml(getChapterNumberLabel(index))}</strong>
-              <span class="chapter-editorial-title">${escapeHtml(chapter.title)}</span>
+              <span class="chapter-editorial-title">${escapeHtml(displayChapterTitle(chapter, index))}</span>
               <small>${escapeHtml(chapter.contentType === "novel" ? chapter.date : `${chapter.date} - ${getChapterReadingInfo(chapter)}`)}</small>
             </span>
             <span class="chapter-meta">
@@ -230,14 +276,15 @@ function renderChapterPage(work, chapterIndex = 0) {
   const paragraphs = getChapterParagraphs(chapter);
   const isNovel = chapter.contentType === "novel";
   const isImageChapter = chapter.contentType === "images";
+  const workTitle = displayTitle(work);
 
   fragment.querySelector(".back-link").href = workUrl(work);
-  fragment.querySelector(".eyebrow").textContent = work.title;
-  fragment.querySelector("h1").textContent = isNovel ? `Capítulo ${String(safeIndex + 1)}` : chapter.title;
+  fragment.querySelector(".eyebrow").textContent = workTitle;
+  fragment.querySelector("h1").textContent = isNovel ? getChapterNumberLabel(safeIndex) : displayChapterTitle(chapter, safeIndex);
   fragment.querySelector(".chapter-tools").innerHTML = `
-    ${previousIndex === null ? '<span class="button ghost disabled">Anterior</span>' : `<a class="button secondary" href="${chapterUrl(work, previousIndex)}">Anterior</a>`}
-    <a class="button secondary" href="${workUrl(work)}">Lista de capítulos</a>
-    ${nextIndex === null ? '<span class="button ghost disabled">Próximo</span>' : `<a class="button primary" href="${chapterUrl(work, nextIndex)}">Próximo</a>`}
+    ${previousIndex === null ? '<span class="button ghost disabled">Previous</span>' : `<a class="button secondary" href="${chapterUrl(work, previousIndex)}">Previous</a>`}
+    <a class="button secondary" href="${workUrl(work)}">Chapter list</a>
+    ${nextIndex === null ? '<span class="button ghost disabled">Next</span>' : `<a class="button primary" href="${chapterUrl(work, nextIndex)}">Next</a>`}
   `;
 
   if (isNovel) {
@@ -251,11 +298,11 @@ function renderChapterPage(work, chapterIndex = 0) {
     page.classList.add("image-chapter-page");
     fragment.querySelector(".webtoon-strip").className = "image-reader";
     fragment.querySelector(".image-reader").innerHTML = imagePages
-      .map((image, index) => `<img src="${image.src}" alt="${image.alt || `${chapter.title} página ${index + 1}`}" loading="lazy">`)
+      .map((image, index) => `<img src="${image.src}" alt="${image.alt || `${displayChapterTitle(chapter, safeIndex)} page ${index + 1}`}" loading="lazy">`)
       .join("");
   } else {
     fragment.querySelector(".webtoon-strip").innerHTML = [
-      `<section class="webtoon-cover-panel"><img src="${work.cover}" alt="Capa de ${work.title}"><div><span>${work.title}</span><strong>${chapter.title}</strong></div></section>`,
+      `<section class="webtoon-cover-panel"><img src="${work.cover}" alt="Cover of ${escapeHtml(workTitle)}"><div><span>${escapeHtml(workTitle)}</span><strong>${escapeHtml(displayChapterTitle(chapter, safeIndex))}</strong></div></section>`,
       ...paragraphs.map(
         (pageText, index) => `
           <section class="webtoon-panel">
@@ -268,8 +315,8 @@ function renderChapterPage(work, chapterIndex = 0) {
   }
 
   fragment.querySelector(".chapter-footer").innerHTML = `
-    <a class="button secondary" href="${workUrl(work)}">Voltar para ${work.title}</a>
-    ${nextIndex === null ? "" : `<a class="button primary" href="${chapterUrl(work, nextIndex)}">Ler próximo capítulo</a>`}
+    <a class="button secondary" href="${workUrl(work)}">Back to ${escapeHtml(workTitle)}</a>
+    ${nextIndex === null ? "" : `<a class="button primary" href="${chapterUrl(work, nextIndex)}">Read next chapter</a>`}
   `;
 
   chapterView.innerHTML = "";
@@ -281,12 +328,12 @@ function handleRoute() {
   const [route, workId, chapterIndex] = window.location.hash.replace(/^#/, "").split("/");
   const work = getWork(workId);
 
-  if (route === "obra" && work) {
+  if (route === "work" && work) {
     renderWorkPage(work);
     return;
   }
 
-  if (route === "ler" && work) {
+  if (route === "read" && work) {
     renderChapterPage(work, Number(chapterIndex || 0));
     return;
   }

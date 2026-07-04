@@ -1,7 +1,7 @@
 {
   "name": "KapiTomo",
   "short_name": "KapiTomo",
-  "description": "Site oficial para ler novels e quadrinhos autorais.",
+  "description": "Official site for reading original novels and comics.",
   "start_url": "https://nanquimori.github.io/KapiTomo/",
   "display": "standalone",
   "background_color": "#fbf7ef",

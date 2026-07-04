@@ -2,157 +2,163 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://nanquimori.github.io/KapiTomo/</loc>
-    <lastmod>2026-06-02</lastmod>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://nanquimori.github.io/KapiTomo/#obra/garoto-outro-mundo</loc>
-    <lastmod>2026-06-02</lastmod>
+    <loc>https://nanquimori.github.io/KapiTomo/#work/world-without-humans</loc>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nanquimori.github.io/KapiTomo/#ler/garoto-outro-mundo/0</loc>
-    <lastmod>2026-06-02</lastmod>
+    <loc>https://nanquimori.github.io/KapiTomo/#read/world-without-humans/0</loc>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://nanquimori.github.io/KapiTomo/#ler/garoto-outro-mundo/1</loc>
-    <lastmod>2026-06-02</lastmod>
+    <loc>https://nanquimori.github.io/KapiTomo/#read/world-without-humans/1</loc>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://nanquimori.github.io/KapiTomo/#ler/garoto-outro-mundo/2</loc>
-    <lastmod>2026-06-02</lastmod>
+    <loc>https://nanquimori.github.io/KapiTomo/#read/world-without-humans/2</loc>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo/</loc>
-    <lastmod>2026-06-02</lastmod>
+    <loc>https://nanquimori.github.io/KapiTomo/manga/world-without-humans/</loc>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nanquimori.github.io/KapiTomo/#obra/garoto-outro-mundo-imagens</loc>
-    <lastmod>2026-06-02</lastmod>
+    <loc>https://nanquimori.github.io/KapiTomo/#work/world-without-humans-comics</loc>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nanquimori.github.io/KapiTomo/#ler/garoto-outro-mundo-imagens/0</loc>
-    <lastmod>2026-06-02</lastmod>
+    <loc>https://nanquimori.github.io/KapiTomo/#read/world-without-humans-comics/0</loc>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://nanquimori.github.io/KapiTomo/#ler/garoto-outro-mundo-imagens/1</loc>
-    <lastmod>2026-06-02</lastmod>
+    <loc>https://nanquimori.github.io/KapiTomo/#read/world-without-humans-comics/1</loc>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://nanquimori.github.io/KapiTomo/#ler/garoto-outro-mundo-imagens/2</loc>
-    <lastmod>2026-06-02</lastmod>
+    <loc>https://nanquimori.github.io/KapiTomo/#read/world-without-humans-comics/2</loc>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://nanquimori.github.io/KapiTomo/manga/garoto-outro-mundo-imagens/</loc>
-    <lastmod>2026-06-02</lastmod>
+    <loc>https://nanquimori.github.io/KapiTomo/manga/world-without-humans-comics/</loc>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://nanquimori.github.io/KapiTomo/api/catalog.json</loc>
-    <lastmod>2026-06-28</lastmod>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://nanquimori.github.io/KapiTomo/api/works/index.json</loc>
-    <lastmod>2026-06-28</lastmod>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo/index.json</loc>
-    <lastmod>2026-06-28</lastmod>
+    <loc>https://nanquimori.github.io/KapiTomo/api/works/world-without-humans/index.json</loc>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo/chapters/capitulo-001.json</loc>
-    <lastmod>2026-06-28</lastmod>
+    <loc>https://nanquimori.github.io/KapiTomo/api/works/world-without-humans/chapters/chapter-001.json</loc>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo/chapters/capitulo-002.json</loc>
-    <lastmod>2026-06-28</lastmod>
+    <loc>https://nanquimori.github.io/KapiTomo/api/works/world-without-humans/chapters/chapter-002.json</loc>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo/chapters/capitulo-003.json</loc>
-    <lastmod>2026-06-28</lastmod>
+    <loc>https://nanquimori.github.io/KapiTomo/api/works/world-without-humans/chapters/chapter-003.json</loc>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo-imagens/index.json</loc>
-    <lastmod>2026-06-28</lastmod>
+    <loc>https://nanquimori.github.io/KapiTomo/api/works/world-without-humans-comics/index.json</loc>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo-imagens/chapters/capitulo-001.json</loc>
-    <lastmod>2026-06-28</lastmod>
+    <loc>https://nanquimori.github.io/KapiTomo/api/works/world-without-humans-comics/chapters/chapter-001.json</loc>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo-imagens/chapters/capitulo-002.json</loc>
-    <lastmod>2026-06-28</lastmod>
+    <loc>https://nanquimori.github.io/KapiTomo/api/works/world-without-humans-comics/chapters/chapter-002.json</loc>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://nanquimori.github.io/KapiTomo/api/works/garoto-outro-mundo-imagens/chapters/capitulo-003.json</loc>
-    <lastmod>2026-06-28</lastmod>
+    <loc>https://nanquimori.github.io/KapiTomo/api/works/world-without-humans-comics/chapters/chapter-003.json</loc>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://nanquimori.github.io/KapiTomo/plugins/catalog.json</loc>
-    <lastmod>2026-06-28</lastmod>
+    <lastmod>2026-07-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://nanquimori.github.io/KapiTomo/plugins/</loc>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/</loc>
-    <lastmod>2026-06-30</lastmod>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://nanquimori.github.io/KapiTomo/nyxovira/privacy/index.html</loc>
-    <lastmod>2026-06-25</lastmod>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://nanquimori.github.io/KapiTomo/nyxalira/privacy/index.html</loc>
-    <lastmod>2026-06-25</lastmod>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://nanquimori.github.io/KapiTomo/privacy/index.html</loc>
-    <lastmod>2026-06-25</lastmod>
+    <lastmod>2026-07-04</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>

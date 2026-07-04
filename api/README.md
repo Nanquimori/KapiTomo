@@ -1,58 +1,48 @@
 # KapiTomo API
 
-A API pública fica em `api/works/` e usa JSON para obras e capítulos.
+The public API lives in `api/works/` and uses JSON for works and chapters.
 
-## Arquivos
+Main index:
 
 ```text
-api/
-|-- catalog.json
-\-- works/
-    |-- index.json
-    |-- garoto-outro-mundo/
-    |   |-- index.json
-    |   \-- chapters/
-    |       |-- capitulo-001.json
-    |       |-- capitulo-002.json
-    |       \-- capitulo-003.json
-    \-- garoto-outro-mundo-imagens/
-        |-- index.json
-        \-- chapters/
-            |-- capitulo-001.json
-            |-- capitulo-002.json
-            \-- capitulo-003.json
+api/works/index.json
 ```
 
-## Contrato
+Work details:
 
-`works/index.json` lista todas as obras.
+```text
+api/works/{work}/index.json
+```
 
-`works/{obra}/index.json` descreve a obra, capa, resumo e capítulos.
+Chapter details:
 
-`works/{obra}/chapters/{capitulo}.json` descreve um capítulo.
+```text
+api/works/{work}/chapters/{chapter}.json
+```
 
-Novel:
+Novel chapter example:
 
 ```json
 {
+  "id": "chapter-001",
+  "title": "Chapter 01",
   "contentType": "novel",
-  "text": "Texto completo do capítulo.",
-  "paragraphs": ["Primeiro parágrafo.", "Segundo parágrafo."]
+  "text": "Full chapter text.",
+  "paragraphs": ["First paragraph.", "Second paragraph."]
 }
 ```
 
-Quadrinho:
+Comic chapter example:
 
 ```json
 {
+  "id": "chapter-001",
+  "title": "Chapter 001",
   "contentType": "images",
   "pages": [
-    {
-      "number": 1,
-      "url": "https://nanquimori.github.io/KapiTomo/assets/works/obra/capitulo/page-001.png"
-    }
+    "https://example.com/page-001.png"
   ]
 }
 ```
 
-`catalog.json` existe para compatibilidade. O formato principal é `works/index.json`.
+`catalog.json` exists only as a published catalog file. The primary work API is `works/index.json`.
