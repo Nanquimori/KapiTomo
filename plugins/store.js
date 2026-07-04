@@ -42,8 +42,8 @@ function setRemoveStatus(message) {
 
 function fetchCatalog() {
   const urls = [
-    "catalog-store.json?v=20260704-repository-hub-en",
-    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260704-repository-hub-en"
+    "catalog-store.json?v=20260704-compact-hub",
+    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260704-compact-hub"
   ];
   return urls.reduce((chain, url) => chain.catch(() => fetch(url, { cache: "no-store" })
     .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))), Promise.reject());
@@ -116,29 +116,27 @@ function renderPlugins(plugins) {
   renderedPlugins = plugins;
   list.innerHTML = plugins.length ? plugins.map((plugin, index) => {
     const actions = [
-      `<button class="button primary" type="button" data-install-plugin="${index}">Install in Nyxovira</button>`
+      `<button class="button primary" type="button" data-install-plugin="${index}">Install</button>`
     ];
     if (plugin.__source === "draft") {
-      actions.push(`<button class="button" type="button" data-publish-plugin="${index}">Request publication</button>`);
+      actions.push(`<button class="button" type="button" data-publish-plugin="${index}">Publish</button>`);
     } else if (plugin.homepage || plugin.site_url) {
-      actions.push(`<a class="button" href="${escapeHtml(plugin.homepage || plugin.site_url)}">Open site</a>`);
+      actions.push(`<a class="button" href="${escapeHtml(plugin.homepage || plugin.site_url)}">Open</a>`);
     }
     return `
       <article class="plugin-card">
-        <div class="plugin-summary">
-          <img class="plugin-icon" src="${escapeHtml(plugin.icon_url)}" alt="">
-          <div>
-            <h3>${escapeHtml(plugin.name || plugin.id || "Plugin")}</h3>
-            <p>${escapeHtml(plugin.description || "")}</p>
-            <div class="meta">
-              ${plugin.author ? `<span>${escapeHtml(plugin.author)}</span>` : ""}
-              ${plugin.version ? `<span>v${escapeHtml(plugin.version)}</span>` : ""}
-              ${plugin.id ? `<span>${escapeHtml(plugin.id)}</span>` : ""}
-              ${plugin.repository_url ? `<span>${escapeHtml(repositoryLabel(plugin.repository_url))}</span>` : ""}
-            </div>
+        <img class="plugin-icon" src="${escapeHtml(plugin.icon_url)}" alt="">
+        <div class="plugin-copy">
+          <h3>${escapeHtml(plugin.name || plugin.id || "Plugin")}</h3>
+          <p>${escapeHtml(plugin.description || "")}</p>
+          <div class="meta">
+            ${plugin.author ? `<span>${escapeHtml(plugin.author)}</span>` : ""}
+            ${plugin.version ? `<span>v${escapeHtml(plugin.version)}</span>` : ""}
+            ${plugin.id ? `<span>${escapeHtml(plugin.id)}</span>` : ""}
+            ${plugin.repository_url ? `<span>${escapeHtml(repositoryLabel(plugin.repository_url))}</span>` : ""}
           </div>
         </div>
-        <div class="button-row">
+        <div class="plugin-actions">
           ${actions.join("")}
         </div>
       </article>
