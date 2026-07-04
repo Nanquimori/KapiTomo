@@ -254,8 +254,10 @@ Official public tags:
 
 | Group | Allowed tags |
 | --- | --- |
-| Language | `portuguese`, `english`, `spanish`, `japanese`, `korean`, `chinese`, `indonesian`, `thai`, `vietnamese`, `french`, `german`, `italian`, `russian`, `arabic` |
-| Type | `manga`, `manhua`, `manhwa`, `novel`, `webtoon`, `comic`, `doujinshi`, `yaoi`, `yuri`, `porn`, `adult` |
+| Language | `english`, `portuguese`, `spanish`, `japanese`, `korean`, `chinese`, `indonesian`, `thai`, `vietnamese`, `french`, `german`, `italian`, `russian`, `arabic` |
+| Type | `manga`, `manhua`, `manhwa`, `novel`, `webtoon`, `comic`, `doujinshi`, `yaoi`, `yuri`, `porn` |
+
+Use `porn` only for sources centered on explicit sexual content. The Hub does not use `adult` because it is too broad and makes filtering less precise.
 
 There is no package URL in the public contract. The repository is the source of the addon.
 

@@ -2,11 +2,11 @@
   "schema_version": 3,
   "name": "KapiTomo Plugin Hub",
   "description": "Public plugin catalog for installing source plugins in Nyxovira.",
-  "catalog_revision": "20260704-expanded-tags",
+  "catalog_revision": "20260704-tags-order",
   "publish_model": "github-repository",
   "suggested_tags": [
-    "portuguese",
     "english",
+    "portuguese",
     "spanish",
     "japanese",
     "korean",
@@ -28,8 +28,7 @@
     "doujinshi",
     "yaoi",
     "yuri",
-    "porn",
-    "adult"
+    "porn"
   ],
   "requirements": {
     "icon_url": "Required. Every online plugin must point to a public icon image.",
@@ -38,8 +37,8 @@
   },
   "official_tags": {
     "languages": [
-      "portuguese",
       "english",
+      "portuguese",
       "spanish",
       "japanese",
       "korean",
@@ -63,8 +62,7 @@
       "doujinshi",
       "yaoi",
       "yuri",
-      "porn",
-      "adult"
+      "porn"
     ]
   },
   "plugins": [
