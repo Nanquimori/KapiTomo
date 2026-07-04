@@ -262,7 +262,7 @@ The catalog entry uses:
 | `repository_ref` | Branch or ref to install from. Usually `main`. |
 | `plugin_path` | Folder containing `plugin.json`. Use `.` when the manifest is at the repository root. |
 | `hosts` | Domains covered by the plugin. The Hub derives this from `match.hosts`, `browser.home_url`, `site_url`, and `homepage`. A host can only have one visible plugin in the catalog. |
-| `status` | Catalog state. `active` appears as `Online`, `broken` appears as `Offline`, and `missing`, `hidden`, or `removed` do not appear in the public storefront. |
+| `status` | Catalog state. `active` appears as `Online`, `broken` appears as `Offline`, and `hidden` or `removed` do not appear in the public storefront. |
 | `tags` | Required. Tags are not free-form. Use one official language tag first, then one to three official type tags. The Hub publishes the first 4 valid public tags and ignores unsupported or extra tags. |
 
 Official public tags:
@@ -285,7 +285,7 @@ Publishing flow:
 5. A maintainer adds the approval label.
 6. Automation publishes the catalog entry.
 
-The Hub also runs a light health check every 30 minutes. If the source site fails twice in a row, the plugin is marked as `broken` and appears as `Offline`. If the GitHub repository or `plugin.json` disappears, the plugin is marked as `missing` and is hidden from the storefront.
+The Hub also runs a light health check every 30 minutes. If the source site fails twice in a row, the plugin is marked as `broken` and appears as `Offline`. If the GitHub repository or `plugin.json` disappears, the entry is removed from the public catalog.
 
 ## Checklist
 

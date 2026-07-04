@@ -13,7 +13,7 @@ const pluginSearchInput = document.getElementById("pluginSearchInput");
 const viewButtons = Array.from(document.querySelectorAll("[data-view-target]"));
 const viewPanels = Array.from(document.querySelectorAll("[data-view-panel]"));
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
-const CATALOG_VERSION = "20260704-site-status";
+const CATALOG_VERSION = "20260704-live-repository-check";
 const MAX_SELECTED_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
 const OFFICIAL_LANGUAGE_TAGS = [
@@ -427,14 +427,15 @@ function loadAllPlugins() {
         .filter((plugin) => hasRequiredPluginIcon(plugin) && hasRepository(plugin) && isVisiblePlugin(plugin));
       const savedDrafts = loadDraftPlugins();
       return Promise.all([
+        filterAvailablePlugins(catalogPlugins),
         filterAvailablePlugins(savedDrafts)
-      ]).then(([availableDrafts]) => {
-        const publishedKeys = new Set(catalogPlugins.map(pluginKey));
+      ]).then(([availableCatalogPlugins, availableDrafts]) => {
+        const publishedKeys = new Set(availableCatalogPlugins.map(pluginKey));
         const drafts = availableDrafts.filter((plugin) => !publishedKeys.has(pluginKey(plugin)));
         if (drafts.length !== savedDrafts.length) {
           saveDraftPlugins(drafts);
         }
-        allPlugins = uniquePlugins([catalogPlugins, drafts.map((plugin) => ({ ...plugin, __source: "draft" }))]);
+        allPlugins = uniquePlugins([availableCatalogPlugins, drafts.map((plugin) => ({ ...plugin, __source: "draft" }))]);
         const catalogTags = uniqueTags([
           allPlugins.flatMap((plugin) => filterTags(plugin.tags))
         ]);
