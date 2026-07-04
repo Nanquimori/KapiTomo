@@ -52,7 +52,7 @@
       }
 
       .page {
-        width: min(1060px, 100%);
+        width: min(1180px, 100%);
         margin: 0 auto;
         padding: 6px 12px 44px;
       }
@@ -280,7 +280,7 @@
         width: 100%;
         min-width: 0;
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(158px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
         justify-content: start;
         gap: 7px;
       }
@@ -289,9 +289,9 @@
         min-width: 0;
         max-width: 100%;
         overflow: hidden;
-        min-height: 66px;
+        min-height: 62px;
         display: grid;
-        grid-template-columns: 28px minmax(0, 1fr);
+        grid-template-columns: 30px minmax(0, 1fr);
         align-items: start;
         gap: 4px 6px;
         border-radius: 8px;
@@ -302,8 +302,8 @@
       }
 
       .plugin-icon {
-        width: 28px;
-        height: 28px;
+        width: 30px;
+        height: 30px;
         border-radius: 7px;
         object-fit: cover;
         border: 1px solid var(--line);
@@ -387,13 +387,13 @@
         flex: 1 1 0;
         width: auto;
         min-width: 0;
-        max-width: 112px;
+        max-width: 120px;
         overflow: hidden;
         text-overflow: ellipsis;
-        min-height: 24px;
+        min-height: 20px;
         border-radius: 7px;
-        padding: 0 6px;
-        font-size: 0.68rem;
+        padding: 0 7px;
+        font-size: 0.64rem;
       }
 
       .button-row {
@@ -548,14 +548,14 @@
 
         .plugin-list {
           max-width: none;
-          grid-template-columns: repeat(2, minmax(0, 132px));
+          grid-template-columns: repeat(2, minmax(0, 1fr));
           justify-content: start;
           gap: 6px;
         }
 
         .plugin-card {
           width: 100%;
-          min-height: 72px;
+          min-height: 64px;
           grid-template-columns: 28px minmax(0, 1fr);
           gap: 4px 6px;
           border-radius: 9px;
@@ -569,7 +569,7 @@
         }
 
         .plugin-copy h3 {
-          font-size: 0.7rem;
+          font-size: 0.74rem;
         }
 
         .plugin-copy p {
@@ -605,9 +605,9 @@
         .plugin-actions .button {
           flex: 1 1 0;
           max-width: none;
-          min-height: 22px;
+          min-height: 18px;
           padding: 0 5px;
-          font-size: 0.58rem;
+          font-size: 0.56rem;
         }
 
         .button-row {
@@ -628,11 +628,11 @@
 
       @media (max-width: 300px) {
         .plugin-list {
-          grid-template-columns: minmax(0, 132px);
+          grid-template-columns: 1fr;
         }
 
         .plugin-actions .button {
-          max-width: 104px;
+          max-width: 108px;
         }
       }
     </style>
@@ -726,6 +726,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260704-mobile-card-fit"></script>
+    <script src="store.js?v=20260704-balanced-plugin-cards"></script>
   </body>
 </html>
