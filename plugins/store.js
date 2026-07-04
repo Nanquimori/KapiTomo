@@ -194,8 +194,7 @@ function loadAllPlugins() {
       const catalogPlugins = (Array.isArray(catalog.plugins) ? catalog.plugins : [])
         .filter((plugin) => hasRequiredPluginIcon(plugin) && hasRepository(plugin));
       const savedDrafts = loadDraftPlugins();
-      const visibleDrafts = savedDrafts.filter((plugin) => !new Set(catalogPlugins.map(pluginKey)).has(pluginKey(plugin)));
-      renderPlugins(uniquePlugins([catalogPlugins, visibleDrafts.map((plugin) => ({ ...plugin, __source: "draft" }))]));
+      renderPlugins(uniquePlugins([catalogPlugins]));
       return Promise.all([
         filterAvailablePlugins(catalogPlugins),
         filterAvailablePlugins(savedDrafts)
