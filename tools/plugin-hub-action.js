@@ -38,10 +38,7 @@ const TYPE_TAGS = new Set([
   "webcomic",
   "oneshot",
   "one-shot",
-  "doujinshi",
-  "hentai",
-  "porn",
-  "adult"
+  "doujinshi"
 ]);
 
 const env = process.env;
