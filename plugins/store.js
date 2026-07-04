@@ -12,8 +12,9 @@ const tagFilterStatus = document.getElementById("tagFilterStatus");
 const viewButtons = Array.from(document.querySelectorAll("[data-view-target]"));
 const viewPanels = Array.from(document.querySelectorAll("[data-view-panel]"));
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
-const CATALOG_VERSION = "20260704-tag-limit-truncate";
+const CATALOG_VERSION = "20260704-required-tags";
 const MAX_SELECTED_TAGS = 4;
+const MIN_PUBLIC_TAGS = 2;
 const LANGUAGE_TAGS = new Set([
   "portugues",
   "portuguese",
@@ -34,6 +35,21 @@ const LANGUAGE_TAGS = new Set([
   "chinese",
   "chines",
   "zh"
+]);
+const TYPE_TAGS = new Set([
+  "manga",
+  "manhua",
+  "manhwa",
+  "novel",
+  "comic",
+  "webtoon",
+  "webcomic",
+  "oneshot",
+  "one-shot",
+  "doujinshi",
+  "hentai",
+  "porn",
+  "adult"
 ]);
 let renderedPlugins = [];
 let allPlugins = [];
@@ -129,7 +145,18 @@ function normalizePublicationTags(tags) {
     seen.add(clean);
     output.push(clean);
   });
-  return output.length ? output : ["community"];
+  const publicTags = output.filter((tag) => tag !== "official" && tag !== "community");
+  if (publicTags.length < MIN_PUBLIC_TAGS) {
+    throw new Error("plugin.json must declare at least 2 tags: language first, then type.");
+  }
+  if (!isLanguageTag(publicTags[0])) {
+    throw new Error("The first public tag must be the language, for example english or portuguese.");
+  }
+  const invalidType = publicTags.slice(1).find((tag) => !TYPE_TAGS.has(tag));
+  if (invalidType) {
+    throw new Error("After the language tag, every public tag must be a content type.");
+  }
+  return output;
 }
 
 function uniqueTags(groups) {
