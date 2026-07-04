@@ -144,7 +144,7 @@ function normalizePluginPath(value) {
 
 function normalizeStatus(value) {
   const status = optionalText(value || "active", 20).toLowerCase();
-  return ["active", "broken", "hidden", "removed"].includes(status) ? status : "active";
+  return ["active", "broken", "hidden", "removed", "missing"].includes(status) ? status : "active";
 }
 
 function sameList(a, b) {
@@ -332,7 +332,7 @@ async function findDuplicateHost(catalog, plugin) {
     if (String(existing.id || "").toLowerCase() === plugin.id) {
       continue;
     }
-    if (["broken", "hidden", "removed"].includes(normalizeStatus(existing.status))) {
+    if (["hidden", "removed", "missing"].includes(normalizeStatus(existing.status))) {
       continue;
     }
     const existingHosts = await hostsForCatalogPlugin(existing);
@@ -517,6 +517,19 @@ async function checkPluginHealth() {
         changed = true;
       }
     } catch (error) {
+      if (error.status === 404 || error.status === 410) {
+        const needsMissingUpdate = normalizeStatus(plugin.status) !== "missing"
+          || Number(plugin.consecutive_failures || 0) !== 0
+          || plugin.last_error !== error.message;
+        if (needsMissingUpdate) {
+          plugin.status = "missing";
+          plugin.consecutive_failures = 0;
+          plugin.last_error = error.message;
+          plugin.last_checked_at = nowIso();
+          changed = true;
+        }
+        continue;
+      }
       plugin.consecutive_failures = Number(plugin.consecutive_failures || 0) + 1;
       plugin.last_error = error.message;
       plugin.last_checked_at = nowIso();

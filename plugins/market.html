@@ -413,21 +413,25 @@
         line-height: 1.05;
       }
 
-      .status-badge {
+      .site-status {
         grid-column: 1 / -1;
         justify-self: start;
-        border: 1px solid rgba(255, 178, 31, 0.34);
-        border-radius: 999px;
-        padding: 1px 6px;
-        color: #ffd990;
-        background: rgba(255, 178, 31, 0.08);
-        font-size: 0.54rem;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        padding: 2px 6px;
+        font-size: 0.52rem;
         font-weight: 900;
-        line-height: 1.15;
+        line-height: 1;
         text-transform: uppercase;
       }
 
-      .status-broken {
+      .site-status.is-online {
+        border-color: rgba(87, 225, 161, 0.4);
+        color: #94f2c5;
+        background: rgba(37, 156, 101, 0.18);
+      }
+
+      .site-status.is-offline {
         border-color: rgba(255, 107, 44, 0.45);
         color: #ffb08f;
         background: rgba(255, 107, 44, 0.12);
@@ -796,6 +800,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260704-tags-order"></script>
+    <script src="store.js?v=20260704-site-status"></script>
   </body>
 </html>

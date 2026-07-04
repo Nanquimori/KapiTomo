@@ -13,7 +13,7 @@ const pluginSearchInput = document.getElementById("pluginSearchInput");
 const viewButtons = Array.from(document.querySelectorAll("[data-view-target]"));
 const viewPanels = Array.from(document.querySelectorAll("[data-view-panel]"));
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
-const CATALOG_VERSION = "20260704-tags-order";
+const CATALOG_VERSION = "20260704-site-status";
 const MAX_SELECTED_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
 const OFFICIAL_LANGUAGE_TAGS = [
@@ -73,11 +73,19 @@ function hasRepository(plugin) {
 
 function pluginStatus(plugin) {
   const status = String(plugin?.status || "active").trim().toLowerCase();
-  return ["active", "broken", "hidden", "removed"].includes(status) ? status : "active";
+  return ["active", "broken", "hidden", "removed", "missing"].includes(status) ? status : "active";
 }
 
 function isVisiblePlugin(plugin) {
-  return !["broken", "hidden", "removed"].includes(pluginStatus(plugin));
+  return !["hidden", "removed", "missing"].includes(pluginStatus(plugin));
+}
+
+function siteStatusLabel(plugin) {
+  return pluginStatus(plugin) === "broken" ? "Offline" : "Online";
+}
+
+function siteStatusClass(plugin) {
+  return pluginStatus(plugin) === "broken" ? "is-offline" : "is-online";
 }
 
 function setPublishStatus(message) {
@@ -378,7 +386,6 @@ function renderPlugins(plugins) {
   renderedPlugins = plugins;
   list.innerHTML = plugins.length ? plugins.map((plugin, index) => {
     const tags = displayTags(plugin.tags);
-    const status = pluginStatus(plugin);
     const actions = [
       `<button class="button primary" type="button" data-install-plugin="${index}">Install</button>`
     ];
@@ -397,7 +404,7 @@ function renderPlugins(plugins) {
             ${plugin.version ? `<span>v${escapeHtml(plugin.version)}</span>` : ""}
           </div>
         </div>
-        ${status !== "active" ? `<span class="status-badge status-${escapeHtml(status)}">${escapeHtml(status)}</span>` : ""}
+        <span class="site-status ${escapeHtml(siteStatusClass(plugin))}">${escapeHtml(siteStatusLabel(plugin))}</span>
         ${tags.length ? `<div class="tag-list">${tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>` : ""}
         <div class="plugin-actions">
           ${actions.join("")}
