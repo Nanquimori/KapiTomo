@@ -197,7 +197,7 @@
       }
 
       .plugin-card {
-        min-height: 72px;
+        min-height: 70px;
         display: grid;
         grid-template-columns: 34px minmax(0, 1fr);
         align-items: center;
@@ -221,10 +221,18 @@
       }
 
       .plugin-copy h3,
+      .plugin-copy p,
       .meta span {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+      }
+
+      .plugin-copy p {
+        margin: 2px 0 0;
+        color: var(--muted);
+        font-size: 0.72rem;
+        line-height: 1.22;
       }
 
       .meta {
@@ -239,7 +247,7 @@
 
       .meta span {
         min-width: 0;
-        max-width: 50%;
+        max-width: 46%;
       }
 
       .plugin-actions {
@@ -430,9 +438,17 @@
           font-size: 0.78rem;
         }
 
+        .plugin-copy p {
+          display: none;
+        }
+
         .meta {
           gap: 5px;
           font-size: 0.58rem;
+        }
+
+        .meta span:nth-child(n+3) {
+          display: none;
         }
 
         .plugin-actions {
