@@ -1,30 +1,25 @@
-﻿<!doctype html>
-<html lang="pt-BR">
+<!doctype html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Catálogo público de plugins para instalar fontes no Nyxovira.">
-    <link rel="canonical" href="https://nanquimori.github.io/KapiTomo/plugins/">
-    <meta property="og:site_name" content="KapiTomo">
-    <meta property="og:title" content="KapiTomo Plugin Hub">
-    <meta property="og:description" content="Plugins online para o Nyxovira, publicados por repositórios GitHub com plugin.json.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://nanquimori.github.io/KapiTomo/plugins/">
-    <meta property="og:image" content="https://nanquimori.github.io/KapiTomo/assets/kapitomo-logo.png">
-    <title>KapiTomo Plugin Hub</title>
-    <link rel="icon" type="image/png" href="../assets/kapitomo-logo.png?v=20260703-plugin-hub">
-    <link rel="apple-touch-icon" href="../assets/kapitomo-logo.png?v=20260703-plugin-hub">
+    <title>KapiTomo | Plugin Hub</title>
+    <meta name="description" content="Online plugin catalog for installing source plugins in Nyxovira.">
+    <meta property="og:title" content="KapiTomo | Plugin Hub">
+    <meta property="og:description" content="Online plugins for Nyxovira, published from GitHub repositories with plugin.json.">
+    <link rel="icon" href="../assets/kapitomo-logo.png">
     <style>
       :root {
         color-scheme: dark;
-        --bg: #070411;
-        --panel: #120a22;
-        --panel-soft: #1a0f31;
-        --line: rgba(212, 196, 255, 0.2);
-        --text: #f7f2ff;
-        --muted: #b8abc9;
-        --accent: #ffb51f;
-        --accent-2: #8b5cf6;
+        --bg: #05030b;
+        --panel: #120a24;
+        --panel-soft: #1a1030;
+        --line: rgba(255, 255, 255, 0.16);
+        --text: #fff8f1;
+        --muted: #c8bdd4;
+        --accent: #ffb21f;
+        --accent-2: #ff6b2c;
+        --purple: #7d45ff;
       }
 
       * {
@@ -33,81 +28,87 @@
 
       body {
         margin: 0;
+        min-height: 100vh;
         background:
-          radial-gradient(circle at 18% 10%, rgba(255, 181, 31, 0.14), transparent 32%),
-          radial-gradient(circle at 88% 18%, rgba(139, 92, 246, 0.18), transparent 30%),
-          linear-gradient(180deg, #0a0614, var(--bg));
+          radial-gradient(circle at 20% 0%, rgba(125, 69, 255, 0.25), transparent 34rem),
+          linear-gradient(135deg, #06020d 0%, #160926 54%, #090512 100%);
         color: var(--text);
-        font-family: "Segoe UI", Arial, sans-serif;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
 
       a {
         color: inherit;
+        text-decoration: none;
       }
 
       .page {
-        width: min(1040px, calc(100% - 32px));
+        width: min(1120px, calc(100% - 36px));
         margin: 0 auto;
-        padding: 22px 0 44px;
+        padding: 28px 0 56px;
       }
 
       .topbar {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 14px;
-        margin-bottom: 26px;
+        gap: 16px;
+        margin-bottom: 32px;
       }
 
       .brand {
         display: inline-flex;
         align-items: center;
-        gap: 10px;
-        text-decoration: none;
+        gap: 12px;
         font-weight: 900;
         letter-spacing: 0.08em;
         text-transform: uppercase;
       }
 
       .brand img {
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
       }
 
-      .nav-link {
-        min-height: 38px;
+      .nav-link,
+      .button {
+        min-height: 46px;
         display: inline-flex;
         align-items: center;
-        padding: 0 13px;
+        justify-content: center;
         border: 1px solid var(--line);
-        border-radius: 8px;
-        text-decoration: none;
-        color: var(--muted);
+        border-radius: 12px;
+        padding: 0 18px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        font-weight: 850;
+        cursor: pointer;
+      }
+
+      .button.primary {
+        border: 0;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        color: #150700;
       }
 
       .hero,
-      .panel,
-      .plugin-card {
+      .panel {
         border: 1px solid var(--line);
-        border-radius: 8px;
-        background:
-          linear-gradient(140deg, rgba(255, 181, 31, 0.08), transparent 42%),
-          linear-gradient(220deg, rgba(139, 92, 246, 0.12), transparent 52%),
-          rgba(18, 10, 34, 0.94);
-        box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+        border-radius: 26px;
+        background: rgba(18, 10, 36, 0.86);
+        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.24);
       }
 
       .hero {
-        padding: clamp(24px, 5vw, 46px);
+        padding: clamp(28px, 5vw, 52px);
       }
 
       .kicker {
-        margin: 0 0 10px;
-        color: var(--accent);
-        font-size: 0.72rem;
+        margin: 0 0 18px;
+        color: var(--muted);
+        font-size: 0.82rem;
         font-weight: 900;
-        letter-spacing: 0.22em;
+        letter-spacing: 0.28em;
         text-transform: uppercase;
       }
 
@@ -119,264 +120,160 @@
       }
 
       h1 {
-        max-width: 760px;
-        margin-bottom: 14px;
-        font-size: clamp(2rem, 7vw, 4.8rem);
-        line-height: 0.92;
+        max-width: 820px;
+        margin-bottom: 18px;
+        font-size: clamp(2.6rem, 7vw, 5.4rem);
+        line-height: 0.96;
+      }
+
+      h2 {
+        margin-bottom: 22px;
+        font-size: clamp(1.8rem, 4vw, 3.2rem);
+        line-height: 1.02;
+      }
+
+      h3 {
+        margin-bottom: 10px;
+        font-size: 1.25rem;
       }
 
       .hero p,
-      .panel p,
-      .plugin-card p {
+      .panel > p,
+      .plugin-card p,
+      .steps p {
         color: var(--muted);
-        line-height: 1.65;
+        font-size: 1.04rem;
+        line-height: 1.6;
+      }
+
+      .panel {
+        margin-top: 18px;
+        padding: clamp(22px, 4vw, 46px);
       }
 
       .grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 14px;
-        margin-top: 18px;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 18px;
       }
 
-      .panel,
-      .plugin-card {
-        padding: 18px;
+      .grid .steps {
+        grid-column: 1 / -1;
       }
 
       .plugin-list {
         display: grid;
-        gap: 12px;
-        margin-top: 18px;
+        gap: 18px;
       }
 
       .plugin-card {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 14px;
-        align-items: stretch;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: clamp(18px, 3vw, 28px);
+        background: rgba(12, 6, 26, 0.78);
       }
 
       .plugin-summary {
         display: grid;
-        grid-template-columns: 72px minmax(0, 1fr);
-        gap: 16px;
+        grid-template-columns: 104px minmax(0, 1fr);
+        gap: 22px;
         align-items: start;
-        min-width: 0;
       }
 
       .plugin-icon {
-        width: 72px;
-        height: 72px;
-        border: 1px solid var(--line);
-        border-radius: 14px;
+        width: 104px;
+        aspect-ratio: 1;
+        border-radius: 20px;
         object-fit: cover;
-        background: rgba(0, 0, 0, 0.22);
-      }
-
-      .plugin-card h3 {
-        margin-bottom: 6px;
-        overflow-wrap: anywhere;
+        border: 1px solid var(--line);
+        background: #05030b;
       }
 
       .meta {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
+        gap: 10px;
         color: var(--muted);
-        font-size: 0.84rem;
+        font-weight: 750;
       }
 
       .button-row {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 10px;
-        min-width: 0;
-      }
-
-      .button {
-        width: 100%;
-        min-width: 0;
-        min-height: 40px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0 14px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: var(--panel-soft);
-        color: var(--text);
-        text-decoration: none;
-        text-align: center;
-        font-weight: 800;
-        line-height: 1.12;
-      }
-
-      .button.primary {
-        border-color: rgba(255, 181, 31, 0.42);
-        background: linear-gradient(135deg, #ffb51f, #f06d2f);
-        color: #160a08;
-      }
-
-      code,
-      pre {
-        font-family: "Cascadia Mono", "Consolas", monospace;
-      }
-
-      pre {
-        margin: 12px 0 0;
-        padding: 14px;
-        overflow: auto;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: rgba(0, 0, 0, 0.24);
-        color: #f9f4ff;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 20px;
       }
 
       .publish-form {
         display: grid;
-        gap: 10px;
-        margin-top: 14px;
+        gap: 12px;
       }
 
       .field-label {
         color: var(--muted);
-        font-size: 0.78rem;
-        font-weight: 800;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
+        font-weight: 850;
       }
 
       .text-input {
         width: 100%;
-        min-height: 44px;
-        padding: 0 12px;
+        min-height: 52px;
         border: 1px solid var(--line);
-        border-radius: 8px;
-        background: rgba(0, 0, 0, 0.22);
+        border-radius: 14px;
+        padding: 0 16px;
+        background: rgba(255, 255, 255, 0.06);
         color: var(--text);
         font: inherit;
-      }
-
-      .text-input:focus {
-        border-color: rgba(255, 181, 31, 0.62);
-        outline: none;
+        font-weight: 700;
       }
 
       .publish-status {
-        min-height: 22px;
-        margin: 0;
-        color: var(--muted);
-        font-size: 0.9rem;
-      }
-
-      .profile-card {
-        display: grid;
-        grid-template-columns: 58px minmax(0, 1fr);
-        gap: 12px;
-        align-items: center;
-        padding: 12px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: rgba(0, 0, 0, 0.2);
-      }
-
-      .profile-avatar {
-        width: 58px;
-        height: 58px;
-        border-radius: 50%;
-        object-fit: cover;
-        background: rgba(0, 0, 0, 0.28);
-      }
-
-      .profile-card strong,
-      .profile-card span {
-        display: block;
-        overflow-wrap: anywhere;
-      }
-
-      .profile-card strong {
-        margin-bottom: 2px;
-        font-size: 1.05rem;
-      }
-
-      .profile-card span {
-        color: var(--muted);
-      }
-
-      [hidden] {
-        display: none !important;
-      }
-
-      .steps {
-        counter-reset: step;
-        display: grid;
-        gap: 12px;
+        min-height: 1.5em;
+        margin: 4px 0 0;
       }
 
       .steps article {
         display: grid;
-        grid-template-columns: 32px minmax(0, 1fr);
-        column-gap: 16px;
+        grid-template-columns: 44px minmax(0, 1fr);
+        gap: 18px;
         align-items: start;
-        position: relative;
-        padding-left: 0;
+        padding: 18px 0;
+        border-top: 1px solid var(--line);
+        counter-increment: step;
       }
 
       .steps article::before {
-        counter-increment: step;
         content: counter(step);
-        grid-column: 1;
-        grid-row: 1 / span 2;
-        align-self: start;
-        width: 32px;
-        height: 32px;
-        display: grid;
+        width: 34px;
+        height: 34px;
+        display: inline-grid;
         place-items: center;
-        border-radius: 8px;
-        background: var(--accent);
-        color: #160a08;
-        font-weight: 1000;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        color: #150700;
+        font-weight: 950;
       }
 
-      .steps article h3,
-      .steps article p {
-        grid-column: 2;
+      .steps {
+        counter-reset: step;
       }
 
-      .steps article h3 {
-        min-height: 32px;
-        display: grid;
-        align-content: center;
-        margin: 0 0 6px;
-        line-height: 1.1;
-      }
+      @media (max-width: 760px) {
+        .page {
+          width: min(100% - 28px, 1120px);
+        }
 
-      .steps article p {
-        margin-bottom: 0;
-      }
-
-      @media (max-width: 680px) {
-        .topbar {
+        .topbar,
+        .plugin-summary,
+        .grid {
           grid-template-columns: 1fr;
         }
 
-        .plugin-summary {
-          grid-template-columns: 70px minmax(0, 1fr);
-          gap: 14px;
-        }
-
-        .plugin-icon {
-          width: 70px;
-          height: 70px;
-        }
-
         .topbar {
-          align-items: stretch;
+          display: grid;
         }
 
-        .button {
-          justify-content: center;
+        .button-row {
+          grid-template-columns: 1fr;
         }
       }
     </style>
@@ -388,71 +285,77 @@
           <img src="../assets/kapitomo-logo.png" alt="">
           <span>KapiTomo</span>
         </a>
-        <a class="nav-link" href="../nyxovira/plugin-api/">API de plugins</a>
+        <a class="nav-link" href="../nyxovira/plugin-api/">Plugin API</a>
       </header>
 
       <section class="hero">
         <p class="kicker">Nyxovira</p>
         <h1>Plugin Hub</h1>
-        <p>Um catálogo público para instalar fontes no Nyxovira. O app lê este catálogo direto, baixa o repositório do plugin e instala sem abrir navegador externo.</p>
+        <p>A public catalog for installing source plugins in Nyxovira. The app reads this catalog, downloads the plugin repository, and installs it without opening an external browser.</p>
       </section>
 
-      <section class="panel" style="margin-top: 18px;">
-        <p class="kicker">Catálogo</p>
-        <h2>Plugins publicados</h2>
+      <section class="panel">
+        <p class="kicker">Catalog</p>
+        <h2>Published plugins</h2>
         <div id="pluginList" class="plugin-list" aria-live="polite">
-          <p>Carregando catálogo...</p>
+          <p>Loading catalog...</p>
         </div>
       </section>
 
       <section class="grid">
         <article class="panel">
-          <p class="kicker">Publicar</p>
-          <h2>Publique um addon pronto</h2>
-          <p>Cole o repositório GitHub que já tem <code>plugin.json</code>. O Hub lê o manifesto e cria uma solicitação no GitHub; ao confirmar, o robô valida o repositório e publica no catálogo.</p>
+          <p class="kicker">Publish</p>
+          <h2>Publish a ready addon</h2>
+          <p>Paste the GitHub repository that already contains <code>plugin.json</code>. The Hub reads the manifest and opens a GitHub request; after confirmation, automation validates the repository and publishes it to the catalog.</p>
           <div class="publish-form">
-            <label class="field-label" for="repoUrlInput">Repositório GitHub</label>
-            <input id="repoUrlInput" class="text-input" type="url" placeholder="https://github.com/usuario/meu-addon">
+            <label class="field-label" for="repoUrlInput">GitHub repository</label>
+            <input id="repoUrlInput" class="text-input" type="url" placeholder="https://github.com/user/my-addon">
             <div class="button-row">
-              <button id="loadRepoPluginButton" class="button primary" type="button">Carregar addon</button>
-              <button id="clearDraftPluginsButton" class="button" type="button">Limpar rascunhos</button>
+              <button id="loadRepoPluginButton" class="button primary" type="button">Load addon</button>
+              <button id="clearDraftPluginsButton" class="button" type="button">Clear drafts</button>
             </div>
             <p id="publishStatus" class="publish-status" aria-live="polite"></p>
           </div>
         </article>
 
         <article class="panel">
-          <p class="kicker">Remover</p>
-          <h2>Remova uma publicação</h2>
-          <p>Informe o plugin publicado e confirme a solicitação no GitHub. O robô valida, remove do catálogo e comenta o resultado.</p>
+          <p class="kicker">Remove</p>
+          <h2>Remove a publication</h2>
+          <p>Enter the published plugin and confirm the GitHub request. Automation validates it, removes it from the catalog, and posts the result.</p>
           <div class="publish-form">
-            <label class="field-label" for="removePluginIdInput">ID do plugin</label>
-            <input id="removePluginIdInput" class="text-input" type="text" placeholder="meu-addon">
-            <label class="field-label" for="removeRepoUrlInput">Repositório GitHub</label>
-            <input id="removeRepoUrlInput" class="text-input" type="url" placeholder="https://github.com/usuario/meu-addon">
-            <button id="requestRemovePluginButton" class="button primary" type="button">Solicitar remoção</button>
+            <label class="field-label" for="removePluginIdInput">Plugin ID</label>
+            <input id="removePluginIdInput" class="text-input" type="text" placeholder="my-addon">
+            <label class="field-label" for="removeRepoUrlInput">GitHub repository</label>
+            <input id="removeRepoUrlInput" class="text-input" type="url" placeholder="https://github.com/user/my-addon">
+            <button id="requestRemovePluginButton" class="button primary" type="button">Request removal</button>
             <p id="removeStatus" class="publish-status" aria-live="polite"></p>
           </div>
         </article>
 
         <article class="panel steps">
-          <p class="kicker">Fluxo</p>
-          <h2>Como entrar no catálogo</h2>
+          <p class="kicker">Flow</p>
+          <h2>How to join the catalog</h2>
           <article>
-            <h3>Prepare o addon</h3>
-            <p>Deixe o manifesto e o script da fonte organizados no repositório.</p>
+            <div>
+              <h3>Prepare the addon</h3>
+              <p>Keep the manifest and source script organized in the repository.</p>
+            </div>
           </article>
           <article>
-            <h3>Publique no GitHub</h3>
-            <p>Use a sua própria conta. O addon fica no seu repositório e o KapiTomo publica só a entrada do catálogo.</p>
+            <div>
+              <h3>Publish on GitHub</h3>
+              <p>Use your own account. The addon stays in your repository, and KapiTomo publishes only the catalog entry.</p>
+            </div>
           </article>
           <article>
-            <h3>Adicione ao catálogo</h3>
-            <p>Use o botão Solicitar publicação e confirme no GitHub. A Action atualiza o catálogo e fecha a solicitação quando terminar.</p>
+            <div>
+              <h3>Add it to the catalog</h3>
+              <p>Use the publication button and confirm on GitHub. The automation updates the catalog and closes the request when it finishes.</p>
+            </div>
           </article>
         </article>
       </section>
     </main>
-    <script src="store.js?v=20260704-repository-hub"></script>
+    <script src="store.js?v=20260704-repository-hub-en"></script>
   </body>
 </html>

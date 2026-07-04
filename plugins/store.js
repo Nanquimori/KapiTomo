@@ -7,7 +7,7 @@ const removePluginIdInput = document.getElementById("removePluginIdInput");
 const removeRepoUrlInput = document.getElementById("removeRepoUrlInput");
 const requestRemovePluginButton = document.getElementById("requestRemovePluginButton");
 const removeStatus = document.getElementById("removeStatus");
-const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v2";
+const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 let renderedPlugins = [];
 
 function escapeHtml(value) {
@@ -42,8 +42,8 @@ function setRemoveStatus(message) {
 
 function fetchCatalog() {
   const urls = [
-    "catalog-store.json?v=20260704-repository-hub",
-    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260704-repository-hub"
+    "catalog-store.json?v=20260704-repository-hub-en",
+    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260704-repository-hub-en"
   ];
   return urls.reduce((chain, url) => chain.catch(() => fetch(url, { cache: "no-store" })
     .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))), Promise.reject());
@@ -116,12 +116,12 @@ function renderPlugins(plugins) {
   renderedPlugins = plugins;
   list.innerHTML = plugins.length ? plugins.map((plugin, index) => {
     const actions = [
-      `<button class="button primary" type="button" data-install-plugin="${index}">Instalar no Nyxovira</button>`
+      `<button class="button primary" type="button" data-install-plugin="${index}">Install in Nyxovira</button>`
     ];
     if (plugin.__source === "draft") {
-      actions.push(`<button class="button" type="button" data-publish-plugin="${index}">Solicitar publicação</button>`);
+      actions.push(`<button class="button" type="button" data-publish-plugin="${index}">Request publication</button>`);
     } else if (plugin.homepage || plugin.site_url) {
-      actions.push(`<a class="button" href="${escapeHtml(plugin.homepage || plugin.site_url)}">Abrir site</a>`);
+      actions.push(`<a class="button" href="${escapeHtml(plugin.homepage || plugin.site_url)}">Open site</a>`);
     }
     return `
       <article class="plugin-card">
@@ -143,7 +143,7 @@ function renderPlugins(plugins) {
         </div>
       </article>
     `;
-  }).join("") : "<p>Nenhum plugin publicado ainda.</p>";
+  }).join("") : "<p>No plugins published yet.</p>";
   document.querySelectorAll("[data-install-plugin]").forEach((button) => {
     button.addEventListener("click", () => installPlugin(renderedPlugins[Number(button.dataset.installPlugin)]));
   });
@@ -166,7 +166,7 @@ function loadAllPlugins() {
       renderPlugins(uniquePlugins([catalogPlugins, drafts.map((plugin) => ({ ...plugin, __source: "draft" }))]));
     })
     .catch((error) => {
-      list.innerHTML = `<p>Não foi possível carregar o catálogo: ${escapeHtml(error.message)}</p>`;
+      list.innerHTML = `<p>Could not load the catalog: ${escapeHtml(error.message)}</p>`;
     });
 }
 
@@ -175,14 +175,14 @@ function parseGitHubRepo(rawUrl) {
   try {
     url = new URL(String(rawUrl || "").trim());
   } catch {
-    throw new Error("Cole uma URL válida do GitHub.");
+    throw new Error("Paste a valid GitHub URL.");
   }
   if (!/^(www\.)?github\.com$/i.test(url.hostname)) {
-    throw new Error("Use um repositório do github.com.");
+    throw new Error("Use a github.com repository.");
   }
   const parts = url.pathname.split("/").filter(Boolean);
   if (parts.length < 2) {
-    throw new Error("A URL precisa ter usuário e repositório.");
+    throw new Error("The URL must include an owner and repository.");
   }
   const treeIndex = parts.indexOf("tree");
   return {
@@ -229,25 +229,25 @@ async function fetchRepoManifest(repo) {
       lastError = error;
     }
   }
-  throw new Error("Não encontrei plugin.json no repositório. " + (lastError?.message || ""));
+  throw new Error("plugin.json was not found in the repository. " + (lastError?.message || ""));
 }
 
 async function loadRepoPlugin() {
   try {
     const repo = parseGitHubRepo(repoUrlInput?.value || "");
-    setPublishStatus("Lendo plugin.json do repositório...");
+    setPublishStatus("Reading plugin.json from the repository...");
     const { branch, pluginPath, manifest } = await fetchRepoManifest(repo);
     const browser = manifest.browser || {};
     const repositoryUrl = `https://github.com/${repo.owner}/${repo.repo}`;
     const iconUrl = resolveUrl(browser.home_url || repositoryUrl + "/", browser.icon_url || "");
     if (!iconUrl) {
-      throw new Error("O plugin precisa ter browser.icon_url.");
+      throw new Error("The plugin must declare browser.icon_url.");
     }
-    setPublishStatus("Montando publicação...");
+    setPublishStatus("Preparing the publication request...");
     const plugin = {
       id: manifest.id || repo.repo,
       name: manifest.name || manifest.id || repo.repo,
-      description: manifest.description || `Fonte para baixar obras de ${manifest.name || repo.repo} no Nyxovira.`,
+      description: manifest.description || `Source plugin for downloading works from ${manifest.name || repo.repo} in Nyxovira.`,
       author: manifest.author || repo.owner,
       version: manifest.version || "1.0.0",
       site_url: browser.home_url || repositoryUrl + "/",
@@ -256,31 +256,35 @@ async function loadRepoPlugin() {
       repository_url: repositoryUrl,
       repository_ref: branch,
       plugin_path: pluginPath,
-      tags: Array.isArray(manifest.tags) ? manifest.tags : ["comunidade"],
+      tags: Array.isArray(manifest.tags) ? manifest.tags : ["community"],
       __source: "draft"
     };
     saveDraftPlugin(plugin);
-    setPublishStatus("Addon carregado. Ao confirmar no GitHub, o robô valida o repositório e publica.");
+    setPublishStatus("Addon loaded. Confirm the GitHub request and the catalog automation will validate the repository before publishing.");
     loadAllPlugins();
   } catch (error) {
-    setPublishStatus(error?.message || "Não foi possível carregar o addon.");
+    setPublishStatus(error?.message || "Could not load the addon.");
   }
 }
 
 function openPublishRequest(plugin) {
   const clean = publicPlugin(plugin);
+  if (!clean.repository_url) {
+    setPublishStatus("This draft is outdated. Load the GitHub repository again before requesting publication.");
+    return;
+  }
   const body = [
-    "Solicitação de publicação de plugin para o catálogo do Nyxovira.",
-    "Depois que você criar esta issue, o robô valida o repositório e publica automaticamente se estiver tudo correto.",
+    "Plugin publication request for the Nyxovira catalog.",
+    "After you submit this request, the catalog automation validates the repository and publishes it automatically when everything is correct.",
     "",
-    "Repositório: " + (clean.repository_url || ""),
+    "Repository: " + clean.repository_url,
     "",
     "```json",
     JSON.stringify(clean, null, 2),
     "```"
   ].join("\n");
   const url = "https://github.com/Nanquimori/KapiTomo/issues/new"
-    + "?title=" + encodeURIComponent("[plugin] " + (clean.name || clean.id || "novo-plugin"))
+    + "?title=" + encodeURIComponent("[plugin] " + (clean.name || clean.id || "new-plugin"))
     + "&body=" + encodeURIComponent(body);
   window.open(url, "_blank", "noopener");
 }
@@ -289,48 +293,48 @@ function openRemovalRequest() {
   const pluginId = String(removePluginIdInput?.value || "").trim();
   const repoUrl = String(removeRepoUrlInput?.value || "").trim();
   if (!pluginId) {
-    setRemoveStatus("Informe o ID do plugin publicado.");
+    setRemoveStatus("Enter the published plugin ID.");
     return;
   }
   if (!repoUrl) {
-    setRemoveStatus("Informe o repositório GitHub do plugin.");
+    setRemoveStatus("Enter the plugin GitHub repository.");
     return;
   }
   const body = [
-    "Solicitação de remoção de plugin publicado no catálogo do Nyxovira.",
-    "Depois que você criar esta issue, o robô valida o pedido e remove automaticamente se estiver tudo correto.",
+    "Plugin removal request for the Nyxovira catalog.",
+    "After you submit this request, the catalog automation validates it and removes the plugin automatically when everything is correct.",
     "",
     "Plugin ID: " + pluginId,
-    "Repositório: " + repoUrl,
+    "Repository: " + repoUrl,
     "",
-    "Confirmo que quero remover esta publicação do catálogo online."
+    "I confirm that I want to remove this plugin from the online catalog."
   ].join("\n");
   const url = "https://github.com/Nanquimori/KapiTomo/issues/new"
-    + "?title=" + encodeURIComponent("[plugin-remover] " + pluginId)
+    + "?title=" + encodeURIComponent("[plugin-remove] " + pluginId)
     + "&body=" + encodeURIComponent(body);
-  setRemoveStatus("Abrindo pedido de remoção no GitHub...");
+  setRemoveStatus("Opening the removal request on GitHub...");
   window.open(url, "_blank", "noopener");
 }
 
 function installPlugin(plugin) {
   const bridge = window.NyxoviraAndroidBridge || window.ArchiveInkAndroidBridge;
   if (!hasRequiredPluginIcon(plugin)) {
-    alert("Este plugin não tem icon_url e não pode ser instalado pelo catálogo online.");
+    alert("This plugin does not have icon_url and cannot be installed from the online catalog.");
     return;
   }
   if (!hasRepository(plugin)) {
-    alert("Este plugin não tem repository_url e não pode ser instalado pelo catálogo online.");
+    alert("This plugin does not have repository_url and cannot be installed from the online catalog.");
     return;
   }
   if (!plugin || !bridge || typeof bridge.installOnlinePlugin !== "function") {
-    alert("Abra esta página pelo botão Plugins online dentro do Nyxovira para instalar direto no app.");
+    alert("Open this page from the Online plugins button inside Nyxovira to install directly in the app.");
     return;
   }
   try {
     const result = JSON.parse(bridge.installOnlinePlugin(JSON.stringify(publicPlugin(plugin))) || "{}");
-    alert(result.message || (result.success ? "Plugin instalado." : "Não foi possível instalar o plugin."));
+    alert(result.message || (result.success ? "Plugin installed." : "Could not install the plugin."));
   } catch (error) {
-    alert("Não foi possível instalar o plugin: " + (error && error.message ? error.message : "erro desconhecido"));
+    alert("Could not install the plugin: " + (error && error.message ? error.message : "unknown error"));
   }
 }
 
@@ -344,7 +348,7 @@ repoUrlInput?.addEventListener("keydown", (event) => {
 });
 clearDraftPluginsButton?.addEventListener("click", () => {
   localStorage.removeItem(LOCAL_PLUGIN_KEY);
-  setPublishStatus("Rascunhos removidos deste navegador.");
+  setPublishStatus("Drafts removed from this browser.");
   loadAllPlugins();
 });
 loadAllPlugins();
