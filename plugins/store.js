@@ -1,7 +1,7 @@
 const list = document.getElementById("pluginList");
 const repoUrlInput = document.getElementById("repoUrlInput");
 const loadRepoPluginButton = document.getElementById("loadRepoPluginButton");
-const clearDraftPluginsButton = document.getElementById("clearDraftPluginsButton");
+const discardDraftPluginsButton = document.getElementById("discardDraftPluginsButton");
 const publishStatus = document.getElementById("publishStatus");
 const removePluginIdInput = document.getElementById("removePluginIdInput");
 const removeRepoUrlInput = document.getElementById("removeRepoUrlInput");
@@ -9,11 +9,10 @@ const requestRemovePluginButton = document.getElementById("requestRemovePluginBu
 const removeStatus = document.getElementById("removeStatus");
 const tagFilter = document.getElementById("tagFilter");
 const tagFilterStatus = document.getElementById("tagFilterStatus");
-const clearTagFilterButton = document.getElementById("clearTagFilterButton");
 const viewButtons = Array.from(document.querySelectorAll("[data-view-target]"));
 const viewPanels = Array.from(document.querySelectorAll("[data-view-panel]"));
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
-const CATALOG_VERSION = "20260704-filter-menu";
+const CATALOG_VERSION = "20260704-site-nav";
 const MAX_SELECTED_TAGS = 4;
 let renderedPlugins = [];
 let allPlugins = [];
@@ -171,11 +170,6 @@ function toggleTagFilter(tag) {
   } else if (selectedTags.length < MAX_SELECTED_TAGS) {
     selectedTags = [...selectedTags, clean];
   }
-  applyTagFilters();
-}
-
-function clearTagFilters() {
-  selectedTags = [];
   applyTagFilters();
 }
 
@@ -490,7 +484,6 @@ function installPlugin(plugin) {
 
 loadRepoPluginButton?.addEventListener("click", loadRepoPlugin);
 requestRemovePluginButton?.addEventListener("click", openRemovalRequest);
-clearTagFilterButton?.addEventListener("click", clearTagFilters);
 viewButtons.forEach((button) => {
   button.addEventListener("click", () => setActiveView(button.dataset.viewTarget));
 });
@@ -500,7 +493,7 @@ repoUrlInput?.addEventListener("keydown", (event) => {
     loadRepoPlugin();
   }
 });
-clearDraftPluginsButton?.addEventListener("click", () => {
+discardDraftPluginsButton?.addEventListener("click", () => {
   localStorage.removeItem(LOCAL_PLUGIN_KEY);
   setPublishStatus("Drafts removed from this browser.");
   loadAllPlugins();
