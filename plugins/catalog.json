@@ -2,7 +2,7 @@
   "schema_version": 3,
   "name": "KapiTomo Plugin Hub",
   "description": "Public plugin catalog for installing source plugins in Nyxovira.",
-  "catalog_revision": "20260704-tags-under-catalog",
+  "catalog_revision": "20260704-mobile-card-fit",
   "publish_model": "github-repository",
   "suggested_tags": [
     "portugues",
