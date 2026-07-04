@@ -277,32 +277,34 @@
 
       .plugin-list {
         grid-column: 1 / -1;
+        width: 100%;
         min-width: 0;
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(240px, 280px));
+        grid-template-columns: repeat(auto-fill, minmax(158px, 1fr));
         justify-content: start;
-        gap: 8px;
+        gap: 7px;
       }
 
       .plugin-card {
         min-width: 0;
         max-width: 100%;
-        min-height: 74px;
+        overflow: hidden;
+        min-height: 66px;
         display: grid;
-        grid-template-columns: 34px minmax(0, 1fr);
+        grid-template-columns: 28px minmax(0, 1fr);
         align-items: start;
-        gap: 5px 7px;
+        gap: 4px 6px;
         border-radius: 8px;
-        padding: 7px;
+        padding: 6px;
         background:
           linear-gradient(145deg, rgba(255, 178, 31, 0.055), transparent 44%),
           var(--panel-soft);
       }
 
       .plugin-icon {
-        width: 34px;
-        height: 34px;
-        border-radius: 8px;
+        width: 28px;
+        height: 28px;
+        border-radius: 7px;
         object-fit: cover;
         border: 1px solid var(--line);
         background: #05030b;
@@ -311,6 +313,11 @@
 
       .plugin-copy {
         min-width: 0;
+      }
+
+      .plugin-copy h3 {
+        font-size: 0.82rem;
+        line-height: 1.05;
       }
 
       .plugin-copy h3,
@@ -324,17 +331,17 @@
       .plugin-copy p {
         margin: 2px 0 0;
         color: #a798b6;
-        font-size: 0.72rem;
+        font-size: 0.68rem;
         line-height: 1.22;
       }
 
       .meta {
         min-width: 0;
         display: flex;
-        gap: 6px;
+        gap: 5px;
         margin-top: 2px;
         color: #ad9bc0;
-        font-size: 0.68rem;
+        font-size: 0.6rem;
         font-weight: 800;
       }
 
@@ -346,6 +353,7 @@
       .tag-list {
         grid-column: 1 / -1;
         display: flex;
+        flex-wrap: wrap;
         gap: 3px;
         margin-top: -1px;
         overflow: hidden;
@@ -353,7 +361,7 @@
 
       .tag-list span {
         min-width: 0;
-        max-width: 68px;
+        max-width: 52px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -362,21 +370,24 @@
         padding: 1px 5px;
         color: #120700;
         background: linear-gradient(135deg, #ffc247, #ff9630);
-        font-size: 0.56rem;
+        font-size: 0.52rem;
         font-weight: 850;
       }
 
       .plugin-actions {
         min-width: 0;
         grid-column: 1 / -1;
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
         gap: 5px;
       }
 
       .plugin-actions .button {
-        width: 100%;
+        flex: 1 1 0;
+        width: auto;
         min-width: 0;
+        max-width: 112px;
         overflow: hidden;
         text-overflow: ellipsis;
         min-height: 24px;
@@ -536,27 +547,29 @@
         }
 
         .plugin-list {
-          grid-template-columns: minmax(0, min(100%, 280px));
-          gap: 5px;
+          max-width: none;
+          grid-template-columns: repeat(2, minmax(0, 132px));
+          justify-content: start;
+          gap: 6px;
         }
 
         .plugin-card {
-          width: min(100%, 280px);
+          width: 100%;
           min-height: 72px;
-          grid-template-columns: 30px minmax(0, 1fr);
+          grid-template-columns: 28px minmax(0, 1fr);
           gap: 4px 6px;
           border-radius: 9px;
           padding: 5px;
         }
 
         .plugin-icon {
-          width: 30px;
-          height: 30px;
+          width: 28px;
+          height: 28px;
           border-radius: 7px;
         }
 
         .plugin-copy h3 {
-          font-size: 0.78rem;
+          font-size: 0.7rem;
         }
 
         .plugin-copy p {
@@ -565,7 +578,7 @@
 
         .meta {
           gap: 5px;
-          font-size: 0.58rem;
+          font-size: 0.52rem;
         }
 
         .tag-list {
@@ -574,9 +587,9 @@
         }
 
         .tag-list span {
-          max-width: 52px;
-          padding: 1px 4px;
-          font-size: 0.5rem;
+          max-width: 44px;
+          padding: 1px 3px;
+          font-size: 0.45rem;
         }
 
         .meta span:nth-child(n+3) {
@@ -585,14 +598,16 @@
 
         .plugin-actions {
           grid-column: 1 / -1;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+          display: flex;
           gap: 4px;
         }
 
         .plugin-actions .button {
-          min-height: 23px;
+          flex: 1 1 0;
+          max-width: none;
+          min-height: 22px;
           padding: 0 5px;
-          font-size: 0.62rem;
+          font-size: 0.58rem;
         }
 
         .button-row {
@@ -611,9 +626,13 @@
         }
       }
 
-      @media (max-width: 340px) {
+      @media (max-width: 300px) {
         .plugin-list {
-          grid-template-columns: 1fr;
+          grid-template-columns: minmax(0, 132px);
+        }
+
+        .plugin-actions .button {
+          max-width: 104px;
         }
       }
     </style>
@@ -707,6 +726,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260704-tags-under-catalog"></script>
+    <script src="store.js?v=20260704-mobile-card-fit"></script>
   </body>
 </html>
