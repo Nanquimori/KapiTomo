@@ -2,7 +2,7 @@
   "schema_version": 3,
   "name": "KapiTomo Plugin Hub",
   "description": "Public plugin catalog for installing source plugins in Nyxovira.",
-  "catalog_revision": "20260704-required-tags",
+  "catalog_revision": "20260704-governed-hub",
   "publish_model": "github-repository",
   "suggested_tags": [
     "portuguese",
@@ -28,6 +28,13 @@
       "repository_url": "https://github.com/Nanquimori/KapiTomo",
       "repository_ref": "main",
       "plugin_path": "nyxovira/plugin-api/kapitomo",
+      "hosts": [
+        "nanquimori.github.io"
+      ],
+      "status": "active",
+      "consecutive_failures": 0,
+      "last_error": "",
+      "last_checked_at": "2026-07-04T18:55:00.000Z",
       "tags": [
         "official",
         "english",
@@ -39,7 +46,7 @@
       "id": "nexustoons",
       "name": "NexusToons",
       "description": "Source plugin for downloading works from NexusToons in Nyxovira.",
-      "author": "Testador",
+      "author": "Nanquimori",
       "version": "1.0.7",
       "site_url": "https://nexustoons.com/",
       "homepage": "https://nexustoons.com/",
@@ -47,6 +54,13 @@
       "repository_url": "https://github.com/Nanquimori/NexusToons",
       "repository_ref": "main",
       "plugin_path": "",
+      "hosts": [
+        "nexustoons.com"
+      ],
+      "status": "active",
+      "consecutive_failures": 0,
+      "last_error": "",
+      "last_checked_at": "2026-07-04T18:55:00.000Z",
       "tags": [
         "portuguese",
         "manga",
