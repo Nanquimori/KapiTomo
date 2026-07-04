@@ -25,22 +25,6 @@
         "novel",
         "comic"
       ]
-    },
-    {
-      "id": "nexustoons",
-      "name": "NexusToons",
-      "description": "Source plugin for downloading works from NexusToons in Nyxovira.",
-      "author": "yxz0w0zxy",
-      "version": "1.0.7",
-      "site_url": "https://nexustoons.com/",
-      "homepage": "https://nexustoons.com/",
-      "icon_url": "https://nexustoons.com/icon.png",
-      "repository_url": "https://github.com/yxz0w0zxy/teste_plugin",
-      "repository_ref": "main",
-      "plugin_path": "",
-      "tags": [
-        "community"
-      ]
     }
   ]
 }
