@@ -498,8 +498,10 @@ async function validatePluginHealth(plugin) {
 async function checkPluginHealth() {
   const catalog = loadCatalog();
   let changed = false;
+  const checkedPlugins = [];
   for (const plugin of catalog.plugins) {
     if (["hidden", "removed"].includes(normalizeStatus(plugin.status))) {
+      checkedPlugins.push(plugin);
       continue;
     }
     try {
@@ -516,18 +518,10 @@ async function checkPluginHealth() {
         plugin.hosts = health.hosts;
         changed = true;
       }
+      checkedPlugins.push(plugin);
     } catch (error) {
       if (error.status === 404 || error.status === 410) {
-        const needsMissingUpdate = normalizeStatus(plugin.status) !== "missing"
-          || Number(plugin.consecutive_failures || 0) !== 0
-          || plugin.last_error !== error.message;
-        if (needsMissingUpdate) {
-          plugin.status = "missing";
-          plugin.consecutive_failures = 0;
-          plugin.last_error = error.message;
-          plugin.last_checked_at = nowIso();
-          changed = true;
-        }
+        changed = true;
         continue;
       }
       plugin.consecutive_failures = Number(plugin.consecutive_failures || 0) + 1;
@@ -536,9 +530,11 @@ async function checkPluginHealth() {
       if (plugin.consecutive_failures >= BROKEN_AFTER_FAILURES) {
         plugin.status = "broken";
       }
+      checkedPlugins.push(plugin);
       changed = true;
     }
   }
+  catalog.plugins = checkedPlugins;
   catalog.plugins = sortPlugins(catalog.plugins);
   if (changed && !dryRun) {
     writeCatalogs(catalog);

@@ -113,4 +113,4 @@ Publishing is reviewed:
 4. A maintainer approves valid requests.
 5. The catalog is updated and published to GitHub Pages.
 
-If a source site fails health checks, the plugin appears as `Offline`. If the repository or `plugin.json` disappears, the plugin is hidden from the storefront.
+If a source site fails health checks, the plugin appears as `Offline`. If the repository or `plugin.json` disappears, the plugin is removed from the public catalog.
