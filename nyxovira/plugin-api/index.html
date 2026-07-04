@@ -209,8 +209,14 @@
       }
 
       nav {
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         margin: 16px 0;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+
+      nav::-webkit-scrollbar {
+        display: none;
       }
 
       .grid {
@@ -218,28 +224,6 @@
         grid-template-columns: minmax(0, 1fr);
         gap: 14px;
         align-items: start;
-      }
-
-      .side {
-        position: static;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 7px;
-      }
-
-      .side a {
-        width: auto;
-        min-height: 34px;
-        display: inline-flex;
-        align-items: center;
-        border: 1px solid var(--line);
-        background: rgba(255, 255, 255, 0.04);
-        padding: 7px 10px;
-        color: var(--muted);
-        text-decoration: none;
-        font-weight: 800;
-        font-size: 12px;
-        line-height: 1.15;
       }
 
       .content {
@@ -359,7 +343,6 @@
         .hero,
         nav,
         .grid,
-        .side,
         .content,
         .panel {
           width: 100%;
@@ -457,34 +440,16 @@
 
         nav {
           display: flex;
-          flex-wrap: wrap;
+          flex-wrap: nowrap;
           gap: 6px;
           margin: 10px 0;
-          overflow: hidden;
+          overflow-x: auto;
         }
 
         nav a {
           flex: 0 0 auto;
           width: auto;
           min-width: 0;
-        }
-
-        .side {
-          position: static;
-          display: flex;
-          flex-wrap: wrap;
-          gap: 6px;
-        }
-
-        .side a {
-          width: auto;
-          flex: 0 0 auto;
-          min-height: 30px;
-          display: inline-flex;
-          align-items: center;
-          padding: 6px 8px;
-          font-size: 11px;
-          line-height: 1.15;
         }
 
         .content {
@@ -547,8 +512,7 @@
         }
 
         .button,
-        nav a,
-        .side a {
+        nav a {
           white-space: normal;
         }
       }
@@ -589,24 +553,16 @@
       </section>
 
       <nav aria-label="Documentation sections">
-        <a href="#files">Files</a>
-        <a href="#manifest">Manifest</a>
-        <a href="#mapping">Mapping</a>
-        <a href="#chapter-plan">Chapter plan</a>
-        <a href="#prepare">Preparation</a>
-        <a href="#publishing">Publishing</a>
+        <a href="#files">Addon files</a>
+        <a href="#manifest">plugin.json</a>
+        <a href="#mapping">Routes and fields</a>
+        <a href="#chapter-plan">Instant chapter list</a>
+        <a href="#prepare">Prepare after selection</a>
+        <a href="#formats">Chapter formats</a>
+        <a href="#publishing">Plugin Hub</a>
       </nav>
 
       <main class="grid">
-        <aside class="side" aria-label="API sections">
-          <a href="#files">Addon files</a>
-          <a href="#manifest">plugin.json</a>
-          <a href="#mapping">Routes and fields</a>
-          <a href="#chapter-plan">Instant chapter list</a>
-          <a href="#prepare">Prepare after selection</a>
-          <a href="#publishing">Plugin Hub</a>
-        </aside>
-
         <div class="content">
           <section id="files" class="panel">
             <h2>Addon files</h2>
@@ -712,6 +668,29 @@ return "https://example.com/manga/work/";</code></pre>
   window.__nyxoviraChapterPlan = JSON.stringify(plan);
   return plan;
 };</code></pre>
+          </section>
+
+          <section id="formats" class="panel">
+            <h2>Chapter formats</h2>
+            <p>Use <code>paragraphs</code> for novels and <code>pages</code> for image chapters.</p>
+            <pre><code>{
+  "id": "chapter-1",
+  "title": "Chapter 1",
+  "contentType": "novel",
+  "paragraphs": [
+    "First paragraph.",
+    "Second paragraph."
+  ]
+}</code></pre>
+            <pre><code>{
+  "id": "chapter-1",
+  "title": "Chapter 1",
+  "contentType": "images",
+  "pages": [
+    "https://example.com/page-001.png",
+    "https://example.com/page-002.png"
+  ]
+}</code></pre>
           </section>
 
           <section id="publishing" class="panel">

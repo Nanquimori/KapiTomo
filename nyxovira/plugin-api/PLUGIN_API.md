@@ -71,7 +71,7 @@ Main fields:
 | `parser.adapter` | Source parser type. Use `html_series` for simple sites or JS indexes. |
 | `parser.base_url` | Base URL used to resolve relative links. |
 
-## Manual Route And Field Mapping
+## Routes And Fields
 
 Do not hardcode language support in the app. Put the source mapping in the addon.
 
@@ -139,7 +139,7 @@ return "https://example.com/manga/work-slug/";
 
 Nyxovira shows the chapter list from `window.__nyxoviraChapterPlan` immediately.
 
-## Prepare Pages After Selection
+## Prepare After Selection
 
 For large comics or APIs where each chapter must be loaded separately, do not load every page before the chapter list appears.
 
@@ -210,7 +210,7 @@ Comic chapter:
 }
 ```
 
-## Publishing In The Plugin Hub
+## Plugin Hub
 
 The Plugin Hub installs addons directly from public GitHub repositories.
 
