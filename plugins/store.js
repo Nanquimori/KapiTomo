@@ -12,7 +12,7 @@ const tagFilterStatus = document.getElementById("tagFilterStatus");
 const viewButtons = Array.from(document.querySelectorAll("[data-view-target]"));
 const viewPanels = Array.from(document.querySelectorAll("[data-view-panel]"));
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
-const CATALOG_VERSION = "20260704-no-hero-scale";
+const CATALOG_VERSION = "20260704-plugin-grid";
 const MAX_SELECTED_TAGS = 4;
 let renderedPlugins = [];
 let allPlugins = [];
@@ -147,7 +147,7 @@ function setTagStatus(filteredCount) {
     return;
   }
   if (!selectedTags.length) {
-    tagFilterStatus.textContent = `${allPlugins.length} plugin${allPlugins.length === 1 ? "" : "s"} in the catalog.`;
+    tagFilterStatus.textContent = "";
     return;
   }
   tagFilterStatus.textContent = `${filteredCount} plugin${filteredCount === 1 ? "" : "s"} matching ${selectedTags.join(", ")}.`;
