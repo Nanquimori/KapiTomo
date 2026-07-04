@@ -101,15 +101,15 @@
 
       .button,
       nav a {
-        min-height: 38px;
+        min-height: 34px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         border: 1px solid var(--line);
         background: rgba(255, 255, 255, 0.04);
         color: var(--text);
-        padding: 0 13px;
-        font-size: 13px;
+        padding: 0 10px;
+        font-size: 12px;
         font-weight: 800;
         text-decoration: none;
       }
@@ -201,6 +201,7 @@
         color: var(--accent);
         font-family: var(--font-code);
         align-self: center;
+        transform: translateY(4px);
       }
 
       nav {
@@ -210,7 +211,7 @@
 
       .grid {
         display: grid;
-        grid-template-columns: 250px minmax(0, 1fr);
+        grid-template-columns: 210px minmax(0, 1fr);
         gap: 18px;
         align-items: start;
       }
@@ -218,18 +219,24 @@
       .side {
         position: sticky;
         top: 14px;
-        display: grid;
+        display: flex;
+        flex-wrap: wrap;
         gap: 8px;
       }
 
       .side a {
+        width: auto;
+        min-height: 34px;
+        display: inline-flex;
+        align-items: center;
         border: 1px solid var(--line);
         background: rgba(255, 255, 255, 0.04);
-        padding: 10px 12px;
+        padding: 7px 10px;
         color: var(--muted);
         text-decoration: none;
         font-weight: 800;
-        font-size: 13px;
+        font-size: 12px;
+        line-height: 1.15;
       }
 
       .content {
@@ -324,6 +331,7 @@
         color: #150700;
         font-weight: 950;
         align-self: center;
+        transform: translateY(4px);
       }
 
       @media (max-width: 860px) {
