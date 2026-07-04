@@ -187,7 +187,7 @@
       .quick-row {
         display: grid;
         grid-template-columns: 32px 1fr;
-        gap: 10px;
+        gap: 7px;
         align-items: center;
       }
 
@@ -204,6 +204,10 @@
         transform: translateY(4px);
       }
 
+      .quick-row span {
+        transform: translateY(4px);
+      }
+
       nav {
         flex-wrap: wrap;
         margin: 16px 0;
@@ -211,17 +215,16 @@
 
       .grid {
         display: grid;
-        grid-template-columns: 210px minmax(0, 1fr);
-        gap: 18px;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
         align-items: start;
       }
 
       .side {
-        position: sticky;
-        top: 14px;
+        position: static;
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
+        gap: 7px;
       }
 
       .side a {
@@ -317,8 +320,12 @@
         counter-increment: step;
         display: grid;
         grid-template-columns: 42px minmax(0, 1fr);
-        gap: 14px;
+        gap: 8px;
         align-items: center;
+      }
+
+      .step p {
+        transform: translateY(4px);
       }
 
       .step::before {
@@ -433,12 +440,13 @@
 
         .quick-row {
           grid-template-columns: 28px minmax(0, 1fr);
-          gap: 8px;
+          gap: 5px;
         }
 
         .quick-row span {
           font-size: 12px;
           overflow-wrap: anywhere;
+          transform: translateY(4px);
         }
 
         .quick-row b {
@@ -511,7 +519,7 @@
 
         .step {
           grid-template-columns: 32px minmax(0, 1fr);
-          gap: 10px;
+          gap: 6px;
         }
 
         .step::before {
