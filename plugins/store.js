@@ -42,8 +42,8 @@ function setRemoveStatus(message) {
 
 function fetchCatalog() {
   const urls = [
-    "catalog-store.json?v=20260704-compact-hub",
-    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260704-compact-hub"
+    "catalog-store.json?v=20260704-prune-stale-plugins",
+    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260704-prune-stale-plugins"
   ];
   return urls.reduce((chain, url) => chain.catch(() => fetch(url, { cache: "no-store" })
     .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))), Promise.reject());
@@ -74,6 +74,44 @@ function repositoryLabel(repositoryUrl) {
   } catch {
     return "";
   }
+}
+
+function pluginManifestUrl(plugin) {
+  try {
+    const url = new URL(plugin.repository_url);
+    if (!/^(www\.)?github\.com$/i.test(url.hostname)) {
+      return "";
+    }
+    const [owner, repo] = url.pathname.split("/").filter(Boolean);
+    if (!owner || !repo) {
+      return "";
+    }
+    const pluginPath = normalizePluginPath(plugin.plugin_path);
+    const manifestPath = [pluginPath, "plugin.json"].filter(Boolean).join("/");
+    return `https://raw.githubusercontent.com/${owner}/${repo.replace(/\.git$/i, "")}/${encodeURIComponent(plugin.repository_ref || "main")}/${manifestPath}`;
+  } catch {
+    return "";
+  }
+}
+
+async function hasAvailableRepository(plugin) {
+  const url = pluginManifestUrl(plugin);
+  if (!url) {
+    return false;
+  }
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    return response.status !== 404;
+  } catch {
+    return true;
+  }
+}
+
+async function filterAvailablePlugins(plugins) {
+  const checked = await Promise.all(plugins.map(async (plugin) => (
+    await hasAvailableRepository(plugin) ? plugin : null
+  )));
+  return checked.filter(Boolean);
 }
 
 function uniquePlugins(groups) {
@@ -155,13 +193,20 @@ function loadAllPlugins() {
     .then((catalog) => {
       const catalogPlugins = (Array.isArray(catalog.plugins) ? catalog.plugins : [])
         .filter((plugin) => hasRequiredPluginIcon(plugin) && hasRepository(plugin));
-      const publishedKeys = new Set(catalogPlugins.map(pluginKey));
       const savedDrafts = loadDraftPlugins();
-      const drafts = savedDrafts.filter((plugin) => !publishedKeys.has(pluginKey(plugin)));
-      if (drafts.length !== savedDrafts.length) {
-        saveDraftPlugins(drafts);
-      }
-      renderPlugins(uniquePlugins([catalogPlugins, drafts.map((plugin) => ({ ...plugin, __source: "draft" }))]));
+      const visibleDrafts = savedDrafts.filter((plugin) => !new Set(catalogPlugins.map(pluginKey)).has(pluginKey(plugin)));
+      renderPlugins(uniquePlugins([catalogPlugins, visibleDrafts.map((plugin) => ({ ...plugin, __source: "draft" }))]));
+      return Promise.all([
+        filterAvailablePlugins(catalogPlugins),
+        filterAvailablePlugins(savedDrafts)
+      ]).then(([availableCatalogPlugins, availableDrafts]) => {
+        const publishedKeys = new Set(availableCatalogPlugins.map(pluginKey));
+        const drafts = availableDrafts.filter((plugin) => !publishedKeys.has(pluginKey(plugin)));
+        if (drafts.length !== savedDrafts.length) {
+          saveDraftPlugins(drafts);
+        }
+        renderPlugins(uniquePlugins([availableCatalogPlugins, drafts.map((plugin) => ({ ...plugin, __source: "draft" }))]));
+      });
     })
     .catch((error) => {
       list.innerHTML = `<p>Could not load the catalog: ${escapeHtml(error.message)}</p>`;
@@ -192,10 +237,11 @@ function parseGitHubRepo(rawUrl) {
 }
 
 function normalizePluginPath(rawPath) {
-  return String(rawPath || "")
+  const clean = String(rawPath || "")
     .replace(/\\/g, "/")
     .replace(/^\/+|\/+$/g, "")
     .replace(/\/plugin\.json$/i, "");
+  return clean === "." ? "" : clean;
 }
 
 function resolveUrl(baseUrl, maybeUrl) {

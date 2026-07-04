@@ -3,6 +3,9 @@ name: Plugin Hub
 on:
   issues:
     types: [opened, edited, reopened]
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -14,7 +17,7 @@ concurrency:
 
 jobs:
   update-catalog:
-    if: startsWith(github.event.issue.title, '[plugin]') || startsWith(github.event.issue.title, '[plugin-remover]')
+    if: github.event_name != 'issues' || startsWith(github.event.issue.title, '[plugin]') || startsWith(github.event.issue.title, '[plugin-remove]')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout catalog

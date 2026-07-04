@@ -83,10 +83,11 @@ function normalizePluginPath(value) {
     .replace(/\\/g, "/")
     .replace(/^\/+|\/+$/g, "")
     .replace(/\/plugin\.json$/i, "");
-  if (clean.includes("..")) {
+  const normalized = clean === "." ? "" : clean;
+  if (normalized.includes("..")) {
     throw new Error("Invalid plugin_path.");
   }
-  return clean;
+  return normalized;
 }
 
 function extractJson(body) {
@@ -115,7 +116,9 @@ async function fetchRepositoryManifest(plugin) {
     headers: { "User-Agent": "kapitomo-plugin-hub" }
   });
   if (!response.ok) {
-    throw new Error(`Could not read plugin.json from the repository: HTTP ${response.status}.`);
+    const error = new Error(`Could not read plugin.json from the repository: HTTP ${response.status}.`);
+    error.status = response.status;
+    throw error;
   }
   try {
     return await response.json();
@@ -244,6 +247,36 @@ async function removePlugin(issue) {
   };
 }
 
+async function pruneUnavailablePlugins() {
+  const catalog = loadCatalog();
+  const kept = [];
+  const removed = [];
+  for (const plugin of catalog.plugins) {
+    try {
+      await fetchRepositoryManifest(plugin);
+      kept.push(plugin);
+    } catch (error) {
+      if (error && error.status === 404) {
+        removed.push(plugin);
+      } else {
+        console.warn(`Skipped pruning ${plugin.id || plugin.name}: ${error.message}`);
+        kept.push(plugin);
+      }
+    }
+  }
+  catalog.plugins = sortPlugins(kept);
+  if (removed.length && !dryRun) {
+    writeCatalogs(catalog);
+  }
+  const names = removed.map((plugin) => plugin.name || plugin.id).join(", ");
+  return {
+    title: "Prune unavailable plugins",
+    message: removed.length
+      ? `Removed unavailable plugins from the catalog: ${names}.`
+      : "No unavailable plugins were found."
+  };
+}
+
 function hasStagedChanges(cwd = process.cwd()) {
   try {
     execFileSync("git", ["diff", "--cached", "--quiet"], { cwd });
@@ -276,7 +309,7 @@ function syncPagesBranch(title, issueNumber) {
     if (!hasStagedChanges(tempRoot)) {
       return false;
     }
-    run("git", ["commit", "-m", `${title} on site (#${issueNumber})`], { cwd: tempRoot });
+    run("git", ["commit", "-m", issueNumber ? `${title} on site (#${issueNumber})` : `${title} on site`], { cwd: tempRoot });
     run("git", ["push", "origin", `HEAD:${pagesBranch}`], { cwd: tempRoot });
     return true;
   } finally {
@@ -299,7 +332,7 @@ function commitAndPush(title, issueNumber) {
   if (!hasStagedChanges()) {
     return false;
   }
-  run("git", ["commit", "-m", `${title} (#${issueNumber})`]);
+  run("git", ["commit", "-m", issueNumber ? `${title} (#${issueNumber})` : title]);
   const mainBranch = env.PLUGIN_HUB_MAIN_BRANCH || "main";
   run("git", ["push", "origin", `HEAD:${mainBranch}`]);
   syncPagesBranch(title, issueNumber);
@@ -343,7 +376,10 @@ async function main() {
   const event = readEvent();
   const issue = event.issue;
   if (!issue) {
-    throw new Error("GitHub event has no request.");
+    const result = await pruneUnavailablePlugins();
+    const changed = dryRun ? true : commitAndPush(result.title);
+    console.log(`${result.message}\nStatus: ${changed ? "catalog updated" : "catalog was already up to date"}.`);
+    return;
   }
   const title = String(issue.title || "");
   if (!title.startsWith("[plugin]") && !title.startsWith("[plugin-remove]")) {
