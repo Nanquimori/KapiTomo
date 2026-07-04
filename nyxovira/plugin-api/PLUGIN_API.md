@@ -248,7 +248,14 @@ The catalog entry uses:
 | `plugin_path` | Folder containing `plugin.json`. Use `.` when the manifest is at the repository root. |
 | `hosts` | Domains covered by the plugin. The Hub derives this from `match.hosts`, `browser.home_url`, `site_url`, and `homepage`. A host can only have one visible plugin in the catalog. |
 | `status` | Catalog state. Only `active` appears in the public catalog. `broken`, `hidden`, and `removed` stay in the catalog file for history but do not appear in the public storefront. |
-| `tags` | Required. Use at least 2 public lowercase tags: the first tag must be the language, and the remaining public tags must be content types such as `manga`, `manhua`, `manhwa`, or `novel`. Nyxovira publishes the first 4 public tags and ignores extra ones. |
+| `tags` | Required. Tags are not free-form. Use one official language tag first, then one to three official type tags. The Hub publishes the first 4 valid public tags and ignores unsupported or extra tags. |
+
+Official public tags:
+
+| Group | Allowed tags |
+| --- | --- |
+| Language | `portuguese`, `english` |
+| Type | `manga`, `manhua`, `manhwa`, `novel` |
 
 There is no package URL in the public contract. The repository is the source of the addon.
 
@@ -256,7 +263,7 @@ Publishing flow:
 
 1. Paste the public GitHub repository in the Plugin Hub.
 2. Confirm the generated GitHub request.
-3. Automation validates `plugin.json`, the public icon, tags, repository, and covered hosts.
+3. Automation validates `plugin.json`, the public icon, official tags, repository, and covered hosts.
 4. If another visible plugin already covers the same host, the request is rejected.
 5. A maintainer adds the approval label.
 6. Automation publishes the catalog entry.
@@ -268,7 +275,7 @@ The Hub also runs a light health check every 30 minutes. If a plugin fails valid
 Before publishing:
 
 1. `plugin.json` has a stable `id`, `version`, `match.hosts`, `browser.home_url`, and `browser.icon_url`.
-2. `plugin.json.tags` has language first and at least one content type after it.
+2. `plugin.json.tags` has an official language first and at least one official content type after it.
 3. `browser/download_target.js` returns the current work URL.
 4. The first download click creates a chapter plan immediately.
 5. Large chapters prepare their pages through `window.__nyxoviraPrepareDownloadPlan`.

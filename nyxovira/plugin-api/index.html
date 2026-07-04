@@ -615,8 +615,17 @@ return "https://example.com/manga/work/";</code></pre>
   "status": "active",
   "tags": ["english", "manga", "novel"]
 }</code></pre>
-            <p>Tags are required. Put the language first, then at least one content type. The Hub publishes the first 4 public tags and ignores extra ones.</p>
-            <p>The Hub validates the repository, icon, tags, and covered hosts. A visible host can only have one plugin. Valid requests wait for maintainer approval before publication.</p>
+            <p>Tags are required and are not free-form. Put one official language first, then one to three official content types. The Hub publishes the first 4 valid public tags and ignores unsupported or extra tags.</p>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Group</th><th>Allowed tags</th></tr></thead>
+                <tbody>
+                  <tr><td>Language</td><td><code>portuguese</code>, <code>english</code></td></tr>
+                  <tr><td>Type</td><td><code>manga</code>, <code>manhua</code>, <code>manhwa</code>, <code>novel</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>The Hub validates the repository, icon, official tags, and covered hosts. A visible host can only have one plugin. Valid requests wait for maintainer approval before publication.</p>
             <div class="steps">
               <div class="step"><p>Keep <code>plugin.json</code> and <code>browser/download_target.js</code> in the repository.</p></div>
               <div class="step"><p>Open the Plugin Hub and paste the GitHub repository URL.</p></div>

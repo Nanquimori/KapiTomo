@@ -2,7 +2,7 @@
   "schema_version": 3,
   "name": "KapiTomo Plugin Hub",
   "description": "Public plugin catalog for installing source plugins in Nyxovira.",
-  "catalog_revision": "20260704-governed-hub",
+  "catalog_revision": "20260704-official-tags",
   "publish_model": "github-repository",
   "suggested_tags": [
     "portuguese",
@@ -14,7 +14,20 @@
   ],
   "requirements": {
     "icon_url": "Required. Every online plugin must point to a public icon image.",
-    "repository_url": "Required. Every online plugin must be hosted in a public GitHub repository."
+    "repository_url": "Required. Every online plugin must be hosted in a public GitHub repository.",
+    "tags": "Required. Tags are not free-form. Use one official language tag first, then one to three official type tags."
+  },
+  "official_tags": {
+    "languages": [
+      "portuguese",
+      "english"
+    ],
+    "types": [
+      "manga",
+      "manhua",
+      "manhwa",
+      "novel"
+    ]
   },
   "plugins": [
     {
