@@ -180,6 +180,8 @@ window.__nyxoviraPrepareDownloadPlan = function (context) {
 
 Nyxovira calls this only after the user chooses chapters and confirms the download. This keeps the first download click fast while still downloading every selected page correctly.
 
+The app passes `{ selectedChapterIds, chapterPlan }` to the function. The function may return the final plan object or a JSON string. If it returns nothing, Nyxovira keeps the original chapter plan.
+
 ## Chapter Formats
 
 Novel chapter:
@@ -210,6 +212,8 @@ Comic chapter:
 }
 ```
 
+For image chapters, `pages` is the preferred field. Nyxovira also reads `images` for compatibility.
+
 ## Plugin Hub
 
 The Plugin Hub installs addons directly from public GitHub repositories.
@@ -238,7 +242,7 @@ The catalog entry uses:
 | `repository_url` | Public GitHub repository containing `plugin.json`. |
 | `repository_ref` | Branch or ref to install from. Usually `main`. |
 | `plugin_path` | Folder containing `plugin.json`. Use `.` when the manifest is at the repository root. |
-| `tags` | Short lowercase labels for language and content type, such as `english`, `portuguese`, `spanish`, `manga`, `manhua`, `manhwa`, `novel`, or another source-specific category. |
+| `tags` | Up to 4 public lowercase labels. Use one language tag first, then content tags such as `manga`, `manhua`, `manhwa`, or `novel`. |
 
 There is no package URL in the public contract. The repository is the source of the addon.
 
@@ -251,6 +255,6 @@ Before publishing:
 3. The first download click creates a chapter plan immediately.
 4. Large chapters prepare their pages through `window.__nyxoviraPrepareDownloadPlan`.
 5. Novel chapters use `paragraphs`.
-6. Comic chapters use `pages`.
+6. Comic chapters use `pages`; `images` is accepted for compatibility.
 7. The addon works from a clean public GitHub repository.
 8. The repository is submitted through the online Plugin Hub.
