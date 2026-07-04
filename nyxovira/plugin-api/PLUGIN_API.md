@@ -80,32 +80,32 @@ Example:
 ```js
 var addon = {
   siteBaseUrl: "https://example.com",
-  sourceVariable: "SOURCE_WORKS",
+  sourceVariable: "EXAMPLE_WORK_INDEX",
   sourceRoutes: {
-    work: "work",
-    read: "read"
+    detailsHash: "series",
+    readerHash: "reader"
   },
   nyxoviraRoutes: {
-    series: "manga",
-    chapter: "chapter"
+    publicSeriesPath: "manga",
+    publicChapterPath: "chapter"
   },
   fields: {
-    workId: "id",
-    workTitle: "title",
-    workSummary: "description",
-    workCover: "cover",
-    workChapters: "chapters",
-    chapterTitle: "title",
-    chapterContentType: "contentType",
-    chapterParagraphs: "paragraphs",
-    chapterPages: "pages",
-    chapterImages: "images",
-    imageSource: "src"
+    workId: "slug",
+    workTitle: "name",
+    workSummary: "synopsis",
+    workCover: "cover_url",
+    workChapters: "episodes",
+    chapterTitle: "name",
+    chapterContentType: "format",
+    chapterParagraphs: "text_blocks",
+    chapterPages: "page_urls",
+    chapterImages: "image_list",
+    imageSource: "url"
   }
 };
 ```
 
-This lets a site use its own names while Nyxovira receives one consistent format.
+This lets the site keep its own route and field names while Nyxovira receives one consistent format.
 
 ## Instant Chapter List
 
@@ -229,7 +229,7 @@ The catalog entry uses:
   "repository_url": "https://github.com/user/my-source",
   "repository_ref": "main",
   "plugin_path": ".",
-  "tags": ["portugues", "manga", "novel"]
+  "tags": ["english", "manga", "novel"]
 }
 ```
 
@@ -238,7 +238,7 @@ The catalog entry uses:
 | `repository_url` | Public GitHub repository containing `plugin.json`. |
 | `repository_ref` | Branch or ref to install from. Usually `main`. |
 | `plugin_path` | Folder containing `plugin.json`. Use `.` when the manifest is at the repository root. |
-| `tags` | Short lowercase labels for language and content type, such as `portugues`, `english`, `manga`, `manhua`, `manhwa`, `novel`, or another source-specific category. |
+| `tags` | Short lowercase labels for language and content type, such as `english`, `portuguese`, `spanish`, `manga`, `manhua`, `manhwa`, `novel`, or another source-specific category. |
 
 There is no package URL in the public contract. The repository is the source of the addon.
 
