@@ -149,6 +149,10 @@ function normalizeStatus(value) {
   return ["active", "broken", "hidden", "removed"].includes(status) ? status : "active";
 }
 
+function sameList(a, b) {
+  return JSON.stringify((Array.isArray(a) ? a : []).slice().sort()) === JSON.stringify((Array.isArray(b) ? b : []).slice().sort());
+}
+
 function normalizeTags(value) {
   const rawTags = Array.isArray(value) ? value : ["community"];
   const output = [];
@@ -494,12 +498,18 @@ async function checkPluginHealth() {
     }
     try {
       const health = await validatePluginHealth(plugin);
-      plugin.status = "active";
-      plugin.consecutive_failures = 0;
-      plugin.last_error = "";
-      plugin.last_checked_at = nowIso();
-      plugin.hosts = health.hosts;
-      changed = true;
+      const needsUpdate = normalizeStatus(plugin.status) !== "active"
+        || Number(plugin.consecutive_failures || 0) !== 0
+        || Boolean(plugin.last_error)
+        || !sameList(plugin.hosts, health.hosts);
+      if (needsUpdate) {
+        plugin.status = "active";
+        plugin.consecutive_failures = 0;
+        plugin.last_error = "";
+        plugin.last_checked_at = nowIso();
+        plugin.hosts = health.hosts;
+        changed = true;
+      }
     } catch (error) {
       plugin.consecutive_failures = Number(plugin.consecutive_failures || 0) + 1;
       plugin.last_error = error.message;
