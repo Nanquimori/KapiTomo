@@ -6,6 +6,43 @@ const { execFileSync } = require("child_process");
 const CATALOG_PATHS = ["plugins/catalog-store.json", "plugins/catalog.json"];
 const MAINTAINERS = new Set(["nanquimori"]);
 const MAX_PUBLIC_TAGS = 4;
+const MIN_PUBLIC_TAGS = 2;
+const LANGUAGE_TAGS = new Set([
+  "portugues",
+  "portuguese",
+  "pt",
+  "pt-br",
+  "english",
+  "ingles",
+  "en",
+  "spanish",
+  "espanol",
+  "es",
+  "japanese",
+  "japones",
+  "ja",
+  "korean",
+  "coreano",
+  "ko",
+  "chinese",
+  "chines",
+  "zh"
+]);
+const TYPE_TAGS = new Set([
+  "manga",
+  "manhua",
+  "manhwa",
+  "novel",
+  "comic",
+  "webtoon",
+  "webcomic",
+  "oneshot",
+  "one-shot",
+  "doujinshi",
+  "hentai",
+  "porn",
+  "adult"
+]);
 
 const env = process.env;
 const dryRun = env.PLUGIN_HUB_DRY_RUN === "1";
@@ -112,7 +149,18 @@ function normalizeTags(value) {
     seen.add(tag);
     output.push(tag);
   }
-  return output.length ? output : ["community"];
+  const publicTags = output.filter((tag) => tag !== "official" && tag !== "community");
+  if (publicTags.length < MIN_PUBLIC_TAGS) {
+    throw new Error("tags must include at least 2 public tags: language first, then type.");
+  }
+  if (!LANGUAGE_TAGS.has(publicTags[0])) {
+    throw new Error("the first public tag must be the language, for example english or portuguese.");
+  }
+  const invalidType = publicTags.slice(1).find((tag) => !TYPE_TAGS.has(tag));
+  if (invalidType) {
+    throw new Error(`invalid type tag after language: ${invalidType}.`);
+  }
+  return output;
 }
 
 function extractJson(body) {

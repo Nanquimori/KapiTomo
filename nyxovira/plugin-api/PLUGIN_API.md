@@ -242,7 +242,7 @@ The catalog entry uses:
 | `repository_url` | Public GitHub repository containing `plugin.json`. |
 | `repository_ref` | Branch or ref to install from. Usually `main`. |
 | `plugin_path` | Folder containing `plugin.json`. Use `.` when the manifest is at the repository root. |
-| `tags` | Public lowercase labels. Nyxovira publishes the first 4 public tags and ignores extra ones. Use one language tag first, then content tags such as `manga`, `manhua`, `manhwa`, or `novel`. |
+| `tags` | Required. Use at least 2 public lowercase tags: the first tag must be the language, and the remaining public tags must be content types such as `manga`, `manhua`, `manhwa`, or `novel`. Nyxovira publishes the first 4 public tags and ignores extra ones. |
 
 There is no package URL in the public contract. The repository is the source of the addon.
 
@@ -251,10 +251,11 @@ There is no package URL in the public contract. The repository is the source of 
 Before publishing:
 
 1. `plugin.json` has a stable `id`, `version`, `match.hosts`, `browser.home_url`, and `browser.icon_url`.
-2. `browser/download_target.js` returns the current work URL.
-3. The first download click creates a chapter plan immediately.
-4. Large chapters prepare their pages through `window.__nyxoviraPrepareDownloadPlan`.
-5. Novel chapters use `paragraphs`.
-6. Comic chapters use `pages`; `images` is accepted for compatibility.
-7. The addon works from a clean public GitHub repository.
-8. The repository is submitted through the online Plugin Hub.
+2. `plugin.json.tags` has language first and at least one content type after it.
+3. `browser/download_target.js` returns the current work URL.
+4. The first download click creates a chapter plan immediately.
+5. Large chapters prepare their pages through `window.__nyxoviraPrepareDownloadPlan`.
+6. Novel chapters use `paragraphs`.
+7. Comic chapters use `pages`; `images` is accepted for compatibility.
+8. The addon works from a clean public GitHub repository.
+9. The repository is submitted through the online Plugin Hub.
