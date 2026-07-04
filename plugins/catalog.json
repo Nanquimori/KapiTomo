@@ -2,7 +2,7 @@
   "schema_version": 3,
   "name": "KapiTomo Plugin Hub",
   "description": "Public plugin catalog for installing source plugins in Nyxovira.",
-  "catalog_revision": "20260704-tag-row",
+  "catalog_revision": "20260704-filter-menu",
   "publish_model": "github-repository",
   "suggested_tags": [
     "portugues",
