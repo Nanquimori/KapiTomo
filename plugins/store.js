@@ -13,12 +13,12 @@ const pluginSearchInput = document.getElementById("pluginSearchInput");
 const viewButtons = Array.from(document.querySelectorAll("[data-view-target]"));
 const viewPanels = Array.from(document.querySelectorAll("[data-view-panel]"));
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
-const CATALOG_VERSION = "20260704-expanded-tags";
+const CATALOG_VERSION = "20260704-tags-order";
 const MAX_SELECTED_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
 const OFFICIAL_LANGUAGE_TAGS = [
-  "portuguese",
   "english",
+  "portuguese",
   "spanish",
   "japanese",
   "korean",
@@ -42,8 +42,7 @@ const OFFICIAL_TYPE_TAGS = [
   "doujinshi",
   "yaoi",
   "yuri",
-  "porn",
-  "adult"
+  "porn"
 ];
 const LANGUAGE_TAGS = new Set(OFFICIAL_LANGUAGE_TAGS);
 const TYPE_TAGS = new Set(OFFICIAL_TYPE_TAGS);

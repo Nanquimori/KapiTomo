@@ -10,8 +10,8 @@ const BROKEN_AFTER_FAILURES = 2;
 const MAX_PUBLIC_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
 const OFFICIAL_LANGUAGE_TAGS = [
-  "portuguese",
   "english",
+  "portuguese",
   "spanish",
   "japanese",
   "korean",
@@ -35,8 +35,7 @@ const OFFICIAL_TYPE_TAGS = [
   "doujinshi",
   "yaoi",
   "yuri",
-  "porn",
-  "adult"
+  "porn"
 ];
 const LANGUAGE_TAGS = new Set(OFFICIAL_LANGUAGE_TAGS);
 const TYPE_TAGS = new Set(OFFICIAL_TYPE_TAGS);
