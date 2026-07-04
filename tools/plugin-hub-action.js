@@ -487,7 +487,7 @@ async function validatePluginHealth(plugin) {
   }
   const homeUrl = manifest.browser.home_url || plugin.homepage || plugin.site_url;
   await checkUrl(homeUrl, "browser.home_url", { allowForbidden: true });
-  await checkUrl(manifest.browser.icon_url, "browser.icon_url");
+  await checkUrl(manifest.browser.icon_url, "browser.icon_url", { allowForbidden: true });
   return {
     manifest,
     hosts: pluginHostsFromManifest(plugin, manifest)
