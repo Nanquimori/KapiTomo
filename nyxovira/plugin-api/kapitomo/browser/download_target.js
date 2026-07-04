@@ -4,8 +4,8 @@
       siteBaseUrl: "https://nanquimori.github.io/KapiTomo",
       sourceVariable: "KAPI_TOMO_WORKS",
       sourceRoutes: {
-        work: "work",
-        read: "read"
+        detailsHash: "work",
+        readerHash: "read"
       },
       nyxoviraRoutes: {
         series: "manga",
@@ -107,8 +107,8 @@
       if (publicMatch) return decodeURIComponent(publicMatch[1]);
 
       var hash = String(location.hash || "").replace(/^#\/?/, "");
-      var workPattern = new RegExp("^" + addon.sourceRoutes.work + "\\/([^\\/?#]+)$", "i");
-      var readPattern = new RegExp("^" + addon.sourceRoutes.read + "\\/([^\\/?#]+)(?:\\/[^\\/?#]+)?$", "i");
+      var workPattern = new RegExp("^" + addon.sourceRoutes.detailsHash + "\\/([^\\/?#]+)$", "i");
+      var readPattern = new RegExp("^" + addon.sourceRoutes.readerHash + "\\/([^\\/?#]+)(?:\\/[^\\/?#]+)?$", "i");
       var workMatch = hash.match(workPattern);
       if (workMatch) return decodeURIComponent(workMatch[1]);
       var readMatch = hash.match(readPattern);
