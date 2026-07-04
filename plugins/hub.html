@@ -192,25 +192,24 @@
 
       .plugin-list {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 6px;
       }
 
       .plugin-card {
-        min-height: 72px;
+        min-height: 56px;
         display: grid;
-        grid-template-columns: 34px minmax(0, 1fr);
+        grid-template-columns: 42px minmax(0, 1fr) auto;
         align-items: center;
-        gap: 5px 7px;
+        gap: 8px;
         border-radius: 10px;
-        padding: 6px;
+        padding: 6px 7px;
         background: var(--panel-soft);
       }
 
       .plugin-icon {
-        width: 34px;
-        height: 34px;
-        border-radius: 8px;
+        width: 42px;
+        height: 42px;
+        border-radius: 9px;
         object-fit: cover;
         border: 1px solid var(--line);
         background: #05030b;
@@ -221,10 +220,18 @@
       }
 
       .plugin-copy h3,
+      .plugin-copy p,
       .meta span {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+      }
+
+      .plugin-copy p {
+        margin: 2px 0 0;
+        color: var(--muted);
+        font-size: 0.72rem;
+        line-height: 1.22;
       }
 
       .meta {
@@ -239,21 +246,20 @@
 
       .meta span {
         min-width: 0;
-        max-width: 50%;
+        max-width: 46%;
       }
 
       .plugin-actions {
-        grid-column: 1 / -1;
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        display: flex;
+        align-items: center;
         gap: 5px;
       }
 
       .plugin-actions .button {
-        min-height: 24px;
-        border-radius: 7px;
-        padding: 0 6px;
-        font-size: 0.68rem;
+        min-height: 30px;
+        border-radius: 8px;
+        padding: 0 8px;
+        font-size: 0.72rem;
       }
 
       .forms-grid {
@@ -408,53 +414,52 @@
         }
 
         .plugin-list {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 5px;
         }
 
         .plugin-card {
-          min-height: 66px;
-          grid-template-columns: 30px minmax(0, 1fr);
-          gap: 4px 6px;
+          min-height: 50px;
+          grid-template-columns: 38px minmax(0, 1fr) auto;
+          gap: 7px;
           border-radius: 9px;
-          padding: 5px;
+          padding: 5px 6px;
         }
 
         .plugin-icon {
-          width: 30px;
-          height: 30px;
-          border-radius: 7px;
+          width: 38px;
+          height: 38px;
+          border-radius: 8px;
         }
 
         .plugin-copy h3 {
-          font-size: 0.78rem;
+          font-size: 0.88rem;
+        }
+
+        .plugin-copy p {
+          display: none;
         }
 
         .meta {
           gap: 5px;
-          font-size: 0.58rem;
+          font-size: 0.64rem;
+        }
+
+        .meta span:nth-child(n+3) {
+          display: none;
         }
 
         .plugin-actions {
-          grid-column: 1 / -1;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 4px;
         }
 
         .plugin-actions .button {
-          min-height: 23px;
-          padding: 0 5px;
-          font-size: 0.62rem;
+          min-height: 28px;
+          padding: 0 7px;
+          font-size: 0.67rem;
         }
 
         .forms-grid,
         .button-row {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      @media (max-width: 340px) {
-        .plugin-list {
           grid-template-columns: 1fr;
         }
       }
