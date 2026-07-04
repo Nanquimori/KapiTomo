@@ -42,8 +42,8 @@ function setRemoveStatus(message) {
 
 function fetchCatalog() {
   const urls = [
-    "catalog-store.json?v=20260704-stale-plugin-cleanup",
-    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260704-stale-plugin-cleanup"
+    "catalog-store.json?v=20260704-compact-verified-grid",
+    "https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=20260704-compact-verified-grid"
   ];
   return urls.reduce((chain, url) => chain.catch(() => fetch(url, { cache: "no-store" })
     .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))), Promise.reject());
@@ -66,14 +66,6 @@ function pluginKey(plugin) {
     String(plugin?.repository_ref || ""),
     String(plugin?.plugin_path || "")
   ].join("|");
-}
-
-function repositoryLabel(repositoryUrl) {
-  try {
-    return new URL(repositoryUrl).pathname.replace(/^\//, "");
-  } catch {
-    return "";
-  }
 }
 
 function pluginManifestUrl(plugin) {
@@ -166,12 +158,9 @@ function renderPlugins(plugins) {
         <img class="plugin-icon" src="${escapeHtml(plugin.icon_url)}" alt="">
         <div class="plugin-copy">
           <h3>${escapeHtml(plugin.name || plugin.id || "Plugin")}</h3>
-          <p>${escapeHtml(plugin.description || "")}</p>
           <div class="meta">
             ${plugin.author ? `<span>${escapeHtml(plugin.author)}</span>` : ""}
             ${plugin.version ? `<span>v${escapeHtml(plugin.version)}</span>` : ""}
-            ${plugin.id ? `<span>${escapeHtml(plugin.id)}</span>` : ""}
-            ${plugin.repository_url ? `<span>${escapeHtml(repositoryLabel(plugin.repository_url))}</span>` : ""}
           </div>
         </div>
         <div class="plugin-actions">
@@ -194,7 +183,6 @@ function loadAllPlugins() {
       const catalogPlugins = (Array.isArray(catalog.plugins) ? catalog.plugins : [])
         .filter((plugin) => hasRequiredPluginIcon(plugin) && hasRepository(plugin));
       const savedDrafts = loadDraftPlugins();
-      renderPlugins(uniquePlugins([catalogPlugins]));
       return Promise.all([
         filterAvailablePlugins(catalogPlugins),
         filterAvailablePlugins(savedDrafts)
