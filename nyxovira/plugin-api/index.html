@@ -459,6 +459,19 @@
 
       <main class="grid">
         <div class="content">
+          <section id="contract-map" class="panel">
+            <h2>Contract map</h2>
+            <p>The app stays generic. Source routes, source fields, and download rules live inside the addon.</p>
+            <pre><code>Plugin Hub
+  -> public GitHub repository
+  -> plugin.json
+  -> browser/download_target.js
+  -> window.__nyxoviraChapterPlan
+  -> user selects chapters
+  -> window.__nyxoviraPrepareDownloadPlan
+  -> Nyxovira saves selected chapters offline</code></pre>
+          </section>
+
           <section id="files" class="panel">
             <h2>Addon files</h2>
             <p>Place the manifest and browser script inside one folder named after the source id.</p>
