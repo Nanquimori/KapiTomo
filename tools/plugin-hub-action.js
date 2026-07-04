@@ -103,12 +103,14 @@ function normalizeTags(value) {
     if (!/^[a-z0-9._-]+$/.test(tag)) {
       throw new Error("tags must use lowercase letters, numbers, dots, dashes, or underscores.");
     }
+    if (tag !== "official" && tag !== "community") {
+      const publicCount = output.filter((item) => item !== "official" && item !== "community").length;
+      if (publicCount >= MAX_PUBLIC_TAGS) {
+        continue;
+      }
+    }
     seen.add(tag);
     output.push(tag);
-  }
-  const publicTags = output.filter((tag) => tag !== "official" && tag !== "community");
-  if (publicTags.length > MAX_PUBLIC_TAGS) {
-    throw new Error(`tags can include at most ${MAX_PUBLIC_TAGS} public tags.`);
   }
   return output.length ? output : ["community"];
 }
@@ -180,7 +182,12 @@ async function validateRepositoryPlugin(plugin) {
   if (!manifest.browser || !manifest.browser.icon_url) {
     throw new Error("plugin.json must declare browser.icon_url.");
   }
-  normalizeTags(manifest.tags);
+  const manifestTags = normalizeTags(manifest.tags);
+  const requestTags = plugin.tags.filter((tag) => tag !== "official" && tag !== "community");
+  const repositoryTags = manifestTags.filter((tag) => tag !== "official" && tag !== "community");
+  if (requestTags.join("|") !== repositoryTags.join("|")) {
+    plugin.tags = manifestTags;
+  }
 }
 
 function loadCatalog() {
