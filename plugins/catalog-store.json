@@ -1,23 +1,25 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "name": "KapiTomo Plugin Hub",
-  "description": "Catalogo publico de plugins para instalar fontes no Nyxovira.",
-  "publish_model": "github-hosted-package",
+  "description": "Catálogo público de plugins para instalar fontes no Nyxovira.",
+  "publish_model": "github-repository",
   "requirements": {
-    "icon_url": "Obrigatorio. Todo plugin online precisa apontar para uma imagem publica de icone."
+    "icon_url": "Obrigatório. Todo plugin online precisa apontar para uma imagem pública de ícone.",
+    "repository_url": "Obrigatório. Todo plugin online precisa estar em um repositório público do GitHub."
   },
   "plugins": [
     {
       "id": "kapitomo",
       "name": "KapiTomo",
-      "description": "Fonte oficial para baixar obras e capitulos publicados no KapiTomo.",
+      "description": "Fonte oficial para baixar obras e capítulos publicados no KapiTomo.",
       "author": "Nanquimori",
       "version": "1.0.13",
       "site_url": "https://nanquimori.github.io/KapiTomo/",
       "homepage": "https://nanquimori.github.io/KapiTomo/",
       "icon_url": "https://nanquimori.github.io/KapiTomo/assets/kapitomo-logo.png?v=20260626",
-      "package_url": "https://nanquimori.github.io/KapiTomo/downloads/plugins/kapitomo.zip",
-      "sha256": "4cb16b659212afa09d15e5bb1f2584dd2fa80ca47382f6580659fe178110cbe0",
+      "repository_url": "https://github.com/Nanquimori/KapiTomo",
+      "repository_ref": "main",
+      "plugin_path": "nyxovira/plugin-api/kapitomo",
       "tags": [
         "oficial",
         "novel",

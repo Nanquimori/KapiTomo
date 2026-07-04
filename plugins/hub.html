@@ -7,7 +7,7 @@
     <link rel="canonical" href="https://nanquimori.github.io/KapiTomo/plugins/">
     <meta property="og:site_name" content="KapiTomo">
     <meta property="og:title" content="KapiTomo Plugin Hub">
-    <meta property="og:description" content="Plugins online para o Nyxovira, com pacotes hospedados em GitHub Pages, Releases ou outro servidor publico.">
+    <meta property="og:description" content="Plugins online para o Nyxovira, publicados por repositórios GitHub com plugin.json.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://nanquimori.github.io/KapiTomo/plugins/">
     <meta property="og:image" content="https://nanquimori.github.io/KapiTomo/assets/kapitomo-logo.png">
@@ -394,7 +394,7 @@
       <section class="hero">
         <p class="kicker">Nyxovira</p>
         <h1>Plugin Hub</h1>
-        <p>Um catálogo público para instalar fontes no Nyxovira. O app lê este catálogo direto, baixa o pacote, confere o hash e instala sem abrir navegador externo.</p>
+        <p>Um catálogo público para instalar fontes no Nyxovira. O app lê este catálogo direto, baixa o repositório do plugin e instala sem abrir navegador externo.</p>
       </section>
 
       <section class="panel" style="margin-top: 18px;">
@@ -409,7 +409,7 @@
         <article class="panel">
           <p class="kicker">Publicar</p>
           <h2>Publique um addon pronto</h2>
-          <p>Cole o repositório GitHub que já tem <code>plugin.json</code>. O Hub lê o manifesto, encontra o pacote instalável e cria uma solicitação no GitHub; ao confirmar, o robô valida e publica no catálogo.</p>
+          <p>Cole o repositório GitHub que já tem <code>plugin.json</code>. O Hub lê o manifesto e cria uma solicitação no GitHub; ao confirmar, o robô valida o repositório e publica no catálogo.</p>
           <div class="publish-form">
             <label class="field-label" for="repoUrlInput">Repositório GitHub</label>
             <input id="repoUrlInput" class="text-input" type="url" placeholder="https://github.com/usuario/meu-addon">
@@ -444,7 +444,7 @@
           </article>
           <article>
             <h3>Publique no GitHub</h3>
-            <p>Use a sua própria conta. O pacote do addon não precisa ficar armazenado no KapiTomo.</p>
+            <p>Use a sua própria conta. O addon fica no seu repositório e o KapiTomo publica só a entrada do catálogo.</p>
           </article>
           <article>
             <h3>Adicione ao catálogo</h3>
@@ -453,6 +453,6 @@
         </article>
       </section>
     </main>
-    <script src="store.js?v=20260703-auto-hub5"></script>
+    <script src="store.js?v=20260704-repository-hub"></script>
   </body>
 </html>
