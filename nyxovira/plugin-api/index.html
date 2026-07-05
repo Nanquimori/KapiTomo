@@ -246,6 +246,38 @@
         line-height: 1.8;
       }
 
+      .tag-groups,
+      .rule-list {
+        display: grid;
+        gap: 12px;
+        margin-top: 14px;
+      }
+
+      .tag-group,
+      .rule-list article {
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.035);
+        padding: 12px;
+      }
+
+      .tag-group h3,
+      .rule-list h3 {
+        margin-bottom: 8px;
+      }
+
+      .tag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .tag-list code {
+        display: inline-flex;
+        border: 1px solid rgba(156, 230, 208, 0.24);
+        background: rgba(156, 230, 208, 0.07);
+        padding: 3px 7px;
+      }
+
       .steps {
         counter-reset: step;
         display: grid;
@@ -549,9 +581,9 @@
   coverUrl: "https://example.com/cover.png",
   chapters: [
     {
-      id: "chapter-1",
+      id: "chapter-forest-hunt",
       number: "1",
-      title: "Chapter 1",
+      title: "The Forest Hunt",
       contentType: "novel",
       paragraphs: ["First paragraph.", "Second paragraph."]
     }
@@ -587,8 +619,8 @@ return "https://example.com/manga/work/";</code></pre>
             <h2>Chapter formats</h2>
             <p>Use <code>paragraphs</code> for novels and <code>pages</code> for image chapters. The app also reads <code>images</code> for compatibility.</p>
             <pre><code>{
-  "id": "chapter-1",
-  "title": "Chapter 1",
+  "id": "chapter-forest-hunt",
+  "title": "The Forest Hunt",
   "contentType": "novel",
   "paragraphs": [
     "First paragraph.",
@@ -596,8 +628,8 @@ return "https://example.com/manga/work/";</code></pre>
   ]
 }</code></pre>
             <pre><code>{
-  "id": "chapter-1",
-  "title": "Chapter 1",
+  "id": "chapter-arrival",
+  "title": "Arrival at the Ruins",
   "contentType": "images",
   "pages": [
     "https://example.com/page-001.png",
@@ -626,24 +658,59 @@ return "https://example.com/manga/work/";</code></pre>
   "status": "active",
   "tags": ["english", "manga", "novel"]
 }</code></pre>
-            <p>Tags are required and are not free-form. Put one official language first, then one to three official content types. The Hub publishes the first 4 valid public tags and ignores unsupported or extra tags.</p>
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>Group</th><th>Allowed tags</th></tr></thead>
-                <tbody>
-                  <tr><td>Language</td><td><code>english</code>, <code>portuguese</code>, <code>spanish</code>, <code>japanese</code>, <code>korean</code>, <code>chinese</code>, <code>indonesian</code>, <code>thai</code>, <code>vietnamese</code>, <code>french</code>, <code>german</code>, <code>italian</code>, <code>russian</code>, <code>arabic</code></td></tr>
-                  <tr><td>Type</td><td><code>manga</code>, <code>manhua</code>, <code>manhwa</code>, <code>novel</code>, <code>webtoon</code>, <code>comic</code>, <code>doujinshi</code>, <code>yaoi</code>, <code>yuri</code>, <code>porn</code></td></tr>
-                </tbody>
-              </table>
+            <p>Tags are required. Use one language tag first, then one to three content type tags. Unsupported tags and extra tags are ignored.</p>
+            <div class="tag-groups">
+              <section class="tag-group">
+                <h3>Language tags</h3>
+                <div class="tag-list">
+                  <code>english</code><code>portuguese</code><code>spanish</code><code>japanese</code><code>korean</code><code>chinese</code><code>indonesian</code><code>thai</code><code>vietnamese</code><code>french</code><code>german</code><code>italian</code><code>russian</code><code>arabic</code>
+                </div>
+              </section>
+              <section class="tag-group">
+                <h3>Content type tags</h3>
+                <div class="tag-list">
+                  <code>manga</code><code>manhua</code><code>manhwa</code><code>novel</code><code>webtoon</code><code>comic</code><code>doujinshi</code><code>yaoi</code><code>yuri</code><code>porn</code>
+                </div>
+              </section>
             </div>
-            <p>Use <code>porn</code> only for sources centered on explicit sexual content. The Hub does not use <code>adult</code> because it is too broad and makes filtering less precise.</p>
-            <p>The Hub validates the repository, icon, official tags, and covered hosts. A visible host can only have one plugin. Valid requests wait for maintainer approval before publication. If the repository or plugin.json disappears later, the entry is removed from the public catalog.</p>
+            <p>Use <code>porn</code> only when the site is centered on explicit sexual content.</p>
+            <div class="rule-list">
+              <article>
+                <h3>Review</h3>
+                <p>The Hub checks the repository, icon, official tags, and covered hosts. A visible host can only have one plugin.</p>
+              </article>
+              <article>
+                <h3>Publication</h3>
+                <p>Valid requests wait for maintainer approval before publication.</p>
+              </article>
+              <article>
+                <h3>Removal</h3>
+                <p>If the repository or <code>plugin.json</code> disappears later, the entry is removed from the public catalog.</p>
+              </article>
+            </div>
             <div class="steps">
               <div class="step"><p>Keep <code>plugin.json</code> and <code>browser/download_target.js</code> in the repository.</p></div>
               <div class="step"><p>Open the Plugin Hub and paste the GitHub repository URL.</p></div>
               <div class="step"><p>Confirm the GitHub request. Automation validates it, then a maintainer approves publication.</p></div>
             </div>
-            <p>Status values: <code>active</code> appears as Online, <code>broken</code> appears as Offline, and <code>hidden</code> or <code>removed</code> do not appear in the storefront. The Hub checks plugins every 30 minutes and removes entries whose repository or plugin.json disappears.</p>
+            <div class="rule-list">
+              <article>
+                <h3>Online</h3>
+                <p><code>active</code> means the plugin appears as Online.</p>
+              </article>
+              <article>
+                <h3>Offline</h3>
+                <p><code>broken</code> means the plugin appears as Offline.</p>
+              </article>
+              <article>
+                <h3>Hidden</h3>
+                <p><code>hidden</code> and <code>removed</code> do not appear in the public catalog.</p>
+              </article>
+              <article>
+                <h3>Automatic checks</h3>
+                <p>The Hub checks plugins every 30 minutes and removes entries whose repository or <code>plugin.json</code> disappears.</p>
+              </article>
+            </div>
           </section>
         </div>
       </main>
