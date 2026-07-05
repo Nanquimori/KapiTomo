@@ -1,5 +1,7 @@
 # Nyxovira Plugin API
 
+Portuguese version: [PLUGIN_API.pt-BR.md](PLUGIN_API.pt-BR.md)
+
 This document explains how to create and publish a Nyxovira plugin.
 
 A plugin connects Nyxovira to one reading site. It opens the site, recognizes the work page, shows the chapter list as soon as the user taps download, and prepares only the chapters selected by the user.

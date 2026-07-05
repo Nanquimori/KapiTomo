@@ -73,6 +73,37 @@
         padding: 10px 0 18px;
       }
 
+      .language-switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.035);
+        padding: 4px;
+      }
+
+      .language-button {
+        min-height: 26px;
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        padding: 0 8px;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      .language-button[aria-pressed="true"] {
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        color: #160800;
+      }
+
+      .doc-version[hidden],
+      .localized-download[hidden] {
+        display: none !important;
+      }
+
       .brand {
         display: flex;
         align-items: center;
@@ -356,6 +387,10 @@
           min-width: 0;
         }
 
+        .language-switch {
+          flex: 0 0 auto;
+        }
+
         .grid {
           grid-template-columns: 1fr;
         }
@@ -466,16 +501,22 @@
         <a class="brand" href="../../">
           <img src="../../assets/kapitomo-logo.png" alt="">
           <span>
-            <strong>Nyxovira Plugin API</strong>
-            <span>KapiTomo documentation</span>
+            <strong data-brand-title>Nyxovira Plugin API</strong>
+            <span data-brand-subtitle>KapiTomo documentation</span>
           </span>
         </a>
         <div class="actions">
           <a class="button" href="../../plugins/">Plugin Hub</a>
-          <a class="button primary" href="PLUGIN_API.md" download>Download Markdown</a>
+          <div class="language-switch" aria-label="Documentation language">
+            <button class="language-button" type="button" data-set-lang="en" aria-pressed="true">EN</button>
+            <button class="language-button" type="button" data-set-lang="pt" aria-pressed="false">PT</button>
+          </div>
+          <a class="button primary localized-download" data-download-lang="en" href="PLUGIN_API.md" download>Download Markdown</a>
+          <a class="button primary localized-download" data-download-lang="pt" href="PLUGIN_API.pt-BR.md" download hidden>Baixar Markdown</a>
         </div>
       </header>
 
+      <div class="doc-version" data-lang-view="en">
       <section class="hero">
         <div class="stripe"></div>
         <div class="hero-inner">
@@ -718,6 +759,324 @@ return "https://example.com/manga/work/";</code></pre>
           </section>
         </div>
       </main>
+      </div>
+
+      <div class="doc-version" data-lang-view="pt" hidden>
+      <section class="hero">
+        <div class="stripe"></div>
+        <div class="hero-inner">
+          <div>
+            <h1>Crie plugins para o Nyxovira</h1>
+            <p>
+              Um plugin conecta o Nyxovira a um site de leitura, mostra a lista de capítulos rapidamente e prepara
+              apenas os capítulos escolhidos pelo usuário.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <main class="grid">
+        <div class="content">
+          <section class="panel">
+            <h2>Como um plugin funciona</h2>
+            <div class="steps">
+              <div class="step"><p>O criador publica um repositório GitHub com os arquivos do plugin.</p></div>
+              <div class="step"><p>O Plugin Hub lê <code>plugin.json</code> para mostrar nome, ícone, tags, site e repositório.</p></div>
+              <div class="step"><p>O Nyxovira instala o plugin e executa <code>browser/download_target.js</code> nas páginas compatíveis.</p></div>
+              <div class="step"><p>O script mostra os capítulos imediatamente e prepara textos ou páginas de imagem depois da confirmação do usuário.</p></div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h2>Arquivos do plugin</h2>
+            <p>Coloque o manifesto e o script do navegador em uma pasta com o mesmo nome do id do plugin.</p>
+            <div class="folder">
+              my-plugin/<br>
+              |-- plugin.json<br>
+              `-- browser/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;`-- download_target.js
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Arquivo</th><th>Função</th></tr></thead>
+                <tbody>
+                  <tr><td><code>plugin.json</code></td><td>Define id, versão, host, entrada do navegador, ícone e parser.</td></tr>
+                  <tr><td><code>browser/download_target.js</code></td><td>Executa dentro da página aberta e monta o plano de download da obra.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h2>plugin.json</h2>
+            <p>O manifesto descreve o site e informa ao Nyxovira qual script deve rodar no navegador interno.</p>
+            <pre><code>{
+  "schema_version": 1,
+  "id": "my-plugin",
+  "name": "My Plugin",
+  "version": "1.0.0",
+  "match": { "hosts": ["example.com"] },
+  "browser": {
+    "home_url": "https://example.com/",
+    "icon_url": "https://example.com/icon.png",
+    "icon_mode": "pinned",
+    "short_label": "Source",
+    "download_target_script_file": "browser/download_target.js"
+  },
+  "parser": {
+    "adapter": "html_series",
+    "base_url": "https://example.com"
+  }
+}</code></pre>
+          </section>
+
+          <section class="panel">
+            <h2>Mapeamento do site</h2>
+            <p>Relacione os nomes usados pelo site com os campos que o Nyxovira espera: título, capa, capítulos, texto e imagens.</p>
+            <pre><code>var plugin = {
+  siteBaseUrl: "https://example.com",
+  siteVariable: "EXAMPLE_WORK_INDEX",
+  siteRoutes: {
+    detailsHash: "series",
+    readerHash: "reader"
+  },
+  appRoutes: {
+    publicSeriesPath: "manga",
+    publicChapterPath: "chapter"
+  },
+  fields: {
+    workId: "slug",
+    workTitle: "name",
+    workSummary: "synopsis",
+    workCover: "cover_url",
+    workChapters: "episodes",
+    chapterParagraphs: "text_blocks",
+    chapterPages: "page_urls",
+    imageSource: "url"
+  }
+};</code></pre>
+          </section>
+
+          <section class="panel">
+            <h2>Lista instantânea de capítulos</h2>
+            <p>Quando o usuário toca em baixar, defina <code>window.__nyxoviraChapterPlan</code> imediatamente e retorne a URL canônica da obra.</p>
+            <pre><code>window.__nyxoviraChapterPlan = JSON.stringify({
+  title: "Work title",
+  summary: "Short summary",
+  canonicalUrl: "https://example.com/manga/work/",
+  coverUrl: "https://example.com/cover.png",
+  chapters: [
+    {
+      id: "chapter-forest-hunt",
+      number: "1",
+      title: "The Forest Hunt",
+      contentType: "novel",
+      paragraphs: ["First paragraph.", "Second paragraph."]
+    }
+  ]
+});
+
+return "https://example.com/manga/work/";</code></pre>
+          </section>
+
+          <section class="panel">
+            <h2>Preparar depois da seleção</h2>
+            <p>Para quadrinhos grandes ou APIs, mantenha o primeiro plano leve. Carregue as URLs das páginas somente depois que o usuário confirmar os capítulos escolhidos.</p>
+            <pre><code>window.__nyxoviraPrepareDownloadPlan = function (context) {
+  var selectedIds = Array.isArray(context.selectedChapterIds)
+    ? context.selectedChapterIds
+    : [];
+  var plan = context.chapterPlan;
+
+  plan.chapters.forEach(function (chapter) {
+    if (selectedIds.length > 0 && selectedIds.indexOf(chapter.id) < 0) {
+      return;
+    }
+
+    var payload = getJson(chapter.chapterDataPath);
+    chapter.pages = payload.pages.map(function (page) {
+      return page.imageUrl;
+    });
+    delete chapter.chapterDataPath;
+  });
+
+  window.__nyxoviraChapterPlan = JSON.stringify(plan);
+  return plan;
+};</code></pre>
+            <p>O Nyxovira passa <code>{ selectedChapterIds, chapterPlan }</code>. A função pode retornar o plano final como objeto ou JSON. Se não retornar nada, o app mantém o plano original.</p>
+          </section>
+
+          <section class="panel">
+            <h2>Formatos de capítulo</h2>
+            <p>Use <code>paragraphs</code> para novels e <code>pages</code> para capítulos com imagens. O app também lê <code>images</code> por compatibilidade.</p>
+            <pre><code>{
+  "id": "chapter-forest-hunt",
+  "title": "The Forest Hunt",
+  "contentType": "novel",
+  "paragraphs": [
+    "First paragraph.",
+    "Second paragraph."
+  ]
+}</code></pre>
+            <pre><code>{
+  "id": "chapter-arrival",
+  "title": "Arrival at the Ruins",
+  "contentType": "images",
+  "pages": [
+    "https://example.com/page-001.png",
+    "https://example.com/page-002.png"
+  ]
+}</code></pre>
+          </section>
+
+          <section class="panel">
+            <h2>Publicação</h2>
+            <p>O Plugin Hub instala plugins a partir de repositórios públicos do GitHub. O repositório é a fonte do plugin, e as entradas públicas do catálogo são revisadas antes de aparecerem online.</p>
+            <p>O Plugin Hub é um catálogo, não um host de conteúdo. Criadores de plugins são responsáveis pelo código, mapeamento do site, ícones, metadados, permissões e manutenção. Os sites de origem são responsáveis por suas próprias páginas e conteúdos. O Nyxovira Pro libera recursos do app e não vende obras, páginas, capítulos, traduções ou plugins de terceiros.</p>
+            <pre><code>{
+  "id": "my-plugin",
+  "name": "My Plugin",
+  "author": "Author",
+  "version": "1.0.0",
+  "description": "Site plugin for Nyxovira.",
+  "site_url": "https://example.com/",
+  "homepage": "https://example.com/",
+  "icon_url": "https://example.com/icon.png",
+  "repository_url": "https://github.com/user/my-plugin",
+  "repository_ref": "main",
+  "plugin_path": ".",
+  "hosts": ["example.com"],
+  "status": "active",
+  "tags": ["english", "manga", "novel"]
+}</code></pre>
+            <p>Tags são obrigatórias. Use uma tag de idioma primeiro e depois uma a três tags de tipo de conteúdo. Tags extras ou não suportadas são ignoradas.</p>
+            <div class="tag-groups">
+              <section class="tag-group">
+                <h3>Tags de idioma</h3>
+                <div class="tag-list">
+                  <code>english</code><code>portuguese</code><code>spanish</code><code>japanese</code><code>korean</code><code>chinese</code><code>indonesian</code><code>thai</code><code>vietnamese</code><code>french</code><code>german</code><code>italian</code><code>russian</code><code>arabic</code>
+                </div>
+              </section>
+              <section class="tag-group">
+                <h3>Tags de tipo de conteúdo</h3>
+                <div class="tag-list">
+                  <code>manga</code><code>manhua</code><code>manhwa</code><code>novel</code><code>webtoon</code><code>comic</code><code>doujinshi</code><code>yaoi</code><code>yuri</code><code>porn</code>
+                </div>
+              </section>
+            </div>
+            <div class="rule-list">
+              <article>
+                <h3>Revisão</h3>
+                <p>O Hub verifica repositório, ícone, tags oficiais e hosts cobertos. Um host visível só pode ter um plugin.</p>
+              </article>
+              <article>
+                <h3>Publicação</h3>
+                <p>Solicitações válidas aguardam aprovação do mantenedor antes de serem publicadas.</p>
+              </article>
+              <article>
+                <h3>Remoção</h3>
+                <p>Se o repositório ou o <code>plugin.json</code> desaparecer depois, a entrada é removida do catálogo público.</p>
+              </article>
+            </div>
+            <div class="steps">
+              <div class="step"><p>Mantenha <code>plugin.json</code> e <code>browser/download_target.js</code> no repositório.</p></div>
+              <div class="step"><p>Abra o Plugin Hub e cole a URL do repositório GitHub.</p></div>
+              <div class="step"><p>Confirme a solicitação no GitHub. A automação valida tudo, então um mantenedor aprova a publicação.</p></div>
+            </div>
+            <div class="rule-list">
+              <article>
+                <h3>Online</h3>
+                <p><code>active</code> significa que o plugin aparece como Online.</p>
+              </article>
+              <article>
+                <h3>Offline</h3>
+                <p><code>broken</code> significa que o plugin aparece como Offline.</p>
+              </article>
+              <article>
+                <h3>Oculto</h3>
+                <p><code>hidden</code> e <code>removed</code> não aparecem no catálogo público.</p>
+              </article>
+              <article>
+                <h3>Verificações automáticas</h3>
+                <p>O Hub verifica plugins a cada 30 minutos e remove entradas cujo repositório ou <code>plugin.json</code> desapareceu.</p>
+              </article>
+            </div>
+          </section>
+        </div>
+      </main>
+      </div>
     </div>
+    <script>
+      (function () {
+        var storageKey = "nyxoviraPluginApiLanguage";
+        var supported = { en: true, pt: true };
+
+        function normalizeLanguage(value) {
+          var lang = String(value ? value : "").toLowerCase();
+          if (lang.indexOf("pt") === 0) return "pt";
+          return "en";
+        }
+
+        function readUrlLanguage() {
+          try {
+            var params = new URLSearchParams(window.location.search);
+            var value = params.get("lang");
+            return supported[value] ? value : "";
+          } catch (error) {
+            return "";
+          }
+        }
+
+        function setLanguage(lang, persist) {
+          var next = supported[lang] ? lang : "en";
+          document.documentElement.lang = next === "pt" ? "pt-BR" : "en";
+
+          document.querySelectorAll("[data-lang-view]").forEach(function (node) {
+            node.hidden = node.getAttribute("data-lang-view") !== next;
+          });
+
+          document.querySelectorAll("[data-download-lang]").forEach(function (node) {
+            node.hidden = node.getAttribute("data-download-lang") !== next;
+          });
+
+          document.querySelectorAll("[data-set-lang]").forEach(function (button) {
+            button.setAttribute("aria-pressed", button.getAttribute("data-set-lang") === next ? "true" : "false");
+          });
+
+          var title = document.querySelector("[data-brand-title]");
+          var subtitle = document.querySelector("[data-brand-subtitle]");
+          if (title) title.textContent = next === "pt" ? "API de Plugins Nyxovira" : "Nyxovira Plugin API";
+          if (subtitle) subtitle.textContent = next === "pt" ? "Documentação KapiTomo" : "KapiTomo documentation";
+          document.title = next === "pt" ? "Nyxovira | API de Plugins" : "Nyxovira Plugin API";
+
+          if (persist) {
+            try { window.localStorage.setItem(storageKey, next); } catch (error) {}
+          }
+        }
+
+        var initial = readUrlLanguage();
+        if (!initial) {
+          try {
+            var stored = window.localStorage.getItem(storageKey);
+            initial = stored ? stored : "";
+          } catch (error) {}
+        }
+        if (!initial) {
+          var detected = navigator.language ? navigator.language : "";
+          if (!detected && navigator.languages && navigator.languages.length) {
+            detected = navigator.languages[0];
+          }
+          initial = normalizeLanguage(detected);
+        }
+
+        document.querySelectorAll("[data-set-lang]").forEach(function (button) {
+          button.addEventListener("click", function () {
+            setLanguage(button.getAttribute("data-set-lang"), true);
+          });
+        });
+
+        setLanguage(initial, false);
+      })();
+    </script>
   </body>
 </html>
