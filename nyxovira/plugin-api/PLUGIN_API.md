@@ -125,10 +125,10 @@ window.__nyxoviraChapterPlan = JSON.stringify({
   coverUrl: "https://example.com/cover.png",
   chapters: [
     {
-      id: "chapter-1",
+      id: "chapter-forest-hunt",
       number: "1",
-      title: "Chapter 1",
-      label: "Chapter 1",
+      title: "The Forest Hunt",
+      label: "1 - The Forest Hunt",
       url: "https://example.com/manga/work-slug/chapter/1/",
       contentType: "novel",
       paragraphs: ["First paragraph.", "Second paragraph."]
@@ -155,7 +155,7 @@ Set a lightweight chapter plan first:
 {
   "id": "id:387076",
   "number": "1",
-  "title": "Chapter 1",
+  "title": "Arrival at the Ruins",
   "contentType": "images",
   "url": "https://example.com/read/work/387076",
   "chapterDataPath": "/api/chapter/387076"
@@ -194,8 +194,8 @@ Novel chapter:
 
 ```json
 {
-  "id": "chapter-1",
-  "title": "Chapter 1",
+  "id": "chapter-forest-hunt",
+  "title": "The Forest Hunt",
   "contentType": "novel",
   "paragraphs": [
     "First paragraph.",
@@ -208,8 +208,8 @@ Comic chapter:
 
 ```json
 {
-  "id": "chapter-1",
-  "title": "Chapter 1",
+  "id": "chapter-arrival",
+  "title": "Arrival at the Ruins",
   "contentType": "images",
   "pages": [
     "https://example.com/page-001.png",
@@ -255,17 +255,42 @@ The catalog entry uses:
 | `repository_ref` | Branch or ref to install from. Usually `main`. |
 | `plugin_path` | Folder containing `plugin.json`. Use `.` when the manifest is at the repository root. |
 | `hosts` | Domains covered by the plugin. The Hub derives this from `match.hosts`, `browser.home_url`, `site_url`, and `homepage`. A host can only have one visible plugin in the catalog. |
-| `status` | Catalog state. `active` appears as `Online`, `broken` appears as `Offline`, and `hidden` or `removed` do not appear in the public storefront. |
-| `tags` | Required. Tags are not free-form. Use one official language tag first, then one to three official type tags. The Hub publishes the first 4 valid public tags and ignores unsupported or extra tags. |
+| `status` | Catalog state. See the status values below. |
+| `tags` | Required. Use one language tag first, then one to three content type tags. Unsupported tags and extra tags are ignored. |
 
 Official public tags:
 
-| Group | Allowed tags |
-| --- | --- |
-| Language | `english`, `portuguese`, `spanish`, `japanese`, `korean`, `chinese`, `indonesian`, `thai`, `vietnamese`, `french`, `german`, `italian`, `russian`, `arabic` |
-| Type | `manga`, `manhua`, `manhwa`, `novel`, `webtoon`, `comic`, `doujinshi`, `yaoi`, `yuri`, `porn` |
+Language tags:
 
-Use `porn` only for sources centered on explicit sexual content. The Hub does not use `adult` because it is too broad and makes filtering less precise.
+- `english`
+- `portuguese`
+- `spanish`
+- `japanese`
+- `korean`
+- `chinese`
+- `indonesian`
+- `thai`
+- `vietnamese`
+- `french`
+- `german`
+- `italian`
+- `russian`
+- `arabic`
+
+Content type tags:
+
+- `manga`
+- `manhua`
+- `manhwa`
+- `novel`
+- `webtoon`
+- `comic`
+- `doujinshi`
+- `yaoi`
+- `yuri`
+- `porn`
+
+Use `porn` only when the site is centered on explicit sexual content.
 
 There is no package URL in the public publishing format. The repository is the source of the plugin.
 
@@ -278,7 +303,19 @@ Publishing flow:
 5. A maintainer adds the approval label.
 6. Automation publishes the catalog entry.
 
-The Hub also runs a light health check every 30 minutes. If the source site fails twice in a row, the plugin is marked as `broken` and appears as `Offline`. If the GitHub repository or `plugin.json` disappears, the entry is removed from the public catalog.
+Review rules:
+
+- The Hub checks the repository, icon, official tags, and covered hosts.
+- A visible host can only have one plugin.
+- Valid requests wait for maintainer approval before publication.
+- If the repository or `plugin.json` disappears later, the entry is removed from the public catalog.
+
+Status values:
+
+- `active`: appears as Online.
+- `broken`: appears as Offline.
+- `hidden` and `removed`: do not appear in the public catalog.
+- The Hub checks plugins every 30 minutes and removes entries whose repository or `plugin.json` disappears.
 
 ## Checklist
 
