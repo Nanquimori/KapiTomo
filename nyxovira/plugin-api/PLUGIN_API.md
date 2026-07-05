@@ -166,11 +166,15 @@ Then implement:
 
 ```js
 window.__nyxoviraPrepareDownloadPlan = function (context) {
-  var selectedIds = context.selectedChapterIds || [];
+  var selectedIds = Array.isArray(context.selectedChapterIds)
+    ? context.selectedChapterIds
+    : [];
   var plan = context.chapterPlan;
 
   plan.chapters.forEach(function (chapter) {
-    if (selectedIds.length && selectedIds.indexOf(chapter.id) < 0) return;
+    if (selectedIds.length > 0 && selectedIds.indexOf(chapter.id) < 0) {
+      return;
+    }
 
     var payload = getJson(chapter.chapterDataPath);
     chapter.pages = payload.pages.map(function (page) {
@@ -289,8 +293,6 @@ Content type tags:
 - `yaoi`
 - `yuri`
 - `porn`
-
-Use `porn` only when the site is centered on explicit sexual content.
 
 There is no package URL in the public publishing format. The repository is the source of the plugin.
 
