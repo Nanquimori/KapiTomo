@@ -558,6 +558,8 @@ function openPublishRequest(plugin) {
     "Plugin publication request for the Nyxovira catalog.",
     "After you submit this request, the catalog automation validates the repository. A maintainer approves valid requests before they appear in the public catalog.",
     "",
+    "By submitting this plugin, I confirm that I am responsible for the plugin code, metadata, icon, source mapping, permissions, and maintenance. I understand that KapiTomo lists only the catalog entry, and that third-party content, missing pages, broken downloads, and source-site changes remain the responsibility of the plugin creator and source site.",
+    "",
     "Repository: " + clean.repository_url,
     "",
     "```json",

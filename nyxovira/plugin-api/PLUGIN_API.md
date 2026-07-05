@@ -235,6 +235,8 @@ The Plugin Hub installs addons directly from public GitHub repositories.
 
 The public catalog is reviewed. A publication request is validated automatically, but it only appears online after a maintainer approves it. This prevents duplicate plugins for the same site and avoids filling the catalog with sources that do not work.
 
+The Plugin Hub is a catalog, not a content host. The plugin creator is responsible for the plugin code, source mapping, icon, metadata, permissions, and maintenance. Source sites are responsible for their own pages and content. Nyxovira Pro unlocks app features and does not sell third-party works, pages, chapters, translations, or plugins.
+
 The catalog entry uses:
 
 ```json
@@ -301,3 +303,4 @@ Before publishing:
 8. The addon works from a clean public GitHub repository.
 9. No visible plugin in the public catalog already covers the same source host.
 10. The repository is submitted through the online Plugin Hub.
+11. The creator accepts responsibility for the plugin and does not present unauthorized third-party content as KapiTomo or Nyxovira content.
