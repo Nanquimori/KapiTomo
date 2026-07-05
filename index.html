@@ -34,7 +34,7 @@
     <link rel="icon" type="image/png" href="assets/kapitomo-logo.png?v=20260625">
     <link rel="apple-touch-icon" href="assets/kapitomo-logo.png?v=20260625">
     <link rel="manifest" href="site.webmanifest?v=20260704-site-en">
-    <link rel="stylesheet" href="styles.css?v=20260705-terms">
+    <link rel="stylesheet" href="styles.css?v=20260705-bilingual-site">
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -61,22 +61,26 @@
         <img class="brand-mark" src="assets/kapitomo-logo.png" alt="" aria-hidden="true">
         <span>KapiTomo</span>
       </a>
+      <div class="language-switch" aria-label="Language">
+        <button class="language-button" type="button" data-language-option="en" aria-pressed="true">EN</button>
+        <button class="language-button" type="button" data-language-option="pt" aria-pressed="false">PT</button>
+      </div>
     </header>
 
     <main id="top">
       <section class="toolbar-band" aria-label="Library controls">
         <div class="toolbar">
           <label class="search-field">
-            <span>Search</span>
-            <input id="searchInput" type="search" placeholder="Search works...">
+            <span data-i18n="search.label">Search</span>
+            <input id="searchInput" type="search" placeholder="Search works..." data-i18n-placeholder="search.worksPlaceholder">
           </label>
         </div>
       </section>
 
       <section class="section" id="library" aria-labelledby="library-title">
         <div class="section-heading">
-          <p class="eyebrow">Works</p>
-          <h2 id="library-title">Works</h2>
+          <p class="eyebrow" data-i18n="library.eyebrow">Works</p>
+          <h2 id="library-title" data-i18n="library.title">Works</h2>
         </div>
         <div class="crawler-links" aria-label="KapiTomo work links">
           <a href="#work/world-without-humans">The World Without Humans on KapiTomo</a>
@@ -94,21 +98,21 @@
       <section class="section plugin-band" id="plugin" aria-labelledby="plugin-title">
         <div class="section-heading">
           <p class="eyebrow">Nyxovira</p>
-          <h2 id="plugin-title">KapiTomo Plugin</h2>
+          <h2 id="plugin-title" data-i18n="plugin.title">KapiTomo Plugin</h2>
         </div>
-        <p class="section-note">
+        <p class="section-note" data-i18n="plugin.note">
           Online plugins are source connectors. Community or third-party plugins are maintained by their creators
           and by the source sites they target. Nyxovira Pro unlocks app features; it is not a sale of third-party
           works, chapters, translations, or plugins.
         </p>
         <div class="official-links">
-          <a class="official-link primary-link" href="plugins/">
+          <a class="official-link primary-link" href="plugins/" data-i18n="plugin.openPlugins">
             Open online plugins
           </a>
-          <a class="official-link" href="nyxovira/plugin-api/">
+          <a class="official-link" href="nyxovira/plugin-api/" data-i18n="plugin.openDocs">
             Open API documentation
           </a>
-          <a class="official-link" href="terms/">
+          <a class="official-link" href="terms/" data-i18n="plugin.terms">
             Terms and content policy
           </a>
         </div>
@@ -116,24 +120,24 @@
 
       <section class="section publish-band" id="about" aria-labelledby="about-title">
         <div class="section-heading">
-          <p class="eyebrow">About KapiTomo</p>
-          <h2 id="about-title">A library for readers</h2>
+          <p class="eyebrow" data-i18n="about.eyebrow">About KapiTomo</p>
+          <h2 id="about-title" data-i18n="about.title">A library for readers</h2>
         </div>
         <div class="steps">
           <article>
             <strong>1</strong>
-            <h3>Official works</h3>
-            <p>This site gathers official KapiTomo works for free reading in a simple, accessible space.</p>
+            <h3 data-i18n="about.step1.title">Official works</h3>
+            <p data-i18n="about.step1.text">This site gathers official KapiTomo works for free reading in a simple, accessible space.</p>
           </article>
           <article>
             <strong>2</strong>
-            <h3>Free reading</h3>
-            <p>You can read online whenever you want and come back later to continue.</p>
+            <h3 data-i18n="about.step2.title">Free reading</h3>
+            <p data-i18n="about.step2.text">You can read online whenever you want and come back later to continue.</p>
           </article>
           <article>
             <strong>3</strong>
-            <h3>Keep following</h3>
-            <p>Chapters stay organized for online reading, with quick access to published works.</p>
+            <h3 data-i18n="about.step3.title">Keep following</h3>
+            <p data-i18n="about.step3.text">Chapters stay organized for online reading, with quick access to published works.</p>
           </article>
         </div>
       </section>
@@ -147,7 +151,7 @@
         <div class="manga-layout">
           <img class="manga-cover" alt="">
           <div class="manga-info">
-            <a class="back-link" href="#library">Back to works</a>
+            <a class="back-link" href="#library" data-i18n="work.back">Back to works</a>
             <p class="eyebrow manga-genre"></p>
             <h1></h1>
             <div class="manga-badges"></div>
@@ -161,15 +165,15 @@
           <section class="chapter-list-wrap">
             <div class="chapter-list-heading">
               <div>
-                <p class="eyebrow">Chapters</p>
-                <h2>Reading list</h2>
+                <p class="eyebrow" data-i18n="work.chapters">Chapters</p>
+                <h2 data-i18n="work.readingList">Reading list</h2>
               </div>
               <span class="chapter-count"></span>
             </div>
             <div class="chapter-control-panel">
               <label class="chapter-search-field">
-                <span>Search</span>
-                <input class="chapter-search-input" type="search" placeholder="Search chapter...">
+                <span data-i18n="search.label">Search</span>
+                <input class="chapter-search-input" type="search" placeholder="Search chapter..." data-i18n-placeholder="search.chapterPlaceholder">
               </label>
               <button class="chapter-control-button chapter-sort-toggle" type="button" data-chapter-sort-toggle>Start</button>
             </div>
@@ -182,7 +186,7 @@
     <template id="chapterTemplate">
       <article class="chapter-page">
         <header class="chapter-header">
-          <a class="back-link" href="#">Back to work</a>
+          <a class="back-link" href="#" data-i18n="chapter.back">Back to work</a>
           <p class="eyebrow"></p>
           <h1></h1>
           <div class="chapter-tools"></div>
@@ -193,17 +197,17 @@
     </template>
 
     <footer class="site-footer">
-      <p>KapiTomo is an official space for publishing and reading free original works.</p>
-      <p class="footer-policy-title">Policies</p>
-      <nav class="footer-policy-links" aria-label="Policies">
-        <a href="https://nanquimori.github.io/KapiTomo/terms/index.html">Terms</a>
-        <a href="https://nanquimori.github.io/KapiTomo/privacy/index.html">KapiTomo Privacy</a>
-        <a href="https://nanquimori.github.io/KapiTomo/nyxovira/privacy/index.html">Nyxovira Privacy</a>
-        <a href="https://nanquimori.github.io/KapiTomo/nyxalira/privacy/index.html">Nyxalira Privacy</a>
+      <p data-i18n="footer.text">KapiTomo is an official space for publishing and reading free original works.</p>
+      <p class="footer-policy-title" data-i18n="footer.policies">Policies</p>
+      <nav class="footer-policy-links" aria-label="Policies" data-i18n-aria="footer.policies">
+        <a href="https://nanquimori.github.io/KapiTomo/terms/index.html" data-i18n="footer.terms">Terms</a>
+        <a href="https://nanquimori.github.io/KapiTomo/privacy/index.html" data-i18n="footer.kapitomoPrivacy">KapiTomo Privacy</a>
+        <a href="https://nanquimori.github.io/KapiTomo/nyxovira/privacy/index.html" data-i18n="footer.nyxoviraPrivacy">Nyxovira Privacy</a>
+        <a href="https://nanquimori.github.io/KapiTomo/nyxalira/privacy/index.html" data-i18n="footer.nyxaliraPrivacy">Nyxalira Privacy</a>
       </nav>
     </footer>
 
     <script src="data/works.js?v=20260616"></script>
-    <script src="app.js?v=20260704-site-en"></script>
+    <script src="app.js?v=20260705-bilingual-site"></script>
   </body>
 </html>
