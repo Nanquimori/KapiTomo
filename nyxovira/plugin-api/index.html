@@ -1008,7 +1008,7 @@ return "https://example.com/manga/work/";</code></pre>
     </div>
     <script>
       (function () {
-        var storageKey = "nyxoviraPluginApiLanguage";
+        var storageKey = "nyxoviraPluginApiLanguageV2";
         var supported = { en: true, pt: true };
 
         function normalizeLanguage(value) {
@@ -1017,11 +1017,39 @@ return "https://example.com/manga/work/";</code></pre>
           return "en";
         }
 
+        function detectLanguage() {
+          var candidates = [];
+          if (navigator.languages && navigator.languages.length) {
+            candidates = candidates.concat(Array.prototype.slice.call(navigator.languages));
+          }
+          if (navigator.language) {
+            candidates.push(navigator.language);
+          }
+
+          try {
+            var locale = Intl.DateTimeFormat().resolvedOptions().locale;
+            if (locale) candidates.push(locale);
+          } catch (error) {}
+
+          for (var i = 0; i < candidates.length; i += 1) {
+            if (normalizeLanguage(candidates[i]) === "pt") return "pt";
+          }
+
+          try {
+            var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            if (/Sao_Paulo|Lisbon|Madeira|Azores|Luanda|Maputo|Bissau|Cape_Verde/i.test(String(timeZone))) {
+              return "pt";
+            }
+          } catch (error) {}
+
+          return "en";
+        }
+
         function readUrlLanguage() {
           try {
             var params = new URLSearchParams(window.location.search);
             var value = params.get("lang");
-            return supported[value] ? value : "";
+            return value ? normalizeLanguage(value) : "";
           } catch (error) {
             return "";
           }
@@ -1062,11 +1090,7 @@ return "https://example.com/manga/work/";</code></pre>
           } catch (error) {}
         }
         if (!initial) {
-          var detected = navigator.language ? navigator.language : "";
-          if (!detected && navigator.languages && navigator.languages.length) {
-            detected = navigator.languages[0];
-          }
-          initial = normalizeLanguage(detected);
+          initial = detectLanguage();
         }
 
         document.querySelectorAll("[data-set-lang]").forEach(function (button) {
