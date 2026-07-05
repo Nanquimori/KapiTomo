@@ -1,6 +1,6 @@
 # KapiTomo
 
-KapiTomo is the official site for publishing original works and serving clean data to Nyxalira, Nyxovira, and source plugins.
+KapiTomo is the official site for publishing original works and serving clean data to Nyxalira, Nyxovira, and site plugins.
 
 Website: https://nanquimori.github.io/KapiTomo/
 Plugin Hub: https://nanquimori.github.io/KapiTomo/plugins/
@@ -98,7 +98,7 @@ New integrations should use `api/works/index.json`.
 
 ## Plugin Hub
 
-The Plugin Hub installs source plugins from public GitHub repositories. A plugin repository must contain `plugin.json` and `browser/download_target.js`.
+The Plugin Hub installs site plugins from GitHub repositories. A plugin repository must contain `plugin.json` and `browser/download_target.js`.
 
 KapiTomo publishes catalog entries, not third-party works. Community plugins, third-party source sites, missing pages, broken downloads, repository availability, and source permissions are the responsibility of the plugin creator and source site. Nyxovira Pro pays for app features and maintenance; it is not a sale of third-party chapters, pages, translations, plugins, manga, comics, or novels.
 

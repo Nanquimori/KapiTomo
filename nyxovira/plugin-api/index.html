@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Nyxovira Plugin API</title>
-    <meta name="description" content="Online documentation for creating Nyxovira source addons.">
+    <meta name="description" content="Online documentation for creating Nyxovira plugins.">
     <link rel="icon" type="image/png" href="../../assets/kapitomo-logo.png?v=20260704-plugin-api-en">
     <link rel="apple-touch-icon" href="../../assets/kapitomo-logo.png?v=20260704-plugin-api-en">
     <style>
@@ -448,10 +448,10 @@
         <div class="stripe"></div>
         <div class="hero-inner">
           <div>
-            <h1>Create source addons for Nyxovira</h1>
+            <h1>Create plugins for Nyxovira</h1>
             <p>
-              A source addon teaches Nyxovira how to open a reading site, detect an open work, show chapters
-              immediately, and prepare selected chapters for offline download.
+              A plugin connects Nyxovira to a reading site, shows the chapter list quickly, and prepares only the
+              chapters selected by the user.
             </p>
           </div>
         </div>
@@ -459,24 +459,21 @@
 
       <main class="grid">
         <div class="content">
-          <section id="contract-map" class="panel">
-            <h2>Contract map</h2>
-            <p>The app stays generic. Source routes, source fields, and download rules live inside the addon.</p>
-            <pre><code>Plugin Hub
-  -> public GitHub repository
-  -> plugin.json
-  -> browser/download_target.js
-  -> window.__nyxoviraChapterPlan
-  -> user selects chapters
-  -> window.__nyxoviraPrepareDownloadPlan
-  -> Nyxovira saves selected chapters offline</code></pre>
+          <section id="overview" class="panel">
+            <h2>How a plugin works</h2>
+            <div class="steps">
+              <div class="step"><p>The creator publishes a GitHub repository with the plugin files.</p></div>
+              <div class="step"><p>The Plugin Hub reads <code>plugin.json</code> to show the name, icon, tags, site, and repository.</p></div>
+              <div class="step"><p>Nyxovira installs the plugin and runs <code>browser/download_target.js</code> on supported pages.</p></div>
+              <div class="step"><p>The script shows chapters immediately, then prepares the selected text or image pages after the user confirms.</p></div>
+            </div>
           </section>
 
           <section id="files" class="panel">
-            <h2>Addon files</h2>
-            <p>Place the manifest and browser script inside one folder named after the source id.</p>
+            <h2>Plugin files</h2>
+            <p>Place the manifest and browser script inside one folder named after the plugin id.</p>
             <div class="folder">
-              my-source/<br>
+              my-plugin/<br>
               |-- plugin.json<br>
               `-- browser/<br>
               &nbsp;&nbsp;&nbsp;&nbsp;`-- download_target.js
@@ -485,7 +482,7 @@
               <table>
                 <thead><tr><th>File</th><th>Purpose</th></tr></thead>
                 <tbody>
-                  <tr><td><code>plugin.json</code></td><td>Defines the addon id, version, host, browser entry, icon, and parser.</td></tr>
+                  <tr><td><code>plugin.json</code></td><td>Defines the plugin id, version, host, browser entry, icon, and parser.</td></tr>
                   <tr><td><code>browser/download_target.js</code></td><td>Runs inside the open page and builds the work download plan.</td></tr>
                 </tbody>
               </table>
@@ -494,11 +491,11 @@
 
           <section id="manifest" class="panel">
             <h2>plugin.json</h2>
-            <p>The manifest describes the source and tells Nyxovira which browser script to run.</p>
+            <p>The manifest describes the site and tells Nyxovira which browser script to run.</p>
             <pre><code>{
   "schema_version": 1,
-  "id": "my-source",
-  "name": "My Source",
+  "id": "my-plugin",
+  "name": "My Plugin",
   "version": "1.0.0",
   "match": { "hosts": ["example.com"] },
   "browser": {
@@ -516,16 +513,16 @@
           </section>
 
           <section id="mapping" class="panel">
-            <h2>Manual mapping</h2>
-            <p>Keep language and site-specific names inside the addon. The app receives one consistent Nyxovira format.</p>
-            <pre><code>var addon = {
+            <h2>Site mapping</h2>
+            <p>Map the site's names to the fields Nyxovira expects: title, cover, chapters, text, and page images.</p>
+            <pre><code>var plugin = {
   siteBaseUrl: "https://example.com",
-  sourceVariable: "EXAMPLE_WORK_INDEX",
-  sourceRoutes: {
+  siteVariable: "EXAMPLE_WORK_INDEX",
+  siteRoutes: {
     detailsHash: "series",
     readerHash: "reader"
   },
-  nyxoviraRoutes: {
+  appRoutes: {
     publicSeriesPath: "manga",
     publicChapterPath: "chapter"
   },
@@ -611,18 +608,18 @@ return "https://example.com/manga/work/";</code></pre>
 
           <section id="publishing" class="panel">
             <h2>Publishing</h2>
-            <p>The Plugin Hub installs addons from public GitHub repositories. The repository is the addon source, and public catalog entries are reviewed before they appear online.</p>
-            <p>The Plugin Hub is a catalog, not a content host. Plugin creators are responsible for their code, source mapping, icons, metadata, permissions, and maintenance. Source sites are responsible for their own pages and content. Nyxovira Pro unlocks app features and does not sell third-party works, pages, chapters, translations, or plugins.</p>
+            <p>The Plugin Hub installs plugins from public GitHub repositories. The repository is the plugin source, and public catalog entries are reviewed before they appear online.</p>
+            <p>The Plugin Hub is a catalog, not a content host. Plugin creators are responsible for their code, site mapping, icons, metadata, permissions, and maintenance. Source sites are responsible for their own pages and content. Nyxovira Pro unlocks app features and does not sell third-party works, pages, chapters, translations, or plugins.</p>
             <pre><code>{
-  "id": "my-source",
-  "name": "My Source",
+  "id": "my-plugin",
+  "name": "My Plugin",
   "author": "Author",
   "version": "1.0.0",
-  "description": "Source plugin for Nyxovira.",
+  "description": "Site plugin for Nyxovira.",
   "site_url": "https://example.com/",
   "homepage": "https://example.com/",
   "icon_url": "https://example.com/icon.png",
-  "repository_url": "https://github.com/user/my-source",
+  "repository_url": "https://github.com/user/my-plugin",
   "repository_ref": "main",
   "plugin_path": ".",
   "hosts": ["example.com"],

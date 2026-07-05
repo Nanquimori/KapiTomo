@@ -526,7 +526,7 @@ async function loadRepoPlugin() {
     const plugin = {
       id: manifest.id || repo.repo,
       name: manifest.name || manifest.id || repo.repo,
-      description: manifest.description || `Source plugin for downloading works from ${manifest.name || repo.repo} in Nyxovira.`,
+      description: manifest.description || `Site plugin for downloading works from ${manifest.name || repo.repo} in Nyxovira.`,
       author: manifest.author || repo.owner,
       version: manifest.version || "1.0.0",
       site_url: browser.home_url || repositoryUrl + "/",
@@ -539,11 +539,11 @@ async function loadRepoPlugin() {
       __source: "draft"
     };
     saveDraftPlugin(plugin);
-    setPublishStatus("Addon loaded. Confirm the GitHub request and the catalog automation will validate the repository before publishing.");
+    setPublishStatus("Plugin loaded. Confirm the GitHub request and the catalog automation will validate the repository before publishing.");
     loadAllPlugins();
     setActiveView("catalog");
   } catch (error) {
-    setPublishStatus(error?.message || "Could not load the addon.");
+    setPublishStatus(error?.message || "Could not load the plugin.");
   }
 }
 
@@ -558,7 +558,7 @@ function openPublishRequest(plugin) {
     "Plugin publication request for the Nyxovira catalog.",
     "After you submit this request, the catalog automation validates the repository. A maintainer approves valid requests before they appear in the public catalog.",
     "",
-    "By submitting this plugin, I confirm that I am responsible for the plugin code, metadata, icon, source mapping, permissions, and maintenance. I understand that KapiTomo lists only the catalog entry, and that third-party content, missing pages, broken downloads, and source-site changes remain the responsibility of the plugin creator and source site.",
+    "By submitting this plugin, I confirm that I am responsible for the plugin code, metadata, icon, site mapping, permissions, and maintenance. I understand that KapiTomo lists only the catalog entry, and that third-party content, missing pages, broken downloads, and source-site changes remain the responsibility of the plugin creator and source site.",
     "",
     "Repository: " + clean.repository_url,
     "",
