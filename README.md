@@ -25,6 +25,8 @@ Privacy Policy: https://nanquimori.github.io/KapiTomo/privacy/index.html
 |-- terms/
 |-- nyxovira/
 |   |-- plugin-api/
+|   |   |-- PLUGIN_API.md
+|   |   `-- PLUGIN_API.pt-BR.md
 |   `-- privacy/
 |-- nyxalira/
 |   `-- privacy/
