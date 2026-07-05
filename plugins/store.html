@@ -73,6 +73,34 @@
         margin-bottom: 5px;
       }
 
+      .language-switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.04);
+        padding: 3px;
+      }
+
+      .language-button {
+        min-height: 22px;
+        border: 0;
+        border-radius: 6px;
+        background: transparent;
+        color: var(--muted);
+        padding: 0 7px;
+        font: inherit;
+        font-size: 0.66rem;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      .language-button[aria-pressed="true"] {
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        color: #170700;
+      }
+
       .brand {
         min-width: 0;
         flex: 0 0 auto;
@@ -735,74 +763,78 @@
           <span>KapiTomo</span>
         </div>
         <nav class="hub-menu" aria-label="Plugin Hub sections">
-          <button class="menu-tab is-active" type="button" data-view-target="catalog">Catalog</button>
-          <button class="menu-tab" type="button" data-view-target="publish">Publish</button>
-          <button class="menu-tab" type="button" data-view-target="remove">Remove</button>
-          <a class="menu-tab" href="../nyxovira/plugin-api/">Plugin API</a>
-          <a class="menu-tab" href="../terms/">Terms</a>
+          <button class="menu-tab is-active" type="button" data-view-target="catalog" data-i18n="nav.catalog">Catalog</button>
+          <button class="menu-tab" type="button" data-view-target="publish" data-i18n="nav.publish">Publish</button>
+          <button class="menu-tab" type="button" data-view-target="remove" data-i18n="nav.remove">Remove</button>
+          <a class="menu-tab" href="../nyxovira/plugin-api/" data-i18n="nav.api">Plugin API</a>
+          <a class="menu-tab" href="../terms/" data-i18n="nav.terms">Terms</a>
+          <div class="language-switch" aria-label="Language">
+            <button class="language-button" type="button" data-language-option="en" aria-pressed="true">EN</button>
+            <button class="language-button" type="button" data-language-option="pt" aria-pressed="false">PT</button>
+          </div>
         </nav>
       </header>
 
       <section id="catalogPanel" class="panel catalog-panel view-panel" data-view-panel="catalog">
         <div class="panel-head">
           <div>
-            <p class="kicker">Catalog</p>
-            <h2>Published plugins</h2>
+            <p class="kicker" data-i18n="catalog.kicker">Catalog</p>
+            <h2 data-i18n="catalog.title">Published plugins</h2>
           </div>
         </div>
         <div class="catalog-tools">
-          <input id="pluginSearchInput" class="text-input catalog-search" type="search" placeholder="Search plugins" aria-label="Search plugins">
-          <p class="catalog-notice">
+          <input id="pluginSearchInput" class="text-input catalog-search" type="search" placeholder="Search plugins" aria-label="Search plugins" data-i18n-placeholder="catalog.search" data-i18n-aria="catalog.search">
+          <p class="catalog-notice" data-i18n="catalog.notice">
             Plugins are community source connectors. Plugin creators and source sites are responsible for their own
             content, permissions, pages, and download behavior. Nyxovira Pro pays for app features, not third-party works.
           </p>
           <div class="filter-head">
             <div>
-              <p class="kicker">Categories</p>
+              <p class="kicker" data-i18n="catalog.categories">Categories</p>
             </div>
           </div>
-          <div id="tagFilter" class="tag-filter" aria-label="Catalog tag filters"></div>
+          <div id="tagFilter" class="tag-filter" aria-label="Catalog tag filters" data-i18n-aria="catalog.tagFilters"></div>
           <p id="tagFilterStatus" class="filter-status" aria-live="polite"></p>
         </div>
         <div id="pluginList" class="plugin-list" aria-live="polite">
-          <p>Loading catalog...</p>
+          <p data-i18n="catalog.loading">Loading catalog...</p>
         </div>
       </section>
 
       <section id="publishPanel" class="panel view-panel" data-view-panel="publish" hidden>
-        <p class="kicker">Publish</p>
-        <h2>Publish a ready plugin</h2>
-        <p>Paste the GitHub repository that already contains <code>plugin.json</code>. The Hub reads the manifest and opens a GitHub request; after validation, a maintainer approves it before it appears in the catalog.</p>
-        <p class="catalog-notice">By publishing, the plugin creator confirms they are responsible for the plugin code, site mapping, icon, metadata, permissions, and fixes when the source site changes or downloads fail.</p>
+        <p class="kicker" data-i18n="publish.kicker">Publish</p>
+        <h2 data-i18n="publish.title">Publish a ready plugin</h2>
+        <p data-i18n="publish.description">Paste the GitHub repository that already contains <code>plugin.json</code>. The Hub reads the manifest and opens a GitHub request; after validation, a maintainer approves it before it appears in the catalog.</p>
+        <p class="catalog-notice" data-i18n="publish.notice">By publishing, the plugin creator confirms they are responsible for the plugin code, site mapping, icon, metadata, permissions, and fixes when the source site changes or downloads fail.</p>
         <div class="publish-form">
-          <label class="field-label" for="repoUrlInput">GitHub repository</label>
+          <label class="field-label" for="repoUrlInput" data-i18n="publish.repository">GitHub repository</label>
           <input id="repoUrlInput" class="text-input" type="url" placeholder="https://github.com/user/my-plugin">
           <div class="button-row">
-            <button id="loadRepoPluginButton" class="button primary" type="button">Load plugin</button>
-            <button id="discardDraftPluginsButton" class="button" type="button">Discard drafts</button>
+            <button id="loadRepoPluginButton" class="button primary" type="button" data-i18n="publish.load">Load plugin</button>
+            <button id="discardDraftPluginsButton" class="button" type="button" data-i18n="publish.discard">Discard drafts</button>
           </div>
           <p id="publishStatus" class="publish-status" aria-live="polite"></p>
         </div>
 
         <details class="steps">
-          <summary>How publishing works</summary>
+          <summary data-i18n="publish.how">How publishing works</summary>
           <div class="step-list">
             <article>
               <div>
-                <h3>Prepare the plugin</h3>
-                <p>Keep the manifest and browser script organized in the repository.</p>
+                <h3 data-i18n="publish.step1.title">Prepare the plugin</h3>
+                <p data-i18n="publish.step1.text">Keep the manifest and browser script organized in the repository.</p>
               </div>
             </article>
             <article>
               <div>
-                <h3>Publish on GitHub</h3>
-                <p>The plugin stays in your repository, and KapiTomo publishes only the catalog entry.</p>
+                <h3 data-i18n="publish.step2.title">Publish on GitHub</h3>
+                <p data-i18n="publish.step2.text">The plugin stays in your repository, and KapiTomo publishes only the catalog entry.</p>
               </div>
             </article>
             <article>
               <div>
-                <h3>Add it to the catalog</h3>
-                <p>Use the publication button and confirm on GitHub. Automation updates the catalog when it finishes.</p>
+                <h3 data-i18n="publish.step3.title">Add it to the catalog</h3>
+                <p data-i18n="publish.step3.text">Use the publication button and confirm on GitHub. Automation updates the catalog when it finishes.</p>
               </div>
             </article>
           </div>
@@ -810,19 +842,19 @@
       </section>
 
       <section id="removePanel" class="panel view-panel" data-view-panel="remove" hidden>
-        <p class="kicker">Remove</p>
-        <h2>Remove a publication</h2>
-        <p>Enter the published plugin and confirm the GitHub request. Automation validates it, then a maintainer approves hiding it from the public catalog.</p>
+        <p class="kicker" data-i18n="remove.kicker">Remove</p>
+        <h2 data-i18n="remove.title">Remove a publication</h2>
+        <p data-i18n="remove.description">Enter the published plugin and confirm the GitHub request. Automation validates it, then a maintainer approves hiding it from the public catalog.</p>
         <div class="publish-form">
-          <label class="field-label" for="removePluginIdInput">Plugin ID</label>
+          <label class="field-label" for="removePluginIdInput" data-i18n="remove.pluginId">Plugin ID</label>
           <input id="removePluginIdInput" class="text-input" type="text" placeholder="my-plugin">
-          <label class="field-label" for="removeRepoUrlInput">GitHub repository</label>
+          <label class="field-label" for="removeRepoUrlInput" data-i18n="remove.repository">GitHub repository</label>
           <input id="removeRepoUrlInput" class="text-input" type="url" placeholder="https://github.com/user/my-plugin">
-          <button id="requestRemovePluginButton" class="button primary" type="button">Request removal</button>
+          <button id="requestRemovePluginButton" class="button primary" type="button" data-i18n="remove.request">Request removal</button>
           <p id="removeStatus" class="publish-status" aria-live="polite"></p>
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260705-plugin-copy"></script>
+    <script src="store.js?v=20260705-bilingual-hub"></script>
   </body>
 </html>

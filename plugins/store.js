@@ -12,7 +12,9 @@ const tagFilterStatus = document.getElementById("tagFilterStatus");
 const pluginSearchInput = document.getElementById("pluginSearchInput");
 const viewButtons = Array.from(document.querySelectorAll("[data-view-target]"));
 const viewPanels = Array.from(document.querySelectorAll("[data-view-panel]"));
+const languageButtons = Array.from(document.querySelectorAll("[data-language-option]"));
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
+const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const CATALOG_VERSION = "20260704-live-repository-check";
 const MAX_SELECTED_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
@@ -47,11 +49,297 @@ const OFFICIAL_TYPE_TAGS = [
 const LANGUAGE_TAGS = new Set(OFFICIAL_LANGUAGE_TAGS);
 const TYPE_TAGS = new Set(OFFICIAL_TYPE_TAGS);
 const PUBLIC_TAGS = new Set([...OFFICIAL_LANGUAGE_TAGS, ...OFFICIAL_TYPE_TAGS]);
+const I18N = {
+  en: {
+    title: "KapiTomo | Plugin Hub",
+    nav: {
+      catalog: "Catalog",
+      publish: "Publish",
+      remove: "Remove",
+      api: "Plugin API",
+      terms: "Terms"
+    },
+    catalog: {
+      kicker: "Catalog",
+      title: "Published plugins",
+      search: "Search plugins",
+      notice: "Plugins are community source connectors. Plugin creators and source sites are responsible for their own content, permissions, pages, and download behavior. Nyxovira Pro pays for app features, not third-party works.",
+      categories: "Categories",
+      tagFilters: "Catalog tag filters",
+      loading: "Loading catalog...",
+      noTags: "No tags available yet.",
+      noPlugins: "No plugins published yet.",
+      noMatches: "No plugins match the selected tags.",
+      matching: "{count} plugin{plural} matching {filters}.",
+      loadError: "Could not load the catalog: {message}",
+      language: "Language",
+      type: "Type",
+      online: "Online",
+      offline: "Offline",
+      install: "Install",
+      publish: "Publish",
+      open: "Open",
+      pluginFallback: "Plugin"
+    },
+    publish: {
+      kicker: "Publish",
+      title: "Publish a ready plugin",
+      description: "Paste the GitHub repository that already contains plugin.json. The Hub reads the manifest and opens a GitHub request; after validation, a maintainer approves it before it appears in the catalog.",
+      notice: "By publishing, the plugin creator confirms they are responsible for the plugin code, site mapping, icon, metadata, permissions, and fixes when the source site changes or downloads fail.",
+      repository: "GitHub repository",
+      load: "Load plugin",
+      discard: "Discard drafts",
+      how: "How publishing works",
+      step1: {
+        title: "Prepare the plugin",
+        text: "Keep the manifest and browser script organized in the repository."
+      },
+      step2: {
+        title: "Publish on GitHub",
+        text: "The plugin stays in your repository, and KapiTomo publishes only the catalog entry."
+      },
+      step3: {
+        title: "Add it to the catalog",
+        text: "Use the publication button and confirm on GitHub. Automation updates the catalog when it finishes."
+      },
+      reading: "Reading plugin.json from the repository...",
+      preparing: "Preparing the publication request...",
+      loaded: "Plugin loaded. Confirm the GitHub request and the catalog automation will validate the repository before publishing.",
+      failed: "Could not load the plugin.",
+      outdated: "This draft is outdated. Load the GitHub repository again before requesting publication.",
+      draftsRemoved: "Drafts removed from this browser.",
+      requestTitle: "Plugin publication request for the Nyxovira catalog.",
+      requestDescription: "After you submit this request, the catalog automation validates the repository. A maintainer approves valid requests before they appear in the public catalog.",
+      responsibility: "By submitting this plugin, I confirm that I am responsible for the plugin code, metadata, icon, site mapping, permissions, and maintenance. I understand that KapiTomo lists only the catalog entry, and that third-party content, missing pages, broken downloads, and source-site changes remain the responsibility of the plugin creator and source site.",
+      repositoryLine: "Repository: {url}",
+      tagMinimum: "plugin.json must declare at least 2 tags: language first, then type.",
+      firstTag: "The first public tag must be one of: {tags}.",
+      nextTags: "After the language tag, every public tag must be one of: {tags}.",
+      validUrl: "Paste a valid GitHub URL.",
+      githubOnly: "Use a github.com repository.",
+      ownerRepo: "The URL must include an owner and repository.",
+      manifestMissing: "plugin.json was not found in the repository. {message}",
+      iconMissing: "The plugin must declare browser.icon_url."
+    },
+    remove: {
+      kicker: "Remove",
+      title: "Remove a publication",
+      description: "Enter the published plugin and confirm the GitHub request. Automation validates it, then a maintainer approves hiding it from the public catalog.",
+      pluginId: "Plugin ID",
+      repository: "GitHub repository",
+      request: "Request removal",
+      enterId: "Enter the published plugin ID.",
+      enterRepo: "Enter the plugin GitHub repository.",
+      opening: "Opening the removal request on GitHub...",
+      requestTitle: "Plugin removal request for the Nyxovira catalog.",
+      requestDescription: "After you submit this request, the catalog automation validates it. A maintainer approves valid requests before they are hidden from the public catalog.",
+      pluginIdLine: "Plugin ID: {id}",
+      repositoryLine: "Repository: {url}",
+      confirm: "I confirm that I want to remove this plugin from the online catalog."
+    },
+    install: {
+      iconMissing: "This plugin does not have icon_url and cannot be installed from the online catalog.",
+      repositoryMissing: "This plugin does not have repository_url and cannot be installed from the online catalog.",
+      openInsideApp: "Open this page from the Online plugins button inside Nyxovira to install directly in the app.",
+      success: "Plugin installed.",
+      failed: "Could not install the plugin.",
+      failedWithMessage: "Could not install the plugin: {message}",
+      unknown: "unknown error"
+    }
+  },
+  pt: {
+    title: "KapiTomo | Hub de Plugins",
+    nav: {
+      catalog: "Catálogo",
+      publish: "Publicar",
+      remove: "Remover",
+      api: "API de Plugins",
+      terms: "Termos"
+    },
+    catalog: {
+      kicker: "Catálogo",
+      title: "Plugins publicados",
+      search: "Pesquisar plugins",
+      notice: "Plugins são conectores de fonte da comunidade. Criadores de plugins e sites de origem são responsáveis por conteúdo, permissões, páginas e comportamento de download. O Nyxovira Pro paga recursos do app, não obras de terceiros.",
+      categories: "Categorias",
+      tagFilters: "Filtros de tags do catálogo",
+      loading: "Carregando catálogo...",
+      noTags: "Nenhuma tag disponível ainda.",
+      noPlugins: "Nenhum plugin publicado ainda.",
+      noMatches: "Nenhum plugin combina com as tags selecionadas.",
+      matching: "{count} plugin{plural} encontrado{plural} para {filters}.",
+      loadError: "Não foi possível carregar o catálogo: {message}",
+      language: "Idioma",
+      type: "Tipo",
+      online: "Online",
+      offline: "Offline",
+      install: "Instalar",
+      publish: "Publicar",
+      open: "Abrir",
+      pluginFallback: "Plugin"
+    },
+    publish: {
+      kicker: "Publicar",
+      title: "Publique um plugin pronto",
+      description: "Cole o repositório GitHub que já contém plugin.json. O Hub lê o manifesto e abre uma solicitação no GitHub; depois da validação, um mantenedor aprova antes de aparecer no catálogo.",
+      notice: "Ao publicar, o criador confirma que é responsável pelo código do plugin, mapeamento do site, ícone, metadados, permissões e correções quando o site de origem mudar ou downloads falharem.",
+      repository: "Repositório GitHub",
+      load: "Carregar plugin",
+      discard: "Descartar rascunhos",
+      how: "Como a publicação funciona",
+      step1: {
+        title: "Prepare o plugin",
+        text: "Mantenha o manifesto e o script do navegador organizados no repositório."
+      },
+      step2: {
+        title: "Publique no GitHub",
+        text: "O plugin fica no seu repositório, e o KapiTomo publica apenas a entrada do catálogo."
+      },
+      step3: {
+        title: "Adicione ao catálogo",
+        text: "Use o botão de publicação e confirme no GitHub. A automação atualiza o catálogo quando terminar."
+      },
+      reading: "Lendo plugin.json do repositório...",
+      preparing: "Preparando a solicitação de publicação...",
+      loaded: "Plugin carregado. Confirme a solicitação no GitHub e a automação do catálogo validará o repositório antes de publicar.",
+      failed: "Não foi possível carregar o plugin.",
+      outdated: "Este rascunho está desatualizado. Carregue o repositório GitHub novamente antes de solicitar publicação.",
+      draftsRemoved: "Rascunhos removidos deste navegador.",
+      requestTitle: "Solicitação de publicação de plugin para o catálogo do Nyxovira.",
+      requestDescription: "Depois de enviar esta solicitação, a automação do catálogo valida o repositório. Um mantenedor aprova solicitações válidas antes de aparecerem no catálogo público.",
+      responsibility: "Ao enviar este plugin, confirmo que sou responsável pelo código, metadados, ícone, mapeamento do site, permissões e manutenção. Entendo que o KapiTomo lista apenas a entrada do catálogo, e que conteúdo de terceiros, páginas ausentes, downloads quebrados e mudanças no site de origem continuam sendo responsabilidade do criador do plugin e do site de origem.",
+      repositoryLine: "Repositório: {url}",
+      tagMinimum: "plugin.json precisa declarar pelo menos 2 tags: idioma primeiro, depois tipo.",
+      firstTag: "A primeira tag pública precisa ser uma destas: {tags}.",
+      nextTags: "Depois da tag de idioma, toda tag pública precisa ser uma destas: {tags}.",
+      validUrl: "Cole uma URL válida do GitHub.",
+      githubOnly: "Use um repositório github.com.",
+      ownerRepo: "A URL precisa incluir usuário e repositório.",
+      manifestMissing: "plugin.json não foi encontrado no repositório. {message}",
+      iconMissing: "O plugin precisa declarar browser.icon_url."
+    },
+    remove: {
+      kicker: "Remover",
+      title: "Remova uma publicação",
+      description: "Informe o plugin publicado e confirme a solicitação no GitHub. A automação valida tudo, então um mantenedor aprova ocultar do catálogo público.",
+      pluginId: "ID do plugin",
+      repository: "Repositório GitHub",
+      request: "Solicitar remoção",
+      enterId: "Informe o ID do plugin publicado.",
+      enterRepo: "Informe o repositório GitHub do plugin.",
+      opening: "Abrindo a solicitação de remoção no GitHub...",
+      requestTitle: "Solicitação de remoção de plugin do catálogo do Nyxovira.",
+      requestDescription: "Depois de enviar esta solicitação, a automação do catálogo valida tudo. Um mantenedor aprova solicitações válidas antes de ocultar do catálogo público.",
+      pluginIdLine: "ID do plugin: {id}",
+      repositoryLine: "Repositório: {url}",
+      confirm: "Confirmo que quero remover este plugin do catálogo online."
+    },
+    install: {
+      iconMissing: "Este plugin não tem icon_url e não pode ser instalado pelo catálogo online.",
+      repositoryMissing: "Este plugin não tem repository_url e não pode ser instalado pelo catálogo online.",
+      openInsideApp: "Abra esta página pelo botão Plugins online dentro do Nyxovira para instalar direto no app.",
+      success: "Plugin instalado.",
+      failed: "Não foi possível instalar o plugin.",
+      failedWithMessage: "Não foi possível instalar o plugin: {message}",
+      unknown: "erro desconhecido"
+    }
+  }
+};
 let renderedPlugins = [];
 let allPlugins = [];
 let availableTags = [];
 let selectedTags = [];
 let searchQuery = "";
+let currentLanguage = initialLanguage();
+
+function normalizeLanguage(value) {
+  const language = String(value ? value : "").toLowerCase();
+  return language.startsWith("pt") ? "pt" : "en";
+}
+
+function detectLanguage() {
+  const candidates = [];
+  if (navigator.languages && navigator.languages.length) {
+    candidates.push(...navigator.languages);
+  }
+  if (navigator.language) {
+    candidates.push(navigator.language);
+  }
+  try {
+    const locale = Intl.DateTimeFormat().resolvedOptions().locale;
+    if (locale) {
+      candidates.push(locale);
+    }
+  } catch (error) {}
+  if (candidates.some((candidate) => normalizeLanguage(candidate) === "pt")) {
+    return "pt";
+  }
+  try {
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (/Sao_Paulo|Lisbon|Madeira|Azores|Luanda|Maputo|Bissau|Cape_Verde/i.test(String(timeZone))) {
+      return "pt";
+    }
+  } catch (error) {}
+  return "en";
+}
+
+function initialLanguage() {
+  const urlLanguage = new URLSearchParams(window.location.search).get("lang");
+  if (urlLanguage) {
+    return normalizeLanguage(urlLanguage);
+  }
+  try {
+    const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    if (stored) {
+      return normalizeLanguage(stored);
+    }
+  } catch (error) {}
+  return detectLanguage();
+}
+
+function t(key, values = {}) {
+  const parts = key.split(".");
+  let output = I18N[currentLanguage];
+  parts.forEach((part) => {
+    output = output && output[part];
+  });
+  if (typeof output !== "string") {
+    output = key;
+  }
+  Object.entries(values).forEach(([name, value]) => {
+    output = output.split(`{${name}}`).join(value);
+  });
+  return output;
+}
+
+function applyStaticTranslations() {
+  document.documentElement.lang = currentLanguage === "pt" ? "pt-BR" : "en";
+  document.title = t("title");
+  document.querySelectorAll("[data-i18n]").forEach((node) => {
+    node.textContent = t(node.dataset.i18n);
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((node) => {
+    node.setAttribute("placeholder", t(node.dataset.i18nPlaceholder));
+  });
+  document.querySelectorAll("[data-i18n-aria]").forEach((node) => {
+    node.setAttribute("aria-label", t(node.dataset.i18nAria));
+  });
+  languageButtons.forEach((button) => {
+    button.setAttribute("aria-pressed", button.dataset.languageOption === currentLanguage ? "true" : "false");
+  });
+}
+
+function setLanguage(language, persist = true) {
+  currentLanguage = normalizeLanguage(language);
+  if (persist) {
+    try {
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, currentLanguage);
+    } catch (error) {}
+  }
+  applyStaticTranslations();
+  renderTagFilters(availableTags);
+  applyTagFilters();
+}
 
 function escapeHtml(value) {
   return String(value || "").replace(/[&<>"']/g, (char) => ({
@@ -81,7 +369,7 @@ function isVisiblePlugin(plugin) {
 }
 
 function siteStatusLabel(plugin) {
-  return pluginStatus(plugin) === "broken" ? "Offline" : "Online";
+  return pluginStatus(plugin) === "broken" ? t("catalog.offline") : t("catalog.online");
 }
 
 function siteStatusClass(plugin) {
@@ -164,14 +452,14 @@ function normalizePublicationTags(tags) {
   });
   const publicTags = output.filter((tag) => tag !== "official" && tag !== "community");
   if (publicTags.length < MIN_PUBLIC_TAGS) {
-    throw new Error("plugin.json must declare at least 2 tags: language first, then type.");
+    throw new Error(t("publish.tagMinimum"));
   }
   if (!isLanguageTag(publicTags[0])) {
-    throw new Error(`The first public tag must be one of: ${OFFICIAL_LANGUAGE_TAGS.join(", ")}.`);
+    throw new Error(t("publish.firstTag", { tags: OFFICIAL_LANGUAGE_TAGS.join(", ") }));
   }
   const invalidType = publicTags.slice(1).find((tag) => !TYPE_TAGS.has(tag));
   if (invalidType) {
-    throw new Error(`After the language tag, every public tag must be one of: ${OFFICIAL_TYPE_TAGS.join(", ")}.`);
+    throw new Error(t("publish.nextTags", { tags: OFFICIAL_TYPE_TAGS.join(", ") }));
   }
   return output;
 }
@@ -257,10 +545,10 @@ function renderTagFilters(tags) {
   const contentTags = OFFICIAL_TYPE_TAGS;
   tagFilter.innerHTML = availableTags.length
     ? [
-      renderTagGroup("Language", languageTags),
-      renderTagGroup("Type", contentTags)
+      renderTagGroup(t("catalog.language"), languageTags),
+      renderTagGroup(t("catalog.type"), contentTags)
     ].join("")
-    : "<p class=\"filter-status\">No tags available yet.</p>";
+    : `<p class="filter-status">${escapeHtml(t("catalog.noTags"))}</p>`;
   tagFilter.querySelectorAll("[data-filter-tag]").forEach((button) => {
     button.addEventListener("click", () => toggleTagFilter(button.dataset.filterTag));
   });
@@ -271,7 +559,7 @@ function setTagStatus(filteredCount) {
     return;
   }
   if (!allPlugins.length) {
-    tagFilterStatus.textContent = "No plugins published yet.";
+    tagFilterStatus.textContent = t("catalog.noPlugins");
     return;
   }
   if (!selectedTags.length && !searchQuery.trim()) {
@@ -285,7 +573,11 @@ function setTagStatus(filteredCount) {
   if (searchQuery.trim()) {
     pieces.push(`"${searchQuery.trim()}"`);
   }
-  tagFilterStatus.textContent = `${filteredCount} plugin${filteredCount === 1 ? "" : "s"} matching ${pieces.join(" + ")}.`;
+  tagFilterStatus.textContent = t("catalog.matching", {
+    count: filteredCount,
+    plural: filteredCount === 1 ? "" : "s",
+    filters: pieces.join(" + ")
+  });
 }
 
 function applyTagFilters() {
@@ -387,18 +679,18 @@ function renderPlugins(plugins) {
   list.innerHTML = plugins.length ? plugins.map((plugin, index) => {
     const tags = displayTags(plugin.tags);
     const actions = [
-      `<button class="button primary" type="button" data-install-plugin="${index}">Install</button>`
+      `<button class="button primary" type="button" data-install-plugin="${index}">${escapeHtml(t("catalog.install"))}</button>`
     ];
     if (plugin.__source === "draft") {
-      actions.push(`<button class="button" type="button" data-publish-plugin="${index}">Publish</button>`);
+      actions.push(`<button class="button" type="button" data-publish-plugin="${index}">${escapeHtml(t("catalog.publish"))}</button>`);
     } else if (plugin.homepage || plugin.site_url) {
-      actions.push(`<a class="button" href="${escapeHtml(plugin.homepage || plugin.site_url)}">Open</a>`);
+      actions.push(`<a class="button" href="${escapeHtml(plugin.homepage || plugin.site_url)}">${escapeHtml(t("catalog.open"))}</a>`);
     }
     return `
       <article class="plugin-card">
         <img class="plugin-icon" src="${escapeHtml(plugin.icon_url)}" alt="">
         <div class="plugin-copy">
-          <h3>${escapeHtml(plugin.name || plugin.id || "Plugin")}</h3>
+          <h3>${escapeHtml(plugin.name || plugin.id || t("catalog.pluginFallback"))}</h3>
           <div class="meta">
             ${plugin.author ? `<span>${escapeHtml(plugin.author)}</span>` : ""}
             ${plugin.version ? `<span>v${escapeHtml(plugin.version)}</span>` : ""}
@@ -411,7 +703,7 @@ function renderPlugins(plugins) {
         </div>
       </article>
     `;
-  }).join("") : `<p>${selectedTags.length ? "No plugins match the selected tags." : "No plugins published yet."}</p>`;
+  }).join("") : `<p>${selectedTags.length ? escapeHtml(t("catalog.noMatches")) : escapeHtml(t("catalog.noPlugins"))}</p>`;
   document.querySelectorAll("[data-install-plugin]").forEach((button) => {
     button.addEventListener("click", () => installPlugin(renderedPlugins[Number(button.dataset.installPlugin)]));
   });
@@ -444,7 +736,7 @@ function loadAllPlugins() {
       });
     })
     .catch((error) => {
-      list.innerHTML = `<p>Could not load the catalog: ${escapeHtml(error.message)}</p>`;
+      list.innerHTML = `<p>${escapeHtml(t("catalog.loadError", { message: error.message }))}</p>`;
     });
 }
 
@@ -453,14 +745,14 @@ function parseGitHubRepo(rawUrl) {
   try {
     url = new URL(String(rawUrl || "").trim());
   } catch {
-    throw new Error("Paste a valid GitHub URL.");
+    throw new Error(t("publish.validUrl"));
   }
   if (!/^(www\.)?github\.com$/i.test(url.hostname)) {
-    throw new Error("Use a github.com repository.");
+    throw new Error(t("publish.githubOnly"));
   }
   const parts = url.pathname.split("/").filter(Boolean);
   if (parts.length < 2) {
-    throw new Error("The URL must include an owner and repository.");
+    throw new Error(t("publish.ownerRepo"));
   }
   const treeIndex = parts.indexOf("tree");
   return {
@@ -508,21 +800,21 @@ async function fetchRepoManifest(repo) {
       lastError = error;
     }
   }
-  throw new Error("plugin.json was not found in the repository. " + (lastError?.message || ""));
+  throw new Error(t("publish.manifestMissing", { message: lastError?.message || "" }));
 }
 
 async function loadRepoPlugin() {
   try {
     const repo = parseGitHubRepo(repoUrlInput?.value || "");
-    setPublishStatus("Reading plugin.json from the repository...");
+    setPublishStatus(t("publish.reading"));
     const { branch, pluginPath, manifest } = await fetchRepoManifest(repo);
     const browser = manifest.browser || {};
     const repositoryUrl = `https://github.com/${repo.owner}/${repo.repo}`;
     const iconUrl = resolveUrl(browser.home_url || repositoryUrl + "/", browser.icon_url || "");
     if (!iconUrl) {
-      throw new Error("The plugin must declare browser.icon_url.");
+      throw new Error(t("publish.iconMissing"));
     }
-    setPublishStatus("Preparing the publication request...");
+    setPublishStatus(t("publish.preparing"));
     const plugin = {
       id: manifest.id || repo.repo,
       name: manifest.name || manifest.id || repo.repo,
@@ -539,11 +831,11 @@ async function loadRepoPlugin() {
       __source: "draft"
     };
     saveDraftPlugin(plugin);
-    setPublishStatus("Plugin loaded. Confirm the GitHub request and the catalog automation will validate the repository before publishing.");
+    setPublishStatus(t("publish.loaded"));
     loadAllPlugins();
     setActiveView("catalog");
   } catch (error) {
-    setPublishStatus(error?.message || "Could not load the plugin.");
+    setPublishStatus(error?.message || t("publish.failed"));
   }
 }
 
@@ -551,16 +843,16 @@ function openPublishRequest(plugin) {
   const clean = publicPlugin(plugin);
   clean.tags = normalizePublicationTags(clean.tags);
   if (!clean.repository_url) {
-    setPublishStatus("This draft is outdated. Load the GitHub repository again before requesting publication.");
+    setPublishStatus(t("publish.outdated"));
     return;
   }
   const body = [
-    "Plugin publication request for the Nyxovira catalog.",
-    "After you submit this request, the catalog automation validates the repository. A maintainer approves valid requests before they appear in the public catalog.",
+    t("publish.requestTitle"),
+    t("publish.requestDescription"),
     "",
-    "By submitting this plugin, I confirm that I am responsible for the plugin code, metadata, icon, site mapping, permissions, and maintenance. I understand that KapiTomo lists only the catalog entry, and that third-party content, missing pages, broken downloads, and source-site changes remain the responsibility of the plugin creator and source site.",
+    t("publish.responsibility"),
     "",
-    "Repository: " + clean.repository_url,
+    t("publish.repositoryLine", { url: clean.repository_url }),
     "",
     "```json",
     JSON.stringify(clean, null, 2),
@@ -576,48 +868,48 @@ function openRemovalRequest() {
   const pluginId = String(removePluginIdInput?.value || "").trim();
   const repoUrl = String(removeRepoUrlInput?.value || "").trim();
   if (!pluginId) {
-    setRemoveStatus("Enter the published plugin ID.");
+    setRemoveStatus(t("remove.enterId"));
     return;
   }
   if (!repoUrl) {
-    setRemoveStatus("Enter the plugin GitHub repository.");
+    setRemoveStatus(t("remove.enterRepo"));
     return;
   }
   const body = [
-    "Plugin removal request for the Nyxovira catalog.",
-    "After you submit this request, the catalog automation validates it. A maintainer approves valid requests before they are hidden from the public catalog.",
+    t("remove.requestTitle"),
+    t("remove.requestDescription"),
     "",
-    "Plugin ID: " + pluginId,
-    "Repository: " + repoUrl,
+    t("remove.pluginIdLine", { id: pluginId }),
+    t("remove.repositoryLine", { url: repoUrl }),
     "",
-    "I confirm that I want to remove this plugin from the online catalog."
+    t("remove.confirm")
   ].join("\n");
   const url = "https://github.com/Nanquimori/KapiTomo/issues/new"
     + "?title=" + encodeURIComponent("[plugin-remove] " + pluginId)
     + "&body=" + encodeURIComponent(body);
-  setRemoveStatus("Opening the removal request on GitHub...");
+  setRemoveStatus(t("remove.opening"));
   window.open(url, "_blank", "noopener");
 }
 
 function installPlugin(plugin) {
   const bridge = window.NyxoviraAndroidBridge || window.ArchiveInkAndroidBridge;
   if (!hasRequiredPluginIcon(plugin)) {
-    alert("This plugin does not have icon_url and cannot be installed from the online catalog.");
+    alert(t("install.iconMissing"));
     return;
   }
   if (!hasRepository(plugin)) {
-    alert("This plugin does not have repository_url and cannot be installed from the online catalog.");
+    alert(t("install.repositoryMissing"));
     return;
   }
   if (!plugin || !bridge || typeof bridge.installOnlinePlugin !== "function") {
-    alert("Open this page from the Online plugins button inside Nyxovira to install directly in the app.");
+    alert(t("install.openInsideApp"));
     return;
   }
   try {
     const result = JSON.parse(bridge.installOnlinePlugin(JSON.stringify(publicPlugin(plugin))) || "{}");
-    alert(result.message || (result.success ? "Plugin installed." : "Could not install the plugin."));
+    alert(result.message || (result.success ? t("install.success") : t("install.failed")));
   } catch (error) {
-    alert("Could not install the plugin: " + (error && error.message ? error.message : "unknown error"));
+    alert(t("install.failedWithMessage", { message: error && error.message ? error.message : t("install.unknown") }));
   }
 }
 
@@ -625,6 +917,9 @@ loadRepoPluginButton?.addEventListener("click", loadRepoPlugin);
 requestRemovePluginButton?.addEventListener("click", openRemovalRequest);
 viewButtons.forEach((button) => {
   button.addEventListener("click", () => setActiveView(button.dataset.viewTarget));
+});
+languageButtons.forEach((button) => {
+  button.addEventListener("click", () => setLanguage(button.dataset.languageOption));
 });
 repoUrlInput?.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
@@ -638,8 +933,9 @@ pluginSearchInput?.addEventListener("input", () => {
 });
 discardDraftPluginsButton?.addEventListener("click", () => {
   localStorage.removeItem(LOCAL_PLUGIN_KEY);
-  setPublishStatus("Drafts removed from this browser.");
+  setPublishStatus(t("publish.draftsRemoved"));
   loadAllPlugins();
 });
+applyStaticTranslations();
 setActiveView("catalog");
 loadAllPlugins();
