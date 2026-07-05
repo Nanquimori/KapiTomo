@@ -260,6 +260,17 @@
         line-height: 1.25;
       }
 
+      .catalog-notice {
+        max-width: 620px;
+        margin: 0;
+        color: #d8cce7;
+        border-left: 2px solid rgba(255, 178, 31, 0.72);
+        padding: 4px 0 4px 8px;
+        font-size: 0.68rem;
+        font-weight: 650;
+        line-height: 1.32;
+      }
+
       .tag-filter {
         display: grid;
         gap: 5px;
@@ -687,6 +698,12 @@
           margin-bottom: 7px;
         }
 
+        .catalog-notice {
+          padding-left: 6px;
+          font-size: 0.58rem;
+          line-height: 1.28;
+        }
+
         .catalog-search {
           width: 100%;
           max-width: 100%;
@@ -722,6 +739,7 @@
           <button class="menu-tab" type="button" data-view-target="publish">Publish</button>
           <button class="menu-tab" type="button" data-view-target="remove">Remove</button>
           <a class="menu-tab" href="../nyxovira/plugin-api/">Plugin API</a>
+          <a class="menu-tab" href="../terms/">Terms</a>
         </nav>
       </header>
 
@@ -734,6 +752,10 @@
         </div>
         <div class="catalog-tools">
           <input id="pluginSearchInput" class="text-input catalog-search" type="search" placeholder="Search plugins" aria-label="Search plugins">
+          <p class="catalog-notice">
+            Plugins are community source connectors. Plugin creators and source sites are responsible for their own
+            content, permissions, pages, and download behavior. Nyxovira Pro pays for app features, not third-party works.
+          </p>
           <div class="filter-head">
             <div>
               <p class="kicker">Categories</p>
@@ -751,6 +773,7 @@
         <p class="kicker">Publish</p>
         <h2>Publish a ready addon</h2>
         <p>Paste the GitHub repository that already contains <code>plugin.json</code>. The Hub reads the manifest and opens a GitHub request; after validation, a maintainer approves it before it appears in the catalog.</p>
+        <p class="catalog-notice">By publishing, the plugin creator confirms they are responsible for the plugin code, source mapping, icon, metadata, permissions, and fixes when the source site changes or downloads fail.</p>
         <div class="publish-form">
           <label class="field-label" for="repoUrlInput">GitHub repository</label>
           <input id="repoUrlInput" class="text-input" type="url" placeholder="https://github.com/user/my-addon">

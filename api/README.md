@@ -91,3 +91,5 @@ plugins/catalog.json
 ```
 
 The Plugin Hub validates public GitHub repositories, official tags, source hosts, and health status before a plugin appears in the storefront.
+
+KapiTomo does not host or sell third-party works through the plugin catalog. Plugin creators and source sites are responsible for their own content, permissions, page availability, and download behavior. Nyxovira Pro unlocks app features; it is not payment for third-party content.
