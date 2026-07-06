@@ -484,8 +484,8 @@
         top: 5px;
         right: 5px;
         z-index: 1;
-        width: 26px;
-        height: 26px;
+        width: 28px;
+        height: 28px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -494,11 +494,16 @@
         padding: 0;
         background: rgba(13, 7, 20, 0.9);
         color: #8d7a9e;
-        font: inherit;
-        font-size: 1rem;
+        cursor: pointer;
+      }
+
+      .favorite-button::before {
+        content: "\2605";
+        display: block;
+        font-size: 1.25rem;
         font-weight: 950;
         line-height: 1;
-        cursor: pointer;
+        transform: translateY(-1.5px);
       }
 
       .favorite-button.is-active {
@@ -912,6 +917,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260706-simple-tag-states"></script>
+    <script src="store.js?v=20260706-favorite-star-align"></script>
   </body>
 </html>
