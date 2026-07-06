@@ -17,7 +17,7 @@ const languageButtons = Array.from(document.querySelectorAll("[data-language-opt
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
-const CATALOG_VERSION = "20260706-simple-tag-states";
+const CATALOG_VERSION = "20260706-favorite-star-align";
 const MAX_SELECTED_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
 const OFFICIAL_LANGUAGE_TAGS = [
@@ -778,7 +778,7 @@ function renderPlugins(plugins) {
     }
     return `
       <article class="plugin-card">
-        <button class="favorite-button${favorite ? " is-active" : ""}" type="button" data-favorite-plugin="${index}" aria-pressed="${favorite ? "true" : "false"}" aria-label="${escapeHtml(t("catalog.favorite"))}">&#9733;</button>
+        <button class="favorite-button${favorite ? " is-active" : ""}" type="button" data-favorite-plugin="${index}" aria-pressed="${favorite ? "true" : "false"}" aria-label="${escapeHtml(t("catalog.favorite"))}"></button>
         <img class="plugin-icon" src="${escapeHtml(plugin.icon_url)}" alt="">
         <div class="plugin-copy">
           <h3>${escapeHtml(plugin.name || plugin.id || t("catalog.pluginFallback"))}</h3>
