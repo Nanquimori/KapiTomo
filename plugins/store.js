@@ -10,13 +10,16 @@ const removeStatus = document.getElementById("removeStatus");
 const tagFilter = document.getElementById("tagFilter");
 const tagFilterStatus = document.getElementById("tagFilterStatus");
 const pluginSearchInput = document.getElementById("pluginSearchInput");
+const favoritesOnlyButton = document.getElementById("favoritesOnlyButton");
 const viewButtons = Array.from(document.querySelectorAll("[data-view-target]"));
 const viewPanels = Array.from(document.querySelectorAll("[data-view-panel]"));
 const languageButtons = Array.from(document.querySelectorAll("[data-language-option]"));
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
-const CATALOG_VERSION = "20260704-live-repository-check";
+const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
+const CATALOG_VERSION = "20260706-favorite-tag-exclude";
 const MAX_SELECTED_TAGS = 4;
+const MAX_EXCLUDED_TAGS = 8;
 const MIN_PUBLIC_TAGS = 2;
 const OFFICIAL_LANGUAGE_TAGS = [
   "english",
@@ -74,6 +77,13 @@ const I18N = {
       loadError: "Could not load the catalog: {message}",
       language: "Language",
       type: "Type",
+      includeTags: "Required tags",
+      excludeTags: "Hidden tags",
+      favorite: "Favorite",
+      favorites: "Favorites",
+      favoriteOnly: "Favorites only",
+      showAll: "Show all",
+      without: "without {tags}",
       online: "Online",
       offline: "Offline",
       install: "Install",
@@ -171,6 +181,13 @@ const I18N = {
       loadError: "Não foi possível carregar o catálogo: {message}",
       language: "Idioma",
       type: "Tipo",
+      includeTags: "Tags obrigatorias",
+      excludeTags: "Tags ocultas",
+      favorite: "Favoritar",
+      favorites: "Favoritos",
+      favoriteOnly: "So favoritos",
+      showAll: "Mostrar todos",
+      without: "sem {tags}",
       online: "Online",
       offline: "Offline",
       install: "Instalar",
@@ -249,6 +266,9 @@ let renderedPlugins = [];
 let allPlugins = [];
 let availableTags = [];
 let selectedTags = [];
+let excludedTags = [];
+let favoritePluginKeys = loadFavoritePluginKeys();
+let favoritesOnly = false;
 let searchQuery = "";
 let currentLanguage = initialLanguage();
 
@@ -338,6 +358,7 @@ function setLanguage(language, persist = true) {
   }
   applyStaticTranslations();
   renderTagFilters(availableTags);
+  updateFavoritesOnlyButton();
   applyTagFilters();
 }
 
@@ -414,6 +435,39 @@ function pluginKey(plugin) {
     String(plugin?.repository_ref || ""),
     String(plugin?.plugin_path || "")
   ].join("|");
+}
+
+function loadFavoritePluginKeys() {
+  try {
+    const values = JSON.parse(localStorage.getItem(FAVORITE_PLUGIN_KEY) || "[]");
+    return new Set(Array.isArray(values) ? values.map((value) => String(value || "")).filter(Boolean) : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function saveFavoritePluginKeys() {
+  try {
+    localStorage.setItem(FAVORITE_PLUGIN_KEY, JSON.stringify([...favoritePluginKeys].filter(Boolean)));
+  } catch (error) {}
+}
+
+function isFavoritePlugin(plugin) {
+  return favoritePluginKeys.has(pluginKey(plugin));
+}
+
+function toggleFavoritePlugin(plugin) {
+  const key = pluginKey(plugin);
+  if (!key.trim()) {
+    return;
+  }
+  if (favoritePluginKeys.has(key)) {
+    favoritePluginKeys.delete(key);
+  } else {
+    favoritePluginKeys.add(key);
+  }
+  saveFavoritePluginKeys();
+  applyTagFilters();
 }
 
 function displayTags(tags) {
@@ -496,6 +550,18 @@ function pluginMatchesSelectedTags(plugin) {
   return selectedTags.every((tag) => tags.has(tag));
 }
 
+function pluginMatchesExcludedTags(plugin) {
+  if (!excludedTags.length) {
+    return true;
+  }
+  const tags = new Set(filterTags(plugin.tags));
+  return excludedTags.every((tag) => !tags.has(tag));
+}
+
+function pluginMatchesFavoriteMode(plugin) {
+  return !favoritesOnly || isFavoritePlugin(plugin);
+}
+
 function pluginMatchesSearch(plugin) {
   const query = searchQuery.trim().toLowerCase();
   if (!query) {
@@ -517,20 +583,29 @@ function isLanguageTag(tag) {
   return LANGUAGE_TAGS.has(String(tag || "").trim().toLowerCase());
 }
 
-function renderTagButton(tag) {
-  const active = selectedTags.includes(tag);
-  const disabled = !active && selectedTags.length >= MAX_SELECTED_TAGS;
-  return `<button class="filter-chip${active ? " is-active" : ""}" type="button" data-filter-tag="${escapeHtml(tag)}"${disabled ? " disabled" : ""}>${escapeHtml(tag)}</button>`;
+function renderTagButton(tag, mode) {
+  const isExclude = mode === "exclude";
+  const active = isExclude ? excludedTags.includes(tag) : selectedTags.includes(tag);
+  const blockedByOtherMode = isExclude ? selectedTags.includes(tag) : excludedTags.includes(tag);
+  const limit = isExclude ? MAX_EXCLUDED_TAGS : MAX_SELECTED_TAGS;
+  const count = isExclude ? excludedTags.length : selectedTags.length;
+  const disabled = blockedByOtherMode || (!active && count >= limit);
+  const className = [
+    "filter-chip",
+    isExclude ? "filter-chip-exclude" : "",
+    active ? "is-active" : ""
+  ].filter(Boolean).join(" ");
+  return `<button class="${className}" type="button" data-filter-mode="${escapeHtml(mode)}" data-filter-tag="${escapeHtml(tag)}"${disabled ? " disabled" : ""}>${escapeHtml(tag)}</button>`;
 }
 
-function renderTagGroup(title, tags) {
+function renderTagGroup(title, tags, mode) {
   if (!tags.length) {
     return "";
   }
   return `
     <div class="tag-group">
       <p class="tag-group-title">${escapeHtml(title)}</p>
-      <div class="tag-row">${tags.map(renderTagButton).join("")}</div>
+      <div class="tag-row">${tags.map((tag) => renderTagButton(tag, mode)).join("")}</div>
     </div>
   `;
 }
@@ -538,6 +613,7 @@ function renderTagGroup(title, tags) {
 function renderTagFilters(tags) {
   availableTags = uniqueTags([OFFICIAL_LANGUAGE_TAGS, OFFICIAL_TYPE_TAGS, tags]);
   selectedTags = selectedTags.filter((tag) => availableTags.includes(tag));
+  excludedTags = excludedTags.filter((tag) => availableTags.includes(tag) && !selectedTags.includes(tag));
   if (!tagFilter) {
     return;
   }
@@ -545,12 +621,12 @@ function renderTagFilters(tags) {
   const contentTags = OFFICIAL_TYPE_TAGS;
   tagFilter.innerHTML = availableTags.length
     ? [
-      renderTagGroup(t("catalog.language"), languageTags),
-      renderTagGroup(t("catalog.type"), contentTags)
+      `<div class="tag-filter-section"><p class="tag-filter-mode">${escapeHtml(t("catalog.includeTags"))}</p>${renderTagGroup(t("catalog.language"), languageTags, "include")}${renderTagGroup(t("catalog.type"), contentTags, "include")}</div>`,
+      `<div class="tag-filter-section"><p class="tag-filter-mode">${escapeHtml(t("catalog.excludeTags"))}</p>${renderTagGroup(t("catalog.language"), languageTags, "exclude")}${renderTagGroup(t("catalog.type"), contentTags, "exclude")}</div>`
     ].join("")
     : `<p class="filter-status">${escapeHtml(t("catalog.noTags"))}</p>`;
   tagFilter.querySelectorAll("[data-filter-tag]").forEach((button) => {
-    button.addEventListener("click", () => toggleTagFilter(button.dataset.filterTag));
+    button.addEventListener("click", () => toggleTagFilter(button.dataset.filterTag, button.dataset.filterMode));
   });
 }
 
@@ -562,13 +638,19 @@ function setTagStatus(filteredCount) {
     tagFilterStatus.textContent = t("catalog.noPlugins");
     return;
   }
-  if (!selectedTags.length && !searchQuery.trim()) {
+  if (!selectedTags.length && !excludedTags.length && !favoritesOnly && !searchQuery.trim()) {
     tagFilterStatus.textContent = "";
     return;
   }
   const pieces = [];
   if (selectedTags.length) {
     pieces.push(selectedTags.join(", "));
+  }
+  if (excludedTags.length) {
+    pieces.push(t("catalog.without", { tags: excludedTags.join(", ") }));
+  }
+  if (favoritesOnly) {
+    pieces.push(t("catalog.favoriteOnly"));
   }
   if (searchQuery.trim()) {
     pieces.push(`"${searchQuery.trim()}"`);
@@ -581,20 +663,30 @@ function setTagStatus(filteredCount) {
 }
 
 function applyTagFilters() {
-  const filtered = allPlugins.filter((plugin) => pluginMatchesSelectedTags(plugin) && pluginMatchesSearch(plugin));
+  const filtered = allPlugins.filter((plugin) => pluginMatchesSelectedTags(plugin)
+    && pluginMatchesExcludedTags(plugin)
+    && pluginMatchesFavoriteMode(plugin)
+    && pluginMatchesSearch(plugin));
   renderTagFilters(availableTags);
+  updateFavoritesOnlyButton();
   renderPlugins(filtered);
   setTagStatus(filtered.length);
 }
 
-function toggleTagFilter(tag) {
+function toggleTagFilter(tag, mode = "include") {
   const clean = String(tag || "").trim().toLowerCase();
   if (!clean) {
     return;
   }
-  if (selectedTags.includes(clean)) {
+  if (mode === "exclude") {
+    if (excludedTags.includes(clean)) {
+      excludedTags = excludedTags.filter((selected) => selected !== clean);
+    } else if (!selectedTags.includes(clean) && excludedTags.length < MAX_EXCLUDED_TAGS) {
+      excludedTags = [...excludedTags, clean];
+    }
+  } else if (selectedTags.includes(clean)) {
     selectedTags = selectedTags.filter((selected) => selected !== clean);
-  } else if (selectedTags.length < MAX_SELECTED_TAGS) {
+  } else if (!excludedTags.includes(clean) && selectedTags.length < MAX_SELECTED_TAGS) {
     selectedTags = [...selectedTags, clean];
   }
   applyTagFilters();
@@ -674,10 +766,20 @@ function saveDraftPlugin(plugin) {
   saveDraftPlugins(drafts);
 }
 
+function updateFavoritesOnlyButton() {
+  if (!favoritesOnlyButton) {
+    return;
+  }
+  favoritesOnlyButton.classList.toggle("is-active", favoritesOnly);
+  favoritesOnlyButton.setAttribute("aria-pressed", favoritesOnly ? "true" : "false");
+  favoritesOnlyButton.textContent = favoritesOnly ? t("catalog.showAll") : t("catalog.favoriteOnly");
+}
+
 function renderPlugins(plugins) {
   renderedPlugins = plugins;
   list.innerHTML = plugins.length ? plugins.map((plugin, index) => {
     const tags = displayTags(plugin.tags);
+    const favorite = isFavoritePlugin(plugin);
     const actions = [
       `<button class="button primary" type="button" data-install-plugin="${index}">${escapeHtml(t("catalog.install"))}</button>`
     ];
@@ -688,6 +790,7 @@ function renderPlugins(plugins) {
     }
     return `
       <article class="plugin-card">
+        <button class="favorite-button${favorite ? " is-active" : ""}" type="button" data-favorite-plugin="${index}" aria-pressed="${favorite ? "true" : "false"}" aria-label="${escapeHtml(t("catalog.favorite"))}">&#9733;</button>
         <img class="plugin-icon" src="${escapeHtml(plugin.icon_url)}" alt="">
         <div class="plugin-copy">
           <h3>${escapeHtml(plugin.name || plugin.id || t("catalog.pluginFallback"))}</h3>
@@ -703,12 +806,15 @@ function renderPlugins(plugins) {
         </div>
       </article>
     `;
-  }).join("") : `<p>${selectedTags.length ? escapeHtml(t("catalog.noMatches")) : escapeHtml(t("catalog.noPlugins"))}</p>`;
+  }).join("") : `<p>${selectedTags.length || excludedTags.length || favoritesOnly || searchQuery.trim() ? escapeHtml(t("catalog.noMatches")) : escapeHtml(t("catalog.noPlugins"))}</p>`;
   document.querySelectorAll("[data-install-plugin]").forEach((button) => {
     button.addEventListener("click", () => installPlugin(renderedPlugins[Number(button.dataset.installPlugin)]));
   });
   document.querySelectorAll("[data-publish-plugin]").forEach((button) => {
     button.addEventListener("click", () => openPublishRequest(renderedPlugins[Number(button.dataset.publishPlugin)]));
+  });
+  document.querySelectorAll("[data-favorite-plugin]").forEach((button) => {
+    button.addEventListener("click", () => toggleFavoritePlugin(renderedPlugins[Number(button.dataset.favoritePlugin)]));
   });
 }
 
@@ -931,11 +1037,16 @@ pluginSearchInput?.addEventListener("input", () => {
   searchQuery = String(pluginSearchInput.value || "");
   applyTagFilters();
 });
+favoritesOnlyButton?.addEventListener("click", () => {
+  favoritesOnly = !favoritesOnly;
+  applyTagFilters();
+});
 discardDraftPluginsButton?.addEventListener("click", () => {
   localStorage.removeItem(LOCAL_PLUGIN_KEY);
   setPublishStatus(t("publish.draftsRemoved"));
   loadAllPlugins();
 });
 applyStaticTranslations();
+updateFavoritesOnlyButton();
 setActiveView("catalog");
 loadAllPlugins();
