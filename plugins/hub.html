@@ -271,6 +271,27 @@
         font-size: 0.72rem;
       }
 
+      .catalog-search-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .favorites-toggle {
+        min-height: 24px;
+        width: auto;
+        min-width: max-content;
+        border-radius: 7px;
+        padding: 0 9px;
+        font-size: 0.68rem;
+      }
+
+      .favorites-toggle.is-active {
+        border-color: rgba(255, 194, 71, 0.68);
+        color: #ffd990;
+      }
+
       .filter-head {
         display: block;
       }
@@ -301,7 +322,19 @@
 
       .tag-filter {
         display: grid;
+        gap: 7px;
+      }
+
+      .tag-filter-section {
+        display: grid;
         gap: 5px;
+      }
+
+      .tag-filter-mode {
+        margin: 0;
+        color: #f1e7ff;
+        font-size: 0.62rem;
+        font-weight: 950;
       }
 
       .tag-group {
@@ -346,6 +379,16 @@
         color: #ffd990;
       }
 
+      .filter-chip-exclude {
+        border-color: rgba(255, 107, 44, 0.3);
+        color: #c9b8d9;
+      }
+
+      .filter-chip-exclude.is-active {
+        border-color: rgba(255, 107, 44, 0.78);
+        color: #ffb08f;
+      }
+
       .filter-chip:disabled {
         opacity: 0.36;
         cursor: default;
@@ -362,6 +405,7 @@
       }
 
       .plugin-card {
+        position: relative;
         min-width: 0;
         max-width: 100%;
         overflow: hidden;
@@ -450,6 +494,31 @@
         font-size: 0.52rem;
         font-weight: 850;
         line-height: 1.05;
+      }
+
+      .favorite-button {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        z-index: 1;
+        width: 22px;
+        height: 22px;
+        display: inline-grid;
+        place-items: center;
+        border: 1px solid rgba(255, 178, 31, 0.28);
+        border-radius: 999px;
+        background: rgba(13, 7, 20, 0.9);
+        color: #8d7a9e;
+        font: inherit;
+        font-size: 0.72rem;
+        font-weight: 950;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      .favorite-button.is-active {
+        border-color: rgba(255, 194, 71, 0.74);
+        color: #ffd36a;
       }
 
       .site-status {
@@ -783,7 +852,10 @@
           </div>
         </div>
         <div class="catalog-tools">
-          <input id="pluginSearchInput" class="text-input catalog-search" type="search" placeholder="Search plugins" aria-label="Search plugins" data-i18n-placeholder="catalog.search" data-i18n-aria="catalog.search">
+          <div class="catalog-search-row">
+            <input id="pluginSearchInput" class="text-input catalog-search" type="search" placeholder="Search plugins" aria-label="Search plugins" data-i18n-placeholder="catalog.search" data-i18n-aria="catalog.search">
+            <button id="favoritesOnlyButton" class="button favorites-toggle" type="button" aria-pressed="false">Favorites only</button>
+          </div>
           <p class="catalog-notice" data-i18n="catalog.notice">
             Plugins are community source connectors. Plugin creators and source sites are responsible for their own
             content, permissions, pages, and download behavior. Nyxovira Pro pays for app features, not third-party works.
@@ -855,6 +927,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260705-bilingual-hub"></script>
+    <script src="store.js?v=20260706-favorite-tag-exclude"></script>
   </body>
 </html>
