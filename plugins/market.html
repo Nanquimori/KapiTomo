@@ -322,19 +322,7 @@
 
       .tag-filter {
         display: grid;
-        gap: 7px;
-      }
-
-      .tag-filter-section {
-        display: grid;
         gap: 5px;
-      }
-
-      .tag-filter-mode {
-        margin: 0;
-        color: #f1e7ff;
-        font-size: 0.62rem;
-        font-weight: 950;
       }
 
       .tag-group {
@@ -379,12 +367,7 @@
         color: #ffd990;
       }
 
-      .filter-chip-exclude {
-        border-color: rgba(255, 107, 44, 0.3);
-        color: #c9b8d9;
-      }
-
-      .filter-chip-exclude.is-active {
+      .filter-chip.is-excluded {
         border-color: rgba(255, 107, 44, 0.78);
         color: #ffb08f;
       }
@@ -501,16 +484,18 @@
         top: 5px;
         right: 5px;
         z-index: 1;
-        width: 22px;
-        height: 22px;
-        display: inline-grid;
-        place-items: center;
+        width: 26px;
+        height: 26px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         border: 1px solid rgba(255, 178, 31, 0.28);
         border-radius: 999px;
+        padding: 0;
         background: rgba(13, 7, 20, 0.9);
         color: #8d7a9e;
         font: inherit;
-        font-size: 0.72rem;
+        font-size: 1rem;
         font-weight: 950;
         line-height: 1;
         cursor: pointer;
@@ -927,6 +912,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260706-favorite-tag-exclude"></script>
+    <script src="store.js?v=20260706-simple-tag-states"></script>
   </body>
 </html>

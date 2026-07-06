@@ -17,9 +17,8 @@ const languageButtons = Array.from(document.querySelectorAll("[data-language-opt
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
-const CATALOG_VERSION = "20260706-favorite-tag-exclude";
+const CATALOG_VERSION = "20260706-simple-tag-states";
 const MAX_SELECTED_TAGS = 4;
-const MAX_EXCLUDED_TAGS = 8;
 const MIN_PUBLIC_TAGS = 2;
 const OFFICIAL_LANGUAGE_TAGS = [
   "english",
@@ -77,8 +76,6 @@ const I18N = {
       loadError: "Could not load the catalog: {message}",
       language: "Language",
       type: "Type",
-      includeTags: "Required tags",
-      excludeTags: "Hidden tags",
       favorite: "Favorite",
       favorites: "Favorites",
       favoriteOnly: "Favorites only",
@@ -181,8 +178,6 @@ const I18N = {
       loadError: "Não foi possível carregar o catálogo: {message}",
       language: "Idioma",
       type: "Tipo",
-      includeTags: "Tags obrigatorias",
-      excludeTags: "Tags ocultas",
       favorite: "Favoritar",
       favorites: "Favoritos",
       favoriteOnly: "So favoritos",
@@ -583,29 +578,25 @@ function isLanguageTag(tag) {
   return LANGUAGE_TAGS.has(String(tag || "").trim().toLowerCase());
 }
 
-function renderTagButton(tag, mode) {
-  const isExclude = mode === "exclude";
-  const active = isExclude ? excludedTags.includes(tag) : selectedTags.includes(tag);
-  const blockedByOtherMode = isExclude ? selectedTags.includes(tag) : excludedTags.includes(tag);
-  const limit = isExclude ? MAX_EXCLUDED_TAGS : MAX_SELECTED_TAGS;
-  const count = isExclude ? excludedTags.length : selectedTags.length;
-  const disabled = blockedByOtherMode || (!active && count >= limit);
+function renderTagButton(tag) {
+  const active = selectedTags.includes(tag);
+  const excluded = excludedTags.includes(tag);
   const className = [
     "filter-chip",
-    isExclude ? "filter-chip-exclude" : "",
-    active ? "is-active" : ""
+    active ? "is-active" : "",
+    excluded ? "is-excluded" : ""
   ].filter(Boolean).join(" ");
-  return `<button class="${className}" type="button" data-filter-mode="${escapeHtml(mode)}" data-filter-tag="${escapeHtml(tag)}"${disabled ? " disabled" : ""}>${escapeHtml(tag)}</button>`;
+  return `<button class="${className}" type="button" data-filter-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</button>`;
 }
 
-function renderTagGroup(title, tags, mode) {
+function renderTagGroup(title, tags) {
   if (!tags.length) {
     return "";
   }
   return `
     <div class="tag-group">
       <p class="tag-group-title">${escapeHtml(title)}</p>
-      <div class="tag-row">${tags.map((tag) => renderTagButton(tag, mode)).join("")}</div>
+      <div class="tag-row">${tags.map(renderTagButton).join("")}</div>
     </div>
   `;
 }
@@ -621,12 +612,12 @@ function renderTagFilters(tags) {
   const contentTags = OFFICIAL_TYPE_TAGS;
   tagFilter.innerHTML = availableTags.length
     ? [
-      `<div class="tag-filter-section"><p class="tag-filter-mode">${escapeHtml(t("catalog.includeTags"))}</p>${renderTagGroup(t("catalog.language"), languageTags, "include")}${renderTagGroup(t("catalog.type"), contentTags, "include")}</div>`,
-      `<div class="tag-filter-section"><p class="tag-filter-mode">${escapeHtml(t("catalog.excludeTags"))}</p>${renderTagGroup(t("catalog.language"), languageTags, "exclude")}${renderTagGroup(t("catalog.type"), contentTags, "exclude")}</div>`
+      renderTagGroup(t("catalog.language"), languageTags),
+      renderTagGroup(t("catalog.type"), contentTags)
     ].join("")
     : `<p class="filter-status">${escapeHtml(t("catalog.noTags"))}</p>`;
   tagFilter.querySelectorAll("[data-filter-tag]").forEach((button) => {
-    button.addEventListener("click", () => toggleTagFilter(button.dataset.filterTag, button.dataset.filterMode));
+    button.addEventListener("click", () => toggleTagFilter(button.dataset.filterTag));
   });
 }
 
@@ -673,20 +664,17 @@ function applyTagFilters() {
   setTagStatus(filtered.length);
 }
 
-function toggleTagFilter(tag, mode = "include") {
+function toggleTagFilter(tag) {
   const clean = String(tag || "").trim().toLowerCase();
   if (!clean) {
     return;
   }
-  if (mode === "exclude") {
-    if (excludedTags.includes(clean)) {
-      excludedTags = excludedTags.filter((selected) => selected !== clean);
-    } else if (!selectedTags.includes(clean) && excludedTags.length < MAX_EXCLUDED_TAGS) {
-      excludedTags = [...excludedTags, clean];
-    }
-  } else if (selectedTags.includes(clean)) {
+  if (selectedTags.includes(clean)) {
     selectedTags = selectedTags.filter((selected) => selected !== clean);
-  } else if (!excludedTags.includes(clean) && selectedTags.length < MAX_SELECTED_TAGS) {
+    excludedTags = [...excludedTags, clean];
+  } else if (excludedTags.includes(clean)) {
+    excludedTags = excludedTags.filter((selected) => selected !== clean);
+  } else {
     selectedTags = [...selectedTags, clean];
   }
   applyTagFilters();
