@@ -27,7 +27,7 @@ my-plugin/
 
 | Arquivo | Função |
 | --- | --- |
-| `plugin.json` | Define id, nome, versão, hosts compatíveis, entrada do navegador, ícone e parser. |
+| `plugin.json` | Define id, nome, versão, hosts compatíveis, entrada do navegador, ícone e parser opcional. |
 | `browser/download_target.js` | Executa dentro da página aberta pelo Nyxovira e retorna o plano de download da obra. |
 
 Use o mesmo id estável no nome da pasta e em `plugin.json`.
@@ -76,8 +76,8 @@ Campos principais:
 | `browser.home_url` | Página aberta pelo navegador interno do app. |
 | `browser.icon_url` | Imagem pública do ícone. Plugins online precisam ter uma. |
 | `browser.download_target_script_file` | Script do navegador que detecta a obra aberta. |
-| `parser.adapter` | Tipo de parser do site. Use `html_series` para sites simples ou índices JS. |
-| `parser.base_url` | URL base usada para resolver links relativos. |
+| `parser.adapter` | Tipo de parser opcional do site. Use `html_series` para sites simples ou índices JS. |
+| `parser.base_url` | URL base usada para resolver links relativos quando um parser estiver configurado. |
 
 ## Mapeamento do Site
 
@@ -146,6 +146,44 @@ return "https://example.com/manga/work-slug/";
 ```
 
 O Nyxovira mostra a lista de capítulos a partir de `window.__nyxoviraChapterPlan` imediatamente.
+
+## Metadados Robustos de Capítulo
+
+Monte a lista de capítulos a partir de identificadores estáveis, não de texto visual misturado. Muitos sites renderizam a linha do capítulo com data de publicação, contadores, selos, bloqueios ou marcadores como "novo" no mesmo link. Se o plugin extrair o número do texto inteiro da linha, `Capítulo 1 07 jun.` pode virar `107`, ou o app pode mostrar entradas duplicadas que não existem.
+
+Prefira esta ordem:
+
+1. Leia o número do capítulo de um campo dedicado da API quando o site fornecer um.
+2. Se não houver API limpa, leia o número de um segmento estável da rota, como `/chapter/17`, `/read/work/ch-17` ou `/episode-17`.
+3. Use texto visível só como fallback, removendo datas, selos e números não relacionados antes de criar o plano.
+
+Mantenha `number`, `title` e `label` consistentes. O Nyxovira pode usar mais de um desses campos na janela de download, então evite colocar o mesmo número do capítulo em todos os campos sem intenção.
+
+Exemplo seguro para capítulo com imagens:
+
+```js
+var chapterId = "ch-17";
+var number = "017";
+var title = "Capitulo 017";
+
+{
+  id: "id:" + chapterId,
+  number: number,
+  title: title,
+  label: title,
+  contentType: "images",
+  url: "https://example.com/read/work/" + chapterId,
+  chapterDataPath: "/read/work/" + chapterId
+}
+```
+
+Se o site tiver uma API JSON limpa, prefira a API em vez de raspar HTML renderizado. APIs normalmente mantêm número do capítulo, ID, data, regras de acesso e URLs de imagem em campos separados.
+
+Se o plugin usa `browser/download_target.js` para montar um plano de capítulos personalizado e completo, tome cuidado com um bloco `parser` genérico no `plugin.json`. Um parser genérico de HTML também pode varrer a página e produzir uma segunda lista de capítulos a partir de texto visual ruidoso. Omita o parser ou deixe o mapeamento dele preciso quando o script do navegador for a fonte principal da lista.
+
+Remova duplicatas pelo ID estável do capítulo ou pelo número normalizado antes de definir `window.__nyxoviraChapterPlan`. Remova duplicatas novamente em `window.__nyxoviraPrepareDownloadPlan` se o app puder devolver um plano antigo ou gerado anteriormente.
+
+Valide capas da mesma forma. Algumas tags de metadados apontam para uma URL pública bonita que redireciona ou retorna `404`, enquanto a página renderizada usa uma URL de imagem funcional. Prefira uma URL verificada que retorna resposta `2xx` e tipo de conteúdo de imagem. Se necessário, exponha a mesma capa verificada em campos de compatibilidade como `coverUrl`, `cover`, `cover_url` e `thumbnailUrl`.
 
 ## Preparar Depois da Seleção
 
