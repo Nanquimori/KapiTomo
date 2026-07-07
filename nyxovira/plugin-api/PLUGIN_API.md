@@ -27,7 +27,7 @@ my-plugin/
 
 | File | Purpose |
 | --- | --- |
-| `plugin.json` | Defines the plugin id, name, version, supported hosts, browser entry, icon, and optional parser. |
+| `plugin.json` | Defines the plugin id, name, version, supported hosts, browser entry, icon, and parser. |
 | `browser/download_target.js` | Runs inside the page opened by Nyxovira and returns the work download plan. |
 
 Use the same stable id in the folder name and in `plugin.json`.
@@ -76,8 +76,8 @@ Main fields:
 | `browser.home_url` | Page opened by the app browser. |
 | `browser.icon_url` | Public icon image. Online plugins must have one. |
 | `browser.download_target_script_file` | Browser script that detects the open work. |
-| `parser.adapter` | Optional site parser type. Use `html_series` for simple sites or JS indexes. |
-| `parser.base_url` | Base URL used to resolve relative links when a parser is configured. |
+| `parser.adapter` | Site parser type. Use `html_series` for simple sites or JS indexes. |
+| `parser.base_url` | Base URL used to resolve relative links. |
 
 ## Site Mapping
 
@@ -146,44 +146,6 @@ return "https://example.com/manga/work-slug/";
 ```
 
 Nyxovira shows the chapter list from `window.__nyxoviraChapterPlan` immediately.
-
-## Robust Chapter Metadata
-
-Build the chapter list from stable identifiers, not from mixed visible text. Many sites render a chapter row with extra text such as release dates, counters, badges, lock labels, or "new" markers in the same link. If a plugin extracts the chapter number from the whole row text, `Chapter 1 07 Jun` can become `107`, or the app can show duplicate entries that do not exist.
-
-Prefer this order:
-
-1. Read the chapter number from a dedicated API field when the site provides one.
-2. Otherwise read it from a stable route segment such as `/chapter/17`, `/read/work/ch-17`, or `/episode-17`.
-3. Use visible text only as a fallback, and strip dates, badges, and unrelated numbers before creating the plan.
-
-Keep `number`, `title`, and `label` consistent. Nyxovira may use more than one of these fields when showing the download dialog, so avoid putting the same chapter number in every field unless that is the intended display.
-
-Safe image chapter example:
-
-```js
-var chapterId = "ch-17";
-var number = "017";
-var title = "Chapter 017";
-
-{
-  id: "id:" + chapterId,
-  number: number,
-  title: title,
-  label: title,
-  contentType: "images",
-  url: "https://example.com/read/work/" + chapterId,
-  chapterDataPath: "/read/work/" + chapterId
-}
-```
-
-If a site has a clean JSON API, prefer the API over scraping rendered HTML. APIs usually keep chapter numbers, IDs, dates, access flags, and image URLs in separate fields.
-
-If the plugin uses `browser/download_target.js` to build a complete custom chapter plan, be careful with a generic `parser` block in `plugin.json`. A generic HTML parser can also scan the page and produce a second chapter list from noisy visible text. Omit the parser or make its mapping precise when the browser script is the source of truth.
-
-Deduplicate chapters by the stable chapter ID or by the normalized chapter number before setting `window.__nyxoviraChapterPlan`. Deduplicate again in `window.__nyxoviraPrepareDownloadPlan` if the app may pass back a cached or previously generated plan.
-
-Validate covers the same way. Metadata tags sometimes point to a pretty public URL that redirects or returns `404`, while the rendered page uses a working image URL. Prefer a verified image URL that returns a `2xx` response and an image content type. If needed, expose the same verified cover in compatibility fields such as `coverUrl`, `cover`, `cover_url`, and `thumbnailUrl`.
 
 ## Prepare After Selection
 

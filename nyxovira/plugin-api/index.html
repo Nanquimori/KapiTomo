@@ -555,7 +555,7 @@
               <table>
                 <thead><tr><th>File</th><th>Purpose</th></tr></thead>
                 <tbody>
-                  <tr><td><code>plugin.json</code></td><td>Defines the plugin id, version, host, browser entry, icon, and optional parser.</td></tr>
+                  <tr><td><code>plugin.json</code></td><td>Defines the plugin id, version, host, browser entry, icon, and parser.</td></tr>
                   <tr><td><code>browser/download_target.js</code></td><td>Runs inside the open page and builds the work download plan.</td></tr>
                 </tbody>
               </table>
@@ -632,42 +632,6 @@
 });
 
 return "https://example.com/manga/work/";</code></pre>
-          </section>
-
-          <section id="robust-metadata" class="panel">
-            <h2>Robust chapter metadata</h2>
-            <p>Build the chapter list from stable identifiers, not from mixed visible text. Some pages render a chapter row with release dates, counters, badges, lock labels, or "new" markers inside the same link. If a plugin extracts the chapter number from the whole row text, <code>Chapter 1 07 Jun</code> can become <code>107</code>, or the app can show duplicate entries that do not exist.</p>
-            <div class="rule-list">
-              <article>
-                <h3>Prefer stable numbers</h3>
-                <p>Use a dedicated API field first. If there is no clean API, read the number from a stable route segment such as <code>/chapter/17</code>, <code>/read/work/ch-17</code>, or <code>/episode-17</code>. Use visible text only as a fallback after removing dates and unrelated numbers.</p>
-              </article>
-              <article>
-                <h3>Keep display fields consistent</h3>
-                <p><code>number</code>, <code>title</code>, and <code>label</code> may all affect the download dialog. Do not put noisy row text in those fields. Normalize them from the same chapter identifier.</p>
-              </article>
-              <article>
-                <h3>Avoid competing parsers</h3>
-                <p>If <code>browser/download_target.js</code> builds the complete chapter plan, a generic <code>parser</code> can also scan the page and produce a second list from noisy HTML. Omit the parser or make its mapping precise when the browser script is the source of truth.</p>
-              </article>
-              <article>
-                <h3>Verify cover URLs</h3>
-                <p>Metadata tags can point to an image URL that redirects or returns <code>404</code>. Prefer a verified URL that returns a <code>2xx</code> response and an image content type, then reuse it in <code>coverUrl</code>, <code>cover</code>, <code>cover_url</code>, or <code>thumbnailUrl</code> if compatibility fields are needed.</p>
-              </article>
-            </div>
-            <pre><code>var chapterId = "ch-17";
-var number = "017";
-var title = "Chapter 017";
-
-{
-  id: "id:" + chapterId,
-  number: number,
-  title: title,
-  label: title,
-  contentType: "images",
-  url: "https://example.com/read/work/" + chapterId,
-  chapterDataPath: "/read/work/" + chapterId
-}</code></pre>
           </section>
 
           <section id="prepare" class="panel">
@@ -836,7 +800,7 @@ var title = "Chapter 017";
               <table>
                 <thead><tr><th>Arquivo</th><th>Função</th></tr></thead>
                 <tbody>
-                  <tr><td><code>plugin.json</code></td><td>Define id, versão, host, entrada do navegador, ícone e parser opcional.</td></tr>
+                  <tr><td><code>plugin.json</code></td><td>Define id, versão, host, entrada do navegador, ícone e parser.</td></tr>
                   <tr><td><code>browser/download_target.js</code></td><td>Executa dentro da página aberta e monta o plano de download da obra.</td></tr>
                 </tbody>
               </table>
@@ -913,42 +877,6 @@ var title = "Chapter 017";
 });
 
 return "https://example.com/manga/work/";</code></pre>
-          </section>
-
-          <section class="panel">
-            <h2>Metadados robustos de capítulo</h2>
-            <p>Monte a lista de capítulos a partir de identificadores estáveis, não de texto visual misturado. Algumas páginas renderizam a linha do capítulo com datas, contadores, selos, bloqueios ou marcadores como "novo" dentro do mesmo link. Se o plugin extrair o número do texto inteiro da linha, <code>Capítulo 1 07 jun.</code> pode virar <code>107</code>, ou o app pode mostrar entradas duplicadas que não existem.</p>
-            <div class="rule-list">
-              <article>
-                <h3>Prefira números estáveis</h3>
-                <p>Use primeiro um campo dedicado da API. Se não houver API limpa, leia o número de um segmento estável da rota, como <code>/chapter/17</code>, <code>/read/work/ch-17</code> ou <code>/episode-17</code>. Use texto visível só como fallback depois de remover datas e números não relacionados.</p>
-              </article>
-              <article>
-                <h3>Mantenha campos consistentes</h3>
-                <p><code>number</code>, <code>title</code> e <code>label</code> podem afetar a janela de download. Não coloque texto visual ruidoso nesses campos. Normalize todos a partir do mesmo identificador de capítulo.</p>
-              </article>
-              <article>
-                <h3>Evite parsers concorrentes</h3>
-                <p>Se <code>browser/download_target.js</code> monta o plano completo de capítulos, um <code>parser</code> genérico também pode varrer a página e produzir uma segunda lista a partir de HTML ruidoso. Omita o parser ou deixe o mapeamento preciso quando o script do navegador for a fonte principal.</p>
-              </article>
-              <article>
-                <h3>Verifique URLs de capa</h3>
-                <p>Tags de metadados podem apontar para uma URL de imagem que redireciona ou retorna <code>404</code>. Prefira uma URL verificada que retorna resposta <code>2xx</code> e tipo de conteúdo de imagem, então reutilize em <code>coverUrl</code>, <code>cover</code>, <code>cover_url</code> ou <code>thumbnailUrl</code> se campos de compatibilidade forem necessários.</p>
-              </article>
-            </div>
-            <pre><code>var chapterId = "ch-17";
-var number = "017";
-var title = "Capitulo 017";
-
-{
-  id: "id:" + chapterId,
-  number: number,
-  title: title,
-  label: title,
-  contentType: "images",
-  url: "https://example.com/read/work/" + chapterId,
-  chapterDataPath: "/read/work/" + chapterId
-}</code></pre>
           </section>
 
           <section class="panel">
