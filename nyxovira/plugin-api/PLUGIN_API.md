@@ -291,10 +291,6 @@ Content type tags:
 - `novel`
 - `webtoon`
 - `comic`
-- `doujinshi`
-- `yaoi`
-- `yuri`
-- `porn`
 
 There is no package URL in the public publishing format. The repository is the source of the plugin.
 

@@ -17,7 +17,7 @@ const languageButtons = Array.from(document.querySelectorAll("[data-language-opt
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
-const CATALOG_VERSION = "20260706-favorite-star-align";
+const CATALOG_VERSION = "20260709-remove-adult-tags";
 const MAX_SELECTED_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
 const OFFICIAL_LANGUAGE_TAGS = [
@@ -42,11 +42,7 @@ const OFFICIAL_TYPE_TAGS = [
   "manhwa",
   "novel",
   "webtoon",
-  "comic",
-  "doujinshi",
-  "yaoi",
-  "yuri",
-  "porn"
+  "comic"
 ];
 const LANGUAGE_TAGS = new Set(OFFICIAL_LANGUAGE_TAGS);
 const TYPE_TAGS = new Set(OFFICIAL_TYPE_TAGS);
