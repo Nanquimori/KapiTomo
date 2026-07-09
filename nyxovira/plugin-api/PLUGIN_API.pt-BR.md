@@ -291,10 +291,6 @@ Tags de tipo de conteúdo:
 - `novel`
 - `webtoon`
 - `comic`
-- `doujinshi`
-- `yaoi`
-- `yuri`
-- `porn`
 
 O formato público de publicação usa o repositório como fonte do plugin.
 

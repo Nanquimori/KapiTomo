@@ -31,11 +31,7 @@ const OFFICIAL_TYPE_TAGS = [
   "manhwa",
   "novel",
   "webtoon",
-  "comic",
-  "doujinshi",
-  "yaoi",
-  "yuri",
-  "porn"
+  "comic"
 ];
 const LANGUAGE_TAGS = new Set(OFFICIAL_LANGUAGE_TAGS);
 const TYPE_TAGS = new Set(OFFICIAL_TYPE_TAGS);
