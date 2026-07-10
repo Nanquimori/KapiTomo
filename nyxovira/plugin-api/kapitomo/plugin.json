@@ -2,7 +2,7 @@
     "schema_version":  1,
     "id":  "kapitomo",
     "name":  "KapiTomo",
-    "version":  "1.0.16",
+    "version":  "1.0.17",
     "tags":  [
                  "portuguese",
                  "manhwa",
@@ -23,7 +23,7 @@
     "parser":  {
                    "adapter":  "html_series",
                    "base_url":  "https://nanquimori.github.io/KapiTomo",
-                   "static_works_script":  "https://nanquimori.github.io/KapiTomo/data/works.js?v=20260710-site-pt",
+                   "static_works_script":  "https://nanquimori.github.io/KapiTomo/data/works.js?v=20260710-site-pt-novel",
                    "base_path_prefix":  "KapiTomo",
                    "series_path_prefix":  "manga",
                    "hash_series_path_prefixes":  [

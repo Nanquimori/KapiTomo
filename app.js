@@ -233,6 +233,50 @@ const NOVEL_CHAPTER_TITLES = {
   ]
 };
 
+const NOVEL_CHAPTER_PARAGRAPHS = {
+  pt: {
+    "world-without-humans": [
+      [
+        "Caio tinha quatorze anos e voltava da escola para casa quando o chão desapareceu. Um segundo antes havia asfalto, uma mochila pesada e barulho de ônibus. No seguinte, havia lama até os tornozelos, ar frio e uma floresta que respirava como um animal enorme.",
+        "Ele chamou por alguém. Ninguém respondeu. Não havia postes, casas, carros nem vozes humanas. Apenas árvores altas demais, folhas escuras e marcas de garras nos troncos. Caio apertou a alça da mochila e tentou não chorar.",
+        "Um rugido rasgou o céu. Entre as nuvens, uma sombra alada passou devagar. Era um dragão. Não um desenho, não um sonho. Um dragão real, grande como um prédio, procurando alguma coisa no vale.",
+        "Caio correu para baixo de uma raiz gigante e prendeu a respiração. O monstro pousou longe, mas o vento das asas derrubou galhos ao redor dele. Quando tudo ficou quieto, abriu a mochila. Tinha uma garrafa d'água, dois pães, um caderno, uma lanterna pequena e um canivete simples que usava para apontar lápis.",
+        "Não era muito. Mas era tudo. Caio decidiu que não gastaria energia gritando. Primeiro precisava de abrigo. Depois água. Depois um jeito de entender onde estava.",
+        "Enquanto caminhava, encontrou pegadas pequenas perto de um riacho. Achou que eram de uma criança até ver uma flecha presa numa pedra. A ponta estava manchada com veneno verde.",
+        "Risadas finas subiram dos arbustos. Goblins. Quatro deles, baixos, magros e armados com facas curvas, cercavam o riacho farejando o ar. Caio se jogou na lama atrás de uma pedra e cobriu a boca com a manga.",
+        "Um goblin passou tão perto que Caio viu os dentes quebrados e os olhos amarelos. Se ele se mexesse, morreria ali mesmo. Então ficou parado, contando as batidas do próprio coração.",
+        "Quando os goblins foram embora, Caio entendeu a primeira regra daquele mundo: tudo ali via um humano como comida, inimigo ou algo estranho demais para deixar vivo. Pegou a flecha envenenada com cuidado, enterrou o medo no fundo do peito e continuou andando antes que a noite chegasse."
+      ],
+      [
+        "Caio passou a primeira noite dentro do tronco oco de uma árvore. Não dormiu de verdade. Cada estalo parecia um passo, cada sombra parecia uma garra. Quando o sol cinzento nasceu, ele estava com fome, frio e coberto de lama.",
+        "Comeu metade de um pão e guardou o resto. No caderno, escreveu três regras: não correr sem saber para onde ir, não fazer fogo durante o dia e não confiar em ninguém armado.",
+        "A terceira regra falhou antes do meio-dia. Perto de uma clareira, Caio viu dois elfos. Eram altos, bonitos e silenciosos, com arcos longos e roupas de couro claro. Por um segundo, quase pediu ajuda.",
+        "Então viu o que estavam fazendo. Os elfos perseguiam uma criaturinha ferida, rindo sempre que ela tropeçava. Um deles disparou uma flecha só para cortar o caminho da vítima. Não estavam caçando por comida. Estavam brincando.",
+        "Caio recuou devagar, mas seu pé quebrou um galho. Os dois elfos viraram o rosto ao mesmo tempo. Os olhos deles eram prateados e frios. Um deles sorriu como alguém que encontra um brinquedo novo.",
+        "Caio correu. Lembrou da própria regra tarde demais. Flechas assobiaram perto de suas orelhas. Entrou numa parte da mata onde as árvores tinham espinhos vermelhos e se jogou debaixo delas. Os elfos hesitaram. Os espinhos se moviam sozinhos.",
+        "Com o canivete, Caio cortou tiras da própria camisa e enrolou nos braços para atravessar a vegetação sem rasgar a pele. Uma flecha atingiu sua mochila, mas ficou presa no tecido. Ele não olhou para trás.",
+        "No fim da trilha, encontrou uma caverna baixa. Lá dentro havia ossos antigos e cheiro de animal, mas também havia pedras secas. Caio entrou, puxou galhos sobre a abertura e esperou.",
+        "Quando a noite caiu, os elfos desistiram. Caio tremia inteiro. Mesmo assim, fez algo importante: quebrou a flecha presa na mochila e guardou a ponta. Naquele mundo, qualquer ferramenta podia virar uma chance.",
+        "Ele não era forte. Não sabia lutar. Mas sabia observar. E, se conseguisse sobreviver mais um dia, talvez descobrisse uma saída."
+      ],
+      [
+        "Na manhã seguinte, Caio encontrou marcas antigas na parede da caverna. Não eram desenhos de animais. Eram setas, círculos e um símbolo repetido três vezes: uma porta dentro de uma montanha.",
+        "Seguiu as marcas por um túnel estreito. A lanterna falhou duas vezes, e a escuridão parecia pressionar seu rosto. Quando saiu do outro lado, viu ruínas de pedra engolidas por raízes. No centro havia um arco quebrado, igual ao símbolo na parede.",
+        "O problema era o dragão. Ele dormia enrolado ao redor das ruínas, soltando fumaça pelo nariz. Entre suas escamas havia cicatrizes de lanças e flechas. Até os elfos e goblins tinham medo dele.",
+        "Caio se escondeu e pensou. Não podia lutar. Não podia correr. Então fez a única coisa que ainda sabia fazer melhor que os monstros: improvisar.",
+        "Usou a garrafa vazia, pedrinhas e a ponta da flecha para fazer um chocalho. Amarrou tudo numa vinha e jogou longe contra uma coluna caída. O barulho ecoou pela ruína.",
+        "O dragão abriu um olho. Depois o outro. Ergueu a cabeça e avançou na direção do som, irritado. Caio correu abaixado, quase engatinhando, até o arco de pedra.",
+        "O portal não acendeu. Faltava alguma coisa. Caio viu um encaixe no centro da base, exatamente do tamanho da lanterna. Engoliu em seco, colocou o objeto ali e apertou o botão.",
+        "A luz fraca virou uma linha branca. O arco inteiro tremeu. O dragão percebeu e rugiu. Caio sentiu o calor alcançar suas costas, mas não tirou a mão da lanterna.",
+        "Quando o portal se abriu, viu por um instante a rua perto de casa. O mesmo poste, o mesmo muro pichado, o mesmo mundo humano barulhento que antes parecia comum demais.",
+        "Caio pulou. Caiu de joelhos no asfalto, com a mochila rasgada e lama até o pescoço. O portal se fechou atrás dele como um suspiro.",
+        "Ninguém acreditaria nele. Talvez até ele mesmo parasse de acreditar depois de alguns dias. Mas dentro da mochila ainda havia uma escama preta, quente como brasa.",
+        "Caio colocou a escama no bolso e olhou para o céu. Estava em casa. Mas agora sabia uma coisa que nunca esqueceria: sobreviver não era derrotar todos os monstros. Era continuar pensando quando o medo queria pensar por ele."
+      ]
+    ]
+  }
+};
+
 let activeFilter = "All";
 let query = new URLSearchParams(window.location.search).get("q") || "";
 let currentLanguage = initialLanguage();
@@ -424,7 +468,12 @@ function workUrl(work) {
   return `#work/${work.id}`;
 }
 
-function getChapterParagraphs(chapter) {
+function getChapterParagraphs(work, chapter, index) {
+  const localizedParagraphs = NOVEL_CHAPTER_PARAGRAPHS[currentLanguage]?.[work.id]?.[index];
+  if (chapter.contentType === "novel" && Array.isArray(localizedParagraphs) && localizedParagraphs.length) {
+    return localizedParagraphs;
+  }
+
   if (Array.isArray(chapter.paragraphs) && chapter.paragraphs.length) {
     return chapter.paragraphs;
   }
@@ -573,7 +622,7 @@ function renderChapterPage(work, chapterIndex = 0) {
   const nextIndex = safeIndex < work.chapters.length - 1 ? safeIndex + 1 : null;
   const fragment = chapterTemplate.content.cloneNode(true);
   const page = fragment.querySelector(".chapter-page");
-  const paragraphs = getChapterParagraphs(chapter);
+  const paragraphs = getChapterParagraphs(work, chapter, safeIndex);
   const isNovel = chapter.contentType === "novel";
   const isImageChapter = chapter.contentType === "images";
   const workTitle = displayTitle(work);
@@ -592,7 +641,7 @@ function renderChapterPage(work, chapterIndex = 0) {
     page.classList.add("novel-page");
     fragment.querySelector(".webtoon-strip").className = "novel-reader";
     fragment.querySelector(".novel-reader").innerHTML = paragraphs
-      .map((paragraph) => `<p>${paragraph}</p>`)
+      .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
       .join("");
   } else if (isImageChapter) {
     const imagePages = getChapterImages(chapter);
