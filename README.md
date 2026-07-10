@@ -6,8 +6,8 @@ Website: https://nanquimori.github.io/KapiTomo/
 Plugin Hub: https://nanquimori.github.io/KapiTomo/plugins/
 Plugin catalog: https://nanquimori.github.io/KapiTomo/plugins/catalog-store.json
 Plugin API: https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/
-Terms and Content Policy: https://nanquimori.github.io/KapiTomo/terms/index.html
-Privacy Policy: https://nanquimori.github.io/KapiTomo/privacy/index.html
+Terms and Content Policy: https://nanquimori.github.io/KapiTomo/terms/
+Privacy Policy: https://nanquimori.github.io/KapiTomo/privacy/
 
 ## Public Map
 
