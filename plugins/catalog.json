@@ -2,7 +2,7 @@
   "schema_version": 3,
   "name": "KapiTomo Plugin Hub",
   "description": "Public plugin catalog for Nyxovira.",
-  "catalog_revision": "20260709-remove-adult-tags",
+  "catalog_revision": "20260710-kapitomo-1017-pt-novel",
   "publish_model": "github-repository",
   "suggested_tags": [
     "english",
@@ -62,7 +62,7 @@
       "id": "kapitomo",
       "name": "KapiTomo",
       "author": "Nanquimori",
-      "version": "1.0.15",
+      "version": "1.0.17",
       "site_url": "https://nanquimori.github.io/KapiTomo/",
       "homepage": "https://nanquimori.github.io/KapiTomo/",
       "icon_url": "https://nanquimori.github.io/KapiTomo/assets/kapitomo-logo.png?v=20260626",
@@ -75,10 +75,10 @@
       "status": "active",
       "consecutive_failures": 0,
       "last_error": "",
-      "last_checked_at": "2026-07-04T18:55:00.000Z",
+      "last_checked_at": "2026-07-10T15:02:09.045Z",
       "tags": [
         "official",
-        "english",
+        "portuguese",
         "manhwa",
         "novel"
       ]
