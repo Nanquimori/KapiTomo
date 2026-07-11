@@ -5,7 +5,6 @@ const { execFileSync } = require("child_process");
 
 const CATALOG_PATHS = ["plugins/catalog-store.json", "plugins/catalog.json"];
 const MAINTAINERS = new Set(["nanquimori"]);
-const APPROVAL_LABELS = new Set(["approved", "plugin-approved"]);
 const BROKEN_AFTER_FAILURES = 2;
 const MAX_PUBLIC_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
@@ -360,21 +359,6 @@ function isMaintainer(actor) {
   return MAINTAINERS.has(String(actor || "").toLowerCase());
 }
 
-function issueHasApproval(issue) {
-  const labels = Array.isArray(issue.labels) ? issue.labels : [];
-  return labels.some((label) => APPROVAL_LABELS.has(String(label.name || label).toLowerCase()));
-}
-
-function approvalMessage(action) {
-  return [
-    `${action} request validated.`,
-    "",
-    "Status: waiting for maintainer approval.",
-    "",
-    "Add the `approved` label to finish this request."
-  ].join("\n");
-}
-
 async function publishPlugin(issue) {
   const plugin = normalizePlugin(extractJson(issue.body));
   const actor = String(issue.user && issue.user.login || "").trim();
@@ -432,7 +416,8 @@ function removalIdFromIssue(issue) {
 
 async function removePlugin(issue) {
   const id = removalIdFromIssue(issue);
-  const maintainer = isMaintainer(issue.user && issue.user.login);
+  const actor = String(issue.user && issue.user.login || "").trim();
+  const maintainer = isMaintainer(actor);
   const catalog = loadCatalog();
   const existing = catalog.plugins.find((item) => String(item.id || "").toLowerCase() === id);
   if (!existing) {
@@ -441,13 +426,8 @@ async function removePlugin(issue) {
   if (Array.isArray(existing.tags) && existing.tags.includes("official") && !maintainer) {
     throw new Error("Official plugins can only be removed by a maintainer.");
   }
-
-  if (!maintainer && !issueHasApproval(issue)) {
-    return {
-      pending: true,
-      title: `Validate removal ${id}`,
-      message: approvalMessage(`Removal for **${existing.name || id}**`)
-    };
+  if (!maintainer && repositoryOwner(existing.repository_url).toLowerCase() !== actor.toLowerCase()) {
+    throw new Error("Only the plugin repository owner or a maintainer can remove this plugin.");
   }
 
   catalog.plugins = catalog.plugins.map((item) => {
@@ -666,10 +646,6 @@ async function main() {
     const result = title.startsWith("[plugin-remove]")
       ? await removePlugin(issue)
       : await publishPlugin(issue);
-    if (result.pending) {
-      await comment(issue.number, result.message);
-      return;
-    }
     const changed = dryRun ? true : commitAndPush(result.title, issue.number);
     await comment(issue.number, `${result.message}\n\nStatus: ${changed ? "catalog updated" : "catalog was already up to date"}.`);
     await closeIssue(issue.number);

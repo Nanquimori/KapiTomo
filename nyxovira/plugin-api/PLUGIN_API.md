@@ -309,7 +309,7 @@ Review rules:
 - A visible host can only have one plugin.
 - Only the repository owner can publish or update a community plugin.
 - Valid requests are published automatically.
-- Removal requests opened by maintainers are applied automatically; other removals require maintainer approval.
+- Plugin owners can remove their own plugins automatically, and maintainers can remove any plugin. Unauthorized removals are rejected.
 - If the repository or `plugin.json` disappears later, the entry is removed from the public catalog.
 
 Status values:
