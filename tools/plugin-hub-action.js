@@ -105,6 +105,11 @@ function validateGitHubRepository(value) {
   return `https://github.com/${parts[0]}/${parts[1].replace(/\.git$/i, "")}`;
 }
 
+function repositoryOwner(value) {
+  const url = new URL(value);
+  return url.pathname.split("/").filter(Boolean)[0] || "";
+}
+
 function normalizeHost(value) {
   const host = String(value || "").trim().toLowerCase().replace(/^www\./, "");
   return host.replace(/:\d+$/, "");
@@ -372,24 +377,27 @@ function approvalMessage(action) {
 
 async function publishPlugin(issue) {
   const plugin = normalizePlugin(extractJson(issue.body));
+  const actor = String(issue.user && issue.user.login || "").trim();
+  const maintainer = isMaintainer(actor);
+  if (!maintainer && repositoryOwner(plugin.repository_url).toLowerCase() !== actor.toLowerCase()) {
+    throw new Error("The request author must own the plugin repository.");
+  }
   await validateRepositoryPlugin(plugin);
 
   const catalog = loadCatalog();
   const existing = catalog.plugins.find((item) => String(item.id || "").toLowerCase() === plugin.id);
-  if (existing && Array.isArray(existing.tags) && existing.tags.includes("official") && !isMaintainer(issue.user && issue.user.login)) {
+  if (existing && Array.isArray(existing.tags) && existing.tags.includes("official") && !maintainer) {
     throw new Error("Official plugins can only be changed by a maintainer.");
+  }
+  if (existing && !maintainer && repositoryOwner(existing.repository_url).toLowerCase() !== actor.toLowerCase()) {
+    throw new Error("Only the current plugin repository owner or a maintainer can update this plugin.");
+  }
+  if (!maintainer) {
+    plugin.author = actor;
   }
   const duplicate = await findDuplicateHost(catalog, plugin);
   if (duplicate) {
     throw new Error(`Host ${duplicate.host} is already covered by plugin ${duplicate.plugin.id || duplicate.plugin.name}.`);
-  }
-
-  if (!issueHasApproval(issue)) {
-    return {
-      pending: true,
-      title: `Validate plugin ${plugin.id}`,
-      message: approvalMessage(`Plugin **${plugin.name}**`)
-    };
   }
 
   if (existing && Array.isArray(existing.tags) && existing.tags.includes("official") && !plugin.tags.includes("official")) {
