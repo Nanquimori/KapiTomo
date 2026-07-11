@@ -82,6 +82,32 @@
         "manhwa",
         "novel"
       ]
+    },
+    {
+      "id": "nexustoons",
+      "name": "NexusToons",
+      "description": "Site plugin for downloading works from NexusToons in Nyxovira.",
+      "author": "yxz0w0zxy",
+      "version": "1.0.7",
+      "site_url": "https://nexustoons.com/",
+      "homepage": "https://nexustoons.com/",
+      "icon_url": "https://nexustoons.com/icon.png",
+      "repository_url": "https://github.com/yxz0w0zxy/NexusToons",
+      "repository_ref": "main",
+      "plugin_path": "",
+      "tags": [
+        "portuguese",
+        "manga",
+        "manhwa",
+        "manhua"
+      ],
+      "hosts": [
+        "nexustoons.com"
+      ],
+      "status": "active",
+      "consecutive_failures": 0,
+      "last_error": "",
+      "last_checked_at": "2026-07-11T19:35:05.141Z"
     }
   ]
 }
