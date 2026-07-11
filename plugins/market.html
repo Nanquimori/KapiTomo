@@ -319,6 +319,110 @@
         font-weight: 650;
         line-height: 1.32;
       }
+      .ownership-guide {
+        display: grid;
+        gap: 9px;
+        margin: 14px 0;
+        border: 1px solid rgba(182, 143, 255, 0.3);
+        border-radius: 12px;
+        padding: 12px;
+        background:
+          radial-gradient(circle at top right, rgba(182, 143, 255, 0.12), transparent 42%),
+          rgba(255, 255, 255, 0.035);
+      }
+
+      .ownership-guide-head {
+        display: flex;
+        gap: 9px;
+        align-items: center;
+      }
+
+      .ownership-mark {
+        width: 30px;
+        height: 30px;
+        flex: 0 0 30px;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(255, 189, 68, 0.38);
+        border-radius: 9px;
+        background: rgba(255, 189, 68, 0.09);
+        color: #ffbd44;
+        font-size: 0.9rem;
+        font-weight: 950;
+      }
+
+      .ownership-guide .kicker {
+        margin: 0;
+      }
+
+      .ownership-guide h3 {
+        margin: 2px 0 0;
+        font-size: 0.92rem;
+      }
+
+      .ownership-guide > p {
+        margin: 0;
+        color: #cfc2df;
+        font-size: 0.76rem;
+        line-height: 1.45;
+      }
+
+      .ownership-examples {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .ownership-examples li {
+        display: flex;
+        gap: 7px;
+        align-items: flex-start;
+        border: 1px solid rgba(255, 255, 255, 0.075);
+        border-radius: 9px;
+        padding: 8px;
+        background: rgba(7, 3, 16, 0.36);
+        color: #ddd3e8;
+        font-size: 0.71rem;
+        line-height: 1.38;
+      }
+
+      .ownership-examples li::before {
+        content: "✓";
+        color: #7ce3a1;
+        font-weight: 950;
+      }
+
+      .ownership-examples li[data-tone="blocked"]::before {
+        content: "×";
+        color: #ff8c9d;
+      }
+
+      .ownership-examples li[data-tone="moderator"]::before {
+        content: "◆";
+        color: #ffbd44;
+      }
+
+      .ownership-examples code {
+        color: #d7bdff;
+        font-size: 0.69rem;
+        font-weight: 850;
+        overflow-wrap: anywhere;
+        white-space: normal;
+        word-break: break-word;
+      }
+
+      .ownership-examples li > span {
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+
+      .ownership-rule {
+        border-top: 1px solid var(--line);
+        padding-top: 8px;
+      }
 
       .tag-filter {
         display: grid;
@@ -791,6 +895,14 @@
           line-height: 1.28;
         }
 
+        .ownership-guide {
+          padding: 9px;
+        }
+
+        .ownership-examples {
+          grid-template-columns: 1fr;
+        }
+
         .catalog-search {
           width: 100%;
           max-width: 100%;
@@ -907,6 +1019,23 @@
         <p class="kicker" data-i18n="remove.kicker">Remove</p>
         <h2 data-i18n="remove.title">Remove a publication</h2>
         <p data-i18n="remove.description">Enter the published plugin and confirm the GitHub request. Plugin owners can remove their own plugins automatically, and maintainers can remove any plugin.</p>
+        <aside class="ownership-guide" aria-labelledby="ownershipGuideTitle">
+          <div class="ownership-guide-head">
+            <span class="ownership-mark" aria-hidden="true">@</span>
+            <div>
+              <p class="kicker" data-i18n="ownership.kicker">Ownership</p>
+              <h3 id="ownershipGuideTitle" data-i18n="ownership.title">Who can manage a plugin?</h3>
+            </div>
+          </div>
+          <p data-i18n="ownership.explainer">The Hub compares the GitHub account that opens the request with the repository owner saved in the catalog.</p>
+          <ul class="ownership-examples">
+            <li><span><code>joao123</code> <span data-i18n="ownership.joao">can publish and remove</span> <code>joao123/PluginManga</code>.</span></li>
+            <li><span><code>maria456</code> <span data-i18n="ownership.maria">can publish and remove</span> <code>maria456/PluginNovel</code>.</span></li>
+            <li data-tone="blocked"><span><code>joao123</code> <span data-i18n="ownership.blocked">cannot remove Maria's plugin</span> <code>maria456/PluginNovel</code>.</span></li>
+            <li data-tone="moderator"><span><code>Nanquimori</code> <span data-i18n="ownership.moderator">can remove both to moderate the catalog</span>.</span></li>
+          </ul>
+          <p class="ownership-rule" data-i18n="ownership.rule">The typed link and ID identify the plugin; authorization comes from the GitHub account that creates the issue.</p>
+        </aside>
         <div class="publish-form">
           <label class="field-label" for="removePluginIdInput" data-i18n="remove.pluginId">Plugin ID</label>
           <input id="removePluginIdInput" class="text-input" type="text" placeholder="my-plugin">
@@ -917,6 +1046,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260710-kapitomo-1017-pt-novel"></script>
+    <script src="store.js?v=20260711-plugin-ownership"></script>
   </body>
 </html>
