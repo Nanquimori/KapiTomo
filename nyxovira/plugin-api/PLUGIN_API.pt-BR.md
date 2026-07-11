@@ -230,7 +230,7 @@ Para capítulos com imagens, `pages` é o campo preferido. O Nyxovira também l�
 
 O Plugin Hub instala plugins diretamente de repositórios públicos do GitHub.
 
-O catálogo público é revisado. Uma solicitação de publicação é validada automaticamente, mas só aparece online depois que um mantenedor aprova. Isso evita plugins duplicados para o mesmo site e reduz entradas que não funcionam.
+As solicitações de publicação são validadas automaticamente e plugins válidos são publicados imediatamente. A validação impede plugins duplicados para o mesmo site e recusa repositórios que não seguem as regras do catálogo. Mantenedores podem remover plugins que violem essas regras.
 
 O Plugin Hub é um catálogo, não um host de conteúdo. O criador do plugin é responsável pelo código, mapeamento do site, ícone, metadados, permissões e manutenção. Os sites de origem são responsáveis por suas próprias páginas e conteúdos. O Nyxovira Pro libera recursos do app e não vende obras, páginas, capítulos, traduções ou plugins de terceiros.
 
@@ -300,14 +300,16 @@ Fluxo de publicação:
 2. Confirme a solicitação gerada no GitHub.
 3. A automação valida `plugin.json`, ícone público, tags oficiais, repositório e hosts cobertos.
 4. Se outro plugin visível já cobre o mesmo host, a solicitação é recusada.
-5. Um mantenedor adiciona o selo de aprovação.
-6. A automação publica a entrada no catálogo.
+5. O autor da solicitação deve ser dono do repositório do plugin.
+6. A automação publica imediatamente a entrada válida no catálogo.
 
 Regras de revisão:
 
 - O Hub verifica repositório, ícone, tags oficiais e hosts cobertos.
 - Um host visível só pode ter um plugin.
-- Solicitações válidas aguardam aprovação do mantenedor antes de serem publicadas.
+- Somente o dono do repositório pode publicar ou atualizar um plugin da comunidade.
+- Solicitações válidas são publicadas automaticamente.
+- Mantenedores podem remover plugins que violem as regras do catálogo.
 - Se o repositório ou `plugin.json` desaparecer depois, a entrada é removida do catálogo público.
 
 Valores de status:

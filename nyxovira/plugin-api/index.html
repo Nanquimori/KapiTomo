@@ -686,7 +686,7 @@ return "https://example.com/manga/work/";</code></pre>
 
           <section id="publishing" class="panel">
             <h2>Publishing</h2>
-            <p>The Plugin Hub installs plugins from public GitHub repositories. The repository is the plugin source, and public catalog entries are reviewed before they appear online.</p>
+            <p>The Plugin Hub installs plugins from public GitHub repositories. The repository is the plugin source, and valid catalog entries are published automatically.</p>
             <p>The Plugin Hub is a catalog, not a content host. Plugin creators are responsible for their code, site mapping, icons, metadata, permissions, and maintenance. Source sites are responsible for their own pages and content. Nyxovira Pro unlocks app features and does not sell third-party works, pages, chapters, translations, or plugins.</p>
             <pre><code>{
   "id": "my-plugin",
@@ -722,11 +722,11 @@ return "https://example.com/manga/work/";</code></pre>
             <div class="rule-list">
               <article>
                 <h3>Review</h3>
-                <p>The Hub checks the repository, icon, official tags, and covered hosts. A visible host can only have one plugin.</p>
+                <p>The Hub checks the repository, icon, official tags, covered hosts, and repository ownership. A visible host can only have one plugin.</p>
               </article>
               <article>
                 <h3>Publication</h3>
-                <p>Valid requests wait for maintainer approval before publication.</p>
+                <p>Valid requests are published automatically. Maintainers can remove plugins that violate the catalog rules.</p>
               </article>
               <article>
                 <h3>Removal</h3>
@@ -736,7 +736,7 @@ return "https://example.com/manga/work/";</code></pre>
             <div class="steps">
               <div class="step"><p>Keep <code>plugin.json</code> and <code>browser/download_target.js</code> in the repository.</p></div>
               <div class="step"><p>Open the Plugin Hub and paste the GitHub repository URL.</p></div>
-              <div class="step"><p>Confirm the GitHub request. Automation validates it, then a maintainer approves publication.</p></div>
+              <div class="step"><p>Confirm the GitHub request. Automation validates it and publishes valid plugins immediately.</p></div>
             </div>
             <div class="rule-list">
               <article>
@@ -931,7 +931,7 @@ return "https://example.com/manga/work/";</code></pre>
 
           <section class="panel">
             <h2>Publicação</h2>
-            <p>O Plugin Hub instala plugins a partir de repositórios públicos do GitHub. O repositório é a fonte do plugin, e as entradas públicas do catálogo são revisadas antes de aparecerem online.</p>
+            <p>O Plugin Hub instala plugins a partir de repositórios públicos do GitHub. O repositório é a fonte do plugin, e entradas válidas são publicadas automaticamente.</p>
             <p>O Plugin Hub é um catálogo, não um host de conteúdo. Criadores de plugins são responsáveis pelo código, mapeamento do site, ícones, metadados, permissões e manutenção. Os sites de origem são responsáveis por suas próprias páginas e conteúdos. O Nyxovira Pro libera recursos do app e não vende obras, páginas, capítulos, traduções ou plugins de terceiros.</p>
             <pre><code>{
   "id": "my-plugin",
@@ -967,11 +967,11 @@ return "https://example.com/manga/work/";</code></pre>
             <div class="rule-list">
               <article>
                 <h3>Revisão</h3>
-                <p>O Hub verifica repositório, ícone, tags oficiais e hosts cobertos. Um host visível só pode ter um plugin.</p>
+                <p>O Hub verifica repositório, ícone, tags oficiais, hosts cobertos e a propriedade do repositório. Um host visível só pode ter um plugin.</p>
               </article>
               <article>
                 <h3>Publicação</h3>
-                <p>Solicitações válidas aguardam aprovação do mantenedor antes de serem publicadas.</p>
+                <p>Solicitações válidas são publicadas automaticamente. Mantenedores podem remover plugins que violem as regras do catálogo.</p>
               </article>
               <article>
                 <h3>Remoção</h3>
@@ -981,7 +981,7 @@ return "https://example.com/manga/work/";</code></pre>
             <div class="steps">
               <div class="step"><p>Mantenha <code>plugin.json</code> e <code>browser/download_target.js</code> no repositório.</p></div>
               <div class="step"><p>Abra o Plugin Hub e cole a URL do repositório GitHub.</p></div>
-              <div class="step"><p>Confirme a solicitação no GitHub. A automação valida tudo, então um mantenedor aprova a publicação.</p></div>
+              <div class="step"><p>Confirme a solicitação no GitHub. A automação valida tudo e publica imediatamente os plugins válidos.</p></div>
             </div>
             <div class="rule-list">
               <article>

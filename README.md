@@ -111,13 +111,14 @@ Public plugin entries include:
 - `status`, shown as `Online` or `Offline` in the Hub.
 - official tags only: one language first, then one to three content types.
 
-Publishing is reviewed:
+Publishing is automatic after validation:
 
 1. Paste the plugin GitHub repository in the Hub.
 2. Confirm the generated GitHub publication request.
 3. Automation validates the repository, manifest, icon, tags, and hosts.
-4. A maintainer approves valid requests.
-5. The catalog is updated and published to GitHub Pages.
+4. The request author must own the plugin repository.
+5. Valid requests are added to the catalog and published to GitHub Pages.
+6. Maintainers can remove plugins that violate the catalog rules.
 
 If a source site fails health checks, the plugin appears as `Offline`. If the repository or `plugin.json` disappears, the plugin is removed from the public catalog.
 
