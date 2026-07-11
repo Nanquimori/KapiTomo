@@ -432,16 +432,17 @@ function removalIdFromIssue(issue) {
 
 async function removePlugin(issue) {
   const id = removalIdFromIssue(issue);
+  const maintainer = isMaintainer(issue.user && issue.user.login);
   const catalog = loadCatalog();
   const existing = catalog.plugins.find((item) => String(item.id || "").toLowerCase() === id);
   if (!existing) {
     throw new Error(`Plugin ${id} does not exist in the catalog.`);
   }
-  if (Array.isArray(existing.tags) && existing.tags.includes("official") && !isMaintainer(issue.user && issue.user.login)) {
+  if (Array.isArray(existing.tags) && existing.tags.includes("official") && !maintainer) {
     throw new Error("Official plugins can only be removed by a maintainer.");
   }
 
-  if (!issueHasApproval(issue)) {
+  if (!maintainer && !issueHasApproval(issue)) {
     return {
       pending: true,
       title: `Validate removal ${id}`,

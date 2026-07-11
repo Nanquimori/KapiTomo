@@ -127,7 +127,7 @@ const I18N = {
     remove: {
       kicker: "Remove",
       title: "Remove a publication",
-      description: "Enter the published plugin and confirm the GitHub request. Automation validates it, then a maintainer approves hiding it from the public catalog.",
+      description: "Enter the published plugin and confirm the GitHub request. Maintainer requests are applied automatically; other requests require maintainer approval.",
       pluginId: "Plugin ID",
       repository: "GitHub repository",
       request: "Request removal",
@@ -135,7 +135,7 @@ const I18N = {
       enterRepo: "Enter the plugin GitHub repository.",
       opening: "Opening the removal request on GitHub...",
       requestTitle: "Plugin removal request for the Nyxovira catalog.",
-      requestDescription: "After you submit this request, the catalog automation validates it. A maintainer approves valid requests before they are hidden from the public catalog.",
+      requestDescription: "After you submit this request, the catalog automation validates it. Maintainer requests are applied automatically; other valid requests wait for maintainer approval.",
       pluginIdLine: "Plugin ID: {id}",
       repositoryLine: "Repository: {url}",
       confirm: "I confirm that I want to remove this plugin from the online catalog."
@@ -229,7 +229,7 @@ const I18N = {
     remove: {
       kicker: "Remover",
       title: "Remova uma publicação",
-      description: "Informe o plugin publicado e confirme a solicitação no GitHub. A automação valida tudo, então um mantenedor aprova ocultar do catálogo público.",
+      description: "Informe o plugin publicado e confirme a solicitação no GitHub. Solicitações de mantenedores são aplicadas automaticamente; outras exigem aprovação.",
       pluginId: "ID do plugin",
       repository: "Repositório GitHub",
       request: "Solicitar remoção",
@@ -237,7 +237,7 @@ const I18N = {
       enterRepo: "Informe o repositório GitHub do plugin.",
       opening: "Abrindo a solicitação de remoção no GitHub...",
       requestTitle: "Solicitação de remoção de plugin do catálogo do Nyxovira.",
-      requestDescription: "Depois de enviar esta solicitação, a automação do catálogo valida tudo. Um mantenedor aprova solicitações válidas antes de ocultar do catálogo público.",
+      requestDescription: "Depois de enviar esta solicitação, a automação do catálogo valida tudo. Solicitações de mantenedores são aplicadas automaticamente; outras solicitações válidas aguardam aprovação.",
       pluginIdLine: "ID do plugin: {id}",
       repositoryLine: "Repositório: {url}",
       confirm: "Confirmo que quero remover este plugin do catálogo online."
