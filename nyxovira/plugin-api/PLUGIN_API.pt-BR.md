@@ -309,7 +309,7 @@ Regras de revisão:
 - Um host visível só pode ter um plugin.
 - Somente o dono do repositório pode publicar ou atualizar um plugin da comunidade.
 - Solicitações válidas são publicadas automaticamente.
-- Mantenedores podem remover plugins que violem as regras do catálogo.
+- Solicitações de remoção abertas por mantenedores são aplicadas automaticamente; outras remoções exigem aprovação.
 - Se o repositório ou `plugin.json` desaparecer depois, a entrada é removida do catálogo público.
 
 Valores de status:
