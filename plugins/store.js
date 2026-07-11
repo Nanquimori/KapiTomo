@@ -140,6 +140,16 @@ const I18N = {
       repositoryLine: "Repository: {url}",
       confirm: "I confirm that I want to remove this plugin from the online catalog."
     },
+    ownership: {
+      kicker: "Ownership",
+      title: "Who can manage a plugin?",
+      explainer: "The Hub compares the GitHub account that opens the request with the repository owner saved in the catalog.",
+      joao: "can publish and remove",
+      maria: "can publish and remove",
+      blocked: "cannot remove Maria's plugin",
+      moderator: "can remove both to moderate the catalog",
+      rule: "The typed link and ID identify the plugin; authorization comes from the GitHub account that creates the issue."
+    },
     install: {
       iconMissing: "This plugin does not have icon_url and cannot be installed from the online catalog.",
       repositoryMissing: "This plugin does not have repository_url and cannot be installed from the online catalog.",
@@ -241,6 +251,16 @@ const I18N = {
       pluginIdLine: "ID do plugin: {id}",
       repositoryLine: "Repositório: {url}",
       confirm: "Confirmo que quero remover este plugin do catálogo online."
+    },
+    ownership: {
+      kicker: "Propriedade",
+      title: "Quem pode gerenciar um plugin?",
+      explainer: "O Hub compara a conta GitHub que abre a solicitação com o dono do repositório salvo no catálogo.",
+      joao: "pode publicar e remover",
+      maria: "pode publicar e remover",
+      blocked: "não pode remover o plugin de Maria",
+      moderator: "pode remover ambos para moderar o catálogo",
+      rule: "O link e o ID informados identificam o plugin; a autorização vem da conta GitHub que cria a issue."
     },
     install: {
       iconMissing: "Este plugin não tem icon_url e não pode ser instalado pelo catálogo online.",
@@ -1032,5 +1052,6 @@ discardDraftPluginsButton?.addEventListener("click", () => {
 });
 applyStaticTranslations();
 updateFavoritesOnlyButton();
-setActiveView("catalog");
+const requestedView = new URLSearchParams(window.location.search).get("view");
+setActiveView(["catalog", "publish", "remove"].includes(requestedView) ? requestedView : "catalog");
 loadAllPlugins();
