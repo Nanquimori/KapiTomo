@@ -104,10 +104,11 @@
       "hosts": [
         "nexustoons.com"
       ],
-      "status": "active",
+      "status": "removed",
       "consecutive_failures": 0,
       "last_error": "",
-      "last_checked_at": "2026-07-11T20:07:53.635Z"
+      "last_checked_at": "2026-07-11T20:07:53.635Z",
+      "removed_at": "2026-07-11T20:09:59.139Z"
     }
   ]
 }
