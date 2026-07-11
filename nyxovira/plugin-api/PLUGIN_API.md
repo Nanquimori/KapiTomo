@@ -230,7 +230,7 @@ For image chapters, `pages` is the preferred field. Nyxovira also reads `images`
 
 The Plugin Hub installs plugins directly from public GitHub repositories.
 
-The public catalog is reviewed. A publication request is validated automatically, but it only appears online after a maintainer approves it. This prevents duplicate plugins for the same site and avoids filling the catalog with sources that do not work.
+Publication requests are validated automatically and valid plugins are published immediately. The validation prevents duplicate plugins for the same site and rejects repositories that do not meet the catalog rules. Maintainers can remove plugins that violate those rules.
 
 The Plugin Hub is a catalog, not a content host. The plugin creator is responsible for the plugin code, site mapping, icon, metadata, permissions, and maintenance. Source sites are responsible for their own pages and content. Nyxovira Pro unlocks app features and does not sell third-party works, pages, chapters, translations, or plugins.
 
@@ -300,14 +300,16 @@ Publishing flow:
 2. Confirm the generated GitHub request.
 3. Automation validates `plugin.json`, the public icon, official tags, repository, and covered hosts.
 4. If another visible plugin already covers the same host, the request is rejected.
-5. A maintainer adds the approval label.
-6. Automation publishes the catalog entry.
+5. The request author must own the plugin repository.
+6. Automation publishes the valid catalog entry immediately.
 
 Review rules:
 
 - The Hub checks the repository, icon, official tags, and covered hosts.
 - A visible host can only have one plugin.
-- Valid requests wait for maintainer approval before publication.
+- Only the repository owner can publish or update a community plugin.
+- Valid requests are published automatically.
+- Maintainers can remove plugins that violate the catalog rules.
 - If the repository or `plugin.json` disappears later, the entry is removed from the public catalog.
 
 Status values:
