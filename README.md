@@ -118,7 +118,7 @@ Publishing is automatic after validation:
 3. Automation validates the repository, manifest, icon, tags, and hosts.
 4. The request author must own the plugin repository.
 5. Valid requests are added to the catalog and published to GitHub Pages.
-6. Removal requests opened by maintainers are applied automatically; other removals require maintainer approval.
+6. Plugin owners can remove their own plugins automatically, and maintainers can remove any plugin.
 
 If a source site fails health checks, the plugin appears as `Offline`. If the repository or `plugin.json` disappears, the plugin is removed from the public catalog.
 
