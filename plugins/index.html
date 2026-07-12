@@ -449,9 +449,13 @@
         width: 11px;
         height: 11px;
         flex: 0 0 11px;
-        border: 1px solid rgba(255, 255, 255, 0.26);
+        border: 1px solid #4d4358;
         border-radius: 3px;
-        background: rgba(255, 255, 255, 0.06);
+        background: #17121d;
+      }
+
+      .tag-filter-legend .is-neutral-state {
+        color: #80708f;
       }
 
       .tag-color-box.is-included {
@@ -491,11 +495,11 @@
         display: inline-flex;
         align-items: center;
         border: 0;
-        border-bottom: 1px solid rgba(255, 178, 31, 0.36);
+        border-bottom: 1px solid #4d4358;
         border-radius: 0;
         padding: 0 1px;
         background: transparent;
-        color: #d5c4e6;
+        color: #80708f;
         font: inherit;
         font-size: 0.66rem;
         font-weight: 900;
@@ -1008,7 +1012,7 @@
             </div>
           </div>
           <div class="tag-filter-legend" aria-label="Tag color meanings" data-i18n-aria="catalog.tagLegend">
-            <span><i class="tag-color-box" aria-hidden="true"></i><span data-i18n="catalog.tagNeutral">No filter</span></span>
+            <span class="is-neutral-state"><i class="tag-color-box" aria-hidden="true"></i><span data-i18n="catalog.tagNeutral">No filter</span></span>
             <span><i class="tag-color-box is-included" aria-hidden="true"></i><span data-i18n="catalog.tagIncluded">Include tag</span></span>
             <span><i class="tag-color-box is-excluded" aria-hidden="true"></i><span data-i18n="catalog.tagExcluded">Exclude tag</span></span>
           </div>
@@ -1091,6 +1095,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260712-restored-tag-shape"></script>
+    <script src="store.js?v=20260712-dark-neutral-tags"></script>
   </body>
 </html>
