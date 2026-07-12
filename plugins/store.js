@@ -81,7 +81,7 @@ const I18N = {
       offline: "Offline",
       install: "Install",
       publish: "Publish",
-      remove: "Delete",
+      remove: "Delete draft",
       open: "Open",
       pluginFallback: "Plugin"
     },
@@ -194,7 +194,7 @@ const I18N = {
       offline: "Offline",
       install: "Instalar",
       publish: "Publicar",
-      remove: "Excluir",
+      remove: "Excluir rascunho",
       open: "Abrir",
       pluginFallback: "Plugin"
     },
@@ -819,11 +819,8 @@ function renderPlugins(plugins) {
     if (plugin.__source === "draft") {
       actions.push(`<button class="button" type="button" data-publish-plugin="${index}">${escapeHtml(t("catalog.publish"))}</button>`);
       actions.push(`<button class="button" type="button" data-delete-draft="${index}">${escapeHtml(t("catalog.remove"))}</button>`);
-    } else {
-      if (plugin.homepage || plugin.site_url) {
-        actions.push(`<a class="button" href="${escapeHtml(plugin.homepage || plugin.site_url)}">${escapeHtml(t("catalog.open"))}</a>`);
-      }
-      actions.push(`<button class="button" type="button" data-remove-plugin="${index}">${escapeHtml(t("catalog.remove"))}</button>`);
+    } else if (plugin.homepage || plugin.site_url) {
+      actions.push(`<a class="button" href="${escapeHtml(plugin.homepage || plugin.site_url)}">${escapeHtml(t("catalog.open"))}</a>`);
     }
     return `
       <article class="plugin-card">
@@ -852,9 +849,6 @@ function renderPlugins(plugins) {
   });
   document.querySelectorAll("[data-delete-draft]").forEach((button) => {
     button.addEventListener("click", () => removeDraftPlugin(renderedPlugins[Number(button.dataset.deleteDraft)]));
-  });
-  document.querySelectorAll("[data-remove-plugin]").forEach((button) => {
-    button.addEventListener("click", () => prepareRemovalRequest(renderedPlugins[Number(button.dataset.removePlugin)]));
   });
   document.querySelectorAll("[data-favorite-plugin]").forEach((button) => {
     button.addEventListener("click", () => toggleFavoritePlugin(renderedPlugins[Number(button.dataset.favoritePlugin)]));
@@ -1039,20 +1033,6 @@ function openRemovalRequest() {
     + "&body=" + encodeURIComponent(body);
   setRemoveStatus(t("remove.opening"));
   window.open(url, "_blank", "noopener");
-}
-
-function prepareRemovalRequest(plugin) {
-  if (!plugin || plugin.__source === "draft") {
-    return;
-  }
-  if (removePluginIdInput) {
-    removePluginIdInput.value = plugin.id || "";
-  }
-  if (removeRepoUrlInput) {
-    removeRepoUrlInput.value = plugin.repository_url || "";
-  }
-  setRemoveStatus("");
-  setActiveView("remove");
 }
 
 function removeDraftPlugin(plugin) {
