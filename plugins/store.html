@@ -429,6 +429,46 @@
         gap: 5px;
       }
 
+      .tag-filter-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px 12px;
+        margin: 1px 0 3px;
+        color: var(--muted);
+        font-size: 0.62rem;
+        font-weight: 800;
+      }
+
+      .tag-filter-legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .tag-color-box {
+        width: 11px;
+        height: 11px;
+        flex: 0 0 11px;
+        border: 1px solid #4d4358;
+        border-radius: 3px;
+        background: #17121d;
+      }
+
+      .tag-filter-legend .is-neutral-state {
+        color: #80708f;
+      }
+
+      .tag-color-box.is-included {
+        border-color: var(--accent);
+        background: #ffb21f;
+      }
+
+      .tag-color-box.is-excluded {
+        border-color: #ff263d;
+        background: #d90020;
+        box-shadow: 0 0 7px rgba(255, 20, 55, 0.48);
+      }
+
       .tag-group {
         display: grid;
         gap: 3px;
@@ -455,11 +495,11 @@
         display: inline-flex;
         align-items: center;
         border: 0;
-        border-bottom: 1px solid rgba(255, 178, 31, 0.36);
+        border-bottom: 1px solid #4d4358;
         border-radius: 0;
         padding: 0 1px;
         background: transparent;
-        color: #d5c4e6;
+        color: #80708f;
         font: inherit;
         font-size: 0.66rem;
         font-weight: 900;
@@ -468,12 +508,16 @@
 
       .filter-chip.is-active {
         border-color: var(--accent);
+        background: transparent;
         color: #ffd990;
+        box-shadow: none;
       }
 
       .filter-chip.is-excluded {
-        border-color: rgba(255, 107, 44, 0.78);
-        color: #ffb08f;
+        border-color: #ff263d;
+        background: transparent;
+        color: #ff263d;
+        box-shadow: none;
       }
 
       .filter-chip:disabled {
@@ -967,6 +1011,11 @@
               <p class="kicker" data-i18n="catalog.categories">Categories</p>
             </div>
           </div>
+          <div class="tag-filter-legend" aria-label="Tag color meanings" data-i18n-aria="catalog.tagLegend">
+            <span class="is-neutral-state"><i class="tag-color-box" aria-hidden="true"></i><span data-i18n="catalog.tagNeutral">No filter</span></span>
+            <span><i class="tag-color-box is-included" aria-hidden="true"></i><span data-i18n="catalog.tagIncluded">Include tag</span></span>
+            <span><i class="tag-color-box is-excluded" aria-hidden="true"></i><span data-i18n="catalog.tagExcluded">Exclude tag</span></span>
+          </div>
           <div id="tagFilter" class="tag-filter" aria-label="Catalog tag filters" data-i18n-aria="catalog.tagFilters"></div>
           <p id="tagFilterStatus" class="filter-status" aria-live="polite"></p>
         </div>
@@ -1046,6 +1095,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260711-plugin-ownership"></script>
+    <script src="store.js?v=20260712-dark-neutral-tags"></script>
   </body>
 </html>
