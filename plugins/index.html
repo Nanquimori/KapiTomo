@@ -455,14 +455,14 @@
       }
 
       .tag-color-box.is-included {
-        border-color: #ff263d;
-        background: #d90020;
-        box-shadow: 0 0 7px rgba(255, 20, 55, 0.48);
+        border-color: var(--accent);
+        background: #ffb21f;
       }
 
       .tag-color-box.is-excluded {
-        border-color: #4f8cff;
-        background: #185ccc;
+        border-color: #ff263d;
+        background: #d90020;
+        box-shadow: 0 0 7px rgba(255, 20, 55, 0.48);
       }
 
       .tag-group {
@@ -502,16 +502,17 @@
       }
 
       .filter-chip.is-active {
+        border-color: var(--accent);
+        background: transparent;
+        color: #ffd990;
+        box-shadow: none;
+      }
+
+      .filter-chip.is-excluded {
         border-color: #ff263d;
         background: #d90020;
         color: #ffffff;
         box-shadow: 0 0 8px rgba(255, 20, 55, 0.38);
-      }
-
-      .filter-chip.is-excluded {
-        border-color: #4f8cff;
-        background: rgba(24, 92, 204, 0.32);
-        color: #bcd5ff;
       }
 
       .filter-chip:disabled {
@@ -1089,6 +1090,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260712-red-tag-legend"></script>
+    <script src="store.js?v=20260712-correct-tag-colors"></script>
   </body>
 </html>
