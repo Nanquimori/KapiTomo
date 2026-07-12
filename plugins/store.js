@@ -81,6 +81,7 @@ const I18N = {
       offline: "Offline",
       install: "Install",
       publish: "Publish",
+      remove: "Delete",
       open: "Open",
       pluginFallback: "Plugin"
     },
@@ -193,6 +194,7 @@ const I18N = {
       offline: "Offline",
       install: "Instalar",
       publish: "Publicar",
+      remove: "Excluir",
       open: "Abrir",
       pluginFallback: "Plugin"
     },
@@ -446,6 +448,35 @@ function pluginKey(plugin) {
     String(plugin?.repository_ref || ""),
     String(plugin?.plugin_path || "")
   ].join("|");
+}
+
+function normalizedPluginId(plugin) {
+  return String(plugin?.id || "").trim().toLowerCase();
+}
+
+function normalizedRepositoryUrl(plugin) {
+  const rawUrl = String(plugin?.repository_url || "").trim();
+  try {
+    const url = new URL(rawUrl);
+    const parts = url.pathname.split("/").filter(Boolean);
+    if (/^(www\.)?github\.com$/i.test(url.hostname) && parts.length >= 2) {
+      return `github.com/${parts[0]}/${parts[1].replace(/\.git$/i, "")}`.toLowerCase();
+    }
+  } catch (error) {}
+  return rawUrl.replace(/\.git\/?$/i, "").replace(/\/+$/, "").toLowerCase();
+}
+
+function isSamePluginPublication(first, second) {
+  const firstId = normalizedPluginId(first);
+  const secondId = normalizedPluginId(second);
+  if (firstId && secondId && firstId === secondId) {
+    return true;
+  }
+  const firstRepository = normalizedRepositoryUrl(first);
+  const secondRepository = normalizedRepositoryUrl(second);
+  return Boolean(firstRepository
+    && firstRepository === secondRepository
+    && normalizePluginPath(first?.plugin_path).toLowerCase() === normalizePluginPath(second?.plugin_path).toLowerCase());
 }
 
 function loadFavoritePluginKeys() {
@@ -735,14 +766,12 @@ async function filterAvailablePlugins(plugins) {
 }
 
 function uniquePlugins(groups) {
-  const seen = new Set();
   const output = [];
   groups.flat().forEach((plugin) => {
     const key = pluginKey(plugin);
-    if (!key.trim() || seen.has(key)) {
+    if (!key.trim() || output.some((existing) => isSamePluginPublication(existing, plugin))) {
       return;
     }
-    seen.add(key);
     output.push(plugin);
   });
   return output;
@@ -789,8 +818,12 @@ function renderPlugins(plugins) {
     ];
     if (plugin.__source === "draft") {
       actions.push(`<button class="button" type="button" data-publish-plugin="${index}">${escapeHtml(t("catalog.publish"))}</button>`);
-    } else if (plugin.homepage || plugin.site_url) {
-      actions.push(`<a class="button" href="${escapeHtml(plugin.homepage || plugin.site_url)}">${escapeHtml(t("catalog.open"))}</a>`);
+      actions.push(`<button class="button" type="button" data-delete-draft="${index}">${escapeHtml(t("catalog.remove"))}</button>`);
+    } else {
+      if (plugin.homepage || plugin.site_url) {
+        actions.push(`<a class="button" href="${escapeHtml(plugin.homepage || plugin.site_url)}">${escapeHtml(t("catalog.open"))}</a>`);
+      }
+      actions.push(`<button class="button" type="button" data-remove-plugin="${index}">${escapeHtml(t("catalog.remove"))}</button>`);
     }
     return `
       <article class="plugin-card">
@@ -817,6 +850,12 @@ function renderPlugins(plugins) {
   document.querySelectorAll("[data-publish-plugin]").forEach((button) => {
     button.addEventListener("click", () => openPublishRequest(renderedPlugins[Number(button.dataset.publishPlugin)]));
   });
+  document.querySelectorAll("[data-delete-draft]").forEach((button) => {
+    button.addEventListener("click", () => removeDraftPlugin(renderedPlugins[Number(button.dataset.deleteDraft)]));
+  });
+  document.querySelectorAll("[data-remove-plugin]").forEach((button) => {
+    button.addEventListener("click", () => prepareRemovalRequest(renderedPlugins[Number(button.dataset.removePlugin)]));
+  });
   document.querySelectorAll("[data-favorite-plugin]").forEach((button) => {
     button.addEventListener("click", () => toggleFavoritePlugin(renderedPlugins[Number(button.dataset.favoritePlugin)]));
   });
@@ -832,8 +871,9 @@ function loadAllPlugins() {
         filterAvailablePlugins(catalogPlugins),
         filterAvailablePlugins(savedDrafts)
       ]).then(([availableCatalogPlugins, availableDrafts]) => {
-        const publishedKeys = new Set(availableCatalogPlugins.map(pluginKey));
-        const drafts = availableDrafts.filter((plugin) => !publishedKeys.has(pluginKey(plugin)));
+        const drafts = availableDrafts.filter((draft) => (
+          !availableCatalogPlugins.some((published) => isSamePluginPublication(published, draft))
+        ));
         if (drafts.length !== savedDrafts.length) {
           saveDraftPlugins(drafts);
         }
@@ -999,6 +1039,28 @@ function openRemovalRequest() {
     + "&body=" + encodeURIComponent(body);
   setRemoveStatus(t("remove.opening"));
   window.open(url, "_blank", "noopener");
+}
+
+function prepareRemovalRequest(plugin) {
+  if (!plugin || plugin.__source === "draft") {
+    return;
+  }
+  if (removePluginIdInput) {
+    removePluginIdInput.value = plugin.id || "";
+  }
+  if (removeRepoUrlInput) {
+    removeRepoUrlInput.value = plugin.repository_url || "";
+  }
+  setRemoveStatus("");
+  setActiveView("remove");
+}
+
+function removeDraftPlugin(plugin) {
+  if (!plugin || plugin.__source !== "draft") {
+    return;
+  }
+  saveDraftPlugins(loadDraftPlugins().filter((draft) => !isSamePluginPublication(draft, plugin)));
+  loadAllPlugins();
 }
 
 function installPlugin(plugin) {
