@@ -39,6 +39,88 @@ const PUBLIC_TAGS = new Set([...OFFICIAL_LANGUAGE_TAGS, ...OFFICIAL_TYPE_TAGS]);
 const env = process.env;
 const dryRun = env.PLUGIN_HUB_DRY_RUN === "1";
 
+const PORTUGUESE_ERRORS = new Map([
+  ["The request author must own the plugin repository.", "O autor da solicitação deve ser o proprietário do repositório do plugin."],
+  ["Official plugins can only be changed by a maintainer.", "Plugins oficiais só podem ser alterados por um mantenedor."],
+  ["Only the current plugin repository owner or a maintainer can update this plugin.", "Somente o proprietário atual do repositório do plugin ou um mantenedor pode atualizar este plugin."],
+  ["Official plugins can only be removed by a maintainer.", "Plugins oficiais só podem ser removidos por um mantenedor."],
+  ["Only the plugin repository owner or a maintainer can remove this plugin.", "Somente o proprietário do repositório do plugin ou um mantenedor pode remover este plugin."],
+  ["Enter the plugin ID to remove.", "Informe o ID do plugin que deseja remover."],
+  ["Could not find a JSON block in the request.", "Não foi possível encontrar um bloco JSON na solicitação."],
+  ["The plugin.json id does not match the request id.", "O ID do plugin.json não corresponde ao ID da solicitação."],
+  ["The request version does not match plugin.json.", "A versão da solicitação não corresponde ao plugin.json."],
+  ["plugin.json must declare browser.icon_url.", "O plugin.json precisa declarar browser.icon_url."],
+  ["plugin.json must declare match.hosts or browser.home_url.", "O plugin.json precisa declarar match.hosts ou browser.home_url."],
+  ["Plugin catalog was not found.", "O catálogo de plugins não foi encontrado."],
+  ["repository_url must point to github.com.", "repository_url precisa apontar para github.com."],
+  ["repository_url must include an owner and repository.", "repository_url precisa incluir o proprietário e o repositório."],
+  ["Invalid repository_ref.", "repository_ref é inválido."],
+  ["Invalid plugin_path.", "plugin_path é inválido."],
+  ["id must use only lowercase letters, numbers, dots, dashes, or underscores.", "O ID deve usar apenas letras minúsculas, números, pontos, hífens ou sublinhados."],
+  ["tags must use lowercase letters, numbers, dots, dashes, or underscores.", "As tags devem usar apenas letras minúsculas, números, pontos, hífens ou sublinhados."],
+  ["tags must include at least 2 public tags: language first, then type.", "As tags devem incluir pelo menos 2 tags públicas: primeiro o idioma e depois o tipo."]
+]);
+
+function issueLanguage(issue) {
+  const body = String(issue && issue.body || "");
+  const marker = body.match(/plugin-hub-language:\s*(pt|en)\b/i);
+  if (marker) {
+    return marker[1].toLowerCase();
+  }
+  return /Solicitação|Repositório|catálogo|Confirmo que|Depois de enviar/i.test(body) ? "pt" : "en";
+}
+
+function translateRequestError(message, language) {
+  const text = String(message || "");
+  if (language !== "pt") {
+    return text;
+  }
+  if (PORTUGUESE_ERRORS.has(text)) {
+    return PORTUGUESE_ERRORS.get(text);
+  }
+  let match = text.match(/^(.+) is required\.$/);
+  if (match) {
+    return `O campo ${match[1]} é obrigatório.`;
+  }
+  match = text.match(/^(.+) must be a valid URL\.$/);
+  if (match) {
+    return `${match[1]} precisa ser uma URL válida.`;
+  }
+  match = text.match(/^(.+) must start with http or https\.$/);
+  if (match) {
+    return `${match[1]} precisa começar com http ou https.`;
+  }
+  match = text.match(/^Could not read plugin\.json from the repository: (.+)$/);
+  if (match) {
+    return `Não foi possível ler o plugin.json do repositório: ${match[1]}`;
+  }
+  match = text.match(/^The repository plugin\.json is invalid: (.+)$/);
+  if (match) {
+    return `O plugin.json do repositório é inválido: ${match[1]}`;
+  }
+  match = text.match(/^The request JSON is invalid: (.+)$/);
+  if (match) {
+    return `O JSON da solicitação é inválido: ${match[1]}`;
+  }
+  match = text.match(/^Plugin (.+) does not exist in the catalog\.$/);
+  if (match) {
+    return `O plugin ${match[1]} não existe no catálogo.`;
+  }
+  match = text.match(/^Host (.+) is already covered by plugin (.+)\.$/);
+  if (match) {
+    return `O host ${match[1]} já é atendido pelo plugin ${match[2]}.`;
+  }
+  match = text.match(/^the first public tag must be one of: (.+)$/);
+  if (match) {
+    return `A primeira tag pública deve ser uma destas: ${match[1]}`;
+  }
+  match = text.match(/^invalid type tag after language: (.+)\. Allowed types: (.+)$/);
+  if (match) {
+    return `Tag de tipo inválida depois do idioma: ${match[1]}. Tipos permitidos: ${match[2]}`;
+  }
+  return `Erro de validação: ${text}`;
+}
+
 function nowIso() {
   return new Date().toISOString();
 }
@@ -360,6 +442,7 @@ function isMaintainer(actor) {
 }
 
 async function publishPlugin(issue) {
+  const language = issueLanguage(issue);
   const plugin = normalizePlugin(extractJson(issue.body));
   const actor = String(issue.user && issue.user.login || "").trim();
   const maintainer = isMaintainer(actor);
@@ -401,7 +484,9 @@ async function publishPlugin(issue) {
   }
   return {
     title: `Publish plugin ${plugin.id}`,
-    message: `Plugin **${plugin.name}** was published to the catalog.\n\nVersion: \`${plugin.version}\`\nRepository: ${plugin.repository_url}`
+    message: language === "pt"
+      ? `O plugin **${plugin.name}** foi publicado no catálogo.\n\nVersão: \`${plugin.version}\`\nRepositório: ${plugin.repository_url}`
+      : `Plugin **${plugin.name}** was published to the catalog.\n\nVersion: \`${plugin.version}\`\nRepository: ${plugin.repository_url}`
   };
 }
 
@@ -415,6 +500,7 @@ function removalIdFromIssue(issue) {
 }
 
 async function removePlugin(issue) {
+  const language = issueLanguage(issue);
   const id = removalIdFromIssue(issue);
   const actor = String(issue.user && issue.user.login || "").trim();
   const maintainer = isMaintainer(actor);
@@ -445,7 +531,9 @@ async function removePlugin(issue) {
   }
   return {
     title: `Remove plugin ${id}`,
-    message: `Plugin **${existing.name || id}** was marked as removed from the catalog.`
+    message: language === "pt"
+      ? `O plugin **${existing.name || id}** foi marcado como removido do catálogo.`
+      : `Plugin **${existing.name || id}** was marked as removed from the catalog.`
   };
 }
 
@@ -641,16 +729,23 @@ async function main() {
   if (!title.startsWith("[plugin]") && !title.startsWith("[plugin-remove]")) {
     return;
   }
+  const language = issueLanguage(issue);
 
   try {
     const result = title.startsWith("[plugin-remove]")
       ? await removePlugin(issue)
       : await publishPlugin(issue);
     const changed = dryRun ? true : commitAndPush(result.title, issue.number);
-    await comment(issue.number, `${result.message}\n\nStatus: ${changed ? "catalog updated" : "catalog was already up to date"}.`);
+    const status = language === "pt"
+      ? (changed ? "catálogo atualizado" : "o catálogo já estava atualizado")
+      : (changed ? "catalog updated" : "catalog was already up to date");
+    await comment(issue.number, `${result.message}\n\nStatus: ${status}.`);
     await closeIssue(issue.number);
   } catch (error) {
-    await comment(issue.number, `The request could not be completed.\n\nError: ${error.message}`);
+    const errorMessage = translateRequestError(error.message, language);
+    await comment(issue.number, language === "pt"
+      ? `A solicitação não pôde ser concluída.\n\nErro: ${errorMessage}`
+      : `The request could not be completed.\n\nError: ${errorMessage}`);
     process.exitCode = 1;
   }
 }
