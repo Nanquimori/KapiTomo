@@ -991,6 +991,7 @@ function openPublishRequest(plugin) {
     return;
   }
   const body = [
+    `<!-- plugin-hub-language: ${currentLanguage} -->`,
     t("publish.requestTitle"),
     t("publish.requestDescription"),
     "",
@@ -1020,6 +1021,7 @@ function openRemovalRequest() {
     return;
   }
   const body = [
+    `<!-- plugin-hub-language: ${currentLanguage} -->`,
     t("remove.requestTitle"),
     t("remove.requestDescription"),
     "",
