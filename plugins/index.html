@@ -487,13 +487,14 @@
       }
 
       .filter-chip {
-        min-height: 18px;
+        min-height: 12px;
         display: inline-flex;
         align-items: center;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 5px;
-        padding: 1px 5px;
-        background: rgba(255, 255, 255, 0.045);
+        border: 0;
+        border-bottom: 1px solid rgba(255, 178, 31, 0.36);
+        border-radius: 0;
+        padding: 0 1px;
+        background: transparent;
         color: #d5c4e6;
         font: inherit;
         font-size: 0.66rem;
@@ -510,9 +511,9 @@
 
       .filter-chip.is-excluded {
         border-color: #ff263d;
-        background: #d90020;
-        color: #ffffff;
-        box-shadow: 0 0 8px rgba(255, 20, 55, 0.38);
+        background: transparent;
+        color: #ff263d;
+        box-shadow: none;
       }
 
       .filter-chip:disabled {
@@ -948,8 +949,8 @@
         }
 
         .filter-chip {
-          min-height: 18px;
-          padding: 1px 4px;
+          min-height: 12px;
+          padding: 0 1px;
           font-size: 0.58rem;
         }
       }
@@ -1090,6 +1091,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260712-correct-tag-colors"></script>
+    <script src="store.js?v=20260712-restored-tag-shape"></script>
   </body>
 </html>
