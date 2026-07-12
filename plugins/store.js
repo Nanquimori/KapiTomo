@@ -81,7 +81,7 @@ const I18N = {
       offline: "Offline",
       install: "Install",
       publish: "Publish",
-      remove: "Delete draft",
+      remove: "Delete",
       open: "Open",
       pluginFallback: "Plugin"
     },
@@ -194,7 +194,7 @@ const I18N = {
       offline: "Offline",
       install: "Instalar",
       publish: "Publicar",
-      remove: "Excluir rascunho",
+      remove: "Excluir",
       open: "Abrir",
       pluginFallback: "Plugin"
     },
