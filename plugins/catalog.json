@@ -72,10 +72,10 @@
       "hosts": [
         "nanquimori.github.io"
       ],
-      "status": "broken",
-      "consecutive_failures": 3,
-      "last_error": "Could not read plugin.json from the repository: HTTP 429.",
-      "last_checked_at": "2026-08-17T15:50:15.880Z",
+      "status": "active",
+      "consecutive_failures": 0,
+      "last_error": "",
+      "last_checked_at": "2026-08-17T16:27:03.111Z",
       "tags": [
         "official",
         "portuguese",
