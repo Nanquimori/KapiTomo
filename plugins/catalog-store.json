@@ -73,9 +73,9 @@
         "nanquimori.github.io"
       ],
       "status": "active",
-      "consecutive_failures": 0,
-      "last_error": "",
-      "last_checked_at": "2026-07-10T15:02:09.045Z",
+      "consecutive_failures": 1,
+      "last_error": "Could not read plugin.json from the repository: HTTP 503.",
+      "last_checked_at": "2026-08-17T14:55:25.190Z",
       "tags": [
         "official",
         "portuguese",
