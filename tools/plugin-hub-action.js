@@ -315,12 +315,22 @@ function pluginHostsFromManifest(plugin, manifest) {
 }
 
 async function fetchRepositoryManifest(plugin) {
+  const headers = {
+    "Accept": "application/json",
+    "User-Agent": "kapitomo-plugin-hub"
+  };
+  if (env.GITHUB_TOKEN) {
+    headers.Authorization = `Bearer ${env.GITHUB_TOKEN}`;
+  }
   const response = await fetch(rawPluginJsonUrl(plugin.repository_url, plugin.repository_ref, plugin.plugin_path), {
-    headers: { "User-Agent": "kapitomo-plugin-hub" }
+    headers
   });
   if (!response.ok) {
     const error = new Error(`Could not read plugin.json from the repository: HTTP ${response.status}.`);
     error.status = response.status;
+    error.transientRepositoryFailure = response.status === 403
+      || response.status === 429
+      || response.status >= 500;
     throw error;
   }
   try {
@@ -595,6 +605,10 @@ async function checkPluginHealth() {
     } catch (error) {
       if (error.status === 404 || error.status === 410) {
         changed = true;
+        continue;
+      }
+      if (error.transientRepositoryFailure) {
+        checkedPlugins.push(plugin);
         continue;
       }
       plugin.consecutive_failures = Number(plugin.consecutive_failures || 0) + 1;

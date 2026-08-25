@@ -17,7 +17,7 @@ const languageButtons = Array.from(document.querySelectorAll("[data-language-opt
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
-const CATALOG_VERSION = "20260710-kapitomo-1017-pt-novel";
+const CATALOG_VERSION = "20260825-online-status-cache";
 const MAX_SELECTED_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
 const OFFICIAL_LANGUAGE_TAGS = [
@@ -430,13 +430,32 @@ function setRemoveStatus(message) {
   }
 }
 
-function fetchCatalog() {
+function catalogFreshness(catalog) {
+  const plugins = Array.isArray(catalog?.plugins) ? catalog.plugins : [];
+  return plugins.reduce((latest, plugin) => {
+    const checkedAt = Date.parse(String(plugin?.last_checked_at || ""));
+    return Number.isFinite(checkedAt) ? Math.max(latest, checkedAt) : latest;
+  }, 0);
+}
+
+async function fetchCatalog() {
+  const cacheKey = `${CATALOG_VERSION}-${Date.now()}`;
   const urls = [
-    `catalog-store.json?v=${CATALOG_VERSION}`,
-    `https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=${CATALOG_VERSION}`
+    `catalog-store.json?v=${cacheKey}`,
+    `https://raw.githubusercontent.com/Nanquimori/KapiTomo/main/plugins/catalog-store.json?v=${cacheKey}`,
+    `https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=${cacheKey}`
   ];
-  return urls.reduce((chain, url) => chain.catch(() => fetch(url, { cache: "no-store" })
-    .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))), Promise.reject());
+  const results = await Promise.allSettled(urls.map((url) => fetch(url, { cache: "no-store" })
+    .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))));
+  const catalogs = results
+    .filter((result) => result.status === "fulfilled")
+    .map((result) => result.value)
+    .filter((catalog) => catalog && Array.isArray(catalog.plugins));
+  if (!catalogs.length) {
+    const failed = results.find((result) => result.status === "rejected");
+    throw failed?.reason || new Error("No plugin catalog is available.");
+  }
+  return catalogs.sort((first, second) => catalogFreshness(second) - catalogFreshness(first))[0];
 }
 
 function publicPlugin(plugin) {
