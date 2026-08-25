@@ -2,7 +2,7 @@
   "schema_version": 3,
   "name": "KapiTomo Plugin Hub",
   "description": "Public plugin catalog for Nyxovira.",
-  "catalog_revision": "20260710-kapitomo-1017-pt-novel",
+  "catalog_revision": "20260825-online-status-cache",
   "publish_model": "github-repository",
   "suggested_tags": [
     "english",
