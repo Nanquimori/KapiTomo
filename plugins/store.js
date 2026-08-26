@@ -12,6 +12,7 @@ const reportEmailInput = document.getElementById("reportEmailInput");
 const reportDetailsInput = document.getElementById("reportDetailsInput");
 const reportDetailsCount = document.getElementById("reportDetailsCount");
 const reportConfirmationInput = document.getElementById("reportConfirmationInput");
+const reportWebsiteInput = document.getElementById("reportWebsiteInput");
 const requestReportPluginButton = document.getElementById("requestReportPluginButton");
 const reportStatus = document.getElementById("reportStatus");
 const reportCreatorHelp = document.getElementById("reportCreatorHelp");
@@ -26,8 +27,9 @@ const languageButtons = Array.from(document.querySelectorAll("[data-language-opt
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
-const CATALOG_VERSION = "20260826-report-form-v2";
+const CATALOG_VERSION = "20260826-direct-report";
 const REPORT_EMAIL = "nanquimori@gmail.com";
+const REPORT_ENDPOINT = `https://formsubmit.co/ajax/${REPORT_EMAIL}`;
 const MIN_REPORT_DETAILS = 200;
 const MIN_REPORT_WORDS = 20;
 const MAX_SELECTED_TAGS = 4;
@@ -111,7 +113,7 @@ const I18N = {
       notFor: "Not for source-site content, missing chapters, translation quality, advertisements, outages, account rules, or ordinary download/support problems. Those belong to the source site or plugin creator.",
       technicalHelp: "For a technical problem, contact the plugin creator in its repository:",
       creatorRepository: "Open creator repository",
-      notice: "The report is prepared as a private email to the catalog contact address. The contact email is used only to reply about this report.",
+      notice: "The report is sent privately through the form. The contact email is used only to reply about this report.",
       privacyLink: "Privacy Policy",
       pluginId: "Plugin ID",
       email: "Contact email",
@@ -119,19 +121,18 @@ const I18N = {
       detailsPlaceholder: "Clearly explain why you are reporting this plugin. Include only the information you consider important for the review.",
       detailsCount: "{count}/{minimum} minimum characters · {words}/{minimumWords} minimum words",
       confirmation: "I confirm that this report concerns the plugin code, repository, or catalog entry; that it is not an ordinary source-content or support complaint; and that the information is accurate to the best of my knowledge.",
-      request: "Prepare private email report",
+      request: "Send report",
       enterId: "Enter the plugin ID.",
       invalidId: "Use a valid plugin ID.",
       enterEmail: "Enter a contact email.",
       invalidEmail: "Enter a valid contact email.",
       explain: "Write a complete reason with at least {minimum} characters and {minimumWords} words. Current: {count} characters and {words} words.",
-      confirm: "Confirm the responsibility statement before preparing the report.",
-      opening: "Opening your email app with the private report prepared...",
+      confirm: "Confirm the responsibility statement before sending the report.",
+      sending: "Sending report...",
+      sent: "Report sent successfully. It will be reviewed by the Plugin Hub team. Thank you for helping us maintain a safe environment for the entire community.",
+      sendError: "The report could not be sent right now. Check your connection and try again in a few minutes.",
+      activationRequired: "Report delivery still needs to be activated by the catalog owner. Confirm the activation message sent to the catalog email address, then try again.",
       requestTitle: "Plugin catalog violation report: {id}",
-      requestDescription: "This private report concerns the plugin code, repository, or catalog entry. It does not concern third-party source content and does not automatically change the plugin's availability.",
-      pluginIdLine: "Plugin ID: {id}",
-      emailLine: "Contact email: {email}",
-      detailsLine: "Reason:",
       confirmationLine: "Reporter confirmation: accepted",
       rulesLine: "Catalog rules: https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules"
     },
@@ -265,7 +266,7 @@ const I18N = {
       notFor: "Não use para conteúdo do site de origem, capítulos ausentes, qualidade da tradução, anúncios, indisponibilidade, regras de conta ou problemas comuns de download e suporte. Esses assuntos pertencem ao site de origem ou ao criador do plugin.",
       technicalHelp: "Para um problema técnico, procure o criador no repositório do plugin:",
       creatorRepository: "Abrir repositório do criador",
-      notice: "A denúncia é preparada como e-mail privado para o endereço de contato do catálogo. O e-mail informado será usado somente para responder sobre esta denúncia.",
+      notice: "A denúncia é enviada de forma privada pelo formulário. O e-mail informado será usado somente para responder sobre esta denúncia.",
       privacyLink: "Política de Privacidade",
       pluginId: "ID do plugin",
       email: "E-mail para contato",
@@ -273,19 +274,18 @@ const I18N = {
       detailsPlaceholder: "Explique claramente por que você está denunciando este plugin. Inclua apenas as informações que considera importantes para a análise.",
       detailsCount: "{count}/{minimum} caracteres mínimos · {words}/{minimumWords} palavras mínimas",
       confirmation: "Confirmo que esta denúncia trata do código, repositório ou entrada do plugin no catálogo; que não é uma reclamação comum sobre conteúdo da fonte ou suporte; e que as informações são verdadeiras conforme meu conhecimento.",
-      request: "Preparar denúncia por e-mail",
+      request: "Enviar denúncia",
       enterId: "Informe o ID do plugin.",
       invalidId: "Use um ID de plugin válido.",
       enterEmail: "Informe um e-mail para contato.",
       invalidEmail: "Informe um e-mail válido para contato.",
       explain: "Escreva um motivo completo com pelo menos {minimum} caracteres e {minimumWords} palavras. Atual: {count} caracteres e {words} palavras.",
-      confirm: "Confirme a declaração de responsabilidade antes de preparar a denúncia.",
-      opening: "Abrindo seu aplicativo de e-mail com a denúncia privada preparada...",
+      confirm: "Confirme a declaração de responsabilidade antes de enviar a denúncia.",
+      sending: "Enviando denúncia...",
+      sent: "Denúncia enviada com sucesso. Ela será analisada pela equipe do Plugin Hub. Agradecemos por nos ajudar a manter um ambiente seguro para toda a comunidade.",
+      sendError: "Não foi possível enviar a denúncia agora. Verifique sua conexão e tente novamente em alguns minutos.",
+      activationRequired: "O recebimento das denúncias ainda precisa ser ativado pelo responsável do catálogo. Confirme a mensagem de ativação enviada ao e-mail do catálogo e tente novamente.",
       requestTitle: "Denúncia de violação do catálogo: {id}",
-      requestDescription: "Esta denúncia privada diz respeito ao código, repositório ou entrada do plugin no catálogo. Ela não trata de conteúdos da fonte de terceiros e não altera automaticamente a disponibilidade do plugin.",
-      pluginIdLine: "ID do plugin: {id}",
-      emailLine: "E-mail para contato: {email}",
-      detailsLine: "Motivo:",
       confirmationLine: "Confirmação do denunciante: aceita",
       rulesLine: "Regras do catálogo: https://nanquimori.github.io/KapiTomo/terms/#regras-do-catalogo"
     },
@@ -511,9 +511,11 @@ function setPublishStatus(message) {
   }
 }
 
-function setReportStatus(message) {
+function setReportStatus(message, state = "") {
   if (reportStatus) {
     reportStatus.textContent = message || "";
+    reportStatus.classList.toggle("is-success", state === "success");
+    reportStatus.classList.toggle("is-error", state === "error");
   }
 }
 
@@ -1204,7 +1206,7 @@ function isValidReportEmail(value) {
   return email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
 }
 
-function openReportRequest() {
+async function openReportRequest() {
   const pluginId = String(reportPluginIdInput?.value || "").trim().toLowerCase();
   const email = String(reportEmailInput?.value || "").trim();
   const details = String(reportDetailsInput?.value || "").trim();
@@ -1240,23 +1242,56 @@ function openReportRequest() {
     setReportStatus(t("report.confirm"));
     return;
   }
-  const body = [
-    t("report.requestDescription"),
-    "",
-    t("report.pluginIdLine", { id: pluginId }),
-    t("report.emailLine", { email }),
-    "",
-    t("report.detailsLine"),
-    details,
-    "",
-    t("report.confirmationLine"),
-    t("report.rulesLine")
-  ].join("\n");
-  const url = `mailto:${REPORT_EMAIL}`
-    + "?subject=" + encodeURIComponent(t("report.requestTitle", { id: pluginId }))
-    + "&body=" + encodeURIComponent(body);
-  setReportStatus(t("report.opening"));
-  window.location.href = url;
+  if (String(reportWebsiteInput?.value || "").trim()) {
+    setReportStatus(t("report.sent"), "success");
+    return;
+  }
+  setReportStatus(t("report.sending"));
+  if (requestReportPluginButton) {
+    requestReportPluginButton.disabled = true;
+  }
+  try {
+    const response = await fetch(REPORT_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      },
+      body: JSON.stringify({
+        _subject: t("report.requestTitle", { id: pluginId }),
+        _template: "table",
+        _url: "https://nanquimori.github.io/KapiTomo/plugins/?view=report",
+        email,
+        plugin_id: pluginId,
+        reason: details,
+        scope_confirmation: t("report.confirmationLine"),
+        catalog_rules: t("report.rulesLine")
+      })
+    });
+    let result = null;
+    try {
+      result = await response.json();
+    } catch {
+      result = null;
+    }
+    const accepted = response.ok && (result?.success === true || result?.success === "true");
+    if (!accepted) {
+      const serviceMessage = String(result?.message || "");
+      const needsActivation = /activat|confirm.*email|verify.*email/i.test(serviceMessage);
+      setReportStatus(t(needsActivation ? "report.activationRequired" : "report.sendError"), "error");
+      return;
+    }
+    reportDetailsInput.value = "";
+    reportConfirmationInput.checked = false;
+    updateReportDetailsCount();
+    setReportStatus(t("report.sent"), "success");
+  } catch {
+    setReportStatus(t("report.sendError"), "error");
+  } finally {
+    if (requestReportPluginButton) {
+      requestReportPluginButton.disabled = false;
+    }
+  }
 }
 
 function openRemovalRequest() {
