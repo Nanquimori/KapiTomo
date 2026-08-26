@@ -112,11 +112,14 @@
       "hosts": [
         "nexustoons.com"
       ],
-      "status": "removed",
+      "status": "active",
       "consecutive_failures": 0,
       "last_error": "",
-      "last_checked_at": "2026-07-11T20:07:53.635Z",
-      "removed_at": "2026-07-11T20:17:40.106Z"
+      "last_checked_at": "2026-08-26T18:57:45.057Z",
+      "moderation_action": "restore",
+      "moderation_reason": "O proprietário yxz0w0zxy solicitou a republicação na issue #34; a remoção anterior também foi solicitada por ele na issue #20, antes dos campos atuais de auditoria.",
+      "moderated_by": "Nanquimori",
+      "moderated_at": "2026-08-26T18:57:45.057Z"
     }
   ]
 }
