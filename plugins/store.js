@@ -17,7 +17,7 @@ const languageButtons = Array.from(document.querySelectorAll("[data-language-opt
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
-const CATALOG_VERSION = "20260825-online-status-cache";
+const CATALOG_VERSION = "20260826-catalog-rules";
 const MAX_SELECTED_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
 const OFFICIAL_LANGUAGE_TAGS = [
@@ -55,13 +55,14 @@ const I18N = {
       publish: "Publish",
       remove: "Remove",
       api: "Plugin API",
-      terms: "Terms"
+      terms: "Rules & terms"
     },
     catalog: {
       kicker: "Catalog",
       title: "Published plugins",
       search: "Search plugins",
-      notice: "Plugins are community source connectors. Plugin creators and source sites are responsible for their own content, permissions, pages, and download behavior. Nyxovira Pro pays for app features, not third-party works.",
+      notice: "Community plugins are source connectors published from their creators' public GitHub repositories. KapiTomo lists the catalog entry and moderates it under the catalog rules.",
+      rulesLink: "Read the catalog rules",
       categories: "Categories",
       tagFilters: "Catalog tag filters",
       tagLegend: "Tag color meanings",
@@ -92,8 +93,9 @@ const I18N = {
     publish: {
       kicker: "Publish",
       title: "Publish a ready plugin",
-      description: "Paste the GitHub repository that already contains plugin.json. The Hub reads the manifest and opens a GitHub request; valid plugins are published automatically.",
-      notice: "By publishing, the plugin creator confirms they are responsible for the plugin code, site mapping, icon, metadata, permissions, and fixes when the source site changes or downloads fail.",
+      description: "Paste the GitHub repository that already contains plugin.json. The Hub opens a GitHub request and publishes entries that pass the technical checks and accept the catalog rules.",
+      notice: "Publishing confirms that the creator controls the repository and accepts responsibility for the plugin code, metadata, permissions, maintenance, and source mapping. Automatic validation is not an endorsement of third-party content.",
+      rulesLink: "Review the rules before publishing",
       repository: "GitHub repository",
       load: "Load plugin",
       discard: "Discard drafts",
@@ -117,8 +119,9 @@ const I18N = {
       outdated: "This draft is outdated. Load the GitHub repository again before requesting publication.",
       draftsRemoved: "Drafts removed from this browser.",
       requestTitle: "Plugin publication request for the Nyxovira catalog.",
-      requestDescription: "After you submit this request, the catalog automation validates the repository and automatically publishes valid plugins.",
-      responsibility: "By submitting this plugin, I confirm that I am responsible for the plugin code, metadata, icon, site mapping, permissions, and maintenance. I understand that KapiTomo lists only the catalog entry, and that third-party content, missing pages, broken downloads, and source-site changes remain the responsibility of the plugin creator and source site.",
+      requestDescription: "After submission, the catalog automation validates the repository, ownership, manifest, icon, tags, hosts, and acceptance of the current catalog rules.",
+      responsibility: "By submitting this plugin, I confirm that I control its repository, accept the current Plugin Hub catalog rules, and am responsible for the plugin code, metadata, icon, permissions, maintenance, and source mapping. I understand that automatic publication is not approval of third-party content.",
+      rulesLine: "Catalog rules: https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules",
       repositoryLine: "Repository: {url}",
       tagMinimum: "plugin.json must declare at least 2 tags: language first, then type.",
       firstTag: "The first public tag must be one of: {tags}.",
@@ -172,13 +175,14 @@ const I18N = {
       publish: "Publicar",
       remove: "Remover",
       api: "API de Plugins",
-      terms: "Termos"
+      terms: "Regras e termos"
     },
     catalog: {
       kicker: "Catálogo",
       title: "Plugins publicados",
       search: "Pesquisar plugins",
-      notice: "Plugins são conectores de fonte da comunidade. Criadores de plugins e sites de origem são responsáveis por conteúdo, permissões, páginas e comportamento de download. O Nyxovira Pro paga recursos do app, não obras de terceiros.",
+      notice: "Plugins da comunidade são conectores de fontes publicados nos repositórios GitHub públicos de seus criadores. O KapiTomo lista a entrada e aplica as regras de moderação do catálogo.",
+      rulesLink: "Leia as regras do catálogo",
       categories: "Categorias",
       tagFilters: "Filtros de tags do catálogo",
       tagLegend: "Significado das cores das tags",
@@ -209,8 +213,9 @@ const I18N = {
     publish: {
       kicker: "Publicar",
       title: "Publique um plugin pronto",
-      description: "Cole o repositório GitHub que já contém plugin.json. O Hub lê o manifesto e abre uma solicitação no GitHub; plugins válidos são publicados automaticamente.",
-      notice: "Ao publicar, o criador confirma que é responsável pelo código do plugin, mapeamento do site, ícone, metadados, permissões e correções quando o site de origem mudar ou downloads falharem.",
+      description: "Cole o repositório GitHub que já contém plugin.json. O Hub abre uma solicitação no GitHub e publica entradas que passam nas verificações técnicas e aceitam as regras do catálogo.",
+      notice: "A publicação confirma que o criador controla o repositório e aceita responsabilidade pelo código, metadados, permissões, manutenção e mapeamento da fonte. A validação automática não representa aprovação de conteúdos de terceiros.",
+      rulesLink: "Revise as regras antes de publicar",
       repository: "Repositório GitHub",
       load: "Carregar plugin",
       discard: "Descartar rascunhos",
@@ -234,8 +239,9 @@ const I18N = {
       outdated: "Este rascunho está desatualizado. Carregue o repositório GitHub novamente antes de solicitar publicação.",
       draftsRemoved: "Rascunhos removidos deste navegador.",
       requestTitle: "Solicitação de publicação de plugin para o catálogo do Nyxovira.",
-      requestDescription: "Depois de enviar esta solicitação, a automação do catálogo valida o repositório e publica automaticamente os plugins válidos.",
-      responsibility: "Ao enviar este plugin, confirmo que sou responsável pelo código, metadados, ícone, mapeamento do site, permissões e manutenção. Entendo que o KapiTomo lista apenas a entrada do catálogo, e que conteúdo de terceiros, páginas ausentes, downloads quebrados e mudanças no site de origem continuam sendo responsabilidade do criador do plugin e do site de origem.",
+      requestDescription: "Depois do envio, a automação valida repositório, propriedade, manifesto, ícone, tags, domínios e aceitação das regras atuais do catálogo.",
+      responsibility: "Ao enviar este plugin, confirmo que controlo seu repositório, aceito as regras atuais do catálogo do Plugin Hub e sou responsável pelo código, metadados, ícone, permissões, manutenção e mapeamento da fonte. Entendo que a publicação automática não representa aprovação de conteúdos de terceiros.",
+      rulesLine: "Regras do catálogo: https://nanquimori.github.io/KapiTomo/terms/#regras-do-catalogo",
       repositoryLine: "Repositório: {url}",
       tagMinimum: "plugin.json precisa declarar pelo menos 2 tags: idioma primeiro, depois tipo.",
       firstTag: "A primeira tag pública precisa ser uma destas: {tags}.",
@@ -1019,10 +1025,12 @@ function openPublishRequest(plugin) {
   }
   const body = [
     `<!-- plugin-hub-language: ${currentLanguage} -->`,
+    "<!-- plugin-hub-policy: accepted-v1 -->",
     t("publish.requestTitle"),
     t("publish.requestDescription"),
     "",
     t("publish.responsibility"),
+    t("publish.rulesLine"),
     "",
     t("publish.repositoryLine", { url: clean.repository_url }),
     "",

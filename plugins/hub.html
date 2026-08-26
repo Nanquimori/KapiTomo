@@ -319,6 +319,18 @@
         font-weight: 650;
         line-height: 1.32;
       }
+
+      .catalog-policy-link {
+        margin: 6px 0 0;
+        color: var(--accent-soft);
+        font-size: 0.68rem;
+        font-weight: 850;
+      }
+
+      .catalog-policy-link a:hover,
+      .catalog-policy-link a:focus-visible {
+        text-decoration: underline;
+      }
       .ownership-guide {
         display: grid;
         gap: 9px;
@@ -982,7 +994,7 @@
           <button class="menu-tab" type="button" data-view-target="publish" data-i18n="nav.publish">Publish</button>
           <button class="menu-tab" type="button" data-view-target="remove" data-i18n="nav.remove">Remove</button>
           <a class="menu-tab" href="../nyxovira/plugin-api/" data-i18n="nav.api">Plugin API</a>
-          <a class="menu-tab" href="../terms/" data-i18n="nav.terms">Terms</a>
+          <a class="menu-tab" href="../terms/#plugin-catalog-rules" data-i18n="nav.terms">Rules &amp; terms</a>
           <div class="language-switch" aria-label="Language">
             <button class="language-button" type="button" data-language-option="en" aria-pressed="true">EN</button>
             <button class="language-button" type="button" data-language-option="pt" aria-pressed="false">PT</button>
@@ -1003,9 +1015,10 @@
             <button id="favoritesOnlyButton" class="button favorites-toggle" type="button" aria-pressed="false">Favorites only</button>
           </div>
           <p class="catalog-notice" data-i18n="catalog.notice">
-            Plugins are community source connectors. Plugin creators and source sites are responsible for their own
-            content, permissions, pages, and download behavior. Nyxovira Pro pays for app features, not third-party works.
+            Community plugins are source connectors published from their creators' public GitHub repositories.
+            KapiTomo lists the catalog entry and moderates it under the catalog rules.
           </p>
+          <p class="catalog-policy-link"><a href="../terms/#plugin-catalog-rules" data-i18n="catalog.rulesLink">Read the catalog rules</a></p>
           <div class="filter-head">
             <div>
               <p class="kicker" data-i18n="catalog.categories">Categories</p>
@@ -1027,8 +1040,9 @@
       <section id="publishPanel" class="panel view-panel" data-view-panel="publish" hidden>
         <p class="kicker" data-i18n="publish.kicker">Publish</p>
         <h2 data-i18n="publish.title">Publish a ready plugin</h2>
-        <p data-i18n="publish.description">Paste the GitHub repository that already contains <code>plugin.json</code>. The Hub reads the manifest and opens a GitHub request; valid plugins are published automatically.</p>
-        <p class="catalog-notice" data-i18n="publish.notice">By publishing, the plugin creator confirms they are responsible for the plugin code, site mapping, icon, metadata, permissions, and fixes when the source site changes or downloads fail.</p>
+        <p data-i18n="publish.description">Paste the GitHub repository that already contains <code>plugin.json</code>. The Hub opens a GitHub request and publishes entries that pass the technical checks and accept the catalog rules.</p>
+        <p class="catalog-notice" data-i18n="publish.notice">Publishing confirms that the creator controls the repository and accepts responsibility for the plugin code, metadata, permissions, maintenance, and source mapping. Automatic validation is not an endorsement of third-party content.</p>
+        <p class="catalog-policy-link"><a href="../terms/#plugin-catalog-rules" data-i18n="publish.rulesLink">Review the rules before publishing</a></p>
         <div class="publish-form">
           <label class="field-label" for="repoUrlInput" data-i18n="publish.repository">GitHub repository</label>
           <input id="repoUrlInput" class="text-input" type="url" placeholder="https://github.com/user/my-plugin">
@@ -1095,6 +1109,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260825-online-status-cache"></script>
+    <script src="store.js?v=20260826-catalog-rules"></script>
   </body>
 </html>

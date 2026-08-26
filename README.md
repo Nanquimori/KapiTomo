@@ -117,11 +117,24 @@ Publishing is automatic after validation:
 2. Confirm the generated GitHub publication request.
 3. Automation validates the repository, manifest, icon, tags, and hosts.
 4. The request author must own the plugin repository.
-5. Valid requests are added to the catalog and published to GitHub Pages.
-6. Plugin owners can remove their own plugins automatically, and maintainers can remove any plugin.
+5. The request must include acceptance of the current Plugin Hub catalog rules.
+6. Technically valid requests are added to the catalog and published to GitHub Pages.
+7. Automatic publication is not an endorsement of the source or third-party content.
+8. Plugin owners can remove their own plugins automatically, and maintainers can moderate any plugin.
 
-If a source site fails health checks, the plugin appears as `Offline`. If the repository or `plugin.json` disappears, the plugin is removed from the public catalog.
+If a source site fails health checks, the plugin appears as `Offline`. If the repository or `plugin.json` remains missing for two consecutive checks, the plugin is marked as removed. Maintainers can temporarily hide a plugin during a credible review, restore it after review, or remove it after a confirmed violation or authorized request.
+
+Maintainer moderation uses the existing GitHub removal channel with an issue titled `[plugin-remove] plugin-id` and an explicit action:
+
+```text
+Plugin ID: plugin-id
+Action: hide | restore | remove
+Reason: objective moderation reason
+```
+
+Only accounts listed as maintainers can execute this action. The catalog stores the action, reason, maintainer, and timestamp for auditability.
+Creators cannot bypass a temporary hide or a moderator removal by publishing the same plugin again. A maintainer must restore or approve that entry first. A creator who voluntarily removed their own plugin may publish it again after fixing the repository.
 
 ## Content Policy
 
-KapiTomo and Nyxovira are reader and library tools. They must not be used to encourage piracy, bypass restrictions, or download works without authorization. Users are responsible for using plugins and downloads only when they have permission or when the source legally allows it. Rights holders and affected parties can request review or removal through the contact listed in the Terms and Content Policy.
+KapiTomo publishes original works and public catalogs. Nyxovira manages compatible plugins, downloads, updates, and local-library files for readers such as Nyxalira; Nyxovira is not the reading app. Plugins must not contain malware, use misleading metadata, impersonate another party, or bypass authentication, paywalls, DRM, or access restrictions. A community plugin is not removed merely because it connects to a third-party source or receives an unsupported report. See the Terms and Plugin Catalog Rules for the full publication, moderation, review, and removal criteria.

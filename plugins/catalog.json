@@ -2,8 +2,9 @@
   "schema_version": 3,
   "name": "KapiTomo Plugin Hub",
   "description": "Public plugin catalog for Nyxovira.",
-  "catalog_revision": "20260825-online-status-cache",
+  "catalog_revision": "20260826-catalog-rules",
   "publish_model": "github-repository",
+  "rules_url": "https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules",
   "suggested_tags": [
     "english",
     "portuguese",
@@ -29,7 +30,14 @@
   "requirements": {
     "icon_url": "Required. Every online plugin must point to a public icon image.",
     "repository_url": "Required. Every online plugin must be hosted in a public GitHub repository.",
-    "tags": "Required. Use one language tag first, then one to three content type tags. Unsupported tags and extra tags are ignored."
+    "tags": "Required. Use one language tag first, then one to three content type tags. Unsupported tags and extra tags are ignored.",
+    "policy_acceptance": "Required. Publication requests must accept the current Plugin Hub catalog rules."
+  },
+  "moderation": {
+    "active": "Visible and technically available.",
+    "broken": "Visible as Offline after repeated technical failures.",
+    "hidden": "Temporarily unavailable during a credible review.",
+    "removed": "Unavailable after an authorized request, confirmed violation, or repeated repository absence."
   },
   "official_tags": {
     "languages": [
