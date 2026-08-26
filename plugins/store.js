@@ -27,7 +27,7 @@ const languageButtons = Array.from(document.querySelectorAll("[data-language-opt
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
-const CATALOG_VERSION = "20260826-direct-report";
+const CATALOG_VERSION = "20260826-direct-report-v2";
 const REPORT_EMAIL = "nanquimori@gmail.com";
 const REPORT_ENDPOINT = `https://formsubmit.co/ajax/${REPORT_EMAIL}`;
 const MIN_REPORT_DETAILS = 200;
@@ -131,7 +131,6 @@ const I18N = {
       sending: "Sending report...",
       sent: "Report sent successfully. It will be reviewed by the Plugin Hub team. Thank you for helping us maintain a safe environment for the entire community.",
       sendError: "The report could not be sent right now. Check your connection and try again in a few minutes.",
-      activationRequired: "Report delivery still needs to be activated by the catalog owner. Confirm the activation message sent to the catalog email address, then try again.",
       requestTitle: "Plugin catalog violation report: {id}",
       confirmationLine: "Reporter confirmation: accepted",
       rulesLine: "Catalog rules: https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules"
@@ -284,7 +283,6 @@ const I18N = {
       sending: "Enviando denúncia...",
       sent: "Denúncia enviada com sucesso. Ela será analisada pela equipe do Plugin Hub. Agradecemos por nos ajudar a manter um ambiente seguro para toda a comunidade.",
       sendError: "Não foi possível enviar a denúncia agora. Verifique sua conexão e tente novamente em alguns minutos.",
-      activationRequired: "O recebimento das denúncias ainda precisa ser ativado pelo responsável do catálogo. Confirme a mensagem de ativação enviada ao e-mail do catálogo e tente novamente.",
       requestTitle: "Denúncia de violação do catálogo: {id}",
       confirmationLine: "Confirmação do denunciante: aceita",
       rulesLine: "Regras do catálogo: https://nanquimori.github.io/KapiTomo/terms/#regras-do-catalogo"
@@ -1276,9 +1274,7 @@ async function openReportRequest() {
     }
     const accepted = response.ok && (result?.success === true || result?.success === "true");
     if (!accepted) {
-      const serviceMessage = String(result?.message || "");
-      const needsActivation = /activat|confirm.*email|verify.*email/i.test(serviceMessage);
-      setReportStatus(t(needsActivation ? "report.activationRequired" : "report.sendError"), "error");
+      setReportStatus(t("report.sendError"), "error");
       return;
     }
     reportDetailsInput.value = "";
