@@ -1150,14 +1150,14 @@
 
       <section id="reportPanel" class="panel view-panel" data-view-panel="report" hidden>
         <p class="kicker" data-i18n="report.kicker">Report</p>
-        <h2 data-i18n="report.title">Report a catalog violation</h2>
-        <p data-i18n="report.description">Use this channel only for behavior of the plugin code, its public repository, or its catalog entry. Submitting a report does not automatically hide or remove the plugin.</p>
-        <p class="catalog-notice" data-i18n="report.notFor">Not for source-site content, missing chapters, translation quality, advertisements, outages, account rules, or ordinary download/support problems. Those belong to the source site or plugin creator.</p>
+        <h2 data-i18n="report.title">Report a plugin</h2>
+        <p data-i18n="report.description">Use this form to report a serious problem with a plugin available in the catalog. Every report is reviewed before any decision is made.</p>
+        <p class="catalog-notice" data-i18n="report.notFor">Do not use this form to complain about works, missing chapters, translations, advertisements, website availability, or account rules. For common plugin errors, contact its developer.</p>
         <p id="reportCreatorHelp" class="catalog-policy-link" hidden>
-          <span data-i18n="report.technicalHelp">For a technical problem, contact the plugin creator in its repository:</span>
-          <a id="reportCreatorLink" target="_blank" rel="noopener" data-i18n="report.creatorRepository">Open creator repository</a>
+          <span data-i18n="report.technicalHelp">Need help using the plugin? Visit the developer's repository:</span>
+          <a id="reportCreatorLink" target="_blank" rel="noopener" data-i18n="report.creatorRepository">Open developer repository</a>
         </p>
-        <p class="catalog-notice"><span data-i18n="report.notice">The report is sent privately through the form. The contact email is used only to reply about this report.</span> <a href="../privacy/" data-i18n="report.privacyLink">Privacy Policy</a></p>
+        <p class="catalog-notice"><span data-i18n="report.notice">The report is sent privately. Your email will be used only if we need to contact you about the review.</span> <a href="../privacy/" data-i18n="report.privacyLink">Privacy Policy</a></p>
         <div class="publish-form">
           <label class="field-label" for="reportPluginIdInput" data-i18n="report.pluginId">Plugin ID</label>
           <input id="reportPluginIdInput" class="text-input" type="text" placeholder="my-plugin" maxlength="64" autocomplete="off">
@@ -1165,12 +1165,12 @@
           <input id="reportEmailInput" class="text-input" type="email" placeholder="name@example.com" maxlength="254" autocomplete="email" required>
           <label class="field-label" for="reportDetailsInput" data-i18n="report.reason">Reason</label>
           <p class="field-guidance" data-i18n="report.languageRequirement">The reason must be written in Portuguese or English. Reports in other languages cannot be reviewed.</p>
-          <p class="field-guidance" data-i18n="report.duplicatePolicy">Duplicate reports are grouped into the same review. The number of reports is not evidence and never causes a plugin to be hidden or removed.</p>
+          <p class="field-guidance" data-i18n="report.duplicatePolicy">Repeated reports are combined into the same review. A high number of reports does not prove wrongdoing and never removes a plugin automatically.</p>
           <textarea id="reportDetailsInput" class="text-input" minlength="200" maxlength="2000" required data-i18n-placeholder="report.detailsPlaceholder" placeholder="Clearly explain why you are reporting this plugin. Include only the information you consider important for the review."></textarea>
           <p id="reportDetailsCount" class="report-details-count" aria-live="polite">0/200 minimum characters · 0/20 minimum words</p>
           <label class="confirmation-row" for="reportConfirmationInput">
             <input id="reportConfirmationInput" type="checkbox" required>
-            <span data-i18n="report.confirmation">I confirm that this report concerns the plugin code, repository, or catalog entry; that it is not an ordinary source-content or support complaint; and that the information is accurate to the best of my knowledge.</span>
+            <span data-i18n="report.confirmation">I confirm that I have read the guidance above and that the information I provided is true to the best of my knowledge.</span>
           </label>
           <label class="honeypot-field" aria-hidden="true">Website <input id="reportWebsiteInput" type="text" tabindex="-1" autocomplete="off"></label>
           <button id="requestReportPluginButton" class="button primary" type="button" data-i18n="report.request">Send report</button>
@@ -1209,6 +1209,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260826-report-grouping"></script>
+    <script src="store.js?v=20260826-report-copy"></script>
   </body>
 </html>

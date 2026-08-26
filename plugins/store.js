@@ -28,7 +28,7 @@ const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
 const REPORT_HISTORY_KEY = "kapitomo.reportHistory.v1";
-const CATALOG_VERSION = "20260826-report-grouping";
+const CATALOG_VERSION = "20260826-report-copy";
 const REPORT_EMAIL = "nanquimori@gmail.com";
 const REPORT_ENDPOINT = `https://formsubmit.co/ajax/${REPORT_EMAIL}`;
 const REPORT_DUPLICATE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
@@ -111,33 +111,33 @@ const I18N = {
     },
     report: {
       kicker: "Report",
-      title: "Report a catalog violation",
-      description: "Use this channel only for behavior of the plugin code, its public repository, or its catalog entry. Submitting a report does not automatically hide or remove the plugin.",
-      notFor: "Not for source-site content, missing chapters, translation quality, advertisements, outages, account rules, or ordinary download/support problems. Those belong to the source site or plugin creator.",
-      technicalHelp: "For a technical problem, contact the plugin creator in its repository:",
-      creatorRepository: "Open creator repository",
-      notice: "The report is sent privately through the form. The contact email is used only to reply about this report.",
+      title: "Report a plugin",
+      description: "Use this form to report a serious problem with a plugin available in the catalog. Every report is reviewed before any decision is made.",
+      notFor: "Do not use this form to complain about works, missing chapters, translations, advertisements, website availability, or account rules. For common plugin errors, contact its developer.",
+      technicalHelp: "Need help using the plugin? Visit the developer's repository:",
+      creatorRepository: "Open developer repository",
+      notice: "The report is sent privately. Your email will be used only if we need to contact you about the review.",
       privacyLink: "Privacy Policy",
       pluginId: "Plugin ID",
       email: "Contact email",
       reason: "Reason",
       languageRequirement: "The reason must be written in Portuguese or English. Reports in other languages cannot be reviewed.",
-      duplicatePolicy: "Duplicate reports are grouped into the same review. The number of reports is not evidence and never causes a plugin to be hidden or removed.",
+      duplicatePolicy: "Repeated reports are combined into the same review. A high number of reports does not prove wrongdoing and never removes a plugin automatically.",
       detailsPlaceholder: "Clearly explain why you are reporting this plugin. Include only the information you consider important for the review.",
       detailsCount: "{count}/{minimum} minimum characters · {words}/{minimumWords} minimum words",
-      confirmation: "I confirm that this report concerns the plugin code, repository, or catalog entry; that it is not an ordinary source-content or support complaint; and that the information is accurate to the best of my knowledge.",
+      confirmation: "I confirm that I have read the guidance above and that the information I provided is true to the best of my knowledge.",
       request: "Send report",
       enterId: "Enter the plugin ID.",
       invalidId: "Use a valid plugin ID.",
       enterEmail: "Enter a contact email.",
       invalidEmail: "Enter a valid contact email.",
       explain: "Write a complete reason with at least {minimum} characters and {minimumWords} words. Current: {count} characters and {words} words.",
-      confirm: "Confirm the responsibility statement before sending the report.",
+      confirm: "Confirm that you have read the guidance and provided truthful information before sending the report.",
       sending: "Sending report...",
       sent: "Report sent successfully. It will be reviewed by the Plugin Hub team. Thank you for helping us maintain a safe environment for the entire community.",
-      duplicate: "This same report was already sent from this browser and remains grouped in the plugin's review. Sending it again does not increase its weight or change the decision.",
+      duplicate: "This report has already been sent from this browser and is included in the review. Sending it again will not change the decision.",
       sendError: "The report could not be sent right now. Check your connection and try again in a few minutes.",
-      confirmationLine: "Reporter confirmation: accepted",
+      confirmationLine: "Reporter confirmed that the guidance was read and the information is true to the best of their knowledge",
       rulesLine: "Catalog rules: https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules"
     },
     publish: {
@@ -265,33 +265,33 @@ const I18N = {
     },
     report: {
       kicker: "Denúncia",
-      title: "Denuncie uma violação do catálogo",
-      description: "Use este canal somente para comportamentos do código do plugin, de seu repositório público ou de sua entrada no catálogo. Enviar uma denúncia não oculta nem remove o plugin automaticamente.",
-      notFor: "Não use para conteúdo do site de origem, capítulos ausentes, qualidade da tradução, anúncios, indisponibilidade, regras de conta ou problemas comuns de download e suporte. Esses assuntos pertencem ao site de origem ou ao criador do plugin.",
-      technicalHelp: "Para um problema técnico, procure o criador no repositório do plugin:",
-      creatorRepository: "Abrir repositório do criador",
-      notice: "A denúncia é enviada de forma privada pelo formulário. O e-mail informado será usado somente para responder sobre esta denúncia.",
+      title: "Denunciar um plugin",
+      description: "Use este formulário para informar um problema sério com um plugin disponível no catálogo. Toda denúncia é analisada antes de qualquer decisão.",
+      notFor: "Não use este formulário para reclamar de obras, capítulos ausentes, traduções, anúncios, indisponibilidade do site ou regras de conta. Para erros comuns do plugin, procure o desenvolvedor.",
+      technicalHelp: "Precisa de ajuda para usar o plugin? Acesse o repositório do desenvolvedor:",
+      creatorRepository: "Abrir repositório do desenvolvedor",
+      notice: "A denúncia é enviada de forma privada. Seu e-mail será usado apenas se precisarmos falar com você sobre a análise.",
       privacyLink: "Política de Privacidade",
       pluginId: "ID do plugin",
       email: "E-mail para contato",
       reason: "Motivo",
       languageRequirement: "O motivo deve ser escrito em português ou inglês. Denúncias em outros idiomas não poderão ser analisadas.",
-      duplicatePolicy: "Denúncias duplicadas são agrupadas na mesma análise. A quantidade de denúncias não é prova e nunca causa ocultação ou remoção de um plugin.",
+      duplicatePolicy: "Denúncias repetidas são reunidas na mesma análise. Ter muitas denúncias não prova que o plugin fez algo errado e nunca causa remoção automática.",
       detailsPlaceholder: "Explique claramente por que você está denunciando este plugin. Inclua apenas as informações que considera importantes para a análise.",
       detailsCount: "{count}/{minimum} caracteres mínimos · {words}/{minimumWords} palavras mínimas",
-      confirmation: "Confirmo que esta denúncia trata do código, repositório ou entrada do plugin no catálogo; que não é uma reclamação comum sobre conteúdo da fonte ou suporte; e que as informações são verdadeiras conforme meu conhecimento.",
+      confirmation: "Confirmo que li as orientações acima e que as informações que forneci são verdadeiras conforme meu conhecimento.",
       request: "Enviar denúncia",
       enterId: "Informe o ID do plugin.",
       invalidId: "Use um ID de plugin válido.",
       enterEmail: "Informe um e-mail para contato.",
       invalidEmail: "Informe um e-mail válido para contato.",
       explain: "Escreva um motivo completo com pelo menos {minimum} caracteres e {minimumWords} palavras. Atual: {count} caracteres e {words} palavras.",
-      confirm: "Confirme a declaração de responsabilidade antes de enviar a denúncia.",
+      confirm: "Confirme que leu as orientações e forneceu informações verdadeiras antes de enviar a denúncia.",
       sending: "Enviando denúncia...",
       sent: "Denúncia enviada com sucesso. Ela será analisada pela equipe do Plugin Hub. Agradecemos por nos ajudar a manter um ambiente seguro para toda a comunidade.",
-      duplicate: "Esta mesma denúncia já foi enviada por este navegador e permanece agrupada na análise do plugin. Reenviá-la não aumenta seu peso nem altera a decisão.",
+      duplicate: "Esta denúncia já foi enviada neste navegador e está incluída na análise. Enviá-la novamente não muda a decisão.",
       sendError: "Não foi possível enviar a denúncia agora. Verifique sua conexão e tente novamente em alguns minutos.",
-      confirmationLine: "Confirmação do denunciante: aceita",
+      confirmationLine: "O denunciante confirmou que leu as orientações e que as informações são verdadeiras conforme seu conhecimento",
       rulesLine: "Regras do catálogo: https://nanquimori.github.io/KapiTomo/terms/#regras-do-catalogo"
     },
     publish: {
@@ -1334,7 +1334,7 @@ async function openReportRequest() {
         duplicate_fingerprint: fingerprint,
         duplicate_policy: "Duplicate reports are grouped; report quantity is not evidence and never causes hiding or removal.",
         reason: details,
-        scope_confirmation: t("report.confirmationLine"),
+        truthfulness_confirmation: t("report.confirmationLine"),
         catalog_rules: t("report.rulesLine")
       })
     });
