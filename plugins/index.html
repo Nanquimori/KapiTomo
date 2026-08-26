@@ -750,6 +750,21 @@
         font-weight: 700;
       }
 
+      select.text-input {
+        cursor: pointer;
+      }
+
+      select.text-input option {
+        background: #160926;
+        color: var(--text);
+      }
+
+      textarea.text-input {
+        min-height: 112px;
+        padding: 10px 11px;
+        resize: vertical;
+      }
+
       .publish-status {
         min-height: 1.3em;
         margin: 0;
@@ -995,6 +1010,7 @@
         <nav class="hub-menu" aria-label="Plugin Hub sections">
           <button class="menu-tab is-active" type="button" data-view-target="catalog" data-i18n="nav.catalog">Catalog</button>
           <button class="menu-tab" type="button" data-view-target="publish" data-i18n="nav.publish">Publish</button>
+          <button class="menu-tab" type="button" data-view-target="report" data-i18n="nav.report">Report</button>
           <button class="menu-tab" type="button" data-view-target="remove" data-i18n="nav.remove">Remove</button>
           <a class="menu-tab" href="../nyxovira/plugin-api/" data-i18n="nav.api">Plugin API</a>
           <a class="menu-tab" href="../terms/#plugin-catalog-rules" data-i18n="nav.terms">Rules &amp; terms</a>
@@ -1081,10 +1097,38 @@
         </details>
       </section>
 
+      <section id="reportPanel" class="panel view-panel" data-view-panel="report" hidden>
+        <p class="kicker" data-i18n="report.kicker">Report</p>
+        <h2 data-i18n="report.title">Request a plugin review</h2>
+        <p data-i18n="report.description">Report a specific problem for manual review. Submitting a report does not automatically hide or remove the plugin.</p>
+        <p class="catalog-notice" data-i18n="report.notice">The GitHub request is public. Do not include personal data or confidential evidence; send sensitive material by email using the address in the catalog rules.</p>
+        <div class="publish-form">
+          <label class="field-label" for="reportPluginIdInput" data-i18n="report.pluginId">Plugin ID</label>
+          <input id="reportPluginIdInput" class="text-input" type="text" placeholder="my-plugin" maxlength="64" autocomplete="off">
+          <label class="field-label" for="reportReasonInput" data-i18n="report.reason">Reason</label>
+          <select id="reportReasonInput" class="text-input">
+            <option value="" data-i18n="report.chooseReason">Select a reason</option>
+            <option value="security" data-i18n="report.categories.security">Security or harmful behavior</option>
+            <option value="privacy" data-i18n="report.categories.privacy">Privacy or data misuse</option>
+            <option value="identity" data-i18n="report.categories.identity">Impersonation or misleading metadata</option>
+            <option value="access" data-i18n="report.categories.access">Access restriction or technical protection</option>
+            <option value="rights" data-i18n="report.categories.rights">Rights or source authorization</option>
+            <option value="technical" data-i18n="report.categories.technical">Broken or technically incorrect plugin</option>
+            <option value="other" data-i18n="report.categories.other">Other catalog-rule issue</option>
+          </select>
+          <label class="field-label" for="reportEvidenceInput" data-i18n="report.evidence">Evidence URL (optional)</label>
+          <input id="reportEvidenceInput" class="text-input" type="url" placeholder="https://example.com/evidence" maxlength="500">
+          <label class="field-label" for="reportDetailsInput" data-i18n="report.details">What happened?</label>
+          <textarea id="reportDetailsInput" class="text-input" maxlength="2000" data-i18n-placeholder="report.detailsPlaceholder" placeholder="Describe the behavior, affected page, date, and how the problem can be verified."></textarea>
+          <button id="requestReportPluginButton" class="button primary" type="button" data-i18n="report.request">Open review request</button>
+          <p id="reportStatus" class="publish-status" aria-live="polite"></p>
+        </div>
+      </section>
+
       <section id="removePanel" class="panel view-panel" data-view-panel="remove" hidden>
         <p class="kicker" data-i18n="remove.kicker">Remove</p>
         <h2 data-i18n="remove.title">Remove a publication</h2>
-        <p data-i18n="remove.description">Enter the published plugin and confirm the GitHub request. Plugin owners can remove their own plugins automatically, and maintainers can remove any plugin.</p>
+        <p data-i18n="remove.description">Enter the published plugin and confirm the GitHub request. Plugin owners can remove their own entries; maintainer actions require a recorded reason under the catalog rules.</p>
         <aside class="ownership-guide" aria-labelledby="ownershipGuideTitle">
           <div class="ownership-guide-head">
             <span class="ownership-mark" aria-hidden="true">@</span>
@@ -1098,7 +1142,7 @@
             <li><span><code>joao123</code> <span data-i18n="ownership.joao">can publish and remove</span> <code>joao123/PluginManga</code>.</span></li>
             <li><span><code>maria456</code> <span data-i18n="ownership.maria">can publish and remove</span> <code>maria456/PluginNovel</code>.</span></li>
             <li data-tone="blocked"><span><code>joao123</code> <span data-i18n="ownership.blocked">cannot remove Maria's plugin</span> <code>maria456/PluginNovel</code>.</span></li>
-            <li data-tone="moderator"><span><code>Nanquimori</code> <span data-i18n="ownership.moderator">can remove both to moderate the catalog</span>.</span></li>
+            <li data-tone="moderator"><span><code>Nanquimori</code> <span data-i18n="ownership.moderator">can review both under the catalog rules</span>.</span></li>
           </ul>
           <p class="ownership-rule" data-i18n="ownership.rule">The typed link and ID identify the plugin; authorization comes from the GitHub account that creates the issue.</p>
         </aside>
@@ -1112,6 +1156,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260826-policy-acceptance"></script>
+    <script src="store.js?v=20260826-report-review"></script>
   </body>
 </html>

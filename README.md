@@ -122,7 +122,7 @@ Publishing is automatic after validation:
 7. Automatic publication is not an endorsement of the source or third-party content.
 8. Plugin owners can remove their own plugins automatically, and maintainers can moderate any plugin.
 
-If a source site fails health checks, the plugin appears as `Offline`. If the repository or `plugin.json` remains missing for two consecutive checks, the plugin is marked as removed. Maintainers can temporarily hide a plugin during a credible review, restore it after review, or remove it after a confirmed violation or authorized request.
+If a source site fails health checks, the plugin appears as `Offline`. If the repository or `plugin.json` remains missing for two consecutive checks, the plugin is marked as removed. Reports open a manual review and never change the catalog automatically. A maintainer may apply a documented preventive restriction only after independently verifying preliminary evidence of an urgent security or catalog-integrity risk, restore a corrected entry, or remove it after a confirmed violation or authorized request.
 
 Maintainer moderation uses the existing GitHub removal channel with an issue titled `[plugin-remove] plugin-id` and an explicit action:
 
@@ -133,7 +133,9 @@ Reason: objective moderation reason
 ```
 
 Only accounts listed as maintainers can execute this action. The catalog stores the action, reason, maintainer, and timestamp for auditability.
-Creators cannot bypass a temporary hide or a moderator removal by publishing the same plugin again. A maintainer must restore or approve that entry first. A creator who voluntarily removed their own plugin may publish it again after fixing the repository.
+Creators may submit corrections and new versions at any time. When an entry is under a preventive restriction or was removed by moderation, the publication request becomes a correction request: a maintainer reviews the change and restores the listing after the identified issue is resolved. A creator who voluntarily removed their own plugin may publish it again normally.
+
+The Hub includes a `Report` action on every published plugin and a dedicated report panel. It opens a public GitHub issue titled `[plugin-report] plugin-id` with a category, details, and optional evidence URL. Reports are reviewed manually; the Plugin Hub workflow deliberately ignores report issues so no report can hide or remove an entry automatically. Confidential evidence should be sent by email with the public report reference.
 
 ## Content Policy
 
