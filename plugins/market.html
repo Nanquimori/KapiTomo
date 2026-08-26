@@ -1133,8 +1133,8 @@
           <label class="field-label" for="reportEmailInput" data-i18n="report.email">Contact email</label>
           <input id="reportEmailInput" class="text-input" type="email" placeholder="name@example.com" maxlength="254" autocomplete="email" required>
           <label class="field-label" for="reportDetailsInput" data-i18n="report.reason">Reason</label>
-          <textarea id="reportDetailsInput" class="text-input" minlength="200" maxlength="2000" required data-i18n-placeholder="report.detailsPlaceholder" placeholder="Write at least 200 characters and 30 words. Include what the plugin did, where and when it happened, steps to reproduce it, app/plugin version, and why it violates the catalog rules."></textarea>
-          <p id="reportDetailsCount" class="report-details-count" aria-live="polite">0/2000 characters · 0/30 words · at least 10 different words</p>
+          <textarea id="reportDetailsInput" class="text-input" minlength="200" maxlength="2000" required data-i18n-placeholder="report.detailsPlaceholder" placeholder="Clearly explain why you are reporting this plugin. Include only the information you consider important for the review."></textarea>
+          <p id="reportDetailsCount" class="report-details-count" aria-live="polite">0/200 minimum characters · 0/20 minimum words</p>
           <label class="confirmation-row" for="reportConfirmationInput">
             <input id="reportConfirmationInput" type="checkbox" required>
             <span data-i18n="report.confirmation">I confirm that this report concerns the plugin code, repository, or catalog entry; that it is not an ordinary source-content or support complaint; and that the information is accurate to the best of my knowledge.</span>
@@ -1175,6 +1175,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260826-serious-report"></script>
+    <script src="store.js?v=20260826-report-form-v2"></script>
   </body>
 </html>

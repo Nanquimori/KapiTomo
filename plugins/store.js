@@ -26,12 +26,10 @@ const languageButtons = Array.from(document.querySelectorAll("[data-language-opt
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
-const CATALOG_VERSION = "20260826-serious-report";
+const CATALOG_VERSION = "20260826-report-form-v2";
 const REPORT_EMAIL = "nanquimori@gmail.com";
 const MIN_REPORT_DETAILS = 200;
-const MAX_REPORT_DETAILS = 2000;
-const MIN_REPORT_WORDS = 30;
-const MIN_REPORT_UNIQUE_WORDS = 10;
+const MIN_REPORT_WORDS = 20;
 const MAX_SELECTED_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
 const OFFICIAL_LANGUAGE_TAGS = [
@@ -118,15 +116,15 @@ const I18N = {
       pluginId: "Plugin ID",
       email: "Contact email",
       reason: "Reason",
-      detailsPlaceholder: "Write at least 200 characters and 30 words. Include what the plugin did, where and when it happened, steps to reproduce it, app/plugin version, and why it violates the catalog rules.",
-      detailsCount: "{count}/{maximum} characters · {words}/{minimumWords} words · at least {minimumUniqueWords} different words",
+      detailsPlaceholder: "Clearly explain why you are reporting this plugin. Include only the information you consider important for the review.",
+      detailsCount: "{count}/{minimum} minimum characters · {words}/{minimumWords} minimum words",
       confirmation: "I confirm that this report concerns the plugin code, repository, or catalog entry; that it is not an ordinary source-content or support complaint; and that the information is accurate to the best of my knowledge.",
       request: "Prepare private email report",
       enterId: "Enter the plugin ID.",
       invalidId: "Use a valid plugin ID.",
       enterEmail: "Enter a contact email.",
       invalidEmail: "Enter a valid contact email.",
-      explain: "Write a complete reason with at least {minimum} characters, {minimumWords} words, and {minimumUniqueWords} different words. Current: {count} characters, {words} words, {uniqueWords} different words.",
+      explain: "Write a complete reason with at least {minimum} characters and {minimumWords} words. Current: {count} characters and {words} words.",
       confirm: "Confirm the responsibility statement before preparing the report.",
       opening: "Opening your email app with the private report prepared...",
       requestTitle: "Plugin catalog violation report: {id}",
@@ -272,15 +270,15 @@ const I18N = {
       pluginId: "ID do plugin",
       email: "E-mail para contato",
       reason: "Motivo",
-      detailsPlaceholder: "Escreva pelo menos 200 caracteres e 30 palavras. Informe o que o plugin fez, onde e quando ocorreu, como reproduzir, a versão do app/plugin e por que isso viola as regras do catálogo.",
-      detailsCount: "{count}/{maximum} caracteres · {words}/{minimumWords} palavras · pelo menos {minimumUniqueWords} palavras diferentes",
+      detailsPlaceholder: "Explique claramente por que você está denunciando este plugin. Inclua apenas as informações que considera importantes para a análise.",
+      detailsCount: "{count}/{minimum} caracteres mínimos · {words}/{minimumWords} palavras mínimas",
       confirmation: "Confirmo que esta denúncia trata do código, repositório ou entrada do plugin no catálogo; que não é uma reclamação comum sobre conteúdo da fonte ou suporte; e que as informações são verdadeiras conforme meu conhecimento.",
       request: "Preparar denúncia por e-mail",
       enterId: "Informe o ID do plugin.",
       invalidId: "Use um ID de plugin válido.",
       enterEmail: "Informe um e-mail para contato.",
       invalidEmail: "Informe um e-mail válido para contato.",
-      explain: "Escreva um motivo completo com pelo menos {minimum} caracteres, {minimumWords} palavras e {minimumUniqueWords} palavras diferentes. Atual: {count} caracteres, {words} palavras e {uniqueWords} palavras diferentes.",
+      explain: "Escreva um motivo completo com pelo menos {minimum} caracteres e {minimumWords} palavras. Atual: {count} caracteres e {words} palavras.",
       confirm: "Confirme a declaração de responsabilidade antes de preparar a denúncia.",
       opening: "Abrindo seu aplicativo de e-mail com a denúncia privada preparada...",
       requestTitle: "Denúncia de violação do catálogo: {id}",
@@ -1191,18 +1189,14 @@ function updateReportDetailsCount() {
   }
   const count = reportDetailsLength();
   const words = reportDetailsWords();
-  const uniqueWords = new Set(words).size;
   reportDetailsCount.textContent = t("report.detailsCount", {
     count,
-    maximum: MAX_REPORT_DETAILS,
     minimum: MIN_REPORT_DETAILS,
     words: words.length,
-    minimumWords: MIN_REPORT_WORDS,
-    minimumUniqueWords: MIN_REPORT_UNIQUE_WORDS
+    minimumWords: MIN_REPORT_WORDS
   });
   reportDetailsCount.classList.toggle("is-valid", count >= MIN_REPORT_DETAILS
-    && words.length >= MIN_REPORT_WORDS
-    && uniqueWords >= MIN_REPORT_UNIQUE_WORDS);
+    && words.length >= MIN_REPORT_WORDS);
 }
 
 function isValidReportEmail(value) {
@@ -1232,17 +1226,13 @@ function openReportRequest() {
   }
   const detailsLength = reportDetailsLength();
   const detailsWords = reportDetailsWords();
-  const uniqueWords = new Set(detailsWords).size;
   if (detailsLength < MIN_REPORT_DETAILS
-      || detailsWords.length < MIN_REPORT_WORDS
-      || uniqueWords < MIN_REPORT_UNIQUE_WORDS) {
+      || detailsWords.length < MIN_REPORT_WORDS) {
     setReportStatus(t("report.explain", {
       minimum: MIN_REPORT_DETAILS,
       count: detailsLength,
       minimumWords: MIN_REPORT_WORDS,
-      words: detailsWords.length,
-      minimumUniqueWords: MIN_REPORT_UNIQUE_WORDS,
-      uniqueWords
+      words: detailsWords.length
     }));
     return;
   }
