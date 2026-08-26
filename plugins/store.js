@@ -13,6 +13,8 @@ const reportEvidenceInput = document.getElementById("reportEvidenceInput");
 const reportDetailsInput = document.getElementById("reportDetailsInput");
 const requestReportPluginButton = document.getElementById("requestReportPluginButton");
 const reportStatus = document.getElementById("reportStatus");
+const reportCreatorHelp = document.getElementById("reportCreatorHelp");
+const reportCreatorLink = document.getElementById("reportCreatorLink");
 const tagFilter = document.getElementById("tagFilter");
 const tagFilterStatus = document.getElementById("tagFilterStatus");
 const pluginSearchInput = document.getElementById("pluginSearchInput");
@@ -23,7 +25,7 @@ const languageButtons = Array.from(document.querySelectorAll("[data-language-opt
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
-const CATALOG_VERSION = "20260826-report-review";
+const CATALOG_VERSION = "20260826-report-scope";
 const MAX_SELECTED_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
 const OFFICIAL_LANGUAGE_TAGS = [
@@ -100,8 +102,11 @@ const I18N = {
     },
     report: {
       kicker: "Report",
-      title: "Request a plugin review",
-      description: "Report a specific problem for manual review. Submitting a report does not automatically hide or remove the plugin.",
+      title: "Report a catalog violation",
+      description: "Use this channel only for behavior of the plugin code, its public repository, or its catalog entry. Submitting a report does not automatically hide or remove the plugin.",
+      notFor: "Not for source-site content, missing chapters, translation quality, advertisements, outages, account rules, or ordinary download/support problems. Those belong to the source site or plugin creator.",
+      technicalHelp: "For a technical problem, contact the plugin creator in its repository:",
+      creatorRepository: "Open creator repository",
       notice: "The GitHub request is public. Do not include personal data or confidential evidence; send sensitive material by email using the address in the catalog rules.",
       pluginId: "Plugin ID",
       reason: "Reason",
@@ -116,8 +121,8 @@ const I18N = {
       explain: "Describe the problem with enough detail to review it.",
       invalidEvidence: "Evidence must be a valid http or https URL.",
       opening: "Opening the public review request on GitHub...",
-      requestTitle: "Plugin catalog review request.",
-      requestDescription: "This report requests manual review and does not automatically change the plugin's availability.",
+      requestTitle: "Plugin catalog violation report.",
+      requestDescription: "This report concerns the plugin code, repository, or catalog entry. It does not concern third-party source content and does not automatically change the plugin's availability.",
       pluginIdLine: "Plugin ID: {id}",
       categoryLine: "Category: {category}",
       evidenceLine: "Evidence URL: {url}",
@@ -125,13 +130,11 @@ const I18N = {
       detailsLine: "Details:",
       rulesLine: "Catalog rules: https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules",
       categories: {
-        security: "Security or harmful behavior",
-        privacy: "Privacy or data misuse",
-        identity: "Impersonation or misleading metadata",
-        access: "Access restriction or technical protection",
-        rights: "Rights or source authorization",
-        technical: "Broken or technically incorrect plugin",
-        other: "Other catalog-rule issue"
+        malware: "Malware, malicious code, or dangerous redirects",
+        credentials: "Credential theft or deceptive login",
+        privacy: "Undeclared collection or sharing of user data",
+        identity: "False author, impersonation, or deceptive catalog metadata",
+        protection: "Plugin code bypasses login, paywall, DRM, or access control"
       }
     },
     publish: {
@@ -164,7 +167,7 @@ const I18N = {
       draftsRemoved: "Drafts removed from this browser.",
       requestTitle: "Plugin publication request for the Nyxovira catalog.",
       requestDescription: "After submission, the catalog automation validates the repository, ownership, manifest, icon, tags, hosts, and acceptance of the current catalog rules.",
-      responsibility: "By submitting this plugin, I confirm that I control its repository, accept the current Plugin Hub catalog rules, and am responsible for the plugin code, metadata, icon, permissions, maintenance, and source mapping. I understand that automatic publication is not approval of third-party content.",
+      responsibility: "By submitting this plugin, I confirm that I control its repository, accept the current Plugin Hub catalog rules, and am responsible for the plugin code, metadata, icon, permissions requested by the plugin, maintenance, and source mapping. I understand that automatic publication is not approval of third-party content.",
       acceptanceLine: "Catalog rules accepted: yes",
       rulesLine: "Catalog rules: https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules",
       repositoryLine: "Repository: {url}",
@@ -259,8 +262,11 @@ const I18N = {
     },
     report: {
       kicker: "Denúncia",
-      title: "Solicite a análise de um plugin",
-      description: "Informe um problema específico para análise manual. Enviar uma denúncia não oculta nem remove o plugin automaticamente.",
+      title: "Denuncie uma violação do catálogo",
+      description: "Use este canal somente para comportamentos do código do plugin, de seu repositório público ou de sua entrada no catálogo. Enviar uma denúncia não oculta nem remove o plugin automaticamente.",
+      notFor: "Não use para conteúdo do site de origem, capítulos ausentes, qualidade da tradução, anúncios, indisponibilidade, regras de conta ou problemas comuns de download e suporte. Esses assuntos pertencem ao site de origem ou ao criador do plugin.",
+      technicalHelp: "Para um problema técnico, procure o criador no repositório do plugin:",
+      creatorRepository: "Abrir repositório do criador",
       notice: "A solicitação no GitHub é pública. Não inclua dados pessoais nem provas confidenciais; envie material sensível pelo e-mail informado nas regras do catálogo.",
       pluginId: "ID do plugin",
       reason: "Motivo",
@@ -275,8 +281,8 @@ const I18N = {
       explain: "Descreva o problema com detalhes suficientes para análise.",
       invalidEvidence: "A evidência precisa ser uma URL http ou https válida.",
       opening: "Abrindo a solicitação pública de análise no GitHub...",
-      requestTitle: "Solicitação de análise de plugin do catálogo.",
-      requestDescription: "Esta denúncia solicita análise manual e não altera automaticamente a disponibilidade do plugin.",
+      requestTitle: "Denúncia de violação do catálogo de plugins.",
+      requestDescription: "Esta denúncia diz respeito ao código, repositório ou entrada do plugin no catálogo. Ela não trata de conteúdos da fonte de terceiros e não altera automaticamente a disponibilidade do plugin.",
       pluginIdLine: "ID do plugin: {id}",
       categoryLine: "Categoria: {category}",
       evidenceLine: "URL da evidência: {url}",
@@ -284,13 +290,11 @@ const I18N = {
       detailsLine: "Detalhes:",
       rulesLine: "Regras do catálogo: https://nanquimori.github.io/KapiTomo/terms/#regras-do-catalogo",
       categories: {
-        security: "Segurança ou comportamento prejudicial",
-        privacy: "Privacidade ou uso indevido de dados",
-        identity: "Imitação ou metadados enganosos",
-        access: "Restrição de acesso ou proteção técnica",
-        rights: "Direitos ou autorização da fonte",
-        technical: "Plugin quebrado ou tecnicamente incorreto",
-        other: "Outro problema com as regras do catálogo"
+        malware: "Malware, código malicioso ou redirecionamentos perigosos",
+        credentials: "Roubo de credenciais ou tela de login enganosa",
+        privacy: "Coleta ou envio de dados do usuário não declarados",
+        identity: "Autor falso, imitação ou metadados enganosos no catálogo",
+        protection: "O código do plugin contorna login, paywall, DRM ou controle de acesso"
       }
     },
     publish: {
@@ -323,7 +327,7 @@ const I18N = {
       draftsRemoved: "Rascunhos removidos deste navegador.",
       requestTitle: "Solicitação de publicação de plugin para o catálogo do Nyxovira.",
       requestDescription: "Depois do envio, a automação valida repositório, propriedade, manifesto, ícone, tags, domínios e aceitação das regras atuais do catálogo.",
-      responsibility: "Ao enviar este plugin, confirmo que controlo seu repositório, aceito as regras atuais do catálogo do Plugin Hub e sou responsável pelo código, metadados, ícone, permissões, manutenção e mapeamento da fonte. Entendo que a publicação automática não representa aprovação de conteúdos de terceiros.",
+      responsibility: "Ao enviar este plugin, confirmo que controlo seu repositório, aceito as regras atuais do catálogo do Plugin Hub e sou responsável pelo código, metadados, ícone, permissões solicitadas pelo plugin, manutenção e mapeamento da fonte. Entendo que a publicação automática não representa aprovação de conteúdos de terceiros.",
       acceptanceLine: "Regras do catálogo aceitas: sim",
       rulesLine: "Regras do catálogo: https://nanquimori.github.io/KapiTomo/terms/#regras-do-catalogo",
       repositoryLine: "Repositório: {url}",
@@ -1154,9 +1158,27 @@ function preparePluginReport(plugin) {
   if (reportDetailsInput) {
     reportDetailsInput.value = "";
   }
+  updateReportCreatorLink(plugin);
   setReportStatus("");
   setActiveView("report");
   reportReasonInput?.focus();
+}
+
+function updateReportCreatorLink(preferredPlugin = null) {
+  const pluginId = String(reportPluginIdInput?.value || "").trim().toLowerCase();
+  const plugin = preferredPlugin && String(preferredPlugin.id || "").trim().toLowerCase() === pluginId
+    ? preferredPlugin
+    : allPlugins.find((item) => !item.__source && String(item.id || "").trim().toLowerCase() === pluginId);
+  const repositoryUrl = String(plugin?.repository_url || "").trim();
+  if (!reportCreatorHelp || !reportCreatorLink) {
+    return;
+  }
+  reportCreatorHelp.hidden = !repositoryUrl;
+  if (repositoryUrl) {
+    reportCreatorLink.href = repositoryUrl;
+  } else {
+    reportCreatorLink.removeAttribute("href");
+  }
 }
 
 function openReportRequest() {
@@ -1285,6 +1307,7 @@ repoUrlInput?.addEventListener("keydown", (event) => {
     loadRepoPlugin();
   }
 });
+reportPluginIdInput?.addEventListener("input", () => updateReportCreatorLink());
 pluginSearchInput?.addEventListener("input", () => {
   searchQuery = String(pluginSearchInput.value || "");
   applyTagFilters();
