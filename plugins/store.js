@@ -8,9 +8,10 @@ const removeRepoUrlInput = document.getElementById("removeRepoUrlInput");
 const requestRemovePluginButton = document.getElementById("requestRemovePluginButton");
 const removeStatus = document.getElementById("removeStatus");
 const reportPluginIdInput = document.getElementById("reportPluginIdInput");
-const reportReasonInput = document.getElementById("reportReasonInput");
-const reportEvidenceInput = document.getElementById("reportEvidenceInput");
+const reportEmailInput = document.getElementById("reportEmailInput");
 const reportDetailsInput = document.getElementById("reportDetailsInput");
+const reportDetailsCount = document.getElementById("reportDetailsCount");
+const reportConfirmationInput = document.getElementById("reportConfirmationInput");
 const requestReportPluginButton = document.getElementById("requestReportPluginButton");
 const reportStatus = document.getElementById("reportStatus");
 const reportCreatorHelp = document.getElementById("reportCreatorHelp");
@@ -25,7 +26,12 @@ const languageButtons = Array.from(document.querySelectorAll("[data-language-opt
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
-const CATALOG_VERSION = "20260826-report-scope";
+const CATALOG_VERSION = "20260826-serious-report";
+const REPORT_EMAIL = "nanquimori@gmail.com";
+const MIN_REPORT_DETAILS = 200;
+const MAX_REPORT_DETAILS = 2000;
+const MIN_REPORT_WORDS = 30;
+const MIN_REPORT_UNIQUE_WORDS = 10;
 const MAX_SELECTED_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
 const OFFICIAL_LANGUAGE_TAGS = [
@@ -107,35 +113,29 @@ const I18N = {
       notFor: "Not for source-site content, missing chapters, translation quality, advertisements, outages, account rules, or ordinary download/support problems. Those belong to the source site or plugin creator.",
       technicalHelp: "For a technical problem, contact the plugin creator in its repository:",
       creatorRepository: "Open creator repository",
-      notice: "The GitHub request is public. Do not include personal data or confidential evidence; send sensitive material by email using the address in the catalog rules.",
+      notice: "The report is prepared as a private email to the catalog contact address. The contact email is used only to reply about this report.",
+      privacyLink: "Privacy Policy",
       pluginId: "Plugin ID",
+      email: "Contact email",
       reason: "Reason",
-      chooseReason: "Select a reason",
-      evidence: "Evidence URL (optional)",
-      details: "What happened?",
-      detailsPlaceholder: "Describe the behavior, affected page, date, and how the problem can be verified.",
-      request: "Open review request",
+      detailsPlaceholder: "Write at least 200 characters and 30 words. Include what the plugin did, where and when it happened, steps to reproduce it, app/plugin version, and why it violates the catalog rules.",
+      detailsCount: "{count}/{maximum} characters · {words}/{minimumWords} words · at least {minimumUniqueWords} different words",
+      confirmation: "I confirm that this report concerns the plugin code, repository, or catalog entry; that it is not an ordinary source-content or support complaint; and that the information is accurate to the best of my knowledge.",
+      request: "Prepare private email report",
       enterId: "Enter the plugin ID.",
       invalidId: "Use a valid plugin ID.",
-      choose: "Select the reason for the report.",
-      explain: "Describe the problem with enough detail to review it.",
-      invalidEvidence: "Evidence must be a valid http or https URL.",
-      opening: "Opening the public review request on GitHub...",
-      requestTitle: "Plugin catalog violation report.",
-      requestDescription: "This report concerns the plugin code, repository, or catalog entry. It does not concern third-party source content and does not automatically change the plugin's availability.",
+      enterEmail: "Enter a contact email.",
+      invalidEmail: "Enter a valid contact email.",
+      explain: "Write a complete reason with at least {minimum} characters, {minimumWords} words, and {minimumUniqueWords} different words. Current: {count} characters, {words} words, {uniqueWords} different words.",
+      confirm: "Confirm the responsibility statement before preparing the report.",
+      opening: "Opening your email app with the private report prepared...",
+      requestTitle: "Plugin catalog violation report: {id}",
+      requestDescription: "This private report concerns the plugin code, repository, or catalog entry. It does not concern third-party source content and does not automatically change the plugin's availability.",
       pluginIdLine: "Plugin ID: {id}",
-      categoryLine: "Category: {category}",
-      evidenceLine: "Evidence URL: {url}",
-      noEvidence: "not provided",
-      detailsLine: "Details:",
-      rulesLine: "Catalog rules: https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules",
-      categories: {
-        malware: "Malware, malicious code, or dangerous redirects",
-        credentials: "Credential theft or deceptive login",
-        privacy: "Undeclared collection or sharing of user data",
-        identity: "False author, impersonation, or deceptive catalog metadata",
-        protection: "Plugin code bypasses login, paywall, DRM, or access control"
-      }
+      emailLine: "Contact email: {email}",
+      detailsLine: "Reason:",
+      confirmationLine: "Reporter confirmation: accepted",
+      rulesLine: "Catalog rules: https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules"
     },
     publish: {
       kicker: "Publish",
@@ -267,35 +267,29 @@ const I18N = {
       notFor: "Não use para conteúdo do site de origem, capítulos ausentes, qualidade da tradução, anúncios, indisponibilidade, regras de conta ou problemas comuns de download e suporte. Esses assuntos pertencem ao site de origem ou ao criador do plugin.",
       technicalHelp: "Para um problema técnico, procure o criador no repositório do plugin:",
       creatorRepository: "Abrir repositório do criador",
-      notice: "A solicitação no GitHub é pública. Não inclua dados pessoais nem provas confidenciais; envie material sensível pelo e-mail informado nas regras do catálogo.",
+      notice: "A denúncia é preparada como e-mail privado para o endereço de contato do catálogo. O e-mail informado será usado somente para responder sobre esta denúncia.",
+      privacyLink: "Política de Privacidade",
       pluginId: "ID do plugin",
+      email: "E-mail para contato",
       reason: "Motivo",
-      chooseReason: "Selecione um motivo",
-      evidence: "URL da evidência (opcional)",
-      details: "O que aconteceu?",
-      detailsPlaceholder: "Descreva o comportamento, a página afetada, a data e como o problema pode ser verificado.",
-      request: "Abrir solicitação de análise",
+      detailsPlaceholder: "Escreva pelo menos 200 caracteres e 30 palavras. Informe o que o plugin fez, onde e quando ocorreu, como reproduzir, a versão do app/plugin e por que isso viola as regras do catálogo.",
+      detailsCount: "{count}/{maximum} caracteres · {words}/{minimumWords} palavras · pelo menos {minimumUniqueWords} palavras diferentes",
+      confirmation: "Confirmo que esta denúncia trata do código, repositório ou entrada do plugin no catálogo; que não é uma reclamação comum sobre conteúdo da fonte ou suporte; e que as informações são verdadeiras conforme meu conhecimento.",
+      request: "Preparar denúncia por e-mail",
       enterId: "Informe o ID do plugin.",
       invalidId: "Use um ID de plugin válido.",
-      choose: "Selecione o motivo da denúncia.",
-      explain: "Descreva o problema com detalhes suficientes para análise.",
-      invalidEvidence: "A evidência precisa ser uma URL http ou https válida.",
-      opening: "Abrindo a solicitação pública de análise no GitHub...",
-      requestTitle: "Denúncia de violação do catálogo de plugins.",
-      requestDescription: "Esta denúncia diz respeito ao código, repositório ou entrada do plugin no catálogo. Ela não trata de conteúdos da fonte de terceiros e não altera automaticamente a disponibilidade do plugin.",
+      enterEmail: "Informe um e-mail para contato.",
+      invalidEmail: "Informe um e-mail válido para contato.",
+      explain: "Escreva um motivo completo com pelo menos {minimum} caracteres, {minimumWords} palavras e {minimumUniqueWords} palavras diferentes. Atual: {count} caracteres, {words} palavras e {uniqueWords} palavras diferentes.",
+      confirm: "Confirme a declaração de responsabilidade antes de preparar a denúncia.",
+      opening: "Abrindo seu aplicativo de e-mail com a denúncia privada preparada...",
+      requestTitle: "Denúncia de violação do catálogo: {id}",
+      requestDescription: "Esta denúncia privada diz respeito ao código, repositório ou entrada do plugin no catálogo. Ela não trata de conteúdos da fonte de terceiros e não altera automaticamente a disponibilidade do plugin.",
       pluginIdLine: "ID do plugin: {id}",
-      categoryLine: "Categoria: {category}",
-      evidenceLine: "URL da evidência: {url}",
-      noEvidence: "não informada",
-      detailsLine: "Detalhes:",
-      rulesLine: "Regras do catálogo: https://nanquimori.github.io/KapiTomo/terms/#regras-do-catalogo",
-      categories: {
-        malware: "Malware, código malicioso ou redirecionamentos perigosos",
-        credentials: "Roubo de credenciais ou tela de login enganosa",
-        privacy: "Coleta ou envio de dados do usuário não declarados",
-        identity: "Autor falso, imitação ou metadados enganosos no catálogo",
-        protection: "O código do plugin contorna login, paywall, DRM ou controle de acesso"
-      }
+      emailLine: "E-mail para contato: {email}",
+      detailsLine: "Motivo:",
+      confirmationLine: "Confirmação do denunciante: aceita",
+      rulesLine: "Regras do catálogo: https://nanquimori.github.io/KapiTomo/terms/#regras-do-catalogo"
     },
     publish: {
       kicker: "Publicar",
@@ -474,6 +468,7 @@ function setLanguage(language, persist = true) {
   applyStaticTranslations();
   renderTagFilters(availableTags);
   updateFavoritesOnlyButton();
+  updateReportDetailsCount();
   applyTagFilters();
 }
 
@@ -1149,19 +1144,20 @@ function preparePluginReport(plugin) {
   if (reportPluginIdInput) {
     reportPluginIdInput.value = String(plugin?.id || "").trim();
   }
-  if (reportReasonInput) {
-    reportReasonInput.value = "";
-  }
-  if (reportEvidenceInput) {
-    reportEvidenceInput.value = "";
+  if (reportEmailInput) {
+    reportEmailInput.value = "";
   }
   if (reportDetailsInput) {
     reportDetailsInput.value = "";
   }
+  if (reportConfirmationInput) {
+    reportConfirmationInput.checked = false;
+  }
+  updateReportDetailsCount();
   updateReportCreatorLink(plugin);
   setReportStatus("");
   setActiveView("report");
-  reportReasonInput?.focus();
+  reportEmailInput?.focus();
 }
 
 function updateReportCreatorLink(preferredPlugin = null) {
@@ -1181,10 +1177,42 @@ function updateReportCreatorLink(preferredPlugin = null) {
   }
 }
 
+function reportDetailsLength() {
+  return Array.from(String(reportDetailsInput?.value || "").trim()).length;
+}
+
+function reportDetailsWords() {
+  return String(reportDetailsInput?.value || "").toLocaleLowerCase().match(/[\p{L}\p{N}]+/gu) || [];
+}
+
+function updateReportDetailsCount() {
+  if (!reportDetailsCount) {
+    return;
+  }
+  const count = reportDetailsLength();
+  const words = reportDetailsWords();
+  const uniqueWords = new Set(words).size;
+  reportDetailsCount.textContent = t("report.detailsCount", {
+    count,
+    maximum: MAX_REPORT_DETAILS,
+    minimum: MIN_REPORT_DETAILS,
+    words: words.length,
+    minimumWords: MIN_REPORT_WORDS,
+    minimumUniqueWords: MIN_REPORT_UNIQUE_WORDS
+  });
+  reportDetailsCount.classList.toggle("is-valid", count >= MIN_REPORT_DETAILS
+    && words.length >= MIN_REPORT_WORDS
+    && uniqueWords >= MIN_REPORT_UNIQUE_WORDS);
+}
+
+function isValidReportEmail(value) {
+  const email = String(value || "").trim();
+  return email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+}
+
 function openReportRequest() {
   const pluginId = String(reportPluginIdInput?.value || "").trim().toLowerCase();
-  const reason = String(reportReasonInput?.value || "").trim();
-  const evidence = String(reportEvidenceInput?.value || "").trim();
+  const email = String(reportEmailInput?.value || "").trim();
   const details = String(reportDetailsInput?.value || "").trim();
   if (!pluginId) {
     setReportStatus(t("report.enterId"));
@@ -1194,44 +1222,51 @@ function openReportRequest() {
     setReportStatus(t("report.invalidId"));
     return;
   }
-  if (!reason || !t(`report.categories.${reason}`) || t(`report.categories.${reason}`) === `report.categories.${reason}`) {
-    setReportStatus(t("report.choose"));
+  if (!email) {
+    setReportStatus(t("report.enterEmail"));
     return;
   }
-  if (details.length < 20) {
-    setReportStatus(t("report.explain"));
+  if (!isValidReportEmail(email)) {
+    setReportStatus(t("report.invalidEmail"));
     return;
   }
-  if (evidence) {
-    try {
-      const evidenceUrl = new URL(evidence);
-      if (!["http:", "https:"].includes(evidenceUrl.protocol)) {
-        throw new Error("invalid protocol");
-      }
-    } catch {
-      setReportStatus(t("report.invalidEvidence"));
-      return;
-    }
+  const detailsLength = reportDetailsLength();
+  const detailsWords = reportDetailsWords();
+  const uniqueWords = new Set(detailsWords).size;
+  if (detailsLength < MIN_REPORT_DETAILS
+      || detailsWords.length < MIN_REPORT_WORDS
+      || uniqueWords < MIN_REPORT_UNIQUE_WORDS) {
+    setReportStatus(t("report.explain", {
+      minimum: MIN_REPORT_DETAILS,
+      count: detailsLength,
+      minimumWords: MIN_REPORT_WORDS,
+      words: detailsWords.length,
+      minimumUniqueWords: MIN_REPORT_UNIQUE_WORDS,
+      uniqueWords
+    }));
+    return;
+  }
+  if (!reportConfirmationInput?.checked) {
+    setReportStatus(t("report.confirm"));
+    return;
   }
   const body = [
-    `<!-- plugin-hub-language: ${currentLanguage} -->`,
-    t("report.requestTitle"),
     t("report.requestDescription"),
     "",
     t("report.pluginIdLine", { id: pluginId }),
-    t("report.categoryLine", { category: t(`report.categories.${reason}`) }),
-    t("report.evidenceLine", { url: evidence || t("report.noEvidence") }),
+    t("report.emailLine", { email }),
     "",
     t("report.detailsLine"),
     details,
     "",
+    t("report.confirmationLine"),
     t("report.rulesLine")
   ].join("\n");
-  const url = "https://github.com/Nanquimori/KapiTomo/issues/new"
-    + "?title=" + encodeURIComponent("[plugin-report] " + pluginId)
+  const url = `mailto:${REPORT_EMAIL}`
+    + "?subject=" + encodeURIComponent(t("report.requestTitle", { id: pluginId }))
     + "&body=" + encodeURIComponent(body);
   setReportStatus(t("report.opening"));
-  window.open(url, "_blank", "noopener");
+  window.location.href = url;
 }
 
 function openRemovalRequest() {
@@ -1308,6 +1343,7 @@ repoUrlInput?.addEventListener("keydown", (event) => {
   }
 });
 reportPluginIdInput?.addEventListener("input", () => updateReportCreatorLink());
+reportDetailsInput?.addEventListener("input", updateReportDetailsCount);
 pluginSearchInput?.addEventListener("input", () => {
   searchQuery = String(pluginSearchInput.value || "");
   applyTagFilters();
@@ -1323,6 +1359,7 @@ discardDraftPluginsButton?.addEventListener("click", () => {
 });
 applyStaticTranslations();
 updateFavoritesOnlyButton();
+updateReportDetailsCount();
 const requestedView = new URLSearchParams(window.location.search).get("view");
 setActiveView(["catalog", "publish", "report", "remove"].includes(requestedView) ? requestedView : "catalog");
 loadAllPlugins();

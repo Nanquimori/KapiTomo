@@ -750,19 +750,39 @@
         font-weight: 700;
       }
 
-      select.text-input {
-        cursor: pointer;
-      }
-
-      select.text-input option {
-        background: #160926;
-        color: var(--text);
-      }
-
       textarea.text-input {
         min-height: 112px;
         padding: 10px 11px;
         resize: vertical;
+      }
+
+      .report-details-count {
+        margin: -3px 0 0;
+        color: #ffbf7b;
+        font-size: 0.74rem;
+        font-weight: 800;
+      }
+
+      .report-details-count.is-valid {
+        color: #79dda7;
+      }
+
+      .confirmation-row {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        align-items: start;
+        gap: 9px;
+        color: var(--muted);
+        font-size: 0.78rem;
+        line-height: 1.45;
+        cursor: pointer;
+      }
+
+      .confirmation-row input {
+        width: 18px;
+        height: 18px;
+        margin: 1px 0 0;
+        accent-color: var(--accent);
       }
 
       .publish-status {
@@ -1106,24 +1126,20 @@
           <span data-i18n="report.technicalHelp">For a technical problem, contact the plugin creator in its repository:</span>
           <a id="reportCreatorLink" target="_blank" rel="noopener" data-i18n="report.creatorRepository">Open creator repository</a>
         </p>
-        <p class="catalog-notice" data-i18n="report.notice">The GitHub request is public. Do not include personal data or confidential evidence; send sensitive material by email using the address in the catalog rules.</p>
+        <p class="catalog-notice"><span data-i18n="report.notice">The report is prepared as a private email to the catalog contact address. The contact email is used only to reply about this report.</span> <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a> · <a href="../privacy/" data-i18n="report.privacyLink">Privacy Policy</a></p>
         <div class="publish-form">
           <label class="field-label" for="reportPluginIdInput" data-i18n="report.pluginId">Plugin ID</label>
           <input id="reportPluginIdInput" class="text-input" type="text" placeholder="my-plugin" maxlength="64" autocomplete="off">
-          <label class="field-label" for="reportReasonInput" data-i18n="report.reason">Reason</label>
-          <select id="reportReasonInput" class="text-input">
-            <option value="" data-i18n="report.chooseReason">Select a reason</option>
-            <option value="malware" data-i18n="report.categories.malware">Malware, malicious code, or dangerous redirects</option>
-            <option value="credentials" data-i18n="report.categories.credentials">Credential theft or deceptive login</option>
-            <option value="privacy" data-i18n="report.categories.privacy">Undeclared collection or sharing of user data</option>
-            <option value="identity" data-i18n="report.categories.identity">False author, impersonation, or deceptive catalog metadata</option>
-            <option value="protection" data-i18n="report.categories.protection">Plugin code bypasses login, paywall, DRM, or access control</option>
-          </select>
-          <label class="field-label" for="reportEvidenceInput" data-i18n="report.evidence">Evidence URL (optional)</label>
-          <input id="reportEvidenceInput" class="text-input" type="url" placeholder="https://example.com/evidence" maxlength="500">
-          <label class="field-label" for="reportDetailsInput" data-i18n="report.details">What happened?</label>
-          <textarea id="reportDetailsInput" class="text-input" maxlength="2000" data-i18n-placeholder="report.detailsPlaceholder" placeholder="Describe the behavior, affected page, date, and how the problem can be verified."></textarea>
-          <button id="requestReportPluginButton" class="button primary" type="button" data-i18n="report.request">Open review request</button>
+          <label class="field-label" for="reportEmailInput" data-i18n="report.email">Contact email</label>
+          <input id="reportEmailInput" class="text-input" type="email" placeholder="name@example.com" maxlength="254" autocomplete="email" required>
+          <label class="field-label" for="reportDetailsInput" data-i18n="report.reason">Reason</label>
+          <textarea id="reportDetailsInput" class="text-input" minlength="200" maxlength="2000" required data-i18n-placeholder="report.detailsPlaceholder" placeholder="Write at least 200 characters and 30 words. Include what the plugin did, where and when it happened, steps to reproduce it, app/plugin version, and why it violates the catalog rules."></textarea>
+          <p id="reportDetailsCount" class="report-details-count" aria-live="polite">0/2000 characters · 0/30 words · at least 10 different words</p>
+          <label class="confirmation-row" for="reportConfirmationInput">
+            <input id="reportConfirmationInput" type="checkbox" required>
+            <span data-i18n="report.confirmation">I confirm that this report concerns the plugin code, repository, or catalog entry; that it is not an ordinary source-content or support complaint; and that the information is accurate to the best of my knowledge.</span>
+          </label>
+          <button id="requestReportPluginButton" class="button primary" type="button" data-i18n="report.request">Prepare private email report</button>
           <p id="reportStatus" class="publish-status" aria-live="polite"></p>
         </div>
       </section>
@@ -1159,6 +1175,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260826-report-scope"></script>
+    <script src="store.js?v=20260826-serious-report"></script>
   </body>
 </html>
