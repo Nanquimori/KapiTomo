@@ -767,6 +767,29 @@
         color: #79dda7;
       }
 
+      .publish-status.is-success {
+        color: #79dda7;
+        font-weight: 850;
+      }
+
+      .publish-status.is-error {
+        color: #ff9c9c;
+        font-weight: 800;
+      }
+
+      .button:disabled {
+        cursor: wait;
+        opacity: 0.62;
+      }
+
+      .honeypot-field {
+        position: absolute !important;
+        left: -10000px !important;
+        width: 1px !important;
+        height: 1px !important;
+        overflow: hidden !important;
+      }
+
       .confirmation-row {
         display: grid;
         grid-template-columns: auto minmax(0, 1fr);
@@ -1126,7 +1149,7 @@
           <span data-i18n="report.technicalHelp">For a technical problem, contact the plugin creator in its repository:</span>
           <a id="reportCreatorLink" target="_blank" rel="noopener" data-i18n="report.creatorRepository">Open creator repository</a>
         </p>
-        <p class="catalog-notice"><span data-i18n="report.notice">The report is prepared as a private email to the catalog contact address. The contact email is used only to reply about this report.</span> <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a> · <a href="../privacy/" data-i18n="report.privacyLink">Privacy Policy</a></p>
+        <p class="catalog-notice"><span data-i18n="report.notice">The report is sent privately through the form. The contact email is used only to reply about this report.</span> <a href="../privacy/" data-i18n="report.privacyLink">Privacy Policy</a></p>
         <div class="publish-form">
           <label class="field-label" for="reportPluginIdInput" data-i18n="report.pluginId">Plugin ID</label>
           <input id="reportPluginIdInput" class="text-input" type="text" placeholder="my-plugin" maxlength="64" autocomplete="off">
@@ -1139,7 +1162,8 @@
             <input id="reportConfirmationInput" type="checkbox" required>
             <span data-i18n="report.confirmation">I confirm that this report concerns the plugin code, repository, or catalog entry; that it is not an ordinary source-content or support complaint; and that the information is accurate to the best of my knowledge.</span>
           </label>
-          <button id="requestReportPluginButton" class="button primary" type="button" data-i18n="report.request">Prepare private email report</button>
+          <label class="honeypot-field" aria-hidden="true">Website <input id="reportWebsiteInput" type="text" tabindex="-1" autocomplete="off"></label>
+          <button id="requestReportPluginButton" class="button primary" type="button" data-i18n="report.request">Send report</button>
           <p id="reportStatus" class="publish-status" aria-live="polite"></p>
         </div>
       </section>
@@ -1175,6 +1199,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260826-report-form-v2"></script>
+    <script src="store.js?v=20260826-direct-report"></script>
   </body>
 </html>
