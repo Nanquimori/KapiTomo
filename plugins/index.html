@@ -756,6 +756,14 @@
         resize: vertical;
       }
 
+      .field-guidance {
+        margin: -3px 0 0;
+        color: var(--muted);
+        font-size: 0.77rem;
+        font-weight: 750;
+        line-height: 1.45;
+      }
+
       .report-details-count {
         margin: -3px 0 0;
         color: #ffbf7b;
@@ -1156,6 +1164,7 @@
           <label class="field-label" for="reportEmailInput" data-i18n="report.email">Contact email</label>
           <input id="reportEmailInput" class="text-input" type="email" placeholder="name@example.com" maxlength="254" autocomplete="email" required>
           <label class="field-label" for="reportDetailsInput" data-i18n="report.reason">Reason</label>
+          <p class="field-guidance" data-i18n="report.languageRequirement">The reason must be written in Portuguese or English. Reports in other languages cannot be reviewed.</p>
           <textarea id="reportDetailsInput" class="text-input" minlength="200" maxlength="2000" required data-i18n-placeholder="report.detailsPlaceholder" placeholder="Clearly explain why you are reporting this plugin. Include only the information you consider important for the review."></textarea>
           <p id="reportDetailsCount" class="report-details-count" aria-live="polite">0/200 minimum characters · 0/20 minimum words</p>
           <label class="confirmation-row" for="reportConfirmationInput">
@@ -1199,6 +1208,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260826-direct-report-v2"></script>
+    <script src="store.js?v=20260826-direct-report-v3"></script>
   </body>
 </html>
