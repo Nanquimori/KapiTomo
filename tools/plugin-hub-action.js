@@ -67,7 +67,7 @@ PORTUGUESE_ERRORS.set(POLICY_ACCEPTANCE_ERROR, "A solicitação de publicação 
 PORTUGUESE_ERRORS.set("Only a maintainer can moderate catalog plugins.", "Somente um mantenedor pode moderar plugins do catálogo.");
 PORTUGUESE_ERRORS.set("Moderation action must be hide, restore, or remove.", "A ação de moderação precisa ser hide, restore ou remove.");
 PORTUGUESE_ERRORS.set("Moderation reason is required.", "O motivo da moderação é obrigatório.");
-PORTUGUESE_ERRORS.set("A hidden or moderator-removed plugin requires maintainer review before republishing.", "Um plugin ocultado ou removido pela moderação precisa de revisão de um mantenedor antes de ser republicado.");
+PORTUGUESE_ERRORS.set("This catalog entry is under moderation review. The creator may submit corrections, and a maintainer must review them before the listing returns to the catalog.", "Esta entrada está em análise de moderação. O criador pode enviar correções, e um mantenedor precisa analisá-las antes que a entrada volte ao catálogo.");
 
 function issueLanguage(issue) {
   const body = String(issue && issue.body || "");
@@ -496,7 +496,7 @@ async function publishPlugin(issue) {
   const removedByRequester = existingStatus === "removed"
     && String(existing.moderated_by || "").toLowerCase() === actor.toLowerCase();
   if (existing && !maintainer && (existingStatus === "hidden" || (existingStatus === "removed" && !removedByRequester))) {
-    throw new Error("A hidden or moderator-removed plugin requires maintainer review before republishing.");
+    throw new Error("This catalog entry is under moderation review. The creator may submit corrections, and a maintainer must review them before the listing returns to the catalog.");
   }
   await validateRepositoryPlugin(plugin);
   if (!maintainer) {

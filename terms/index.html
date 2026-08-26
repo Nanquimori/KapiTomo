@@ -82,14 +82,15 @@
         <p>
           Automatic publication validates technical requirements and repository ownership. It does not certify
           ownership of third-party content or replace later moderation. KapiTomo may review a plugin after publication
-          and act on reliable reports.
+          and examine reports submitted through the Plugin Hub. A report opens a manual review and does not change the
+          plugin's availability by itself.
         </p>
 
         <h2>Catalog statuses and moderation</h2>
         <ul>
           <li><strong>Active:</strong> the plugin is visible and its required public files respond to automated checks.</li>
           <li><strong>Broken:</strong> the plugin remains listed as offline after repeated technical failures and may return when fixed.</li>
-          <li><strong>Hidden:</strong> the listing is temporarily unavailable while a credible security, rights, identity, or policy report is reviewed.</li>
+          <li><strong>Temporarily unavailable:</strong> a maintainer has documented preliminary evidence of an urgent security risk or another catalog-integrity issue that requires a preventive measure while the review is completed. A report alone does not cause this status.</li>
           <li><strong>Removed:</strong> the listing no longer appears because removal was authorized or a violation was confirmed.</li>
         </ul>
         <p>
@@ -98,8 +99,8 @@
           Decisions are based on the plugin's conduct, a verified request, or evidence of a catalog-rule violation.
         </p>
 
-        <h2>When a plugin may be rejected, hidden, or removed</h2>
-        <p>KapiTomo may reject a publication, request a correction, hide a listing during review, or remove it when:</p>
+        <h2>When a plugin may be rejected, temporarily restricted, or removed</h2>
+        <p>KapiTomo may reject a publication, request a correction, apply a documented preventive restriction, or remove a listing after manual review when:</p>
         <ul>
           <li>The creator requests removal or no longer controls the repository.</li>
           <li>The repository or <code>plugin.json</code> is deleted, becomes unavailable, or no longer contains the published plugin.</li>
@@ -111,12 +112,16 @@
         </ul>
         <p>
           Recoverable metadata errors should normally be corrected. Temporary technical failures should normally be
-          marked broken. Serious credible reports may result in temporary hiding while evidence is reviewed. Confirmed
-          violations, authorized owner requests, and permanently missing repositories may result in removal.
+          marked broken. Reports normally leave the listing visible while evidence is reviewed. Temporary unavailability
+          is exceptional and requires a maintainer to independently verify preliminary evidence of an immediate security
+          or catalog-integrity risk and record the reason. Confirmed violations, authorized owner requests, and
+          permanently missing repositories may result in removal.
         </p>
         <p>
-          A creator cannot bypass a temporary hide or a moderator removal by republishing the same plugin. A maintainer
-          must review or restore that entry first. A creator who voluntarily removed their own plugin may publish it again.
+          Creators may submit corrections and new versions at any time. If a listing is temporarily unavailable or was
+          removed after moderation, a new publication request is treated as a correction request and does not restore
+          visibility automatically; a maintainer reviews the change and restores the listing when the identified issue
+          has been resolved. A creator who voluntarily removed their own plugin may publish it again normally.
         </p>
 
         <h2>Creator and user responsibilities</h2>
@@ -133,14 +138,20 @@
 
         <h2>Reports, review, and correction</h2>
         <p>
-          Rights holders, source owners, plugin creators, and affected parties may request review by emailing
-          <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a>. Include the affected URL, plugin ID,
-          repository URL when available, the specific reason, supporting evidence, and a way to verify the request.
+          Anyone may use the <a href="../plugins/?view=report">Report</a> option in the Plugin Hub to request a manual
+          review. The resulting GitHub issue is public and should include the plugin ID, a specific reason, relevant URLs,
+          and enough detail to verify the report. Do not publish personal data or confidential evidence there. Sensitive
+          material may be sent to <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a> with the public report reference.
         </p>
+        <ol>
+          <li>The report is recorded and checked for a specific, verifiable catalog-rule issue.</li>
+          <li>The maintainer may request more evidence or contact the plugin creator before deciding.</li>
+          <li>The result may be no action, a technical-status correction, a request for changes, a documented preventive restriction in an urgent case, restoration, or removal after confirmation.</li>
+        </ol>
         <p>
-          A report does not cause automatic permanent removal. KapiTomo may correct metadata, mark a plugin broken,
-          hide it during review, restore it when a report is not confirmed, or remove it when the request or violation
-          is verified. Creators may contact the same address to correct a listing or request review of a moderation action.
+          Reports never cause automatic hiding or removal. Unsupported, duplicated, abusive, or unverifiable reports do
+          not change the listing. Creators may use the same report channel or email address to provide a correction,
+          respond with evidence, or request review of a moderation decision.
         </p>
 
         <h2>Pro purchase and external availability</h2>
@@ -203,14 +214,15 @@
         <p>
           A publicação automática valida requisitos técnicos e a propriedade do repositório. Ela não certifica a
           titularidade de conteúdos de terceiros nem substitui a moderação posterior. O KapiTomo pode revisar um
-          plugin após a publicação e agir diante de denúncias confiáveis.
+          plugin após a publicação e analisar denúncias enviadas pelo Plugin Hub. Uma denúncia abre uma análise manual
+          e não altera, por si só, a disponibilidade do plugin.
         </p>
 
         <h2>Estados do catálogo e moderação</h2>
         <ul>
           <li><strong>Ativo:</strong> o plugin está visível e seus arquivos públicos obrigatórios respondem às verificações automáticas.</li>
           <li><strong>Com falha:</strong> o plugin continua listado como offline após falhas técnicas repetidas e pode retornar quando for corrigido.</li>
-          <li><strong>Oculto:</strong> a entrada fica temporariamente indisponível durante a análise de denúncia confiável sobre segurança, direitos, identidade ou política.</li>
+          <li><strong>Indisponível temporariamente:</strong> um mantenedor registrou evidências preliminares de risco urgente de segurança ou de outro problema de integridade do catálogo que exige medida preventiva até a conclusão da análise. A denúncia sozinha não causa esse estado.</li>
           <li><strong>Removido:</strong> a entrada deixa de aparecer porque a remoção foi autorizada ou uma violação foi confirmada.</li>
         </ul>
         <p>
@@ -220,8 +232,8 @@
           solicitação confirmada ou evidências de violação das regras do catálogo.
         </p>
 
-        <h2>Quando um plugin pode ser recusado, ocultado ou removido</h2>
-        <p>O KapiTomo pode recusar a publicação, pedir correção, ocultar durante análise ou remover quando:</p>
+        <h2>Quando um plugin pode ser recusado, restringido temporariamente ou removido</h2>
+        <p>O KapiTomo pode recusar a publicação, pedir correção, aplicar uma restrição preventiva documentada ou remover uma entrada após análise manual quando:</p>
         <ul>
           <li>O criador solicita a remoção ou deixa de controlar o repositório.</li>
           <li>O repositório ou o <code>plugin.json</code> é excluído, fica indisponível ou deixa de conter o plugin publicado.</li>
@@ -233,14 +245,17 @@
         </ul>
         <p>
           Erros recuperáveis de metadados normalmente devem ser corrigidos. Falhas técnicas temporárias normalmente
-          devem resultar no estado offline. Denúncias sérias e confiáveis podem provocar ocultação temporária durante
-          a análise. Violações confirmadas, solicitações autorizadas do proprietário e repositórios permanentemente
-          ausentes podem resultar em remoção.
+          devem resultar no estado offline. Denúncias normalmente mantêm a entrada visível enquanto as evidências são
+          analisadas. A indisponibilidade temporária é excepcional e exige que um mantenedor verifique evidências
+          preliminares de risco imediato à segurança ou à integridade do catálogo e registre o motivo. Violações
+          confirmadas, solicitações autorizadas do proprietário e repositórios permanentemente ausentes podem resultar em remoção.
         </p>
         <p>
-          Um criador não pode contornar uma ocultação temporária ou remoção da moderação republicando o mesmo plugin.
-          Um mantenedor precisa analisar ou restaurar essa entrada primeiro. O criador que removeu voluntariamente o
-          próprio plugin pode publicá-lo novamente.
+          Criadores podem enviar correções e novas versões a qualquer momento. Se uma entrada estiver temporariamente
+          indisponível ou tiver sido removida após moderação, a nova solicitação de publicação será tratada como pedido
+          de correção e não restaurará a visibilidade automaticamente; um mantenedor analisará a mudança e restaurará a
+          entrada quando o problema identificado estiver resolvido. O criador que removeu voluntariamente o próprio
+          plugin pode publicá-lo novamente normalmente.
         </p>
 
         <h2>Responsabilidades do criador e do usuário</h2>
@@ -257,16 +272,21 @@
 
         <h2>Denúncias, análise e correção</h2>
         <p>
-          Titulares de direitos, proprietários de fontes, criadores de plugins e partes afetadas podem solicitar
-          análise pelo e-mail <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a>. Informe a URL afetada,
-          o ID do plugin, o repositório quando disponível, o motivo específico, evidências e uma forma de verificar a
-          solicitação.
+          Qualquer pessoa pode usar a opção <a href="../plugins/?view=report">Denunciar</a> no Plugin Hub para solicitar
+          análise manual. A issue gerada no GitHub é pública e deve informar o ID do plugin, motivo específico, URLs
+          relevantes e detalhes suficientes para verificação. Não publique dados pessoais nem provas confidenciais.
+          Material sensível pode ser enviado para <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a> com a
+          referência da denúncia pública.
         </p>
+        <ol>
+          <li>A denúncia é registrada e verificada quanto a um problema específico e comprovável das regras do catálogo.</li>
+          <li>O mantenedor pode pedir mais evidências ou contatar o criador do plugin antes da decisão.</li>
+          <li>O resultado pode ser nenhuma ação, correção do estado técnico, pedido de ajustes, restrição preventiva documentada em caso urgente, restauração ou remoção após confirmação.</li>
+        </ol>
         <p>
-          Uma denúncia não causa remoção definitiva automática. O KapiTomo pode corrigir metadados, marcar o plugin
-          como offline, ocultá-lo durante a análise, restaurá-lo quando a denúncia não for confirmada ou removê-lo
-          quando a solicitação ou violação for verificada. Criadores podem usar o mesmo endereço para corrigir uma
-          entrada ou pedir revisão de uma ação de moderação.
+          Denúncias nunca causam ocultação ou remoção automática. Denúncias sem elementos, duplicadas, abusivas ou não
+          verificáveis não alteram a entrada. Criadores podem usar o mesmo canal de denúncia ou o e-mail para apresentar
+          uma correção, responder com evidências ou pedir revisão de uma decisão de moderação.
         </p>
 
         <h2>Compra Pro e disponibilidade externa</h2>

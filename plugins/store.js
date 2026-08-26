@@ -7,6 +7,12 @@ const removePluginIdInput = document.getElementById("removePluginIdInput");
 const removeRepoUrlInput = document.getElementById("removeRepoUrlInput");
 const requestRemovePluginButton = document.getElementById("requestRemovePluginButton");
 const removeStatus = document.getElementById("removeStatus");
+const reportPluginIdInput = document.getElementById("reportPluginIdInput");
+const reportReasonInput = document.getElementById("reportReasonInput");
+const reportEvidenceInput = document.getElementById("reportEvidenceInput");
+const reportDetailsInput = document.getElementById("reportDetailsInput");
+const requestReportPluginButton = document.getElementById("requestReportPluginButton");
+const reportStatus = document.getElementById("reportStatus");
 const tagFilter = document.getElementById("tagFilter");
 const tagFilterStatus = document.getElementById("tagFilterStatus");
 const pluginSearchInput = document.getElementById("pluginSearchInput");
@@ -17,7 +23,7 @@ const languageButtons = Array.from(document.querySelectorAll("[data-language-opt
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
-const CATALOG_VERSION = "20260826-policy-acceptance";
+const CATALOG_VERSION = "20260826-report-review";
 const MAX_SELECTED_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
 const OFFICIAL_LANGUAGE_TAGS = [
@@ -53,6 +59,7 @@ const I18N = {
     nav: {
       catalog: "Catalog",
       publish: "Publish",
+      report: "Report",
       remove: "Remove",
       api: "Plugin API",
       terms: "Rules & terms"
@@ -86,9 +93,46 @@ const I18N = {
       offline: "Offline",
       install: "Install",
       publish: "Publish",
+      report: "Report",
       remove: "Delete",
       open: "Open",
       pluginFallback: "Plugin"
+    },
+    report: {
+      kicker: "Report",
+      title: "Request a plugin review",
+      description: "Report a specific problem for manual review. Submitting a report does not automatically hide or remove the plugin.",
+      notice: "The GitHub request is public. Do not include personal data or confidential evidence; send sensitive material by email using the address in the catalog rules.",
+      pluginId: "Plugin ID",
+      reason: "Reason",
+      chooseReason: "Select a reason",
+      evidence: "Evidence URL (optional)",
+      details: "What happened?",
+      detailsPlaceholder: "Describe the behavior, affected page, date, and how the problem can be verified.",
+      request: "Open review request",
+      enterId: "Enter the plugin ID.",
+      invalidId: "Use a valid plugin ID.",
+      choose: "Select the reason for the report.",
+      explain: "Describe the problem with enough detail to review it.",
+      invalidEvidence: "Evidence must be a valid http or https URL.",
+      opening: "Opening the public review request on GitHub...",
+      requestTitle: "Plugin catalog review request.",
+      requestDescription: "This report requests manual review and does not automatically change the plugin's availability.",
+      pluginIdLine: "Plugin ID: {id}",
+      categoryLine: "Category: {category}",
+      evidenceLine: "Evidence URL: {url}",
+      noEvidence: "not provided",
+      detailsLine: "Details:",
+      rulesLine: "Catalog rules: https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules",
+      categories: {
+        security: "Security or harmful behavior",
+        privacy: "Privacy or data misuse",
+        identity: "Impersonation or misleading metadata",
+        access: "Access restriction or technical protection",
+        rights: "Rights or source authorization",
+        technical: "Broken or technically incorrect plugin",
+        other: "Other catalog-rule issue"
+      }
     },
     publish: {
       kicker: "Publish",
@@ -136,7 +180,7 @@ const I18N = {
     remove: {
       kicker: "Remove",
       title: "Remove a publication",
-      description: "Enter the published plugin and confirm the GitHub request. Plugin owners can remove their own plugins automatically, and maintainers can remove any plugin.",
+      description: "Enter the published plugin and confirm the GitHub request. Plugin owners can remove their own entries; maintainer actions require a recorded reason under the catalog rules.",
       pluginId: "Plugin ID",
       repository: "GitHub repository",
       request: "Request removal",
@@ -156,7 +200,7 @@ const I18N = {
       joao: "can publish and remove",
       maria: "can publish and remove",
       blocked: "cannot remove Maria's plugin",
-      moderator: "can remove both to moderate the catalog",
+      moderator: "can review both under the catalog rules",
       rule: "The typed link and ID identify the plugin; authorization comes from the GitHub account that creates the issue."
     },
     install: {
@@ -174,6 +218,7 @@ const I18N = {
     nav: {
       catalog: "Catálogo",
       publish: "Publicar",
+      report: "Denunciar",
       remove: "Remover",
       api: "API de Plugins",
       terms: "Regras e termos"
@@ -207,9 +252,46 @@ const I18N = {
       offline: "Offline",
       install: "Instalar",
       publish: "Publicar",
+      report: "Denunciar",
       remove: "Excluir",
       open: "Abrir",
       pluginFallback: "Plugin"
+    },
+    report: {
+      kicker: "Denúncia",
+      title: "Solicite a análise de um plugin",
+      description: "Informe um problema específico para análise manual. Enviar uma denúncia não oculta nem remove o plugin automaticamente.",
+      notice: "A solicitação no GitHub é pública. Não inclua dados pessoais nem provas confidenciais; envie material sensível pelo e-mail informado nas regras do catálogo.",
+      pluginId: "ID do plugin",
+      reason: "Motivo",
+      chooseReason: "Selecione um motivo",
+      evidence: "URL da evidência (opcional)",
+      details: "O que aconteceu?",
+      detailsPlaceholder: "Descreva o comportamento, a página afetada, a data e como o problema pode ser verificado.",
+      request: "Abrir solicitação de análise",
+      enterId: "Informe o ID do plugin.",
+      invalidId: "Use um ID de plugin válido.",
+      choose: "Selecione o motivo da denúncia.",
+      explain: "Descreva o problema com detalhes suficientes para análise.",
+      invalidEvidence: "A evidência precisa ser uma URL http ou https válida.",
+      opening: "Abrindo a solicitação pública de análise no GitHub...",
+      requestTitle: "Solicitação de análise de plugin do catálogo.",
+      requestDescription: "Esta denúncia solicita análise manual e não altera automaticamente a disponibilidade do plugin.",
+      pluginIdLine: "ID do plugin: {id}",
+      categoryLine: "Categoria: {category}",
+      evidenceLine: "URL da evidência: {url}",
+      noEvidence: "não informada",
+      detailsLine: "Detalhes:",
+      rulesLine: "Regras do catálogo: https://nanquimori.github.io/KapiTomo/terms/#regras-do-catalogo",
+      categories: {
+        security: "Segurança ou comportamento prejudicial",
+        privacy: "Privacidade ou uso indevido de dados",
+        identity: "Imitação ou metadados enganosos",
+        access: "Restrição de acesso ou proteção técnica",
+        rights: "Direitos ou autorização da fonte",
+        technical: "Plugin quebrado ou tecnicamente incorreto",
+        other: "Outro problema com as regras do catálogo"
+      }
     },
     publish: {
       kicker: "Publicar",
@@ -257,7 +339,7 @@ const I18N = {
     remove: {
       kicker: "Remover",
       title: "Remova uma publicação",
-      description: "Informe o plugin publicado e confirme a solicitação no GitHub. Donos removem os próprios plugins automaticamente, e mantenedores podem remover qualquer plugin.",
+      description: "Informe o plugin publicado e confirme a solicitação no GitHub. Donos podem remover as próprias entradas; ações de mantenedores exigem motivo registrado conforme as regras do catálogo.",
       pluginId: "ID do plugin",
       repository: "Repositório GitHub",
       request: "Solicitar remoção",
@@ -277,7 +359,7 @@ const I18N = {
       joao: "pode publicar e remover",
       maria: "pode publicar e remover",
       blocked: "não pode remover o plugin de Maria",
-      moderator: "pode remover ambos para moderar o catálogo",
+      moderator: "pode analisar ambos conforme as regras do catálogo",
       rule: "O link e o ID informados identificam o plugin; a autorização vem da conta GitHub que cria a issue."
     },
     install: {
@@ -429,6 +511,12 @@ function siteStatusClass(plugin) {
 function setPublishStatus(message) {
   if (publishStatus) {
     publishStatus.textContent = message || "";
+  }
+}
+
+function setReportStatus(message) {
+  if (reportStatus) {
+    reportStatus.textContent = message || "";
   }
 }
 
@@ -854,8 +942,11 @@ function renderPlugins(plugins) {
     if (plugin.__source === "draft") {
       actions.push(`<button class="button" type="button" data-publish-plugin="${index}">${escapeHtml(t("catalog.publish"))}</button>`);
       actions.push(`<button class="button" type="button" data-delete-draft="${index}">${escapeHtml(t("catalog.remove"))}</button>`);
-    } else if (plugin.homepage || plugin.site_url) {
-      actions.push(`<a class="button" href="${escapeHtml(plugin.homepage || plugin.site_url)}">${escapeHtml(t("catalog.open"))}</a>`);
+    } else {
+      if (plugin.homepage || plugin.site_url) {
+        actions.push(`<a class="button" href="${escapeHtml(plugin.homepage || plugin.site_url)}">${escapeHtml(t("catalog.open"))}</a>`);
+      }
+      actions.push(`<button class="button" type="button" data-report-plugin="${index}">${escapeHtml(t("catalog.report"))}</button>`);
     }
     return `
       <article class="plugin-card">
@@ -887,6 +978,9 @@ function renderPlugins(plugins) {
   });
   document.querySelectorAll("[data-favorite-plugin]").forEach((button) => {
     button.addEventListener("click", () => toggleFavoritePlugin(renderedPlugins[Number(button.dataset.favoritePlugin)]));
+  });
+  document.querySelectorAll("[data-report-plugin]").forEach((button) => {
+    button.addEventListener("click", () => preparePluginReport(renderedPlugins[Number(button.dataset.reportPlugin)]));
   });
 }
 
@@ -1047,6 +1141,77 @@ function openPublishRequest(plugin) {
   window.open(url, "_blank", "noopener");
 }
 
+function preparePluginReport(plugin) {
+  if (reportPluginIdInput) {
+    reportPluginIdInput.value = String(plugin?.id || "").trim();
+  }
+  if (reportReasonInput) {
+    reportReasonInput.value = "";
+  }
+  if (reportEvidenceInput) {
+    reportEvidenceInput.value = "";
+  }
+  if (reportDetailsInput) {
+    reportDetailsInput.value = "";
+  }
+  setReportStatus("");
+  setActiveView("report");
+  reportReasonInput?.focus();
+}
+
+function openReportRequest() {
+  const pluginId = String(reportPluginIdInput?.value || "").trim().toLowerCase();
+  const reason = String(reportReasonInput?.value || "").trim();
+  const evidence = String(reportEvidenceInput?.value || "").trim();
+  const details = String(reportDetailsInput?.value || "").trim();
+  if (!pluginId) {
+    setReportStatus(t("report.enterId"));
+    return;
+  }
+  if (!/^[a-z0-9][a-z0-9._-]{1,63}$/.test(pluginId)) {
+    setReportStatus(t("report.invalidId"));
+    return;
+  }
+  if (!reason || !t(`report.categories.${reason}`) || t(`report.categories.${reason}`) === `report.categories.${reason}`) {
+    setReportStatus(t("report.choose"));
+    return;
+  }
+  if (details.length < 20) {
+    setReportStatus(t("report.explain"));
+    return;
+  }
+  if (evidence) {
+    try {
+      const evidenceUrl = new URL(evidence);
+      if (!["http:", "https:"].includes(evidenceUrl.protocol)) {
+        throw new Error("invalid protocol");
+      }
+    } catch {
+      setReportStatus(t("report.invalidEvidence"));
+      return;
+    }
+  }
+  const body = [
+    `<!-- plugin-hub-language: ${currentLanguage} -->`,
+    t("report.requestTitle"),
+    t("report.requestDescription"),
+    "",
+    t("report.pluginIdLine", { id: pluginId }),
+    t("report.categoryLine", { category: t(`report.categories.${reason}`) }),
+    t("report.evidenceLine", { url: evidence || t("report.noEvidence") }),
+    "",
+    t("report.detailsLine"),
+    details,
+    "",
+    t("report.rulesLine")
+  ].join("\n");
+  const url = "https://github.com/Nanquimori/KapiTomo/issues/new"
+    + "?title=" + encodeURIComponent("[plugin-report] " + pluginId)
+    + "&body=" + encodeURIComponent(body);
+  setReportStatus(t("report.opening"));
+  window.open(url, "_blank", "noopener");
+}
+
 function openRemovalRequest() {
   const pluginId = String(removePluginIdInput?.value || "").trim();
   const repoUrl = String(removeRepoUrlInput?.value || "").trim();
@@ -1106,6 +1271,7 @@ function installPlugin(plugin) {
 }
 
 loadRepoPluginButton?.addEventListener("click", loadRepoPlugin);
+requestReportPluginButton?.addEventListener("click", openReportRequest);
 requestRemovePluginButton?.addEventListener("click", openRemovalRequest);
 viewButtons.forEach((button) => {
   button.addEventListener("click", () => setActiveView(button.dataset.viewTarget));
@@ -1135,5 +1301,5 @@ discardDraftPluginsButton?.addEventListener("click", () => {
 applyStaticTranslations();
 updateFavoritesOnlyButton();
 const requestedView = new URLSearchParams(window.location.search).get("view");
-setActiveView(["catalog", "publish", "remove"].includes(requestedView) ? requestedView : "catalog");
+setActiveView(["catalog", "publish", "report", "remove"].includes(requestedView) ? requestedView : "catalog");
 loadAllPlugins();
