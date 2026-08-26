@@ -230,7 +230,7 @@ For image chapters, `pages` is the preferred field. Nyxovira also reads `images`
 
 The Plugin Hub installs plugins directly from public GitHub repositories.
 
-Publication requests are validated automatically and valid plugins are published immediately. The validation prevents duplicate plugins for the same site and rejects repositories that do not meet the catalog rules. Maintainers can remove plugins that violate those rules.
+Publication requests are validated automatically and technically valid entries that accept the current catalog rules are published immediately. The validation prevents duplicate plugins for the same source, verifies repository ownership, and rejects repositories that do not meet the public technical requirements. Automatic publication is not an endorsement of the source or third-party content.
 
 The Plugin Hub is a catalog, not a content host. The plugin creator is responsible for the plugin code, site mapping, icon, metadata, permissions, and maintenance. Source sites are responsible for their own pages and content. Nyxovira Pro unlocks app features and does not sell third-party works, pages, chapters, translations, or plugins.
 
@@ -301,23 +301,27 @@ Publishing flow:
 3. Automation validates `plugin.json`, the public icon, official tags, repository, and covered hosts.
 4. If another visible plugin already covers the same host, the request is rejected.
 5. The request author must own the plugin repository.
-6. Automation publishes the valid catalog entry immediately.
+6. The generated request must accept the current Plugin Hub catalog rules.
+7. Automation publishes the technically valid catalog entry immediately.
 
 Review rules:
 
 - The Hub checks the repository, icon, official tags, and covered hosts.
 - A visible host can only have one plugin.
 - Only the repository owner can publish or update a community plugin.
-- Valid requests are published automatically.
-- Plugin owners can remove their own plugins automatically, and maintainers can remove any plugin. Unauthorized removals are rejected.
-- If the repository or `plugin.json` disappears later, the entry is removed from the public catalog.
+- Technically valid requests that accept the current rules are published automatically.
+- Plugin owners can remove their own plugins automatically. Maintainers can hide, restore, or remove any plugin through an authenticated moderation request.
+- A creator cannot republish over a hidden or moderator-removed entry. A maintainer must review or restore it first. Creator-requested removals may be republished by that creator.
+- If the repository or `plugin.json` is missing for two consecutive checks, the entry is marked as removed.
+- Technical validation does not decide copyright ownership or source authorization. Credible reports are reviewed under the public [Terms and Plugin Catalog Rules](https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules).
 
 Status values:
 
 - `active`: appears as Online.
 - `broken`: appears as Offline.
-- `hidden` and `removed`: do not appear in the public catalog.
-- The Hub checks plugins every 30 minutes and removes entries whose repository or `plugin.json` disappears.
+- `hidden`: does not appear while a credible security, rights, identity, or policy report is reviewed.
+- `removed`: does not appear after an authorized request, confirmed violation, or repeated repository/manifest absence.
+- The Hub checks plugins every 30 minutes. Temporary source failures remain recoverable and do not by themselves cause permanent removal.
 
 ## Checklist
 
@@ -333,4 +337,5 @@ Before publishing:
 8. The plugin works from a clean GitHub repository.
 9. No visible plugin in the public catalog already covers the same source host.
 10. The repository is submitted through the online Plugin Hub.
-11. The creator accepts responsibility for the plugin and does not present unauthorized third-party content as KapiTomo or Nyxovira content.
+11. The creator accepts the current catalog rules and responsibility for the plugin code, metadata, permissions, maintenance, and source mapping.
+12. The plugin does not contain malware, steal data or credentials, impersonate another party, or bypass authentication, paywalls, DRM, or access restrictions.

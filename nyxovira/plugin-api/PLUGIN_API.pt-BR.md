@@ -230,7 +230,7 @@ Para capítulos com imagens, `pages` é o campo preferido. O Nyxovira também l�
 
 O Plugin Hub instala plugins diretamente de repositórios públicos do GitHub.
 
-As solicitações de publicação são validadas automaticamente e plugins válidos são publicados imediatamente. A validação impede plugins duplicados para o mesmo site e recusa repositórios que não seguem as regras do catálogo. Mantenedores podem remover plugins que violem essas regras.
+As solicitações de publicação são validadas automaticamente, e entradas tecnicamente válidas que aceitam as regras atuais do catálogo são publicadas imediatamente. A validação impede plugins duplicados para a mesma fonte, verifica a propriedade do repositório e recusa repositórios que não atendem aos requisitos técnicos públicos. A publicação automática não representa aprovação da fonte ou de conteúdos de terceiros.
 
 O Plugin Hub é um catálogo, não um host de conteúdo. O criador do plugin é responsável pelo código, mapeamento do site, ícone, metadados, permissões e manutenção. Os sites de origem são responsáveis por suas próprias páginas e conteúdos. O Nyxovira Pro libera recursos do app e não vende obras, páginas, capítulos, traduções ou plugins de terceiros.
 
@@ -301,23 +301,27 @@ Fluxo de publicação:
 3. A automação valida `plugin.json`, ícone público, tags oficiais, repositório e hosts cobertos.
 4. Se outro plugin visível já cobre o mesmo host, a solicitação é recusada.
 5. O autor da solicitação deve ser dono do repositório do plugin.
-6. A automação publica imediatamente a entrada válida no catálogo.
+6. A solicitação gerada precisa aceitar as regras atuais do catálogo do Plugin Hub.
+7. A automação publica imediatamente a entrada tecnicamente válida no catálogo.
 
 Regras de revisão:
 
 - O Hub verifica repositório, ícone, tags oficiais e hosts cobertos.
 - Um host visível só pode ter um plugin.
 - Somente o dono do repositório pode publicar ou atualizar um plugin da comunidade.
-- Solicitações válidas são publicadas automaticamente.
-- Donos podem remover os próprios plugins automaticamente, e mantenedores podem remover qualquer plugin. Remoções não autorizadas são recusadas.
-- Se o repositório ou `plugin.json` desaparecer depois, a entrada é removida do catálogo público.
+- Solicitações tecnicamente válidas que aceitam as regras atuais são publicadas automaticamente.
+- Donos podem remover os próprios plugins automaticamente. Mantenedores podem ocultar, restaurar ou remover qualquer plugin por uma solicitação autenticada de moderação.
+- Um criador não pode republicar por cima de uma entrada ocultada ou removida pela moderação. Um mantenedor precisa analisá-la ou restaurá-la primeiro. Remoções solicitadas pelo próprio criador podem ser republicadas por ele.
+- Se o repositório ou `plugin.json` permanecer ausente em duas verificações consecutivas, a entrada é marcada como removida.
+- A validação técnica não decide titularidade de direitos autorais nem autorização da fonte. Denúncias confiáveis são analisadas conforme os [Termos e Regras do Catálogo de Plugins](https://nanquimori.github.io/KapiTomo/terms/#regras-do-catalogo).
 
 Valores de status:
 
 - `active`: aparece como Online.
 - `broken`: aparece como Offline.
-- `hidden` e `removed`: não aparecem no catálogo público.
-- O Hub verifica plugins a cada 30 minutos e remove entradas cujo repositório ou `plugin.json` desapareceu.
+- `hidden`: não aparece enquanto uma denúncia confiável sobre segurança, direitos, identidade ou política é analisada.
+- `removed`: não aparece após solicitação autorizada, violação confirmada ou ausência repetida do repositório/manifesto.
+- O Hub verifica plugins a cada 30 minutos. Falhas temporárias da fonte continuam recuperáveis e não causam, isoladamente, remoção definitiva.
 
 ## Checklist
 
@@ -333,4 +337,5 @@ Antes de publicar:
 8. O plugin funciona a partir de um repositório GitHub limpo.
 9. Nenhum plugin visível no catálogo público já cobre o mesmo host de origem.
 10. O repositório é enviado pelo Plugin Hub online.
-11. O criador aceita responsabilidade pelo plugin e não apresenta conteúdo de terceiros como conteúdo do KapiTomo ou do Nyxovira.
+11. O criador aceita as regras atuais do catálogo e a responsabilidade pelo código, metadados, permissões, manutenção e mapeamento da fonte.
+12. O plugin não contém malware, não rouba dados ou credenciais, não imita outra parte e não contorna autenticação, paywall, DRM ou restrições de acesso.

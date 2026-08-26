@@ -90,6 +90,6 @@ plugins/catalog-store.json
 plugins/catalog.json
 ```
 
-The Plugin Hub validates public GitHub repositories, official tags, source hosts, and health status before a plugin appears in the storefront.
+The Plugin Hub validates public GitHub repositories, repository ownership, policy acceptance, official tags, source hosts, and health status before a plugin appears in the storefront. Automatic publication confirms technical eligibility, not endorsement of a source or third-party content.
 
-KapiTomo does not host or sell third-party works through the plugin catalog. Plugin creators and source sites are responsible for their own content, permissions, page availability, and download behavior. Nyxovira Pro unlocks app features; it is not payment for third-party content.
+KapiTomo does not host or sell third-party works through the plugin catalog. Community plugins remain in their creators' public repositories. Maintainers may mark a plugin offline, hide it during a credible review, restore it, or remove it after a confirmed violation, authorized owner request, or repeated repository absence. Nyxovira Pro unlocks app features; it is not payment for third-party content.

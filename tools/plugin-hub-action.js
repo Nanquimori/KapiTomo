@@ -6,8 +6,10 @@ const { execFileSync } = require("child_process");
 const CATALOG_PATHS = ["plugins/catalog-store.json", "plugins/catalog.json"];
 const MAINTAINERS = new Set(["nanquimori"]);
 const BROKEN_AFTER_FAILURES = 2;
+const MISSING_AFTER_FAILURES = 2;
 const MAX_PUBLIC_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
+const POLICY_ACCEPTANCE_MARKER = "plugin-hub-policy: accepted-v1";
 const OFFICIAL_LANGUAGE_TAGS = [
   "english",
   "portuguese",
@@ -60,6 +62,11 @@ const PORTUGUESE_ERRORS = new Map([
   ["tags must use lowercase letters, numbers, dots, dashes, or underscores.", "As tags devem usar apenas letras minúsculas, números, pontos, hífens ou sublinhados."],
   ["tags must include at least 2 public tags: language first, then type.", "As tags devem incluir pelo menos 2 tags públicas: primeiro o idioma e depois o tipo."]
 ]);
+PORTUGUESE_ERRORS.set("The publication request must accept the current Plugin Hub catalog rules.", "A solicitação de publicação precisa aceitar as regras atuais do catálogo do Plugin Hub.");
+PORTUGUESE_ERRORS.set("Only a maintainer can moderate catalog plugins.", "Somente um mantenedor pode moderar plugins do catálogo.");
+PORTUGUESE_ERRORS.set("Moderation action must be hide, restore, or remove.", "A ação de moderação precisa ser hide, restore ou remove.");
+PORTUGUESE_ERRORS.set("Moderation reason is required.", "O motivo da moderação é obrigatório.");
+PORTUGUESE_ERRORS.set("A hidden or moderator-removed plugin requires maintainer review before republishing.", "Um plugin ocultado ou removido pela moderação precisa de revisão de um mantenedor antes de ser republicado.");
 
 function issueLanguage(issue) {
   const body = String(issue && issue.body || "");
@@ -227,6 +234,16 @@ function normalizePluginPath(value) {
 function normalizeStatus(value) {
   const status = optionalText(value || "active", 20).toLowerCase();
   return ["active", "broken", "hidden", "removed", "missing"].includes(status) ? status : "active";
+}
+
+function acceptsCurrentCatalogRules(issue) {
+  return String(issue && issue.body || "").toLowerCase().includes(POLICY_ACCEPTANCE_MARKER);
+}
+
+function requireCurrentCatalogRules(issue) {
+  if (!acceptsCurrentCatalogRules(issue)) {
+    throw new Error("The publication request must accept the current Plugin Hub catalog rules.");
+  }
 }
 
 function sameList(a, b) {
@@ -400,6 +417,8 @@ function loadCatalog() {
 function writeCatalogs(catalog) {
   catalog.schema_version = 3;
   catalog.publish_model = "github-repository";
+  catalog.catalog_revision = "20260826-catalog-rules";
+  catalog.rules_url = "https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules";
   const text = JSON.stringify(catalog, null, 2) + "\n";
   for (const catalogPath of CATALOG_PATHS) {
     fs.writeFileSync(catalogPath, text, "utf8");
@@ -459,7 +478,7 @@ async function publishPlugin(issue) {
   if (!maintainer && repositoryOwner(plugin.repository_url).toLowerCase() !== actor.toLowerCase()) {
     throw new Error("The request author must own the plugin repository.");
   }
-  await validateRepositoryPlugin(plugin);
+  requireCurrentCatalogRules(issue);
 
   const catalog = loadCatalog();
   const existing = catalog.plugins.find((item) => String(item.id || "").toLowerCase() === plugin.id);
@@ -469,6 +488,13 @@ async function publishPlugin(issue) {
   if (existing && !maintainer && repositoryOwner(existing.repository_url).toLowerCase() !== actor.toLowerCase()) {
     throw new Error("Only the current plugin repository owner or a maintainer can update this plugin.");
   }
+  const existingStatus = existing ? normalizeStatus(existing.status) : "active";
+  const removedByRequester = existingStatus === "removed"
+    && String(existing.moderated_by || "").toLowerCase() === actor.toLowerCase();
+  if (existing && !maintainer && (existingStatus === "hidden" || (existingStatus === "removed" && !removedByRequester))) {
+    throw new Error("A hidden or moderator-removed plugin requires maintainer review before republishing.");
+  }
+  await validateRepositoryPlugin(plugin);
   if (!maintainer) {
     plugin.author = actor;
   }
@@ -533,7 +559,11 @@ async function removePlugin(issue) {
     return {
       ...item,
       status: "removed",
-      removed_at: nowIso()
+      removed_at: nowIso(),
+      moderation_action: "remove",
+      moderation_reason: "creator-or-maintainer-request",
+      moderated_by: actor,
+      moderated_at: nowIso()
     };
   });
   if (!dryRun) {
@@ -544,6 +574,84 @@ async function removePlugin(issue) {
     message: language === "pt"
       ? `O plugin **${existing.name || id}** foi marcado como removido do catálogo.`
       : `Plugin **${existing.name || id}** was marked as removed from the catalog.`
+  };
+}
+
+function issueField(issue, name) {
+  const body = String(issue && issue.body || "");
+  const match = body.match(new RegExp(`^${name}:\\s*(.+)$`, "im"));
+  return match ? String(match[1] || "").trim() : "";
+}
+
+async function moderatePlugin(issue) {
+  const language = issueLanguage(issue);
+  const actor = String(issue.user && issue.user.login || "").trim();
+  if (!isMaintainer(actor)) {
+    throw new Error("Only a maintainer can moderate catalog plugins.");
+  }
+
+  const id = normalizeId(issueField(issue, "Plugin ID"));
+  const action = optionalText(issueField(issue, "Action"), 20).toLowerCase();
+  const reason = optionalText(issueField(issue, "Reason"), 500);
+  if (!["hide", "restore", "remove"].includes(action)) {
+    throw new Error("Moderation action must be hide, restore, or remove.");
+  }
+  if (!reason) {
+    throw new Error("Moderation reason is required.");
+  }
+
+  const catalog = loadCatalog();
+  const existing = catalog.plugins.find((item) => String(item.id || "").toLowerCase() === id);
+  if (!existing) {
+    throw new Error(`Plugin ${id} does not exist in the catalog.`);
+  }
+
+  let restoredHealth = null;
+  if (action === "restore") {
+    restoredHealth = await validatePluginHealth(existing);
+  }
+  const timestamp = nowIso();
+  catalog.plugins = catalog.plugins.map((item) => {
+    if (String(item.id || "").toLowerCase() !== id) {
+      return item;
+    }
+    const updated = {
+      ...item,
+      status: action === "hide" ? "hidden" : action === "remove" ? "removed" : "active",
+      moderation_action: action,
+      moderation_reason: reason,
+      moderated_by: actor,
+      moderated_at: timestamp
+    };
+    if (action === "hide") {
+      updated.hidden_at = timestamp;
+      delete updated.removed_at;
+    } else if (action === "remove") {
+      updated.removed_at = timestamp;
+      delete updated.hidden_at;
+    } else {
+      updated.consecutive_failures = 0;
+      updated.last_error = "";
+      updated.last_checked_at = timestamp;
+      updated.hosts = restoredHealth.hosts;
+      delete updated.hidden_at;
+      delete updated.removed_at;
+    }
+    return updated;
+  });
+  catalog.plugins = sortPlugins(catalog.plugins);
+  if (!dryRun) {
+    writeCatalogs(catalog);
+  }
+
+  const actionLabel = language === "pt"
+    ? { hide: "ocultado", restore: "restaurado", remove: "removido" }[action]
+    : { hide: "hidden", restore: "restored", remove: "removed" }[action];
+  return {
+    title: `Moderate plugin ${id}: ${action}`,
+    message: language === "pt"
+      ? `O plugin **${existing.name || id}** foi ${actionLabel}.\n\nMotivo: ${reason}`
+      : `Plugin **${existing.name || id}** was ${actionLabel}.\n\nReason: ${reason}`
   };
 }
 
@@ -604,6 +712,21 @@ async function checkPluginHealth() {
       checkedPlugins.push(plugin);
     } catch (error) {
       if (error.status === 404 || error.status === 410) {
+        plugin.consecutive_failures = Number(plugin.consecutive_failures || 0) + 1;
+        plugin.last_error = error.message;
+        plugin.last_checked_at = nowIso();
+        if (plugin.consecutive_failures >= MISSING_AFTER_FAILURES) {
+          const timestamp = nowIso();
+          plugin.status = "removed";
+          plugin.removed_at = timestamp;
+          plugin.moderation_action = "remove";
+          plugin.moderation_reason = "repository-or-plugin-manifest-missing";
+          plugin.moderated_by = "plugin-hub-health-check";
+          plugin.moderated_at = timestamp;
+        } else {
+          plugin.status = "broken";
+        }
+        checkedPlugins.push(plugin);
         changed = true;
         continue;
       }
@@ -746,9 +869,12 @@ async function main() {
   const language = issueLanguage(issue);
 
   try {
-    const result = title.startsWith("[plugin-remove]")
-      ? await removePlugin(issue)
-      : await publishPlugin(issue);
+    const moderationRequested = title.startsWith("[plugin-remove]") && Boolean(issueField(issue, "Action"));
+    const result = moderationRequested
+      ? await moderatePlugin(issue)
+      : title.startsWith("[plugin-remove]")
+        ? await removePlugin(issue)
+        : await publishPlugin(issue);
     const changed = dryRun ? true : commitAndPush(result.title, issue.number);
     const status = language === "pt"
       ? (changed ? "catálogo atualizado" : "o catálogo já estava atualizado")
