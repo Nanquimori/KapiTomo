@@ -102,7 +102,7 @@ New integrations should use `api/works/index.json`.
 
 The Plugin Hub installs site plugins from GitHub repositories. A plugin repository must contain `plugin.json` and `browser/download_target.js`.
 
-KapiTomo publishes catalog entries, not third-party works. Community plugins, third-party source sites, missing pages, broken downloads, repository availability, and source permissions are the responsibility of the plugin creator and source site. Nyxovira Pro pays for app features and maintenance; it is not a sale of third-party chapters, pages, translations, plugins, manga, comics, or novels.
+KapiTomo publishes catalog entries, not third-party works. Plugin creators are responsible for their code, manifest, requested permissions, repository, accurate catalog metadata, and maintenance. Source sites are responsible for their works, translations, advertisements, accounts, pages, availability, and access rules. KapiTomo operates the catalog entry and review process; it does not operate or continuously audit community repositories or source sites. Nyxovira Pro pays for app features and maintenance; it is not a sale of third-party chapters, pages, translations, plugins, manga, comics, or novels.
 
 Public plugin entries include:
 
@@ -135,7 +135,9 @@ Reason: objective moderation reason
 Only accounts listed as maintainers can execute this action. The catalog stores the action, reason, maintainer, and timestamp for auditability.
 Creators may submit corrections and new versions at any time. When an entry is under a preventive restriction or was removed by moderation, the publication request becomes a correction request: a maintainer reviews the change and restores the listing after the identified issue is resolved. A creator who voluntarily removed their own plugin may publish it again normally.
 
-The Hub includes a `Report` action on every published plugin and a dedicated report panel. It opens a public GitHub issue titled `[plugin-report] plugin-id` with a category, details, and optional evidence URL. Reports are reviewed manually; the Plugin Hub workflow deliberately ignores report issues so no report can hide or remove an entry automatically. Confidential evidence should be sent by email with the public report reference.
+The Hub includes a `Report` action on every published plugin and a dedicated report panel. It accepts only plugin/catalog violations: malware or dangerous redirects, credential theft or deceptive login, undeclared user-data collection or sharing, false authorship/impersonation/deceptive catalog metadata, and plugin code that bypasses login, paywall, DRM, or access controls. It opens a public GitHub issue titled `[plugin-report] plugin-id` with details and an optional evidence URL. Reports are reviewed manually; the Plugin Hub workflow deliberately ignores report issues so no report can hide or remove an entry automatically.
+
+Source-site content, missing chapters, translation quality, advertisements, outages, account rules, and ordinary download or compatibility bugs are not catalog reports. Source matters belong to the source site, technical plugin support belongs in the creator's repository, and formal rights/source-owner notices or confidential evidence go through the private contact address in the terms.
 
 ## Content Policy
 

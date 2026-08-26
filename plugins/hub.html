@@ -1099,8 +1099,13 @@
 
       <section id="reportPanel" class="panel view-panel" data-view-panel="report" hidden>
         <p class="kicker" data-i18n="report.kicker">Report</p>
-        <h2 data-i18n="report.title">Request a plugin review</h2>
-        <p data-i18n="report.description">Report a specific problem for manual review. Submitting a report does not automatically hide or remove the plugin.</p>
+        <h2 data-i18n="report.title">Report a catalog violation</h2>
+        <p data-i18n="report.description">Use this channel only for behavior of the plugin code, its public repository, or its catalog entry. Submitting a report does not automatically hide or remove the plugin.</p>
+        <p class="catalog-notice" data-i18n="report.notFor">Not for source-site content, missing chapters, translation quality, advertisements, outages, account rules, or ordinary download/support problems. Those belong to the source site or plugin creator.</p>
+        <p id="reportCreatorHelp" class="catalog-policy-link" hidden>
+          <span data-i18n="report.technicalHelp">For a technical problem, contact the plugin creator in its repository:</span>
+          <a id="reportCreatorLink" target="_blank" rel="noopener" data-i18n="report.creatorRepository">Open creator repository</a>
+        </p>
         <p class="catalog-notice" data-i18n="report.notice">The GitHub request is public. Do not include personal data or confidential evidence; send sensitive material by email using the address in the catalog rules.</p>
         <div class="publish-form">
           <label class="field-label" for="reportPluginIdInput" data-i18n="report.pluginId">Plugin ID</label>
@@ -1108,13 +1113,11 @@
           <label class="field-label" for="reportReasonInput" data-i18n="report.reason">Reason</label>
           <select id="reportReasonInput" class="text-input">
             <option value="" data-i18n="report.chooseReason">Select a reason</option>
-            <option value="security" data-i18n="report.categories.security">Security or harmful behavior</option>
-            <option value="privacy" data-i18n="report.categories.privacy">Privacy or data misuse</option>
-            <option value="identity" data-i18n="report.categories.identity">Impersonation or misleading metadata</option>
-            <option value="access" data-i18n="report.categories.access">Access restriction or technical protection</option>
-            <option value="rights" data-i18n="report.categories.rights">Rights or source authorization</option>
-            <option value="technical" data-i18n="report.categories.technical">Broken or technically incorrect plugin</option>
-            <option value="other" data-i18n="report.categories.other">Other catalog-rule issue</option>
+            <option value="malware" data-i18n="report.categories.malware">Malware, malicious code, or dangerous redirects</option>
+            <option value="credentials" data-i18n="report.categories.credentials">Credential theft or deceptive login</option>
+            <option value="privacy" data-i18n="report.categories.privacy">Undeclared collection or sharing of user data</option>
+            <option value="identity" data-i18n="report.categories.identity">False author, impersonation, or deceptive catalog metadata</option>
+            <option value="protection" data-i18n="report.categories.protection">Plugin code bypasses login, paywall, DRM, or access control</option>
           </select>
           <label class="field-label" for="reportEvidenceInput" data-i18n="report.evidence">Evidence URL (optional)</label>
           <input id="reportEvidenceInput" class="text-input" type="url" placeholder="https://example.com/evidence" maxlength="500">
@@ -1156,6 +1159,6 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260826-report-review"></script>
+    <script src="store.js?v=20260826-report-scope"></script>
   </body>
 </html>

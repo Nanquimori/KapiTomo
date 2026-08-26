@@ -66,6 +66,12 @@
           availability, and access rules. Temporary source failures, missing pages, or site changes do not by
           themselves prove that a plugin violates these rules.
         </p>
+        <p>
+          The creator is responsible for the plugin code, manifest, requested permissions, repository, accurate
+          catalog metadata, and maintenance. The source site is responsible for its works, translations, advertisements,
+          accounts, availability, pages, and access rules. KapiTomo is responsible for operating the catalog entry and
+          review process; it does not operate or continuously audit community repositories or source sites.
+        </p>
 
         <h2 id="plugin-catalog-rules">Plugin catalog rules</h2>
         <p>A community plugin may be published only when:</p>
@@ -74,16 +80,21 @@
           <li>The repository contains a valid <code>plugin.json</code>, public icon, supported tags, and declared source hosts.</li>
           <li>No other visible plugin already covers the same source host.</li>
           <li>Its name, description, icon, tags, repository, and source mapping are accurate and not misleading.</li>
-          <li>The creator accepts responsibility for the plugin code, permissions, maintenance, and source mapping.</li>
+          <li>The creator accepts responsibility for the plugin code, manifest, permissions requested by the plugin, maintenance, and accurate source mapping.</li>
           <li>The plugin does not contain malware, steal data or credentials, impersonate another creator, or enable harmful behavior.</li>
           <li>The plugin does not bypass authentication, paywalls, DRM, access restrictions, or other technical protections.</li>
-          <li>The creator has not been prohibited from providing the integration by the source owner or applicable rules.</li>
         </ul>
         <p>
           Automatic publication validates technical requirements and repository ownership. It does not certify
           ownership of third-party content or replace later moderation. KapiTomo may review a plugin after publication
           and examine reports submitted through the Plugin Hub. A report opens a manual review and does not change the
           plugin's availability by itself.
+        </p>
+        <p>
+          Publication does not require the community creator to own the works or represent the connected source site,
+          and it does not declare the plugin official. The catalog does not decide the legality, quality, authorship, or
+          availability of content hosted by a source site. A specific formal notice from a verifiable rights holder or
+          source owner is handled separately through the contact channel below.
         </p>
 
         <h2>Catalog statuses and moderation</h2>
@@ -126,9 +137,10 @@
 
         <h2>Creator and user responsibilities</h2>
         <p>
-          Plugin creators must keep their code and metadata accurate, maintain the integration when the source changes,
-          respect source permissions and applicable rules, and update or remove plugins they can no longer maintain or
-          are no longer allowed to provide.
+          Plugin creators must keep their code, manifest, requested permissions, repository, and catalog metadata
+          accurate, maintain the integration when the source changes, and update or remove plugins they can no longer
+          maintain. They are not responsible for third-party works, translations, advertisements, pages, or outages
+          that they do not control.
         </p>
         <p>
           Users are responsible for how they use sites, plugins, and downloaded files. Nyxovira must not be used to
@@ -139,9 +151,17 @@
         <h2>Reports, review, and correction</h2>
         <p>
           Anyone may use the <a href="../plugins/?view=report">Report</a> option in the Plugin Hub to request a manual
-          review. The resulting GitHub issue is public and should include the plugin ID, a specific reason, relevant URLs,
-          and enough detail to verify the report. Do not publish personal data or confidential evidence there. Sensitive
-          material may be sent to <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a> with the public report reference.
+          review only for: malware or dangerous redirects in the plugin; credential theft or deceptive login; undeclared
+          collection or sharing of user data; false authorship, impersonation, or deceptive catalog metadata; or plugin
+          code that bypasses login, paywall, DRM, or another access control. The resulting GitHub issue is public and
+          should include the plugin ID, relevant URLs, and enough detail to reproduce or verify the behavior.
+        </p>
+        <p>
+          This report channel is not for the legality or quality of works on a source site, missing chapters,
+          translations, advertisements, source outages, account rules, or ordinary download and compatibility bugs.
+          Source-content and account matters belong to the source site. Technical plugin problems belong in the
+          creator's repository. A formal rights or source-owner notice requiring identity verification, and any
+          confidential evidence, should be sent to <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a>.
         </p>
         <ol>
           <li>The report is recorded and checked for a specific, verifiable catalog-rule issue.</li>
@@ -198,6 +218,12 @@
           conteúdos, disponibilidade e regras de acesso. Falhas temporárias, páginas ausentes ou mudanças no site não
           demonstram, isoladamente, que um plugin viola estas regras.
         </p>
+        <p>
+          O criador é responsável pelo código do plugin, manifesto, permissões solicitadas, repositório, metadados
+          corretos no catálogo e manutenção. O site de origem é responsável por suas obras, traduções, anúncios, contas,
+          disponibilidade, páginas e regras de acesso. O KapiTomo é responsável pelo funcionamento da entrada e pelo
+          processo de análise do catálogo; ele não opera nem audita continuamente repositórios da comunidade ou sites de origem.
+        </p>
 
         <h2 id="regras-do-catalogo">Regras do catálogo de plugins</h2>
         <p>Um plugin da comunidade só pode ser publicado quando:</p>
@@ -206,16 +232,21 @@
           <li>O repositório contém <code>plugin.json</code> válido, ícone público, tags aceitas e domínios de origem declarados.</li>
           <li>Nenhum outro plugin visível já atende ao mesmo domínio de origem.</li>
           <li>Nome, descrição, ícone, tags, repositório e mapeamento da fonte são verdadeiros e não enganosos.</li>
-          <li>O criador aceita responsabilidade pelo código, permissões, manutenção e mapeamento da fonte.</li>
+          <li>O criador aceita responsabilidade pelo código, manifesto, permissões solicitadas pelo plugin, manutenção e mapeamento correto da fonte.</li>
           <li>O plugin não contém malware, não rouba dados ou credenciais, não imita outro criador e não permite comportamento prejudicial.</li>
           <li>O plugin não contorna autenticação, assinatura, paywall, DRM, restrições de acesso ou outras proteções técnicas.</li>
-          <li>O criador não foi proibido pelo proprietário da fonte ou pelas regras aplicáveis de fornecer a integração.</li>
         </ul>
         <p>
           A publicação automática valida requisitos técnicos e a propriedade do repositório. Ela não certifica a
           titularidade de conteúdos de terceiros nem substitui a moderação posterior. O KapiTomo pode revisar um
           plugin após a publicação e analisar denúncias enviadas pelo Plugin Hub. Uma denúncia abre uma análise manual
           e não altera, por si só, a disponibilidade do plugin.
+        </p>
+        <p>
+          A publicação não exige que o criador da comunidade seja proprietário das obras ou represente o site conectado,
+          nem declara o plugin oficial. O catálogo não decide a legalidade, qualidade, autoria ou disponibilidade de
+          conteúdos hospedados pelo site de origem. Uma notificação formal e específica de titular ou proprietário da
+          fonte verificável é tratada separadamente pelo canal de contato abaixo.
         </p>
 
         <h2>Estados do catálogo e moderação</h2>
@@ -260,9 +291,9 @@
 
         <h2>Responsabilidades do criador e do usuário</h2>
         <p>
-          Criadores devem manter código e metadados corretos, atualizar a integração quando a fonte mudar, respeitar
-          as permissões da fonte e as regras aplicáveis e atualizar ou remover plugins que não possam mais manter ou
-          que não estejam mais autorizados a fornecer.
+          Criadores devem manter código, manifesto, permissões solicitadas, repositório e metadados do catálogo corretos,
+          atualizar a integração quando a fonte mudar e atualizar ou remover plugins que não possam mais manter. Eles
+          não são responsáveis por obras, traduções, anúncios, páginas ou indisponibilidades de terceiros que não controlam.
         </p>
         <p>
           Usuários são responsáveis pelo modo como utilizam sites, plugins e arquivos baixados. O Nyxovira não deve
@@ -273,10 +304,18 @@
         <h2>Denúncias, análise e correção</h2>
         <p>
           Qualquer pessoa pode usar a opção <a href="../plugins/?view=report">Denunciar</a> no Plugin Hub para solicitar
-          análise manual. A issue gerada no GitHub é pública e deve informar o ID do plugin, motivo específico, URLs
-          relevantes e detalhes suficientes para verificação. Não publique dados pessoais nem provas confidenciais.
-          Material sensível pode ser enviado para <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a> com a
-          referência da denúncia pública.
+          análise manual somente para: malware ou redirecionamentos perigosos no plugin; roubo de credenciais ou login
+          enganoso; coleta ou envio de dados do usuário não declarados; autoria falsa, imitação ou metadados enganosos
+          no catálogo; ou código do plugin que contorne login, paywall, DRM ou outro controle de acesso. A issue gerada
+          no GitHub é pública e deve informar o ID do plugin, URLs relevantes e detalhes suficientes para reproduzir ou
+          verificar o comportamento.
+        </p>
+        <p>
+          Este canal de denúncia não serve para legalidade ou qualidade das obras do site de origem, capítulos ausentes,
+          traduções, anúncios, indisponibilidade da fonte, regras de conta ou erros comuns de download e compatibilidade.
+          Assuntos de conteúdo e conta pertencem ao site de origem. Problemas técnicos do plugin pertencem ao repositório
+          do criador. Uma notificação formal de titular ou proprietário da fonte que exija verificação de identidade, e
+          qualquer prova confidencial, deve ser enviada para <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a>.
         </p>
         <ol>
           <li>A denúncia é registrada e verificada quanto a um problema específico e comprovável das regras do catálogo.</li>
