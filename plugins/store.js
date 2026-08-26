@@ -27,7 +27,7 @@ const languageButtons = Array.from(document.querySelectorAll("[data-language-opt
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
-const CATALOG_VERSION = "20260826-direct-report-v2";
+const CATALOG_VERSION = "20260826-direct-report-v3";
 const REPORT_EMAIL = "nanquimori@gmail.com";
 const REPORT_ENDPOINT = `https://formsubmit.co/ajax/${REPORT_EMAIL}`;
 const MIN_REPORT_DETAILS = 200;
@@ -118,6 +118,7 @@ const I18N = {
       pluginId: "Plugin ID",
       email: "Contact email",
       reason: "Reason",
+      languageRequirement: "The reason must be written in Portuguese or English. Reports in other languages cannot be reviewed.",
       detailsPlaceholder: "Clearly explain why you are reporting this plugin. Include only the information you consider important for the review.",
       detailsCount: "{count}/{minimum} minimum characters · {words}/{minimumWords} minimum words",
       confirmation: "I confirm that this report concerns the plugin code, repository, or catalog entry; that it is not an ordinary source-content or support complaint; and that the information is accurate to the best of my knowledge.",
@@ -270,6 +271,7 @@ const I18N = {
       pluginId: "ID do plugin",
       email: "E-mail para contato",
       reason: "Motivo",
+      languageRequirement: "O motivo deve ser escrito em português ou inglês. Denúncias em outros idiomas não poderão ser analisadas.",
       detailsPlaceholder: "Explique claramente por que você está denunciando este plugin. Inclua apenas as informações que considera importantes para a análise.",
       detailsCount: "{count}/{minimum} caracteres mínimos · {words}/{minimumWords} palavras mínimas",
       confirmation: "Confirmo que esta denúncia trata do código, repositório ou entrada do plugin no catálogo; que não é uma reclamação comum sobre conteúdo da fonte ou suporte; e que as informações são verdadeiras conforme meu conhecimento.",
