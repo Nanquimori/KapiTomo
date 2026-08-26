@@ -27,9 +27,12 @@ const languageButtons = Array.from(document.querySelectorAll("[data-language-opt
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
-const CATALOG_VERSION = "20260826-direct-report-v3";
+const REPORT_HISTORY_KEY = "kapitomo.reportHistory.v1";
+const CATALOG_VERSION = "20260826-report-grouping";
 const REPORT_EMAIL = "nanquimori@gmail.com";
 const REPORT_ENDPOINT = `https://formsubmit.co/ajax/${REPORT_EMAIL}`;
+const REPORT_DUPLICATE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
+const MAX_REPORT_HISTORY = 100;
 const MIN_REPORT_DETAILS = 200;
 const MIN_REPORT_WORDS = 20;
 const MAX_SELECTED_TAGS = 4;
@@ -119,6 +122,7 @@ const I18N = {
       email: "Contact email",
       reason: "Reason",
       languageRequirement: "The reason must be written in Portuguese or English. Reports in other languages cannot be reviewed.",
+      duplicatePolicy: "Duplicate reports are grouped into the same review. The number of reports is not evidence and never causes a plugin to be hidden or removed.",
       detailsPlaceholder: "Clearly explain why you are reporting this plugin. Include only the information you consider important for the review.",
       detailsCount: "{count}/{minimum} minimum characters · {words}/{minimumWords} minimum words",
       confirmation: "I confirm that this report concerns the plugin code, repository, or catalog entry; that it is not an ordinary source-content or support complaint; and that the information is accurate to the best of my knowledge.",
@@ -131,8 +135,8 @@ const I18N = {
       confirm: "Confirm the responsibility statement before sending the report.",
       sending: "Sending report...",
       sent: "Report sent successfully. It will be reviewed by the Plugin Hub team. Thank you for helping us maintain a safe environment for the entire community.",
+      duplicate: "This same report was already sent from this browser and remains grouped in the plugin's review. Sending it again does not increase its weight or change the decision.",
       sendError: "The report could not be sent right now. Check your connection and try again in a few minutes.",
-      requestTitle: "Plugin catalog violation report: {id}",
       confirmationLine: "Reporter confirmation: accepted",
       rulesLine: "Catalog rules: https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules"
     },
@@ -272,6 +276,7 @@ const I18N = {
       email: "E-mail para contato",
       reason: "Motivo",
       languageRequirement: "O motivo deve ser escrito em português ou inglês. Denúncias em outros idiomas não poderão ser analisadas.",
+      duplicatePolicy: "Denúncias duplicadas são agrupadas na mesma análise. A quantidade de denúncias não é prova e nunca causa ocultação ou remoção de um plugin.",
       detailsPlaceholder: "Explique claramente por que você está denunciando este plugin. Inclua apenas as informações que considera importantes para a análise.",
       detailsCount: "{count}/{minimum} caracteres mínimos · {words}/{minimumWords} palavras mínimas",
       confirmation: "Confirmo que esta denúncia trata do código, repositório ou entrada do plugin no catálogo; que não é uma reclamação comum sobre conteúdo da fonte ou suporte; e que as informações são verdadeiras conforme meu conhecimento.",
@@ -284,8 +289,8 @@ const I18N = {
       confirm: "Confirme a declaração de responsabilidade antes de enviar a denúncia.",
       sending: "Enviando denúncia...",
       sent: "Denúncia enviada com sucesso. Ela será analisada pela equipe do Plugin Hub. Agradecemos por nos ajudar a manter um ambiente seguro para toda a comunidade.",
+      duplicate: "Esta mesma denúncia já foi enviada por este navegador e permanece agrupada na análise do plugin. Reenviá-la não aumenta seu peso nem altera a decisão.",
       sendError: "Não foi possível enviar a denúncia agora. Verifique sua conexão e tente novamente em alguns minutos.",
-      requestTitle: "Denúncia de violação do catálogo: {id}",
       confirmationLine: "Confirmação do denunciante: aceita",
       rulesLine: "Regras do catálogo: https://nanquimori.github.io/KapiTomo/terms/#regras-do-catalogo"
     },
@@ -1206,6 +1211,63 @@ function isValidReportEmail(value) {
   return email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
 }
 
+function normalizeReportForFingerprint(pluginId, details) {
+  const normalizedDetails = String(details || "")
+    .normalize("NFKD")
+    .replace(/\p{M}/gu, "")
+    .toLocaleLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+  return `${String(pluginId || "").trim().toLocaleLowerCase()}|${normalizedDetails}`;
+}
+
+async function reportFingerprint(pluginId, details) {
+  const normalized = normalizeReportForFingerprint(pluginId, details);
+  if (globalThis.crypto?.subtle && typeof TextEncoder !== "undefined") {
+    const digest = await globalThis.crypto.subtle.digest("SHA-256", new TextEncoder().encode(normalized));
+    return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+  }
+  let first = 2166136261;
+  let second = 2246822519;
+  for (let index = 0; index < normalized.length; index += 1) {
+    const code = normalized.charCodeAt(index);
+    first = Math.imul(first ^ code, 16777619);
+    second = Math.imul(second ^ code, 3266489917);
+  }
+  return `${(first >>> 0).toString(16).padStart(8, "0")}${(second >>> 0).toString(16).padStart(8, "0")}`;
+}
+
+function loadRecentReportHistory() {
+  const cutoff = Date.now() - REPORT_DUPLICATE_WINDOW_MS;
+  try {
+    const stored = JSON.parse(localStorage.getItem(REPORT_HISTORY_KEY) || "[]");
+    if (!Array.isArray(stored)) {
+      return [];
+    }
+    return stored.filter((entry) => entry
+      && typeof entry.fingerprint === "string"
+      && Number(entry.sentAt) >= cutoff);
+  } catch {
+    return [];
+  }
+}
+
+function wasReportRecentlySent(fingerprint) {
+  return loadRecentReportHistory().some((entry) => entry.fingerprint === fingerprint);
+}
+
+function rememberSubmittedReport(pluginId, fingerprint) {
+  const history = loadRecentReportHistory();
+  history.push({
+    pluginId: String(pluginId || "").trim().toLocaleLowerCase(),
+    fingerprint,
+    sentAt: Date.now()
+  });
+  try {
+    localStorage.setItem(REPORT_HISTORY_KEY, JSON.stringify(history.slice(-MAX_REPORT_HISTORY)));
+  } catch {}
+}
+
 async function openReportRequest() {
   const pluginId = String(reportPluginIdInput?.value || "").trim().toLowerCase();
   const email = String(reportEmailInput?.value || "").trim();
@@ -1246,6 +1308,11 @@ async function openReportRequest() {
     setReportStatus(t("report.sent"), "success");
     return;
   }
+  const fingerprint = await reportFingerprint(pluginId, details);
+  if (wasReportRecentlySent(fingerprint)) {
+    setReportStatus(t("report.duplicate"));
+    return;
+  }
   setReportStatus(t("report.sending"));
   if (requestReportPluginButton) {
     requestReportPluginButton.disabled = true;
@@ -1258,11 +1325,14 @@ async function openReportRequest() {
         Accept: "application/json"
       },
       body: JSON.stringify({
-        _subject: t("report.requestTitle", { id: pluginId }),
+        _subject: `[KapiTomo Plugin Report] ${pluginId}`,
         _template: "table",
         _url: "https://nanquimori.github.io/KapiTomo/plugins/?view=report",
         email,
         plugin_id: pluginId,
+        report_group: `plugin:${pluginId}`,
+        duplicate_fingerprint: fingerprint,
+        duplicate_policy: "Duplicate reports are grouped; report quantity is not evidence and never causes hiding or removal.",
         reason: details,
         scope_confirmation: t("report.confirmationLine"),
         catalog_rules: t("report.rulesLine")
@@ -1279,6 +1349,7 @@ async function openReportRequest() {
       setReportStatus(t("report.sendError"), "error");
       return;
     }
+    rememberSubmittedReport(pluginId, fingerprint);
     reportDetailsInput.value = "";
     reportConfirmationInput.checked = false;
     updateReportDetailsCount();
