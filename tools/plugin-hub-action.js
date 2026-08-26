@@ -10,6 +10,7 @@ const MISSING_AFTER_FAILURES = 2;
 const MAX_PUBLIC_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
 const POLICY_ACCEPTANCE_MARKER = "plugin-hub-policy: accepted-v1";
+const POLICY_ACCEPTANCE_ERROR = "The publication request must accept the current Plugin Hub catalog rules. Read https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules and add `Catalog rules accepted: yes` to the request.";
 const OFFICIAL_LANGUAGE_TAGS = [
   "english",
   "portuguese",
@@ -62,7 +63,7 @@ const PORTUGUESE_ERRORS = new Map([
   ["tags must use lowercase letters, numbers, dots, dashes, or underscores.", "As tags devem usar apenas letras minúsculas, números, pontos, hífens ou sublinhados."],
   ["tags must include at least 2 public tags: language first, then type.", "As tags devem incluir pelo menos 2 tags públicas: primeiro o idioma e depois o tipo."]
 ]);
-PORTUGUESE_ERRORS.set("The publication request must accept the current Plugin Hub catalog rules.", "A solicitação de publicação precisa aceitar as regras atuais do catálogo do Plugin Hub.");
+PORTUGUESE_ERRORS.set(POLICY_ACCEPTANCE_ERROR, "A solicitação de publicação precisa aceitar as regras atuais do catálogo do Plugin Hub. Leia https://nanquimori.github.io/KapiTomo/terms/#regras-do-catalogo e adicione `Regras do catálogo aceitas: sim` à solicitação.");
 PORTUGUESE_ERRORS.set("Only a maintainer can moderate catalog plugins.", "Somente um mantenedor pode moderar plugins do catálogo.");
 PORTUGUESE_ERRORS.set("Moderation action must be hide, restore, or remove.", "A ação de moderação precisa ser hide, restore ou remove.");
 PORTUGUESE_ERRORS.set("Moderation reason is required.", "O motivo da moderação é obrigatório.");
@@ -237,12 +238,15 @@ function normalizeStatus(value) {
 }
 
 function acceptsCurrentCatalogRules(issue) {
-  return String(issue && issue.body || "").toLowerCase().includes(POLICY_ACCEPTANCE_MARKER);
+  const body = String(issue && issue.body || "");
+  return body.toLowerCase().includes(POLICY_ACCEPTANCE_MARKER)
+    || /^Catalog rules accepted:\s*yes\s*$/im.test(body)
+    || /^Regras do catálogo aceitas:\s*sim\s*$/im.test(body);
 }
 
 function requireCurrentCatalogRules(issue) {
   if (!acceptsCurrentCatalogRules(issue)) {
-    throw new Error("The publication request must accept the current Plugin Hub catalog rules.");
+    throw new Error(POLICY_ACCEPTANCE_ERROR);
   }
 }
 

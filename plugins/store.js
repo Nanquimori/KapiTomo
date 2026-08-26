@@ -17,7 +17,7 @@ const languageButtons = Array.from(document.querySelectorAll("[data-language-opt
 const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
-const CATALOG_VERSION = "20260826-catalog-rules";
+const CATALOG_VERSION = "20260826-policy-acceptance";
 const MAX_SELECTED_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
 const OFFICIAL_LANGUAGE_TAGS = [
@@ -121,6 +121,7 @@ const I18N = {
       requestTitle: "Plugin publication request for the Nyxovira catalog.",
       requestDescription: "After submission, the catalog automation validates the repository, ownership, manifest, icon, tags, hosts, and acceptance of the current catalog rules.",
       responsibility: "By submitting this plugin, I confirm that I control its repository, accept the current Plugin Hub catalog rules, and am responsible for the plugin code, metadata, icon, permissions, maintenance, and source mapping. I understand that automatic publication is not approval of third-party content.",
+      acceptanceLine: "Catalog rules accepted: yes",
       rulesLine: "Catalog rules: https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules",
       repositoryLine: "Repository: {url}",
       tagMinimum: "plugin.json must declare at least 2 tags: language first, then type.",
@@ -241,6 +242,7 @@ const I18N = {
       requestTitle: "Solicitação de publicação de plugin para o catálogo do Nyxovira.",
       requestDescription: "Depois do envio, a automação valida repositório, propriedade, manifesto, ícone, tags, domínios e aceitação das regras atuais do catálogo.",
       responsibility: "Ao enviar este plugin, confirmo que controlo seu repositório, aceito as regras atuais do catálogo do Plugin Hub e sou responsável pelo código, metadados, ícone, permissões, manutenção e mapeamento da fonte. Entendo que a publicação automática não representa aprovação de conteúdos de terceiros.",
+      acceptanceLine: "Regras do catálogo aceitas: sim",
       rulesLine: "Regras do catálogo: https://nanquimori.github.io/KapiTomo/terms/#regras-do-catalogo",
       repositoryLine: "Repositório: {url}",
       tagMinimum: "plugin.json precisa declarar pelo menos 2 tags: idioma primeiro, depois tipo.",
@@ -1030,6 +1032,7 @@ function openPublishRequest(plugin) {
     t("publish.requestDescription"),
     "",
     t("publish.responsibility"),
+    t("publish.acceptanceLine"),
     t("publish.rulesLine"),
     "",
     t("publish.repositoryLine", { url: clean.repository_url }),
