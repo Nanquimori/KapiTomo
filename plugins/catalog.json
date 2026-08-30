@@ -112,10 +112,15 @@
       "hosts": [
         "nexustoons.com"
       ],
-      "status": "active",
+      "status": "removed",
       "consecutive_failures": 0,
       "last_error": "",
-      "last_checked_at": "2026-08-26T19:13:54.305Z"
+      "last_checked_at": "2026-08-26T19:13:54.305Z",
+      "removed_at": "2026-08-30T19:02:20.453Z",
+      "moderation_action": "remove",
+      "moderation_reason": "creator-or-maintainer-request",
+      "moderated_by": "yxz0w0zxy",
+      "moderated_at": "2026-08-30T19:02:20.453Z"
     }
   ]
 }
