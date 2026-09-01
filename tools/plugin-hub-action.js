@@ -468,6 +468,14 @@ function publicationDate(existing, timestamp = nowIso()) {
   return existing && existing.published_at ? existing.published_at : timestamp;
 }
 
+function requireOfficialAuthorization(plugin, existing, maintainer) {
+  const requestsOfficialTag = Array.isArray(plugin && plugin.tags) && plugin.tags.includes("official");
+  const changesOfficialPlugin = Array.isArray(existing && existing.tags) && existing.tags.includes("official");
+  if (!maintainer && (requestsOfficialTag || changesOfficialPlugin)) {
+    throw new Error("Official plugins can only be changed by a maintainer.");
+  }
+}
+
 function isMaintainer(actor) {
   return MAINTAINERS.has(String(actor || "").toLowerCase());
 }
@@ -484,9 +492,7 @@ async function publishPlugin(issue) {
 
   const catalog = loadCatalog();
   const existing = catalog.plugins.find((item) => String(item.id || "").toLowerCase() === plugin.id);
-  if (existing && Array.isArray(existing.tags) && existing.tags.includes("official") && !maintainer) {
-    throw new Error("Official plugins can only be changed by a maintainer.");
-  }
+  requireOfficialAuthorization(plugin, existing, maintainer);
   if (existing && !maintainer && repositoryOwner(existing.repository_url).toLowerCase() !== actor.toLowerCase()) {
     throw new Error("Only the current plugin repository owner or a maintainer can update this plugin.");
   }
@@ -899,5 +905,6 @@ if (require.main === module) {
 
 module.exports = {
   publicationDate,
+  requireOfficialAuthorization,
   sortPlugins
 };

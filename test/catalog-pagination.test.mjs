@@ -80,6 +80,17 @@ test("assigns a publication date once and preserves it on updates", () => {
   );
 });
 
+test("allows only maintainers to place a plugin in the official section", () => {
+  const official = { id: "fake-official", tags: ["official", "english", "manga"] };
+  const community = { id: "community", tags: ["community", "english", "manga"] };
+  assert.throws(
+    () => pluginHubAction.requireOfficialAuthorization(official, null, false),
+    /Official plugins can only be changed by a maintainer/
+  );
+  assert.doesNotThrow(() => pluginHubAction.requireOfficialAuthorization(official, null, true));
+  assert.doesNotThrow(() => pluginHubAction.requireOfficialAuthorization(community, null, false));
+});
+
 test("keeps every Plugin Hub page identical and loads pagination before the store", () => {
   const pages = ["index.html", "hub.html", "market.html", "store.html"]
     .map((name) => fs.readFileSync(path.join(projectRoot, "plugins", name), "utf8"));
