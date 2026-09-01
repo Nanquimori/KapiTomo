@@ -25,6 +25,13 @@ const favoritesOnlyButton = document.getElementById("favoritesOnlyButton");
 const catalogPagination = document.getElementById("catalogPagination");
 const officialCatalogSection = document.getElementById("officialCatalogSection");
 const officialPluginList = document.getElementById("officialPluginList");
+const restrictedAccessButton = document.getElementById("restrictedAccessButton");
+const restrictedAccessForm = document.getElementById("restrictedAccessForm");
+const restrictedAccessStatus = document.getElementById("restrictedAccessStatus");
+const birthDayInput = document.getElementById("birthDayInput");
+const birthMonthInput = document.getElementById("birthMonthInput");
+const birthYearInput = document.getElementById("birthYearInput");
+const cancelRestrictedAccessButton = document.getElementById("cancelRestrictedAccessButton");
 const viewButtons = Array.from(document.querySelectorAll("[data-view-target]"));
 const viewPanels = Array.from(document.querySelectorAll("[data-view-panel]"));
 const languageButtons = Array.from(document.querySelectorAll("[data-language-option]"));
@@ -32,7 +39,8 @@ const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
 const REPORT_HISTORY_KEY = "kapitomo.reportHistory.v1";
-const CATALOG_VERSION = "20260901-expanded-taxonomy";
+const RESTRICTED_ACCESS_KEY = "kapitomo.restrictedAccess.v1";
+const CATALOG_VERSION = "20260901-age-gated-taxonomy";
 const REPORT_CONFIG = globalThis.KAPITOMO_REPORT_CONFIG || {};
 const REPORT_ENDPOINT = String(REPORT_CONFIG.endpoint || "").trim();
 const REPORT_TURNSTILE_SITE_KEY = String(REPORT_CONFIG.turnstileSiteKey || "").trim();
@@ -44,8 +52,9 @@ const MIN_REPORT_WORDS = 20;
 let reportTurnstileWidgetId = null;
 let reportTurnstileToken = "";
 let reportTurnstileScriptPromise = null;
-const MAX_PUBLIC_TAGS = 5;
+const MAX_PUBLIC_TAGS = 9;
 const MAX_TYPE_TAGS = 3;
+const MAX_GENRE_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
 const OFFICIAL_LANGUAGE_TAGS = [
   "english",
@@ -68,22 +77,34 @@ const OFFICIAL_TYPE_TAGS = [
   "manhua",
   "manhwa",
   "novel",
-  "light-novel",
-  "web-novel",
   "webtoon",
   "comic",
-  "graphic-novel",
-  "one-shot",
-  "doujinshi",
   "other"
+];
+const OFFICIAL_GENRE_TAGS = [
+  "action",
+  "adventure",
+  "comedy",
+  "drama",
+  "fantasy",
+  "horror",
+  "mystery",
+  "romance",
+  "sci-fi",
+  "slice-of-life",
+  "sports",
+  "supernatural",
+  "thriller"
 ];
 const OFFICIAL_CLASSIFICATION_TAGS = ["adult"];
 const LANGUAGE_TAGS = new Set(OFFICIAL_LANGUAGE_TAGS);
 const TYPE_TAGS = new Set(OFFICIAL_TYPE_TAGS);
+const GENRE_TAGS = new Set(OFFICIAL_GENRE_TAGS);
 const CLASSIFICATION_TAGS = new Set(OFFICIAL_CLASSIFICATION_TAGS);
 const PUBLIC_TAGS = new Set([
   ...OFFICIAL_LANGUAGE_TAGS,
   ...OFFICIAL_TYPE_TAGS,
+  ...OFFICIAL_GENRE_TAGS,
   ...OFFICIAL_CLASSIFICATION_TAGS
 ]);
 const I18N = {
@@ -130,15 +151,27 @@ const I18N = {
       loadError: "Could not load the catalog: {message}",
       language: "Language",
       type: "Type",
+      genre: "Genre",
       classification: "Classification",
       tagLabels: {
-        "light-novel": "light novel",
-        "web-novel": "web novel",
-        "graphic-novel": "graphic novel",
-        "one-shot": "one-shot",
-        doujinshi: "doujinshi",
         other: "other",
         adult: "+18"
+      },
+      restricted: {
+        title: "Restricted content",
+        locked: "Restricted plugins are hidden.",
+        unlocked: "Restricted plugins are visible on this browser.",
+        enable: "Review access",
+        disable: "Disable access",
+        prompt: "Enter your date of birth. Access is available only to people aged 18 or older.",
+        privacy: "Your date of birth is checked only in this browser and is not saved or sent.",
+        day: "Day",
+        month: "Month",
+        year: "Year",
+        confirm: "Verify age and enable",
+        cancel: "Cancel",
+        invalidDate: "Enter a valid day, month, and year.",
+        underage: "Access cannot be enabled because the entered date does not indicate an age of 18 or older."
       },
       favorite: "Favorite",
       favorites: "Favorites",
@@ -226,9 +259,11 @@ const I18N = {
       repositoryLine: "Repository: {url}",
       tagMinimum: "plugin.json must declare at least 2 tags: language first, then type.",
       firstTag: "The first public tag must be one of: {tags}.",
-      nextTags: "After the language tag, use one to three types from: {tags}. You may add adult last as an optional +18 classification.",
+      nextTags: "After language, use one to three types from: {types}. You may then add up to four genres from: {genres}. The optional adult classification must be last.",
       typeLimit: "Use no more than three content types.",
-      classificationLast: "The +18 classification must appear after the content types.",
+      genreLimit: "Use no more than four genres.",
+      genreAfterType: "Genre tags must appear after content types.",
+      classificationLast: "The adult classification must appear last.",
       validUrl: "Paste a valid GitHub URL.",
       githubOnly: "Use a github.com repository.",
       ownerRepo: "The URL must include an owner and repository.",
@@ -314,15 +349,38 @@ const I18N = {
       loadError: "Não foi possível carregar o catálogo: {message}",
       language: "Idioma",
       type: "Tipo",
+      genre: "Gênero",
       classification: "Classificação",
       tagLabels: {
-        "light-novel": "light novel",
-        "web-novel": "web novel",
-        "graphic-novel": "graphic novel",
-        "one-shot": "one-shot",
-        doujinshi: "doujinshi",
         other: "outros",
-        adult: "+18"
+        adult: "+18",
+        action: "ação",
+        adventure: "aventura",
+        comedy: "comédia",
+        fantasy: "fantasia",
+        horror: "terror",
+        mystery: "mistério",
+        "sci-fi": "ficção científica",
+        "slice-of-life": "cotidiano",
+        sports: "esportes",
+        supernatural: "sobrenatural",
+        thriller: "suspense"
+      },
+      restricted: {
+        title: "Conteúdo restrito",
+        locked: "Plugins restritos estão ocultos.",
+        unlocked: "Plugins restritos estão visíveis neste navegador.",
+        enable: "Revisar acesso",
+        disable: "Desativar acesso",
+        prompt: "Informe sua data de nascimento. O acesso está disponível somente para pessoas com 18 anos ou mais.",
+        privacy: "Sua data de nascimento é verificada somente neste navegador e não é salva nem enviada.",
+        day: "Dia",
+        month: "Mês",
+        year: "Ano",
+        confirm: "Verificar idade e ativar",
+        cancel: "Cancelar",
+        invalidDate: "Informe um dia, mês e ano válidos.",
+        underage: "O acesso não pode ser ativado porque a data informada não indica idade igual ou superior a 18 anos."
       },
       favorite: "Favoritar",
       favorites: "Favoritos",
@@ -410,9 +468,11 @@ const I18N = {
       repositoryLine: "Repositório: {url}",
       tagMinimum: "plugin.json precisa declarar pelo menos 2 tags: idioma primeiro, depois tipo.",
       firstTag: "A primeira tag pública precisa ser uma destas: {tags}.",
-      nextTags: "Depois da tag de idioma, use de um a três tipos entre: {tags}. Você pode adicionar adult por último como classificação opcional +18.",
+      nextTags: "Depois do idioma, use de um a três tipos entre: {types}. Em seguida, você pode adicionar até quatro gêneros entre: {genres}. A classificação opcional adult deve ficar por último.",
       typeLimit: "Use no máximo três tipos de conteúdo.",
-      classificationLast: "A classificação +18 deve aparecer depois dos tipos de conteúdo.",
+      genreLimit: "Use no máximo quatro gêneros.",
+      genreAfterType: "As tags de gênero devem aparecer depois dos tipos de conteúdo.",
+      classificationLast: "A classificação adult deve aparecer por último.",
       validUrl: "Cole uma URL válida do GitHub.",
       githubOnly: "Use um repositório github.com.",
       ownerRepo: "A URL precisa incluir usuário e repositório.",
@@ -468,6 +528,9 @@ let searchQuery = "";
 let filteredCatalogPlugins = [];
 let currentCatalogPage = 1;
 let currentLanguage = initialLanguage();
+let restrictedAccessEnabled = loadRestrictedAccess();
+let restrictedAccessFormOpen = false;
+let restrictedAccessMessageKey = "";
 
 function normalizeLanguage(value) {
   const language = String(value ? value : "").toLowerCase();
@@ -514,6 +577,110 @@ function initialLanguage() {
   return detectLanguage();
 }
 
+function loadRestrictedAccess() {
+  try {
+    return localStorage.getItem(RESTRICTED_ACCESS_KEY) === "enabled";
+  } catch {
+    return false;
+  }
+}
+
+function saveRestrictedAccess(enabled) {
+  try {
+    if (enabled) {
+      localStorage.setItem(RESTRICTED_ACCESS_KEY, "enabled");
+    } else {
+      localStorage.removeItem(RESTRICTED_ACCESS_KEY);
+    }
+  } catch {}
+}
+
+function clearBirthDateInputs() {
+  [birthDayInput, birthMonthInput, birthYearInput].forEach((input) => {
+    if (input) {
+      input.value = "";
+    }
+  });
+}
+
+function renderRestrictedAccess() {
+  if (!restrictedAccessButton || !restrictedAccessForm || !restrictedAccessStatus) {
+    return;
+  }
+  restrictedAccessButton.textContent = t(restrictedAccessEnabled
+    ? "catalog.restricted.disable"
+    : "catalog.restricted.enable");
+  restrictedAccessButton.setAttribute("aria-expanded", restrictedAccessFormOpen ? "true" : "false");
+  restrictedAccessForm.hidden = restrictedAccessEnabled || !restrictedAccessFormOpen;
+  restrictedAccessStatus.textContent = t(restrictedAccessMessageKey || (restrictedAccessEnabled
+    ? "catalog.restricted.unlocked"
+    : "catalog.restricted.locked"));
+  restrictedAccessStatus.classList.toggle("is-error", Boolean(restrictedAccessMessageKey));
+}
+
+function reloadCatalogForRestrictedAccess() {
+  pinnedOfficialPlugins = [];
+  allPlugins = [];
+  filteredCatalogPlugins = [];
+  currentCatalogPage = 1;
+  selectedTags = selectedTags.filter((tag) => tag !== "adult");
+  excludedTags = excludedTags.filter((tag) => tag !== "adult");
+  if (officialCatalogSection) {
+    officialCatalogSection.hidden = true;
+  }
+  if (catalogPagination) {
+    catalogPagination.hidden = true;
+    catalogPagination.innerHTML = "";
+  }
+  if (list) {
+    list.innerHTML = `<p>${escapeHtml(t("catalog.loading"))}</p>`;
+  }
+  loadAllPlugins();
+}
+
+function toggleRestrictedAccess() {
+  restrictedAccessMessageKey = "";
+  if (restrictedAccessEnabled) {
+    restrictedAccessEnabled = false;
+    restrictedAccessFormOpen = false;
+    saveRestrictedAccess(false);
+    clearBirthDateInputs();
+    renderRestrictedAccess();
+    reloadCatalogForRestrictedAccess();
+    return;
+  }
+  restrictedAccessFormOpen = !restrictedAccessFormOpen;
+  renderRestrictedAccess();
+  if (restrictedAccessFormOpen) {
+    birthDayInput?.focus();
+  }
+}
+
+function confirmRestrictedAccess() {
+  const assessment = globalThis.KapiTomoAdultAccess.assessBirthDate(
+    birthDayInput?.value,
+    birthMonthInput?.value,
+    birthYearInput?.value
+  );
+  if (!assessment.valid) {
+    restrictedAccessMessageKey = "catalog.restricted.invalidDate";
+    renderRestrictedAccess();
+    return;
+  }
+  if (!assessment.isAdult) {
+    restrictedAccessMessageKey = "catalog.restricted.underage";
+    renderRestrictedAccess();
+    return;
+  }
+  restrictedAccessEnabled = true;
+  restrictedAccessFormOpen = false;
+  restrictedAccessMessageKey = "";
+  saveRestrictedAccess(true);
+  clearBirthDateInputs();
+  renderRestrictedAccess();
+  reloadCatalogForRestrictedAccess();
+}
+
 function t(key, values = {}) {
   const parts = key.split(".");
   let output = I18N[currentLanguage];
@@ -544,6 +711,7 @@ function applyStaticTranslations() {
   languageButtons.forEach((button) => {
     button.setAttribute("aria-pressed", button.dataset.languageOption === currentLanguage ? "true" : "false");
   });
+  renderRestrictedAccess();
 }
 
 function setLanguage(language, persist = true) {
@@ -836,9 +1004,12 @@ function normalizePublicationTags(tags) {
     throw new Error(t("publish.firstTag", { tags: OFFICIAL_LANGUAGE_TAGS.join(", ") }));
   }
   const contentTags = publicTags.slice(1);
-  const invalidTag = contentTags.find((tag) => !TYPE_TAGS.has(tag) && !CLASSIFICATION_TAGS.has(tag));
+  const invalidTag = contentTags.find((tag) => !TYPE_TAGS.has(tag) && !GENRE_TAGS.has(tag) && !CLASSIFICATION_TAGS.has(tag));
   if (invalidTag) {
-    throw new Error(t("publish.nextTags", { tags: OFFICIAL_TYPE_TAGS.join(", ") }));
+    throw new Error(t("publish.nextTags", {
+      types: OFFICIAL_TYPE_TAGS.join(", "),
+      genres: OFFICIAL_GENRE_TAGS.join(", ")
+    }));
   }
   const typeTags = contentTags.filter((tag) => TYPE_TAGS.has(tag));
   if (!typeTags.length) {
@@ -847,8 +1018,16 @@ function normalizePublicationTags(tags) {
   if (typeTags.length > MAX_TYPE_TAGS) {
     throw new Error(t("publish.typeLimit"));
   }
+  const genreTags = contentTags.filter((tag) => GENRE_TAGS.has(tag));
+  if (genreTags.length > MAX_GENRE_TAGS) {
+    throw new Error(t("publish.genreLimit"));
+  }
+  const firstGenreIndex = contentTags.findIndex((tag) => GENRE_TAGS.has(tag));
+  if (firstGenreIndex >= 0 && contentTags.slice(firstGenreIndex + 1).some((tag) => TYPE_TAGS.has(tag))) {
+    throw new Error(t("publish.genreAfterType"));
+  }
   const firstClassificationIndex = contentTags.findIndex((tag) => CLASSIFICATION_TAGS.has(tag));
-  if (firstClassificationIndex >= 0 && contentTags.slice(firstClassificationIndex + 1).some((tag) => TYPE_TAGS.has(tag))) {
+  if (firstClassificationIndex >= 0 && contentTags.slice(firstClassificationIndex + 1).some((tag) => TYPE_TAGS.has(tag) || GENRE_TAGS.has(tag))) {
     throw new Error(t("publish.classificationLast"));
   }
   return output;
@@ -955,8 +1134,9 @@ function renderTagFilters(tags) {
   availableTags = uniqueTags([
     OFFICIAL_LANGUAGE_TAGS,
     OFFICIAL_TYPE_TAGS,
-    OFFICIAL_CLASSIFICATION_TAGS,
-    tags
+    OFFICIAL_GENRE_TAGS,
+    restrictedAccessEnabled ? OFFICIAL_CLASSIFICATION_TAGS : [],
+    restrictedAccessEnabled ? tags : tags.filter((tag) => tag !== "adult")
   ]);
   selectedTags = selectedTags.filter((tag) => availableTags.includes(tag));
   excludedTags = excludedTags.filter((tag) => availableTags.includes(tag) && !selectedTags.includes(tag));
@@ -965,12 +1145,14 @@ function renderTagFilters(tags) {
   }
   const languageTags = OFFICIAL_LANGUAGE_TAGS;
   const contentTags = OFFICIAL_TYPE_TAGS;
+  const genreTags = OFFICIAL_GENRE_TAGS;
   const classificationTags = OFFICIAL_CLASSIFICATION_TAGS;
   tagFilter.innerHTML = availableTags.length
     ? [
       renderTagGroup(t("catalog.language"), languageTags),
       renderTagGroup(t("catalog.type"), contentTags),
-      renderTagGroup(t("catalog.classification"), classificationTags)
+      renderTagGroup(t("catalog.genre"), genreTags),
+      restrictedAccessEnabled ? renderTagGroup(t("catalog.classification"), classificationTags) : ""
     ].join("")
     : `<p class="filter-status">${escapeHtml(t("catalog.noTags"))}</p>`;
   tagFilter.querySelectorAll("[data-filter-tag]").forEach((button) => {
@@ -1258,18 +1440,27 @@ function renderPlugins(plugins) {
 function loadAllPlugins() {
   fetchCatalog()
     .then((catalog) => {
-      const catalogPlugins = (Array.isArray(catalog.plugins) ? catalog.plugins : [])
-        .filter((plugin) => hasRequiredPluginIcon(plugin) && hasRepository(plugin) && isVisiblePlugin(plugin));
+      const catalogPlugins = globalThis.KapiTomoAdultAccess.visiblePlugins(
+        (Array.isArray(catalog.plugins) ? catalog.plugins : [])
+          .filter((plugin) => hasRequiredPluginIcon(plugin) && hasRepository(plugin) && isVisiblePlugin(plugin)),
+        restrictedAccessEnabled
+      );
       const savedDrafts = loadDraftPlugins();
+      const visibleDrafts = globalThis.KapiTomoAdultAccess.visiblePlugins(savedDrafts, restrictedAccessEnabled);
       return Promise.all([
         filterAvailablePlugins(catalogPlugins),
-        filterAvailablePlugins(savedDrafts)
+        filterAvailablePlugins(visibleDrafts)
       ]).then(([availableCatalogPlugins, availableDrafts]) => {
         const drafts = availableDrafts.filter((draft) => (
           !availableCatalogPlugins.some((published) => isSamePluginPublication(published, draft))
         ));
-        if (drafts.length !== savedDrafts.length) {
-          saveDraftPlugins(drafts);
+        const removedVisibleDrafts = visibleDrafts.filter((draft) => (
+          !drafts.some((retained) => isSamePluginPublication(retained, draft))
+        ));
+        if (removedVisibleDrafts.length) {
+          saveDraftPlugins(savedDrafts.filter((draft) => (
+            !removedVisibleDrafts.some((removed) => isSamePluginPublication(removed, draft))
+          )));
         }
         const partitionedCatalog = globalThis.KapiTomoPagination.partitionCatalogPlugins(availableCatalogPlugins);
         pinnedOfficialPlugins = partitionedCatalog.official;
@@ -1733,6 +1924,17 @@ pluginSearchInput?.addEventListener("input", () => {
 favoritesOnlyButton?.addEventListener("click", () => {
   favoritesOnly = !favoritesOnly;
   applyTagFilters(true);
+});
+restrictedAccessButton?.addEventListener("click", toggleRestrictedAccess);
+restrictedAccessForm?.addEventListener("submit", (event) => {
+  event.preventDefault();
+  confirmRestrictedAccess();
+});
+cancelRestrictedAccessButton?.addEventListener("click", () => {
+  restrictedAccessFormOpen = false;
+  restrictedAccessMessageKey = "";
+  clearBirthDateInputs();
+  renderRestrictedAccess();
 });
 discardDraftPluginsButton?.addEventListener("click", () => {
   localStorage.removeItem(LOCAL_PLUGIN_KEY);

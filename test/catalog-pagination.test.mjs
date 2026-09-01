@@ -10,6 +10,7 @@ const pagination = globalThis.KapiTomoPagination;
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const require = createRequire(import.meta.url);
 const pluginHubAction = require("../tools/plugin-hub-action.js");
+const adultAccess = require("../plugins/adult-access.js");
 
 test("keeps up to 20 plugins on the first page", () => {
   const result = pagination.paginate(Array.from({ length: 20 }, (_, index) => index + 1), 1);
@@ -91,41 +92,56 @@ test("allows only maintainers to place a plugin in the official section", () => 
   assert.doesNotThrow(() => pluginHubAction.requireOfficialAuthorization(community, null, false));
 });
 
-test("supports reading formats, other, and a separate +18 classification", () => {
+test("supports useful types, broad genres, and a separate adult classification", () => {
   assert.deepEqual(pluginHubAction.OFFICIAL_TYPE_TAGS, [
     "manga",
     "manhua",
     "manhwa",
     "novel",
-    "light-novel",
-    "web-novel",
     "webtoon",
     "comic",
-    "graphic-novel",
-    "one-shot",
-    "doujinshi",
     "other"
   ]);
+  assert.ok(pluginHubAction.OFFICIAL_GENRE_TAGS.includes("romance"));
   assert.deepEqual(pluginHubAction.OFFICIAL_CLASSIFICATION_TAGS, ["adult"]);
   assert.deepEqual(
-    pluginHubAction.normalizeTags(["community", "portuguese", "other", "adult"]),
-    ["community", "portuguese", "other", "adult"]
+    pluginHubAction.normalizeTags(["community", "portuguese", "other", "romance", "adult"]),
+    ["community", "portuguese", "other", "romance", "adult"]
   );
 });
 
-test("rejects subgenres and keeps the +18 classification after formats", () => {
+test("keeps broad genres ordered and the adult classification last", () => {
   assert.deepEqual(
-    pluginHubAction.normalizeTags(["community", "portuguese", "manga", "romance", "adult"]),
-    ["community", "portuguese", "manga", "adult"]
+    pluginHubAction.normalizeTags(["community", "portuguese", "manga", "romance", "dark-romance", "adult"]),
+    ["community", "portuguese", "manga", "romance", "adult"]
   );
   assert.throws(
     () => pluginHubAction.normalizeTags(["community", "portuguese", "adult", "manga"]),
-    /classification tags must appear after content types/
+    /classification tags must appear last/
+  );
+  assert.throws(
+    () => pluginHubAction.normalizeTags(["community", "portuguese", "romance", "manga"]),
+    /genre tags must appear after content types/
   );
   assert.throws(
     () => pluginHubAction.normalizeTags(["community", "portuguese", "manga", "manhua", "manhwa", "comic"]),
     /at most 3 content types/
   );
+});
+
+test("requires a valid birth date indicating age 18 or older", () => {
+  const today = new Date(2026, 8, 1, 12, 0, 0, 0);
+  assert.deepEqual(adultAccess.assessBirthDate(1, 9, 2008, today), { valid: true, isAdult: true });
+  assert.deepEqual(adultAccess.assessBirthDate(2, 9, 2008, today), { valid: true, isAdult: false });
+  assert.deepEqual(adultAccess.assessBirthDate(31, 2, 2000, today), { valid: false, isAdult: false });
+  assert.deepEqual(adultAccess.assessBirthDate("", 9, 2000, today), { valid: false, isAdult: false });
+});
+
+test("hides adult plugins until restricted access is enabled", () => {
+  const regular = { id: "regular", tags: ["portuguese", "manga", "romance"] };
+  const restricted = { id: "restricted", tags: ["portuguese", "manga", "romance", "adult"] };
+  assert.deepEqual(adultAccess.visiblePlugins([regular, restricted], false), [regular]);
+  assert.deepEqual(adultAccess.visiblePlugins([regular, restricted], true), [regular, restricted]);
 });
 
 test("keeps catalog taxonomy metadata synchronized with automation", () => {
@@ -134,8 +150,9 @@ test("keeps catalog taxonomy metadata synchronized with automation", () => {
   catalogs.forEach((catalog) => {
     assert.deepEqual(catalog.official_tags.languages, pluginHubAction.OFFICIAL_LANGUAGE_TAGS);
     assert.deepEqual(catalog.official_tags.types, pluginHubAction.OFFICIAL_TYPE_TAGS);
+    assert.deepEqual(catalog.official_tags.genres, pluginHubAction.OFFICIAL_GENRE_TAGS);
     assert.deepEqual(catalog.official_tags.classifications, pluginHubAction.OFFICIAL_CLASSIFICATION_TAGS);
-    assert.equal(catalog.catalog_revision, "20260901-expanded-taxonomy");
+    assert.equal(catalog.catalog_revision, "20260901-age-gated-taxonomy");
   });
   assert.deepEqual(catalogs[1], catalogs[0]);
 });
@@ -147,7 +164,11 @@ test("keeps every Plugin Hub page identical and loads pagination before the stor
   assert.match(pages[0], /id="officialCatalogSection"/);
   assert.match(pages[0], /id="officialPluginList"/);
   assert.match(pages[0], /id="catalogPagination"/);
+  assert.match(pages[0], /id="restrictedAccessForm"/);
+  assert.match(pages[0], /id="birthDayInput"/);
+  assert.match(pages[0], /adult-access\.js\?v=20260901-age-gate/);
   assert.match(pages[0], /catalog-pagination\.js\?v=20260901-pinned-official/);
-  assert.match(pages[0], /store\.js\?v=20260901-expanded-taxonomy/);
+  assert.match(pages[0], /store\.js\?v=20260901-age-gated-taxonomy/);
+  assert.ok(pages[0].indexOf("adult-access.js") < pages[0].indexOf("store.js"));
   assert.ok(pages[0].indexOf("catalog-pagination.js") < pages[0].indexOf("store.js"));
 });
