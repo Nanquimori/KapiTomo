@@ -550,6 +550,30 @@
         gap: 7px;
       }
 
+      .catalog-group,
+      .catalog-group-heading {
+        grid-column: 1 / -1;
+        width: 100%;
+        min-width: 0;
+      }
+
+      .catalog-group {
+        display: grid;
+        gap: 6px;
+      }
+
+      .catalog-group[hidden] {
+        display: none;
+      }
+
+      .catalog-group-heading {
+        margin: 4px 0 0;
+      }
+
+      .catalog-group-heading .kicker {
+        margin: 0;
+      }
+
       .catalog-pagination {
         grid-column: 1 / -1;
         width: 100%;
@@ -655,6 +679,24 @@
         background:
           linear-gradient(145deg, rgba(255, 178, 31, 0.055), transparent 44%),
           var(--panel-soft);
+      }
+
+      .plugin-card.is-official {
+        border-color: rgba(255, 178, 31, 0.62);
+        box-shadow: inset 3px 0 0 var(--accent);
+      }
+
+      .official-badge {
+        grid-column: 1 / -1;
+        justify-self: start;
+        border-radius: 999px;
+        padding: 2px 7px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        color: #180800;
+        font-size: 0.52rem;
+        font-weight: 950;
+        line-height: 1;
+        text-transform: uppercase;
       }
 
       .plugin-icon {
@@ -1215,6 +1257,15 @@
           <div id="tagFilter" class="tag-filter" aria-label="Catalog tag filters" data-i18n-aria="catalog.tagFilters"></div>
           <p id="tagFilterStatus" class="filter-status" aria-live="polite"></p>
         </div>
+        <section id="officialCatalogSection" class="catalog-group" aria-labelledby="officialCatalogHeading" hidden>
+          <div class="catalog-group-heading">
+            <p id="officialCatalogHeading" class="kicker" data-i18n="catalog.officialPlugin">Official plugin</p>
+          </div>
+          <div id="officialPluginList" class="plugin-list" aria-live="polite"></div>
+        </section>
+        <div class="catalog-group-heading">
+          <p class="kicker" data-i18n="catalog.communityPlugins">Community plugins</p>
+        </div>
         <div id="pluginList" class="plugin-list" aria-live="polite">
           <p data-i18n="catalog.loading">Loading catalog...</p>
         </div>
@@ -1325,7 +1376,7 @@
       </section>
     </main>
     <script src="report-config.js?v=20260901-secure-reports"></script>
-    <script src="catalog-pagination.js?v=20260901-pagination"></script>
-    <script src="store.js?v=20260901-pagination"></script>
+    <script src="catalog-pagination.js?v=20260901-pinned-official"></script>
+    <script src="store.js?v=20260901-pinned-official"></script>
   </body>
 </html>

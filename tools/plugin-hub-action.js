@@ -2,6 +2,7 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const { execFileSync } = require("child_process");
+const { sortCatalogPlugins } = require("../plugins/catalog-pagination.js");
 
 const CATALOG_PATHS = ["plugins/catalog-store.json", "plugins/catalog.json"];
 const MAINTAINERS = new Set(["nanquimori"]);
@@ -460,14 +461,11 @@ async function findDuplicateHost(catalog, plugin) {
 }
 
 function sortPlugins(plugins) {
-  return plugins.slice().sort((a, b) => {
-    const ao = Array.isArray(a.tags) && a.tags.includes("official") ? 0 : 1;
-    const bo = Array.isArray(b.tags) && b.tags.includes("official") ? 0 : 1;
-    if (ao !== bo) {
-      return ao - bo;
-    }
-    return String(a.name || a.id).localeCompare(String(b.name || b.id), "pt-BR");
-  });
+  return sortCatalogPlugins(plugins);
+}
+
+function publicationDate(existing, timestamp = nowIso()) {
+  return existing && existing.published_at ? existing.published_at : timestamp;
 }
 
 function isMaintainer(actor) {
@@ -513,6 +511,7 @@ async function publishPlugin(issue) {
   plugin.status = "active";
   plugin.consecutive_failures = 0;
   plugin.last_error = "";
+  plugin.published_at = publicationDate(existing);
   plugin.last_checked_at = nowIso();
 
   catalog.plugins = sortPlugins([
@@ -894,4 +893,11 @@ async function main() {
   }
 }
 
-main();
+if (require.main === module) {
+  main();
+}
+
+module.exports = {
+  publicationDate,
+  sortPlugins
+};

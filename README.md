@@ -102,7 +102,7 @@ New integrations should use `api/works/index.json`.
 
 The Plugin Hub installs site plugins from GitHub repositories. A plugin repository must contain `plugin.json` and `browser/download_target.js`.
 
-The online catalog displays at most 20 plugins per page. When more entries are available, users can move with Previous and Next, select a numbered page, or choose any page directly from the page selector. Search, tag, and favorites filters reset to the first page and paginate only the matching results.
+The official KapiTomo plugin is pinned in its own section above the community catalog and never consumes a paginated slot. Each page displays at most 20 community plugins, ordered from newest to oldest by their first publication date. Updating an existing plugin preserves that date. When more entries are available, users can move with Previous and Next, select a numbered page, or choose any page directly from the page selector. Search, tag, and favorites filters reset to the first page and paginate only matching community entries.
 
 KapiTomo publishes catalog entries, not third-party works. Plugin creators are responsible for their code, manifest, requested permissions, repository, accurate catalog metadata, and maintenance. Source sites are responsible for their works, translations, advertisements, accounts, pages, availability, and access rules. KapiTomo operates the catalog entry and review process; it does not operate or continuously audit community repositories or source sites. Nyxovira Pro pays for app features and maintenance; it is not a sale of third-party chapters, pages, translations, plugins, manga, comics, or novels.
 
