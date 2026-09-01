@@ -8,9 +8,8 @@ const CATALOG_PATHS = ["plugins/catalog-store.json", "plugins/catalog.json"];
 const MAINTAINERS = new Set(["nanquimori"]);
 const BROKEN_AFTER_FAILURES = 2;
 const MISSING_AFTER_FAILURES = 2;
-const MAX_PUBLIC_TAGS = 9;
+const MAX_PUBLIC_TAGS = 5;
 const MAX_TYPE_TAGS = 3;
-const MAX_GENRE_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
 const POLICY_ACCEPTANCE_MARKER = "plugin-hub-policy: accepted-v1";
 const POLICY_ACCEPTANCE_ERROR = "The publication request must accept the current Plugin Hub catalog rules. Read https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules and add `Catalog rules accepted: yes` to the request.";
@@ -39,30 +38,13 @@ const OFFICIAL_TYPE_TAGS = [
   "comic",
   "other"
 ];
-const OFFICIAL_GENRE_TAGS = [
-  "action",
-  "adventure",
-  "comedy",
-  "drama",
-  "fantasy",
-  "horror",
-  "mystery",
-  "romance",
-  "sci-fi",
-  "slice-of-life",
-  "sports",
-  "supernatural",
-  "thriller"
-];
 const OFFICIAL_CLASSIFICATION_TAGS = ["adult"];
 const LANGUAGE_TAGS = new Set(OFFICIAL_LANGUAGE_TAGS);
 const TYPE_TAGS = new Set(OFFICIAL_TYPE_TAGS);
-const GENRE_TAGS = new Set(OFFICIAL_GENRE_TAGS);
 const CLASSIFICATION_TAGS = new Set(OFFICIAL_CLASSIFICATION_TAGS);
 const PUBLIC_TAGS = new Set([
   ...OFFICIAL_LANGUAGE_TAGS,
   ...OFFICIAL_TYPE_TAGS,
-  ...OFFICIAL_GENRE_TAGS,
   ...OFFICIAL_CLASSIFICATION_TAGS
 ]);
 
@@ -96,8 +78,6 @@ PORTUGUESE_ERRORS.set("Moderation action must be hide, restore, or remove.", "A 
 PORTUGUESE_ERRORS.set("Moderation reason is required.", "O motivo da moderação é obrigatório.");
 PORTUGUESE_ERRORS.set("This catalog entry is under moderation review. The creator may submit corrections, and a maintainer must review them before the listing returns to the catalog.", "Esta entrada está em análise de moderação. O criador pode enviar correções, e um mantenedor precisa analisá-las antes que a entrada volte ao catálogo.");
 PORTUGUESE_ERRORS.set("tags may include at most 3 content types.", "As tags podem incluir no máximo 3 tipos de conteúdo.");
-PORTUGUESE_ERRORS.set("tags may include at most 4 genres.", "As tags podem incluir no máximo 4 gêneros.");
-PORTUGUESE_ERRORS.set("genre tags must appear after content types.", "As tags de gênero devem aparecer depois dos tipos de conteúdo.");
 PORTUGUESE_ERRORS.set("classification tags must appear last.", "As tags de classificação devem aparecer por último.");
 
 function issueLanguage(issue) {
@@ -153,9 +133,9 @@ function translateRequestError(message, language) {
   if (match) {
     return `A primeira tag pública deve ser uma destas: ${match[1]}`;
   }
-  match = text.match(/^invalid catalog tag after language: (.+)\. Allowed types: (.+)\. Allowed genres: (.+)\. Optional classifications: (.+)$/);
+  match = text.match(/^invalid catalog tag after language: (.+)\. Allowed types: (.+)\. Optional classifications: (.+)$/);
   if (match) {
-    return `Tag de catálogo inválida depois do idioma: ${match[1]}. Tipos permitidos: ${match[2]}. Gêneros permitidos: ${match[3]}. Classificações opcionais: ${match[4]}`;
+    return `Tag de catálogo inválida depois do idioma: ${match[1]}. Tipos permitidos: ${match[2]}. Classificações opcionais: ${match[3]}`;
   }
   return `Erro de validação: ${text}`;
 }
@@ -317,9 +297,9 @@ function normalizeTags(value) {
     throw new Error(`the first public tag must be one of: ${OFFICIAL_LANGUAGE_TAGS.join(", ")}.`);
   }
   const contentTags = publicTags.slice(1);
-  const invalidTag = contentTags.find((tag) => !TYPE_TAGS.has(tag) && !GENRE_TAGS.has(tag) && !CLASSIFICATION_TAGS.has(tag));
+  const invalidTag = contentTags.find((tag) => !TYPE_TAGS.has(tag) && !CLASSIFICATION_TAGS.has(tag));
   if (invalidTag) {
-    throw new Error(`invalid catalog tag after language: ${invalidTag}. Allowed types: ${OFFICIAL_TYPE_TAGS.join(", ")}. Allowed genres: ${OFFICIAL_GENRE_TAGS.join(", ")}. Optional classifications: ${OFFICIAL_CLASSIFICATION_TAGS.join(", ")}.`);
+    throw new Error(`invalid catalog tag after language: ${invalidTag}. Allowed types: ${OFFICIAL_TYPE_TAGS.join(", ")}. Optional classifications: ${OFFICIAL_CLASSIFICATION_TAGS.join(", ")}.`);
   }
   const typeTags = contentTags.filter((tag) => TYPE_TAGS.has(tag));
   if (!typeTags.length) {
@@ -328,16 +308,8 @@ function normalizeTags(value) {
   if (typeTags.length > MAX_TYPE_TAGS) {
     throw new Error("tags may include at most 3 content types.");
   }
-  const genreTags = contentTags.filter((tag) => GENRE_TAGS.has(tag));
-  if (genreTags.length > MAX_GENRE_TAGS) {
-    throw new Error("tags may include at most 4 genres.");
-  }
-  const firstGenreIndex = contentTags.findIndex((tag) => GENRE_TAGS.has(tag));
-  if (firstGenreIndex >= 0 && contentTags.slice(firstGenreIndex + 1).some((tag) => TYPE_TAGS.has(tag))) {
-    throw new Error("genre tags must appear after content types.");
-  }
   const firstClassificationIndex = contentTags.findIndex((tag) => CLASSIFICATION_TAGS.has(tag));
-  if (firstClassificationIndex >= 0 && contentTags.slice(firstClassificationIndex + 1).some((tag) => TYPE_TAGS.has(tag) || GENRE_TAGS.has(tag))) {
+  if (firstClassificationIndex >= 0 && contentTags.slice(firstClassificationIndex + 1).some((tag) => TYPE_TAGS.has(tag))) {
     throw new Error("classification tags must appear last.");
   }
   return output;
@@ -472,7 +444,7 @@ function loadCatalog() {
 function writeCatalogs(catalog) {
   catalog.schema_version = 3;
   catalog.publish_model = "github-repository";
-  catalog.catalog_revision = "20260901-age-gated-taxonomy";
+  catalog.catalog_revision = "20260901-age-gated-types";
   catalog.rules_url = "https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules";
   const text = JSON.stringify(catalog, null, 2) + "\n";
   for (const catalogPath of CATALOG_PATHS) {
@@ -955,7 +927,6 @@ if (require.main === module) {
 
 module.exports = {
   OFFICIAL_CLASSIFICATION_TAGS,
-  OFFICIAL_GENRE_TAGS,
   OFFICIAL_LANGUAGE_TAGS,
   OFFICIAL_TYPE_TAGS,
   normalizeTags,

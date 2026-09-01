@@ -2,7 +2,7 @@
   "schema_version": 3,
   "name": "KapiTomo Plugin Hub",
   "description": "Public plugin catalog for Nyxovira.",
-  "catalog_revision": "20260901-age-gated-taxonomy",
+  "catalog_revision": "20260901-age-gated-types",
   "publish_model": "github-repository",
   "rules_url": "https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules",
   "suggested_tags": [
@@ -27,25 +27,12 @@
     "webtoon",
     "comic",
     "other",
-    "action",
-    "adventure",
-    "comedy",
-    "drama",
-    "fantasy",
-    "horror",
-    "mystery",
-    "romance",
-    "sci-fi",
-    "slice-of-life",
-    "sports",
-    "supernatural",
-    "thriller",
     "adult"
   ],
   "requirements": {
     "icon_url": "Required. Every online plugin must point to a public icon image.",
     "repository_url": "Required. Every online plugin must be hosted in a public GitHub repository.",
-    "tags": "Required. Use one language first, one to three types, up to four broad genres, and optional adult last. Unsupported and extra tags are ignored.",
+    "tags": "Required. Use one language first, one to three types, and optional adult last. Unsupported and extra tags are ignored.",
     "policy_acceptance": "Required. Publication requests must accept the current Plugin Hub catalog rules."
   },
   "moderation": {
@@ -79,21 +66,6 @@
       "webtoon",
       "comic",
       "other"
-    ],
-    "genres": [
-      "action",
-      "adventure",
-      "comedy",
-      "drama",
-      "fantasy",
-      "horror",
-      "mystery",
-      "romance",
-      "sci-fi",
-      "slice-of-life",
-      "sports",
-      "supernatural",
-      "thriller"
     ],
     "classifications": [
       "adult"
