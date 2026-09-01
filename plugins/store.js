@@ -40,7 +40,7 @@ const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
 const REPORT_HISTORY_KEY = "kapitomo.reportHistory.v1";
 const RESTRICTED_ACCESS_KEY = "kapitomo.restrictedAccess.v1";
-const CATALOG_VERSION = "20260901-age-gated-taxonomy";
+const CATALOG_VERSION = "20260901-age-gated-types";
 const REPORT_CONFIG = globalThis.KAPITOMO_REPORT_CONFIG || {};
 const REPORT_ENDPOINT = String(REPORT_CONFIG.endpoint || "").trim();
 const REPORT_TURNSTILE_SITE_KEY = String(REPORT_CONFIG.turnstileSiteKey || "").trim();
@@ -52,9 +52,8 @@ const MIN_REPORT_WORDS = 20;
 let reportTurnstileWidgetId = null;
 let reportTurnstileToken = "";
 let reportTurnstileScriptPromise = null;
-const MAX_PUBLIC_TAGS = 9;
+const MAX_PUBLIC_TAGS = 5;
 const MAX_TYPE_TAGS = 3;
-const MAX_GENRE_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
 const OFFICIAL_LANGUAGE_TAGS = [
   "english",
@@ -81,30 +80,13 @@ const OFFICIAL_TYPE_TAGS = [
   "comic",
   "other"
 ];
-const OFFICIAL_GENRE_TAGS = [
-  "action",
-  "adventure",
-  "comedy",
-  "drama",
-  "fantasy",
-  "horror",
-  "mystery",
-  "romance",
-  "sci-fi",
-  "slice-of-life",
-  "sports",
-  "supernatural",
-  "thriller"
-];
 const OFFICIAL_CLASSIFICATION_TAGS = ["adult"];
 const LANGUAGE_TAGS = new Set(OFFICIAL_LANGUAGE_TAGS);
 const TYPE_TAGS = new Set(OFFICIAL_TYPE_TAGS);
-const GENRE_TAGS = new Set(OFFICIAL_GENRE_TAGS);
 const CLASSIFICATION_TAGS = new Set(OFFICIAL_CLASSIFICATION_TAGS);
 const PUBLIC_TAGS = new Set([
   ...OFFICIAL_LANGUAGE_TAGS,
   ...OFFICIAL_TYPE_TAGS,
-  ...OFFICIAL_GENRE_TAGS,
   ...OFFICIAL_CLASSIFICATION_TAGS
 ]);
 const I18N = {
@@ -151,27 +133,26 @@ const I18N = {
       loadError: "Could not load the catalog: {message}",
       language: "Language",
       type: "Type",
-      genre: "Genre",
       classification: "Classification",
       tagLabels: {
         other: "other",
         adult: "+18"
       },
       restricted: {
-        title: "Restricted content",
-        locked: "Restricted plugins are hidden.",
-        unlocked: "Restricted plugins are visible on this browser.",
-        enable: "Review access",
-        disable: "Disable access",
-        prompt: "Enter your date of birth. Access is available only to people aged 18 or older.",
-        privacy: "Your date of birth is checked only in this browser and is not saved or sent.",
+        title: "Adult plugins (18+)",
+        locked: "Plugins classified as 18+ are hidden until you verify your age.",
+        unlocked: "Plugins classified as 18+ are visible on this browser.",
+        enable: "Verify age",
+        disable: "Hide 18+ plugins",
+        prompt: "Select your date of birth. You must be at least 18 years old to view adult plugins.",
+        privacy: "KapiTomo checks the selected date only in this browser. It does not save or send your birth date.",
         day: "Day",
         month: "Month",
         year: "Year",
-        confirm: "Verify age and enable",
+        confirm: "Confirm age and show 18+ plugins",
         cancel: "Cancel",
-        invalidDate: "Enter a valid day, month, and year.",
-        underage: "Access cannot be enabled because the entered date does not indicate an age of 18 or older."
+        invalidDate: "Select a valid date of birth.",
+        underage: "Access denied: you must be at least 18 years old to view adult plugins."
       },
       favorite: "Favorite",
       favorites: "Favorites",
@@ -259,10 +240,8 @@ const I18N = {
       repositoryLine: "Repository: {url}",
       tagMinimum: "plugin.json must declare at least 2 tags: language first, then type.",
       firstTag: "The first public tag must be one of: {tags}.",
-      nextTags: "After language, use one to three types from: {types}. You may then add up to four genres from: {genres}. The optional adult classification must be last.",
+      nextTags: "After language, use one to three types from: {types}. The optional adult classification must be last.",
       typeLimit: "Use no more than three content types.",
-      genreLimit: "Use no more than four genres.",
-      genreAfterType: "Genre tags must appear after content types.",
       classificationLast: "The adult classification must appear last.",
       validUrl: "Paste a valid GitHub URL.",
       githubOnly: "Use a github.com repository.",
@@ -349,38 +328,26 @@ const I18N = {
       loadError: "Não foi possível carregar o catálogo: {message}",
       language: "Idioma",
       type: "Tipo",
-      genre: "Gênero",
       classification: "Classificação",
       tagLabels: {
         other: "outros",
-        adult: "+18",
-        action: "ação",
-        adventure: "aventura",
-        comedy: "comédia",
-        fantasy: "fantasia",
-        horror: "terror",
-        mystery: "mistério",
-        "sci-fi": "ficção científica",
-        "slice-of-life": "cotidiano",
-        sports: "esportes",
-        supernatural: "sobrenatural",
-        thriller: "suspense"
+        adult: "+18"
       },
       restricted: {
-        title: "Conteúdo restrito",
-        locked: "Plugins restritos estão ocultos.",
-        unlocked: "Plugins restritos estão visíveis neste navegador.",
-        enable: "Revisar acesso",
-        disable: "Desativar acesso",
-        prompt: "Informe sua data de nascimento. O acesso está disponível somente para pessoas com 18 anos ou mais.",
-        privacy: "Sua data de nascimento é verificada somente neste navegador e não é salva nem enviada.",
+        title: "Plugins adultos (+18)",
+        locked: "Plugins com classificação +18 ficam ocultos até você verificar sua idade.",
+        unlocked: "Plugins com classificação +18 estão visíveis neste navegador.",
+        enable: "Verificar idade",
+        disable: "Ocultar plugins +18",
+        prompt: "Selecione sua data de nascimento. Você precisa ter 18 anos completos para visualizar plugins adultos.",
+        privacy: "O KapiTomo verifica a data selecionada somente neste navegador. A data de nascimento não é salva nem enviada.",
         day: "Dia",
         month: "Mês",
         year: "Ano",
-        confirm: "Verificar idade e ativar",
+        confirm: "Confirmar idade e mostrar plugins +18",
         cancel: "Cancelar",
-        invalidDate: "Informe um dia, mês e ano válidos.",
-        underage: "O acesso não pode ser ativado porque a data informada não indica idade igual ou superior a 18 anos."
+        invalidDate: "Selecione uma data de nascimento válida.",
+        underage: "Acesso negado: você precisa ter 18 anos completos para visualizar plugins adultos."
       },
       favorite: "Favoritar",
       favorites: "Favoritos",
@@ -468,10 +435,8 @@ const I18N = {
       repositoryLine: "Repositório: {url}",
       tagMinimum: "plugin.json precisa declarar pelo menos 2 tags: idioma primeiro, depois tipo.",
       firstTag: "A primeira tag pública precisa ser uma destas: {tags}.",
-      nextTags: "Depois do idioma, use de um a três tipos entre: {types}. Em seguida, você pode adicionar até quatro gêneros entre: {genres}. A classificação opcional adult deve ficar por último.",
+      nextTags: "Depois do idioma, use de um a três tipos entre: {types}. A classificação opcional adult deve ficar por último.",
       typeLimit: "Use no máximo três tipos de conteúdo.",
-      genreLimit: "Use no máximo quatro gêneros.",
-      genreAfterType: "As tags de gênero devem aparecer depois dos tipos de conteúdo.",
       classificationLast: "A classificação adult deve aparecer por último.",
       validUrl: "Cole uma URL válida do GitHub.",
       githubOnly: "Use um repositório github.com.",
@@ -603,10 +568,42 @@ function clearBirthDateInputs() {
   });
 }
 
+function setBirthDateOptions(select, placeholder, items) {
+  if (!select) {
+    return;
+  }
+  const previous = select.value;
+  select.innerHTML = [
+    `<option value="">${escapeHtml(placeholder)}</option>`,
+    ...items.map((item) => `<option value="${escapeHtml(item.value)}">${escapeHtml(item.label)}</option>`)
+  ].join("");
+  if (items.some((item) => String(item.value) === previous)) {
+    select.value = previous;
+  }
+}
+
+function populateBirthDateSelectors() {
+  setBirthDateOptions(birthDayInput, t("catalog.restricted.day"),
+    Array.from({ length: 31 }, (_, index) => ({ value: index + 1, label: index + 1 })));
+  const locale = currentLanguage === "pt" ? "pt-BR" : "en";
+  setBirthDateOptions(birthMonthInput, t("catalog.restricted.month"),
+    Array.from({ length: 12 }, (_, index) => ({
+      value: index + 1,
+      label: new Intl.DateTimeFormat(locale, { month: "long" }).format(new Date(2024, index, 1))
+    })));
+  const currentYear = new Date().getFullYear();
+  setBirthDateOptions(birthYearInput, t("catalog.restricted.year"),
+    Array.from({ length: currentYear - 1899 }, (_, index) => ({
+      value: currentYear - index,
+      label: currentYear - index
+    })));
+}
+
 function renderRestrictedAccess() {
   if (!restrictedAccessButton || !restrictedAccessForm || !restrictedAccessStatus) {
     return;
   }
+  populateBirthDateSelectors();
   restrictedAccessButton.textContent = t(restrictedAccessEnabled
     ? "catalog.restricted.disable"
     : "catalog.restricted.enable");
@@ -1004,11 +1001,10 @@ function normalizePublicationTags(tags) {
     throw new Error(t("publish.firstTag", { tags: OFFICIAL_LANGUAGE_TAGS.join(", ") }));
   }
   const contentTags = publicTags.slice(1);
-  const invalidTag = contentTags.find((tag) => !TYPE_TAGS.has(tag) && !GENRE_TAGS.has(tag) && !CLASSIFICATION_TAGS.has(tag));
+  const invalidTag = contentTags.find((tag) => !TYPE_TAGS.has(tag) && !CLASSIFICATION_TAGS.has(tag));
   if (invalidTag) {
     throw new Error(t("publish.nextTags", {
-      types: OFFICIAL_TYPE_TAGS.join(", "),
-      genres: OFFICIAL_GENRE_TAGS.join(", ")
+      types: OFFICIAL_TYPE_TAGS.join(", ")
     }));
   }
   const typeTags = contentTags.filter((tag) => TYPE_TAGS.has(tag));
@@ -1018,16 +1014,8 @@ function normalizePublicationTags(tags) {
   if (typeTags.length > MAX_TYPE_TAGS) {
     throw new Error(t("publish.typeLimit"));
   }
-  const genreTags = contentTags.filter((tag) => GENRE_TAGS.has(tag));
-  if (genreTags.length > MAX_GENRE_TAGS) {
-    throw new Error(t("publish.genreLimit"));
-  }
-  const firstGenreIndex = contentTags.findIndex((tag) => GENRE_TAGS.has(tag));
-  if (firstGenreIndex >= 0 && contentTags.slice(firstGenreIndex + 1).some((tag) => TYPE_TAGS.has(tag))) {
-    throw new Error(t("publish.genreAfterType"));
-  }
   const firstClassificationIndex = contentTags.findIndex((tag) => CLASSIFICATION_TAGS.has(tag));
-  if (firstClassificationIndex >= 0 && contentTags.slice(firstClassificationIndex + 1).some((tag) => TYPE_TAGS.has(tag) || GENRE_TAGS.has(tag))) {
+  if (firstClassificationIndex >= 0 && contentTags.slice(firstClassificationIndex + 1).some((tag) => TYPE_TAGS.has(tag))) {
     throw new Error(t("publish.classificationLast"));
   }
   return output;
@@ -1134,7 +1122,6 @@ function renderTagFilters(tags) {
   availableTags = uniqueTags([
     OFFICIAL_LANGUAGE_TAGS,
     OFFICIAL_TYPE_TAGS,
-    OFFICIAL_GENRE_TAGS,
     restrictedAccessEnabled ? OFFICIAL_CLASSIFICATION_TAGS : [],
     restrictedAccessEnabled ? tags : tags.filter((tag) => tag !== "adult")
   ]);
@@ -1145,13 +1132,11 @@ function renderTagFilters(tags) {
   }
   const languageTags = OFFICIAL_LANGUAGE_TAGS;
   const contentTags = OFFICIAL_TYPE_TAGS;
-  const genreTags = OFFICIAL_GENRE_TAGS;
   const classificationTags = OFFICIAL_CLASSIFICATION_TAGS;
   tagFilter.innerHTML = availableTags.length
     ? [
       renderTagGroup(t("catalog.language"), languageTags),
       renderTagGroup(t("catalog.type"), contentTags),
-      renderTagGroup(t("catalog.genre"), genreTags),
       restrictedAccessEnabled ? renderTagGroup(t("catalog.classification"), classificationTags) : ""
     ].join("")
     : `<p class="filter-status">${escapeHtml(t("catalog.noTags"))}</p>`;

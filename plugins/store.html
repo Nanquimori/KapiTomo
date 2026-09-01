@@ -1313,21 +1313,21 @@
           <div class="restricted-access">
             <div class="restricted-access-head">
               <div>
-                <p class="kicker" data-i18n="catalog.restricted.title">Restricted content</p>
-                <p id="restrictedAccessStatus" class="restricted-access-status" aria-live="polite">Restricted plugins are hidden.</p>
+                <p class="kicker" data-i18n="catalog.restricted.title">Adult plugins (18+)</p>
+                <p id="restrictedAccessStatus" class="restricted-access-status" aria-live="polite">Plugins classified as 18+ are hidden until you verify your age.</p>
               </div>
-              <button id="restrictedAccessButton" class="button" type="button" aria-controls="restrictedAccessForm" aria-expanded="false">Review access</button>
+              <button id="restrictedAccessButton" class="button" type="button" aria-controls="restrictedAccessForm" aria-expanded="false">Verify age</button>
             </div>
             <form id="restrictedAccessForm" class="restricted-access-form" hidden>
-              <p data-i18n="catalog.restricted.prompt">Enter your date of birth. Access is available only to people aged 18 or older.</p>
+              <p data-i18n="catalog.restricted.prompt">Select your date of birth. You must be at least 18 years old to view adult plugins.</p>
               <div class="birth-date-fields">
-                <label><span data-i18n="catalog.restricted.day">Day</span><input id="birthDayInput" class="birth-date-input" type="number" inputmode="numeric" min="1" max="31" autocomplete="bday-day" required></label>
-                <label><span data-i18n="catalog.restricted.month">Month</span><input id="birthMonthInput" class="birth-date-input" type="number" inputmode="numeric" min="1" max="12" autocomplete="bday-month" required></label>
-                <label><span data-i18n="catalog.restricted.year">Year</span><input id="birthYearInput" class="birth-date-input" type="number" inputmode="numeric" min="1900" max="9999" autocomplete="bday-year" required></label>
+                <label><span data-i18n="catalog.restricted.day">Day</span><select id="birthDayInput" class="birth-date-input" autocomplete="bday-day" required></select></label>
+                <label><span data-i18n="catalog.restricted.month">Month</span><select id="birthMonthInput" class="birth-date-input" autocomplete="bday-month" required></select></label>
+                <label><span data-i18n="catalog.restricted.year">Year</span><select id="birthYearInput" class="birth-date-input" autocomplete="bday-year" required></select></label>
               </div>
-              <p data-i18n="catalog.restricted.privacy">Your date of birth is checked only in this browser and is not saved or sent.</p>
+              <p data-i18n="catalog.restricted.privacy">KapiTomo checks the selected date only in this browser. It does not save or send your birth date.</p>
               <div class="restricted-form-actions">
-                <button id="confirmRestrictedAccessButton" class="button primary" type="submit" data-i18n="catalog.restricted.confirm">Verify age and enable</button>
+                <button id="confirmRestrictedAccessButton" class="button primary" type="submit" data-i18n="catalog.restricted.confirm">Confirm age and show 18+ plugins</button>
                 <button id="cancelRestrictedAccessButton" class="button" type="button" data-i18n="catalog.restricted.cancel">Cancel</button>
               </div>
             </form>
@@ -1466,6 +1466,6 @@
     <script src="report-config.js?v=20260901-secure-reports"></script>
     <script src="adult-access.js?v=20260901-age-gate"></script>
     <script src="catalog-pagination.js?v=20260901-pinned-official"></script>
-    <script src="store.js?v=20260901-age-gated-taxonomy"></script>
+    <script src="store.js?v=20260901-age-gated-types"></script>
   </body>
 </html>
