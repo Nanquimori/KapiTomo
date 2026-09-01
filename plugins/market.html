@@ -444,6 +444,72 @@
         gap: 5px;
       }
 
+      .restricted-access {
+        display: grid;
+        gap: 7px;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        padding: 8px 0;
+      }
+
+      .restricted-access-head,
+      .restricted-form-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 7px;
+      }
+
+      .restricted-access-status,
+      .restricted-access-form p {
+        margin: 2px 0 0;
+        color: var(--muted);
+        font-size: 0.68rem;
+      }
+
+      .restricted-access-status.is-error {
+        color: #ff9a9a;
+      }
+
+      .restricted-access-form {
+        display: grid;
+        gap: 7px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        padding: 9px;
+        background: rgba(255, 255, 255, 0.035);
+      }
+
+      .restricted-access-form[hidden] {
+        display: none;
+      }
+
+      .birth-date-fields {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(70px, 100px));
+        gap: 7px;
+      }
+
+      .birth-date-fields label {
+        display: grid;
+        gap: 3px;
+        color: var(--muted);
+        font-size: 0.66rem;
+        font-weight: 850;
+      }
+
+      .birth-date-input {
+        width: 100%;
+        min-height: 34px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 0 8px;
+        background: #17121d;
+        color: var(--text);
+        font: inherit;
+      }
+
       .tag-filter-legend {
         display: flex;
         flex-wrap: wrap;
@@ -1244,6 +1310,28 @@
             KapiTomo lists the catalog entry and moderates it under the catalog rules.
           </p>
           <p class="catalog-policy-link"><a href="../terms/#plugin-catalog-rules" data-i18n="catalog.rulesLink">Read the catalog rules</a></p>
+          <div class="restricted-access">
+            <div class="restricted-access-head">
+              <div>
+                <p class="kicker" data-i18n="catalog.restricted.title">Restricted content</p>
+                <p id="restrictedAccessStatus" class="restricted-access-status" aria-live="polite">Restricted plugins are hidden.</p>
+              </div>
+              <button id="restrictedAccessButton" class="button" type="button" aria-controls="restrictedAccessForm" aria-expanded="false">Review access</button>
+            </div>
+            <form id="restrictedAccessForm" class="restricted-access-form" hidden>
+              <p data-i18n="catalog.restricted.prompt">Enter your date of birth. Access is available only to people aged 18 or older.</p>
+              <div class="birth-date-fields">
+                <label><span data-i18n="catalog.restricted.day">Day</span><input id="birthDayInput" class="birth-date-input" type="number" inputmode="numeric" min="1" max="31" autocomplete="bday-day" required></label>
+                <label><span data-i18n="catalog.restricted.month">Month</span><input id="birthMonthInput" class="birth-date-input" type="number" inputmode="numeric" min="1" max="12" autocomplete="bday-month" required></label>
+                <label><span data-i18n="catalog.restricted.year">Year</span><input id="birthYearInput" class="birth-date-input" type="number" inputmode="numeric" min="1900" max="9999" autocomplete="bday-year" required></label>
+              </div>
+              <p data-i18n="catalog.restricted.privacy">Your date of birth is checked only in this browser and is not saved or sent.</p>
+              <div class="restricted-form-actions">
+                <button id="confirmRestrictedAccessButton" class="button primary" type="submit" data-i18n="catalog.restricted.confirm">Verify age and enable</button>
+                <button id="cancelRestrictedAccessButton" class="button" type="button" data-i18n="catalog.restricted.cancel">Cancel</button>
+              </div>
+            </form>
+          </div>
           <div class="filter-head">
             <div>
               <p class="kicker" data-i18n="catalog.categories">Categories</p>
@@ -1376,7 +1464,8 @@
       </section>
     </main>
     <script src="report-config.js?v=20260901-secure-reports"></script>
+    <script src="adult-access.js?v=20260901-age-gate"></script>
     <script src="catalog-pagination.js?v=20260901-pinned-official"></script>
-    <script src="store.js?v=20260901-expanded-taxonomy"></script>
+    <script src="store.js?v=20260901-age-gated-taxonomy"></script>
   </body>
 </html>
