@@ -53,9 +53,56 @@
     return output;
   }
 
-  root.KapiTomoPagination = Object.freeze({
+  function isOfficialPlugin(plugin) {
+    return Array.isArray(plugin && plugin.tags) && plugin.tags.includes("official");
+  }
+
+  function publicationTimestamp(plugin) {
+    const timestamp = Date.parse(String(plugin && plugin.published_at || ""));
+    return Number.isFinite(timestamp) ? timestamp : 0;
+  }
+
+  function comparePluginNames(first, second) {
+    return String(first && (first.name || first.id) || "")
+      .localeCompare(String(second && (second.name || second.id) || ""), "pt-BR");
+  }
+
+  function sortCommunityPluginsNewestFirst(plugins) {
+    return (Array.isArray(plugins) ? plugins : []).slice().sort((first, second) => {
+      const dateDifference = publicationTimestamp(second) - publicationTimestamp(first);
+      return dateDifference || comparePluginNames(first, second);
+    });
+  }
+
+  function partitionCatalogPlugins(plugins) {
+    const official = [];
+    const community = [];
+    (Array.isArray(plugins) ? plugins : []).forEach((plugin) => {
+      (isOfficialPlugin(plugin) ? official : community).push(plugin);
+    });
+    return {
+      official: official.sort(comparePluginNames),
+      community: sortCommunityPluginsNewestFirst(community)
+    };
+  }
+
+  function sortCatalogPlugins(plugins) {
+    const partitioned = partitionCatalogPlugins(plugins);
+    return [...partitioned.official, ...partitioned.community];
+  }
+
+  const api = Object.freeze({
     DEFAULT_PAGE_SIZE,
     paginate,
-    visiblePageItems
+    visiblePageItems,
+    isOfficialPlugin,
+    sortCommunityPluginsNewestFirst,
+    partitionCatalogPlugins,
+    sortCatalogPlugins
   });
+
+  root.KapiTomoPagination = api;
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = api;
+  }
 })(globalThis);

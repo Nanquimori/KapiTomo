@@ -23,6 +23,8 @@ const tagFilterStatus = document.getElementById("tagFilterStatus");
 const pluginSearchInput = document.getElementById("pluginSearchInput");
 const favoritesOnlyButton = document.getElementById("favoritesOnlyButton");
 const catalogPagination = document.getElementById("catalogPagination");
+const officialCatalogSection = document.getElementById("officialCatalogSection");
+const officialPluginList = document.getElementById("officialPluginList");
 const viewButtons = Array.from(document.querySelectorAll("[data-view-target]"));
 const viewPanels = Array.from(document.querySelectorAll("[data-view-panel]"));
 const languageButtons = Array.from(document.querySelectorAll("[data-language-option]"));
@@ -30,7 +32,7 @@ const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
 const REPORT_HISTORY_KEY = "kapitomo.reportHistory.v1";
-const CATALOG_VERSION = "20260901-secure-reports";
+const CATALOG_VERSION = "20260901-pinned-official";
 const REPORT_CONFIG = globalThis.KAPITOMO_REPORT_CONFIG || {};
 const REPORT_ENDPOINT = String(REPORT_CONFIG.endpoint || "").trim();
 const REPORT_TURNSTILE_SITE_KEY = String(REPORT_CONFIG.turnstileSiteKey || "").trim();
@@ -95,6 +97,9 @@ const I18N = {
       tagIncluded: "Include tag",
       tagExcluded: "Exclude tag",
       loading: "Loading catalog...",
+      officialPlugin: "Official plugin",
+      officialBadge: "Official",
+      communityPlugins: "Community plugins",
       paginationLabel: "Catalog pages",
       previousPage: "Previous",
       nextPage: "Next",
@@ -103,9 +108,10 @@ const I18N = {
       choosePage: "Choose a catalog page",
       goToPage: "Go to page {page}",
       currentPage: "Page {page}, current page",
-      showing: "Showing plugins {start}-{end} of {total}.",
+      showing: "Showing community plugins {start}-{end} of {total}.",
       noTags: "No tags available yet.",
       noPlugins: "No plugins published yet.",
+      noCommunityPlugins: "No community plugins published yet.",
       noMatches: "No plugins match the selected tags.",
       matching: "{count} plugin{plural} matching {filters}.",
       loadError: "Could not load the catalog: {message}",
@@ -263,6 +269,9 @@ const I18N = {
       tagIncluded: "Incluir tag",
       tagExcluded: "Excluir tag",
       loading: "Carregando catálogo...",
+      officialPlugin: "Plugin oficial",
+      officialBadge: "Oficial",
+      communityPlugins: "Plugins da comunidade",
       paginationLabel: "Páginas do catálogo",
       previousPage: "Anterior",
       nextPage: "Próxima",
@@ -271,9 +280,10 @@ const I18N = {
       choosePage: "Escolha uma página do catálogo",
       goToPage: "Ir para a página {page}",
       currentPage: "Página {page}, página atual",
-      showing: "Exibindo plugins {start}-{end} de {total}.",
+      showing: "Exibindo plugins da comunidade {start}-{end} de {total}.",
       noTags: "Nenhuma tag disponível ainda.",
       noPlugins: "Nenhum plugin publicado ainda.",
+      noCommunityPlugins: "Nenhum plugin da comunidade foi publicado ainda.",
       noMatches: "Nenhum plugin combina com as tags selecionadas.",
       matching: "{count} plugin{plural} encontrado{plural} para {filters}.",
       loadError: "Não foi possível carregar o catálogo: {message}",
@@ -410,6 +420,7 @@ const I18N = {
   }
 };
 let renderedPlugins = [];
+let pinnedOfficialPlugins = [];
 let allPlugins = [];
 let availableTags = [];
 let selectedTags = [];
@@ -910,7 +921,7 @@ function setTagStatus(filteredCount) {
     return;
   }
   if (!allPlugins.length) {
-    tagFilterStatus.textContent = t("catalog.noPlugins");
+    tagFilterStatus.textContent = "";
     return;
   }
   if (!selectedTags.length && !excludedTags.length && !favoritesOnly && !searchQuery.trim()) {
@@ -1117,9 +1128,9 @@ function updateFavoritesOnlyButton() {
   favoritesOnlyButton.textContent = favoritesOnly ? t("catalog.showAll") : t("catalog.favoriteOnly");
 }
 
-function renderPlugins(plugins) {
-  renderedPlugins = plugins;
-  list.innerHTML = plugins.length ? plugins.map((plugin, index) => {
+function pluginCardsHtml(plugins, indexOffset = 0) {
+  return plugins.map((plugin, localIndex) => {
+    const index = indexOffset + localIndex;
     const tags = displayTags(plugin.tags);
     const favorite = isFavoritePlugin(plugin);
     const actions = [
@@ -1135,7 +1146,7 @@ function renderPlugins(plugins) {
       actions.push(`<button class="button" type="button" data-report-plugin="${index}">${escapeHtml(t("catalog.report"))}</button>`);
     }
     return `
-      <article class="plugin-card">
+      <article class="plugin-card${globalThis.KapiTomoPagination.isOfficialPlugin(plugin) ? " is-official" : ""}">
         <button class="favorite-button${favorite ? " is-active" : ""}" type="button" data-favorite-plugin="${index}" aria-pressed="${favorite ? "true" : "false"}" aria-label="${escapeHtml(t("catalog.favorite"))}"></button>
         <img class="plugin-icon" src="${escapeHtml(plugin.icon_url)}" alt="">
         <div class="plugin-copy">
@@ -1145,6 +1156,7 @@ function renderPlugins(plugins) {
             ${plugin.version ? `<span>v${escapeHtml(plugin.version)}</span>` : ""}
           </div>
         </div>
+        ${globalThis.KapiTomoPagination.isOfficialPlugin(plugin) ? `<span class="official-badge">${escapeHtml(t("catalog.officialBadge"))}</span>` : ""}
         <span class="site-status ${escapeHtml(siteStatusClass(plugin))}">${escapeHtml(siteStatusLabel(plugin))}</span>
         ${tags.length ? `<div class="tag-list">${tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>` : ""}
         <div class="plugin-actions">
@@ -1152,7 +1164,18 @@ function renderPlugins(plugins) {
         </div>
       </article>
     `;
-  }).join("") : `<p>${selectedTags.length || excludedTags.length || favoritesOnly || searchQuery.trim() ? escapeHtml(t("catalog.noMatches")) : escapeHtml(t("catalog.noPlugins"))}</p>`;
+  }).join("");
+}
+
+function renderPlugins(plugins) {
+  renderedPlugins = [...pinnedOfficialPlugins, ...plugins];
+  if (officialCatalogSection && officialPluginList) {
+    officialCatalogSection.hidden = !pinnedOfficialPlugins.length;
+    officialPluginList.innerHTML = pluginCardsHtml(pinnedOfficialPlugins);
+  }
+  list.innerHTML = plugins.length
+    ? pluginCardsHtml(plugins, pinnedOfficialPlugins.length)
+    : `<p>${selectedTags.length || excludedTags.length || favoritesOnly || searchQuery.trim() ? escapeHtml(t("catalog.noMatches")) : escapeHtml(t("catalog.noCommunityPlugins"))}</p>`;
   document.querySelectorAll("[data-install-plugin]").forEach((button) => {
     button.addEventListener("click", () => installPlugin(renderedPlugins[Number(button.dataset.installPlugin)]));
   });
@@ -1186,7 +1209,12 @@ function loadAllPlugins() {
         if (drafts.length !== savedDrafts.length) {
           saveDraftPlugins(drafts);
         }
-        allPlugins = uniquePlugins([availableCatalogPlugins, drafts.map((plugin) => ({ ...plugin, __source: "draft" }))]);
+        const partitionedCatalog = globalThis.KapiTomoPagination.partitionCatalogPlugins(availableCatalogPlugins);
+        pinnedOfficialPlugins = partitionedCatalog.official;
+        allPlugins = uniquePlugins([
+          drafts.map((plugin) => ({ ...plugin, __source: "draft" })),
+          partitionedCatalog.community
+        ]);
         const catalogTags = uniqueTags([
           allPlugins.flatMap((plugin) => filterTags(plugin.tags))
         ]);
@@ -1195,11 +1223,15 @@ function loadAllPlugins() {
       });
     })
     .catch((error) => {
+      pinnedOfficialPlugins = [];
       filteredCatalogPlugins = [];
       currentCatalogPage = 1;
       if (catalogPagination) {
         catalogPagination.hidden = true;
         catalogPagination.innerHTML = "";
+      }
+      if (officialCatalogSection) {
+        officialCatalogSection.hidden = true;
       }
       list.innerHTML = `<p>${escapeHtml(t("catalog.loadError", { message: error.message }))}</p>`;
     });
