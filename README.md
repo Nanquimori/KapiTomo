@@ -111,7 +111,8 @@ Public plugin entries include:
 - `repository_url`, `repository_ref`, and `plugin_path` for installation.
 - `hosts` to prevent duplicate visible plugins for the same site.
 - `status`, shown as `Online` or `Offline` in the Hub.
-- official tags only: one language first, then one to three content types.
+- official tags only: one language first, then one to three reading formats (`manga`, `manhua`, `manhwa`, `novel`, `light-novel`, `web-novel`, `webtoon`, `comic`, `graphic-novel`, `one-shot`, `doujinshi`, or `other`).
+- optional `adult` classification last for sources that expose +18 material through the plugin. It is separate from the reading format, and genre/subgenre tags are not accepted.
 
 Publishing is automatic after validation:
 

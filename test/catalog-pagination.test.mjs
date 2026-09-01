@@ -91,6 +91,55 @@ test("allows only maintainers to place a plugin in the official section", () => 
   assert.doesNotThrow(() => pluginHubAction.requireOfficialAuthorization(community, null, false));
 });
 
+test("supports reading formats, other, and a separate +18 classification", () => {
+  assert.deepEqual(pluginHubAction.OFFICIAL_TYPE_TAGS, [
+    "manga",
+    "manhua",
+    "manhwa",
+    "novel",
+    "light-novel",
+    "web-novel",
+    "webtoon",
+    "comic",
+    "graphic-novel",
+    "one-shot",
+    "doujinshi",
+    "other"
+  ]);
+  assert.deepEqual(pluginHubAction.OFFICIAL_CLASSIFICATION_TAGS, ["adult"]);
+  assert.deepEqual(
+    pluginHubAction.normalizeTags(["community", "portuguese", "other", "adult"]),
+    ["community", "portuguese", "other", "adult"]
+  );
+});
+
+test("rejects subgenres and keeps the +18 classification after formats", () => {
+  assert.deepEqual(
+    pluginHubAction.normalizeTags(["community", "portuguese", "manga", "romance", "adult"]),
+    ["community", "portuguese", "manga", "adult"]
+  );
+  assert.throws(
+    () => pluginHubAction.normalizeTags(["community", "portuguese", "adult", "manga"]),
+    /classification tags must appear after content types/
+  );
+  assert.throws(
+    () => pluginHubAction.normalizeTags(["community", "portuguese", "manga", "manhua", "manhwa", "comic"]),
+    /at most 3 content types/
+  );
+});
+
+test("keeps catalog taxonomy metadata synchronized with automation", () => {
+  const catalogs = ["catalog-store.json", "catalog.json"]
+    .map((name) => JSON.parse(fs.readFileSync(path.join(projectRoot, "plugins", name), "utf8")));
+  catalogs.forEach((catalog) => {
+    assert.deepEqual(catalog.official_tags.languages, pluginHubAction.OFFICIAL_LANGUAGE_TAGS);
+    assert.deepEqual(catalog.official_tags.types, pluginHubAction.OFFICIAL_TYPE_TAGS);
+    assert.deepEqual(catalog.official_tags.classifications, pluginHubAction.OFFICIAL_CLASSIFICATION_TAGS);
+    assert.equal(catalog.catalog_revision, "20260901-expanded-taxonomy");
+  });
+  assert.deepEqual(catalogs[1], catalogs[0]);
+});
+
 test("keeps every Plugin Hub page identical and loads pagination before the store", () => {
   const pages = ["index.html", "hub.html", "market.html", "store.html"]
     .map((name) => fs.readFileSync(path.join(projectRoot, "plugins", name), "utf8"));
@@ -99,6 +148,6 @@ test("keeps every Plugin Hub page identical and loads pagination before the stor
   assert.match(pages[0], /id="officialPluginList"/);
   assert.match(pages[0], /id="catalogPagination"/);
   assert.match(pages[0], /catalog-pagination\.js\?v=20260901-pinned-official/);
-  assert.match(pages[0], /store\.js\?v=20260901-pinned-official/);
+  assert.match(pages[0], /store\.js\?v=20260901-expanded-taxonomy/);
   assert.ok(pages[0].indexOf("catalog-pagination.js") < pages[0].indexOf("store.js"));
 });
