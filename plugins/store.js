@@ -32,7 +32,7 @@ const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
 const REPORT_HISTORY_KEY = "kapitomo.reportHistory.v1";
-const CATALOG_VERSION = "20260901-pinned-official";
+const CATALOG_VERSION = "20260901-expanded-taxonomy";
 const REPORT_CONFIG = globalThis.KAPITOMO_REPORT_CONFIG || {};
 const REPORT_ENDPOINT = String(REPORT_CONFIG.endpoint || "").trim();
 const REPORT_TURNSTILE_SITE_KEY = String(REPORT_CONFIG.turnstileSiteKey || "").trim();
@@ -44,7 +44,8 @@ const MIN_REPORT_WORDS = 20;
 let reportTurnstileWidgetId = null;
 let reportTurnstileToken = "";
 let reportTurnstileScriptPromise = null;
-const MAX_SELECTED_TAGS = 4;
+const MAX_PUBLIC_TAGS = 5;
+const MAX_TYPE_TAGS = 3;
 const MIN_PUBLIC_TAGS = 2;
 const OFFICIAL_LANGUAGE_TAGS = [
   "english",
@@ -67,12 +68,24 @@ const OFFICIAL_TYPE_TAGS = [
   "manhua",
   "manhwa",
   "novel",
+  "light-novel",
+  "web-novel",
   "webtoon",
-  "comic"
+  "comic",
+  "graphic-novel",
+  "one-shot",
+  "doujinshi",
+  "other"
 ];
+const OFFICIAL_CLASSIFICATION_TAGS = ["adult"];
 const LANGUAGE_TAGS = new Set(OFFICIAL_LANGUAGE_TAGS);
 const TYPE_TAGS = new Set(OFFICIAL_TYPE_TAGS);
-const PUBLIC_TAGS = new Set([...OFFICIAL_LANGUAGE_TAGS, ...OFFICIAL_TYPE_TAGS]);
+const CLASSIFICATION_TAGS = new Set(OFFICIAL_CLASSIFICATION_TAGS);
+const PUBLIC_TAGS = new Set([
+  ...OFFICIAL_LANGUAGE_TAGS,
+  ...OFFICIAL_TYPE_TAGS,
+  ...OFFICIAL_CLASSIFICATION_TAGS
+]);
 const I18N = {
   en: {
     title: "KapiTomo | Plugin Hub",
@@ -117,6 +130,16 @@ const I18N = {
       loadError: "Could not load the catalog: {message}",
       language: "Language",
       type: "Type",
+      classification: "Classification",
+      tagLabels: {
+        "light-novel": "light novel",
+        "web-novel": "web novel",
+        "graphic-novel": "graphic novel",
+        "one-shot": "one-shot",
+        doujinshi: "doujinshi",
+        other: "other",
+        adult: "+18"
+      },
       favorite: "Favorite",
       favorites: "Favorites",
       favoriteOnly: "Favorites only",
@@ -203,7 +226,9 @@ const I18N = {
       repositoryLine: "Repository: {url}",
       tagMinimum: "plugin.json must declare at least 2 tags: language first, then type.",
       firstTag: "The first public tag must be one of: {tags}.",
-      nextTags: "After the language tag, every public tag must be one of: {tags}.",
+      nextTags: "After the language tag, use one to three types from: {tags}. You may add adult last as an optional +18 classification.",
+      typeLimit: "Use no more than three content types.",
+      classificationLast: "The +18 classification must appear after the content types.",
       validUrl: "Paste a valid GitHub URL.",
       githubOnly: "Use a github.com repository.",
       ownerRepo: "The URL must include an owner and repository.",
@@ -289,6 +314,16 @@ const I18N = {
       loadError: "Não foi possível carregar o catálogo: {message}",
       language: "Idioma",
       type: "Tipo",
+      classification: "Classificação",
+      tagLabels: {
+        "light-novel": "light novel",
+        "web-novel": "web novel",
+        "graphic-novel": "graphic novel",
+        "one-shot": "one-shot",
+        doujinshi: "doujinshi",
+        other: "outros",
+        adult: "+18"
+      },
       favorite: "Favoritar",
       favorites: "Favoritos",
       favoriteOnly: "So favoritos",
@@ -375,7 +410,9 @@ const I18N = {
       repositoryLine: "Repositório: {url}",
       tagMinimum: "plugin.json precisa declarar pelo menos 2 tags: idioma primeiro, depois tipo.",
       firstTag: "A primeira tag pública precisa ser uma destas: {tags}.",
-      nextTags: "Depois da tag de idioma, toda tag pública precisa ser uma destas: {tags}.",
+      nextTags: "Depois da tag de idioma, use de um a três tipos entre: {tags}. Você pode adicionar adult por último como classificação opcional +18.",
+      typeLimit: "Use no máximo três tipos de conteúdo.",
+      classificationLast: "A classificação +18 deve aparecer depois dos tipos de conteúdo.",
       validUrl: "Cole uma URL válida do GitHub.",
       githubOnly: "Use um repositório github.com.",
       ownerRepo: "A URL precisa incluir usuário e repositório.",
@@ -761,7 +798,7 @@ function displayTags(tags) {
   return (Array.isArray(tags) ? tags : [])
     .map((tag) => String(tag || "").trim().toLowerCase())
     .filter((tag) => PUBLIC_TAGS.has(tag))
-    .slice(0, 4);
+    .slice(0, MAX_PUBLIC_TAGS);
 }
 
 function filterTags(tags) {
@@ -784,7 +821,7 @@ function normalizePublicationTags(tags) {
         return;
       }
       const publicCount = output.filter((item) => item !== "official" && item !== "community").length;
-      if (publicCount >= MAX_SELECTED_TAGS) {
+      if (publicCount >= MAX_PUBLIC_TAGS) {
         return;
       }
     }
@@ -798,9 +835,21 @@ function normalizePublicationTags(tags) {
   if (!isLanguageTag(publicTags[0])) {
     throw new Error(t("publish.firstTag", { tags: OFFICIAL_LANGUAGE_TAGS.join(", ") }));
   }
-  const invalidType = publicTags.slice(1).find((tag) => !TYPE_TAGS.has(tag));
-  if (invalidType) {
+  const contentTags = publicTags.slice(1);
+  const invalidTag = contentTags.find((tag) => !TYPE_TAGS.has(tag) && !CLASSIFICATION_TAGS.has(tag));
+  if (invalidTag) {
     throw new Error(t("publish.nextTags", { tags: OFFICIAL_TYPE_TAGS.join(", ") }));
+  }
+  const typeTags = contentTags.filter((tag) => TYPE_TAGS.has(tag));
+  if (!typeTags.length) {
+    throw new Error(t("publish.tagMinimum"));
+  }
+  if (typeTags.length > MAX_TYPE_TAGS) {
+    throw new Error(t("publish.typeLimit"));
+  }
+  const firstClassificationIndex = contentTags.findIndex((tag) => CLASSIFICATION_TAGS.has(tag));
+  if (firstClassificationIndex >= 0 && contentTags.slice(firstClassificationIndex + 1).some((tag) => TYPE_TAGS.has(tag))) {
+    throw new Error(t("publish.classificationLast"));
   }
   return output;
 }
@@ -881,7 +930,13 @@ function renderTagButton(tag) {
     active ? "is-active" : "",
     excluded ? "is-excluded" : ""
   ].filter(Boolean).join(" ");
-  return `<button class="${className}" type="button" data-filter-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</button>`;
+  return `<button class="${className}" type="button" data-filter-tag="${escapeHtml(tag)}">${escapeHtml(tagLabel(tag))}</button>`;
+}
+
+function tagLabel(tag) {
+  const key = `catalog.tagLabels.${tag}`;
+  const localized = t(key);
+  return localized === key ? tag : localized;
 }
 
 function renderTagGroup(title, tags) {
@@ -897,7 +952,12 @@ function renderTagGroup(title, tags) {
 }
 
 function renderTagFilters(tags) {
-  availableTags = uniqueTags([OFFICIAL_LANGUAGE_TAGS, OFFICIAL_TYPE_TAGS, tags]);
+  availableTags = uniqueTags([
+    OFFICIAL_LANGUAGE_TAGS,
+    OFFICIAL_TYPE_TAGS,
+    OFFICIAL_CLASSIFICATION_TAGS,
+    tags
+  ]);
   selectedTags = selectedTags.filter((tag) => availableTags.includes(tag));
   excludedTags = excludedTags.filter((tag) => availableTags.includes(tag) && !selectedTags.includes(tag));
   if (!tagFilter) {
@@ -905,10 +965,12 @@ function renderTagFilters(tags) {
   }
   const languageTags = OFFICIAL_LANGUAGE_TAGS;
   const contentTags = OFFICIAL_TYPE_TAGS;
+  const classificationTags = OFFICIAL_CLASSIFICATION_TAGS;
   tagFilter.innerHTML = availableTags.length
     ? [
       renderTagGroup(t("catalog.language"), languageTags),
-      renderTagGroup(t("catalog.type"), contentTags)
+      renderTagGroup(t("catalog.type"), contentTags),
+      renderTagGroup(t("catalog.classification"), classificationTags)
     ].join("")
     : `<p class="filter-status">${escapeHtml(t("catalog.noTags"))}</p>`;
   tagFilter.querySelectorAll("[data-filter-tag]").forEach((button) => {
@@ -1158,7 +1220,7 @@ function pluginCardsHtml(plugins, indexOffset = 0) {
         </div>
         ${globalThis.KapiTomoPagination.isOfficialPlugin(plugin) ? `<span class="official-badge">${escapeHtml(t("catalog.officialBadge"))}</span>` : ""}
         <span class="site-status ${escapeHtml(siteStatusClass(plugin))}">${escapeHtml(siteStatusLabel(plugin))}</span>
-        ${tags.length ? `<div class="tag-list">${tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>` : ""}
+        ${tags.length ? `<div class="tag-list">${tags.map((tag) => `<span>${escapeHtml(tagLabel(tag))}</span>`).join("")}</div>` : ""}
         <div class="plugin-actions">
           ${actions.join("")}
         </div>
