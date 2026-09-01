@@ -550,6 +550,96 @@
         gap: 7px;
       }
 
+      .catalog-pagination {
+        grid-column: 1 / -1;
+        width: 100%;
+        display: grid;
+        gap: 7px;
+        margin-top: 4px;
+        border-top: 1px solid var(--line);
+        padding-top: 10px;
+      }
+
+      .catalog-pagination[hidden] {
+        display: none;
+      }
+
+      .pagination-summary {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.72rem;
+        font-weight: 750;
+      }
+
+      .pagination-controls,
+      .pagination-numbers,
+      .pagination-picker {
+        display: flex;
+        align-items: center;
+      }
+
+      .pagination-controls {
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .pagination-numbers {
+        max-width: 100%;
+        gap: 4px;
+        overflow-x: auto;
+      }
+
+      .pagination-direction,
+      .pagination-number {
+        min-width: 32px;
+        min-height: 30px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 4px 8px;
+        background: rgba(255, 255, 255, 0.045);
+        color: var(--text);
+        font: inherit;
+        font-size: 0.7rem;
+        font-weight: 850;
+        cursor: pointer;
+      }
+
+      .pagination-number.is-current {
+        border-color: var(--accent);
+        background: var(--accent);
+        color: #211400;
+      }
+
+      .pagination-direction:disabled,
+      .pagination-number:disabled {
+        cursor: default;
+        opacity: 0.5;
+      }
+
+      .pagination-ellipsis {
+        min-width: 18px;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      .pagination-picker {
+        gap: 5px;
+        color: var(--muted);
+        font-size: 0.68rem;
+        font-weight: 800;
+      }
+
+      .pagination-picker select {
+        min-height: 30px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 3px 7px;
+        background: #17121d;
+        color: var(--text);
+        font: inherit;
+        font-weight: 850;
+      }
+
       .plugin-card {
         position: relative;
         min-width: 0;
@@ -798,6 +888,11 @@
         overflow: hidden !important;
       }
 
+      .report-challenge {
+        min-height: 65px;
+        margin-top: 2px;
+      }
+
       .confirmation-row {
         display: grid;
         grid-template-columns: auto minmax(0, 1fr);
@@ -946,6 +1041,24 @@
           grid-template-columns: repeat(2, minmax(0, calc((100vw - 22px) / 2)));
           justify-content: start;
           gap: 6px;
+        }
+
+        .catalog-pagination {
+          width: calc(100vw - 16px);
+        }
+
+        .pagination-summary {
+          text-align: center;
+        }
+
+        .pagination-controls {
+          justify-content: center;
+        }
+
+        .pagination-picker {
+          flex: 1 0 100%;
+          justify-content: center;
+          order: 2;
         }
 
         .plugin-card {
@@ -1105,6 +1218,7 @@
         <div id="pluginList" class="plugin-list" aria-live="polite">
           <p data-i18n="catalog.loading">Loading catalog...</p>
         </div>
+        <nav id="catalogPagination" class="catalog-pagination" aria-label="Catalog pages" data-i18n-aria="catalog.paginationLabel" hidden></nav>
       </section>
 
       <section id="publishPanel" class="panel view-panel" data-view-panel="publish" hidden>
@@ -1173,6 +1287,7 @@
             <span data-i18n="report.confirmation">I confirm that I have read the guidance above and that the information I provided is true to the best of my knowledge.</span>
           </label>
           <label class="honeypot-field" aria-hidden="true">Website <input id="reportWebsiteInput" type="text" tabindex="-1" autocomplete="off"></label>
+          <div id="reportChallenge" class="report-challenge" data-i18n-aria="report.securityVerification" aria-label="Security verification"></div>
           <button id="requestReportPluginButton" class="button primary" type="button" data-i18n="report.request">Send report</button>
           <p id="reportStatus" class="publish-status" aria-live="polite"></p>
         </div>
@@ -1209,6 +1324,8 @@
         </div>
       </section>
     </main>
-    <script src="store.js?v=20260826-report-copy"></script>
+    <script src="report-config.js?v=20260901-secure-reports"></script>
+    <script src="catalog-pagination.js?v=20260901-pagination"></script>
+    <script src="store.js?v=20260901-pagination"></script>
   </body>
 </html>

@@ -1,0 +1,8 @@
+* @Nanquimori
+
+# Security-sensitive publication and delivery paths.
+/.github/ @Nanquimori
+/tools/plugin-hub-action.js @Nanquimori
+/plugins/ @Nanquimori
+/report-worker/ @Nanquimori
+/SECURITY.md @Nanquimori

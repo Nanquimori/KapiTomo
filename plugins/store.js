@@ -13,6 +13,7 @@ const reportDetailsInput = document.getElementById("reportDetailsInput");
 const reportDetailsCount = document.getElementById("reportDetailsCount");
 const reportConfirmationInput = document.getElementById("reportConfirmationInput");
 const reportWebsiteInput = document.getElementById("reportWebsiteInput");
+const reportChallenge = document.getElementById("reportChallenge");
 const requestReportPluginButton = document.getElementById("requestReportPluginButton");
 const reportStatus = document.getElementById("reportStatus");
 const reportCreatorHelp = document.getElementById("reportCreatorHelp");
@@ -21,6 +22,7 @@ const tagFilter = document.getElementById("tagFilter");
 const tagFilterStatus = document.getElementById("tagFilterStatus");
 const pluginSearchInput = document.getElementById("pluginSearchInput");
 const favoritesOnlyButton = document.getElementById("favoritesOnlyButton");
+const catalogPagination = document.getElementById("catalogPagination");
 const viewButtons = Array.from(document.querySelectorAll("[data-view-target]"));
 const viewPanels = Array.from(document.querySelectorAll("[data-view-panel]"));
 const languageButtons = Array.from(document.querySelectorAll("[data-language-option]"));
@@ -28,13 +30,18 @@ const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
 const REPORT_HISTORY_KEY = "kapitomo.reportHistory.v1";
-const CATALOG_VERSION = "20260826-report-copy";
-const REPORT_EMAIL = "nanquimori@gmail.com";
-const REPORT_ENDPOINT = `https://formsubmit.co/ajax/${REPORT_EMAIL}`;
+const CATALOG_VERSION = "20260901-secure-reports";
+const REPORT_CONFIG = globalThis.KAPITOMO_REPORT_CONFIG || {};
+const REPORT_ENDPOINT = String(REPORT_CONFIG.endpoint || "").trim();
+const REPORT_TURNSTILE_SITE_KEY = String(REPORT_CONFIG.turnstileSiteKey || "").trim();
+const TURNSTILE_SCRIPT_URL = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 const REPORT_DUPLICATE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
 const MAX_REPORT_HISTORY = 100;
 const MIN_REPORT_DETAILS = 200;
 const MIN_REPORT_WORDS = 20;
+let reportTurnstileWidgetId = null;
+let reportTurnstileToken = "";
+let reportTurnstileScriptPromise = null;
 const MAX_SELECTED_TAGS = 4;
 const MIN_PUBLIC_TAGS = 2;
 const OFFICIAL_LANGUAGE_TAGS = [
@@ -88,6 +95,15 @@ const I18N = {
       tagIncluded: "Include tag",
       tagExcluded: "Exclude tag",
       loading: "Loading catalog...",
+      paginationLabel: "Catalog pages",
+      previousPage: "Previous",
+      nextPage: "Next",
+      page: "Page",
+      ofPages: "of {total}",
+      choosePage: "Choose a catalog page",
+      goToPage: "Go to page {page}",
+      currentPage: "Page {page}, current page",
+      showing: "Showing plugins {start}-{end} of {total}.",
       noTags: "No tags available yet.",
       noPlugins: "No plugins published yet.",
       noMatches: "No plugins match the selected tags.",
@@ -137,6 +153,11 @@ const I18N = {
       sent: "Report sent successfully. It will be reviewed by the Plugin Hub team. Thank you for helping us maintain a safe environment for the entire community.",
       duplicate: "This report has already been sent from this browser and is included in the review. Sending it again will not change the decision.",
       sendError: "The report could not be sent right now. Check your connection and try again in a few minutes.",
+      securityVerification: "Security verification",
+      serviceUnavailable: "Secure reporting is not configured right now. Please try again later.",
+      captchaRequired: "Complete the security verification before sending the report.",
+      captchaFailed: "The security verification failed or expired. Complete it again and retry.",
+      rateLimited: "Too many reports were sent from this connection. Wait a minute and try again.",
       confirmationLine: "Reporter confirmed that the guidance was read and the information is true to the best of their knowledge",
       rulesLine: "Catalog rules: https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules"
     },
@@ -242,6 +263,15 @@ const I18N = {
       tagIncluded: "Incluir tag",
       tagExcluded: "Excluir tag",
       loading: "Carregando catálogo...",
+      paginationLabel: "Páginas do catálogo",
+      previousPage: "Anterior",
+      nextPage: "Próxima",
+      page: "Página",
+      ofPages: "de {total}",
+      choosePage: "Escolha uma página do catálogo",
+      goToPage: "Ir para a página {page}",
+      currentPage: "Página {page}, página atual",
+      showing: "Exibindo plugins {start}-{end} de {total}.",
       noTags: "Nenhuma tag disponível ainda.",
       noPlugins: "Nenhum plugin publicado ainda.",
       noMatches: "Nenhum plugin combina com as tags selecionadas.",
@@ -291,6 +321,11 @@ const I18N = {
       sent: "Denúncia enviada com sucesso. Ela será analisada pela equipe do Plugin Hub. Agradecemos por nos ajudar a manter um ambiente seguro para toda a comunidade.",
       duplicate: "Esta denúncia já foi enviada neste navegador e está incluída na análise. Enviá-la novamente não muda a decisão.",
       sendError: "Não foi possível enviar a denúncia agora. Verifique sua conexão e tente novamente em alguns minutos.",
+      securityVerification: "Verificação de segurança",
+      serviceUnavailable: "O canal seguro de denúncias não está configurado no momento. Tente novamente mais tarde.",
+      captchaRequired: "Conclua a verificação de segurança antes de enviar a denúncia.",
+      captchaFailed: "A verificação de segurança falhou ou expirou. Faça-a novamente e tente outra vez.",
+      rateLimited: "Muitas denúncias foram enviadas por esta conexão. Aguarde um minuto e tente novamente.",
       confirmationLine: "O denunciante confirmou que leu as orientações e que as informações são verdadeiras conforme seu conhecimento",
       rulesLine: "Regras do catálogo: https://nanquimori.github.io/KapiTomo/terms/#regras-do-catalogo"
     },
@@ -382,6 +417,8 @@ let excludedTags = [];
 let favoritePluginKeys = loadFavoritePluginKeys();
 let favoritesOnly = false;
 let searchQuery = "";
+let filteredCatalogPlugins = [];
+let currentCatalogPage = 1;
 let currentLanguage = initialLanguage();
 
 function normalizeLanguage(value) {
@@ -521,6 +558,76 @@ function setReportStatus(message, state = "") {
     reportStatus.textContent = message || "";
     reportStatus.classList.toggle("is-success", state === "success");
     reportStatus.classList.toggle("is-error", state === "error");
+  }
+}
+
+function reportSecurityConfigured() {
+  try {
+    const endpoint = new URL(REPORT_ENDPOINT);
+    return endpoint.protocol === "https:"
+      && endpoint.hostname !== "formsubmit.co"
+      && Boolean(REPORT_TURNSTILE_SITE_KEY);
+  } catch {
+    return false;
+  }
+}
+
+function loadReportTurnstileScript() {
+  if (globalThis.turnstile?.render) {
+    return Promise.resolve();
+  }
+  if (reportTurnstileScriptPromise) {
+    return reportTurnstileScriptPromise;
+  }
+  reportTurnstileScriptPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = TURNSTILE_SCRIPT_URL;
+    script.async = true;
+    script.defer = true;
+    script.addEventListener("load", resolve, { once: true });
+    script.addEventListener("error", () => reject(new Error("turnstile_load_failed")), { once: true });
+    document.head.appendChild(script);
+  });
+  return reportTurnstileScriptPromise;
+}
+
+async function initializeReportChallenge() {
+  if (!reportChallenge || reportTurnstileWidgetId !== null) {
+    return;
+  }
+  if (!reportSecurityConfigured()) {
+    setReportStatus(t("report.serviceUnavailable"), "error");
+    return;
+  }
+  try {
+    await loadReportTurnstileScript();
+    reportTurnstileWidgetId = globalThis.turnstile.render(reportChallenge, {
+      sitekey: REPORT_TURNSTILE_SITE_KEY,
+      action: "plugin-report",
+      theme: "auto",
+      callback(token) {
+        reportTurnstileToken = String(token || "");
+        if (reportStatus?.classList.contains("is-error")) {
+          setReportStatus("");
+        }
+      },
+      "expired-callback"() {
+        reportTurnstileToken = "";
+      },
+      "error-callback"() {
+        reportTurnstileToken = "";
+        setReportStatus(t("report.captchaFailed"), "error");
+      }
+    });
+  } catch {
+    setReportStatus(t("report.serviceUnavailable"), "error");
+  }
+}
+
+function resetReportChallenge() {
+  reportTurnstileToken = "";
+  if (reportTurnstileWidgetId !== null && globalThis.turnstile?.reset) {
+    globalThis.turnstile.reset(reportTurnstileWidgetId);
   }
 }
 
@@ -709,6 +816,9 @@ function setActiveView(view) {
   viewButtons.forEach((button) => {
     button.classList.toggle("is-active", button.dataset.viewTarget === activeView);
   });
+  if (activeView === "report") {
+    initializeReportChallenge();
+  }
 }
 
 function pluginMatchesSelectedTags(plugin) {
@@ -827,15 +937,87 @@ function setTagStatus(filteredCount) {
   });
 }
 
-function applyTagFilters() {
-  const filtered = allPlugins.filter((plugin) => pluginMatchesSelectedTags(plugin)
+function renderCatalogPagination(model) {
+  if (!catalogPagination) {
+    return;
+  }
+  if (model.totalPages <= 1) {
+    catalogPagination.hidden = true;
+    catalogPagination.innerHTML = "";
+    return;
+  }
+
+  const pageButtons = globalThis.KapiTomoPagination.visiblePageItems(model.totalPages, model.page)
+    .map((item) => {
+      if (item === "ellipsis") {
+        return `<span class="pagination-ellipsis" aria-hidden="true">…</span>`;
+      }
+      const current = item === model.page;
+      return `<button class="pagination-number${current ? " is-current" : ""}" type="button" data-catalog-page="${item}"${current ? " aria-current=\"page\" disabled" : ""} aria-label="${escapeHtml(t(current ? "catalog.currentPage" : "catalog.goToPage", { page: item }))}">${item}</button>`;
+    })
+    .join("");
+  const pageOptions = Array.from({ length: model.totalPages }, (_, index) => index + 1)
+    .map((page) => `<option value="${page}"${page === model.page ? " selected" : ""}>${page}</option>`)
+    .join("");
+
+  catalogPagination.hidden = false;
+  catalogPagination.innerHTML = `
+    <p class="pagination-summary">${escapeHtml(t("catalog.showing", {
+      start: model.start,
+      end: model.end,
+      total: model.totalItems
+    }))}</p>
+    <div class="pagination-controls">
+      <button class="pagination-direction" type="button" data-catalog-page="${model.page - 1}"${model.page === 1 ? " disabled" : ""}>‹ ${escapeHtml(t("catalog.previousPage"))}</button>
+      <div class="pagination-numbers">${pageButtons}</div>
+      <label class="pagination-picker">
+        <span>${escapeHtml(t("catalog.page"))}</span>
+        <select data-catalog-page-select aria-label="${escapeHtml(t("catalog.choosePage"))}">${pageOptions}</select>
+        <span>${escapeHtml(t("catalog.ofPages", { total: model.totalPages }))}</span>
+      </label>
+      <button class="pagination-direction" type="button" data-catalog-page="${model.page + 1}"${model.page === model.totalPages ? " disabled" : ""}>${escapeHtml(t("catalog.nextPage"))} ›</button>
+    </div>
+  `;
+  catalogPagination.querySelectorAll("[data-catalog-page]").forEach((button) => {
+    button.addEventListener("click", () => goToCatalogPage(Number(button.dataset.catalogPage)));
+  });
+  catalogPagination.querySelector("[data-catalog-page-select]")?.addEventListener("change", (event) => {
+    goToCatalogPage(Number(event.currentTarget.value));
+  });
+}
+
+function renderCatalogPage(scrollToCatalog = false) {
+  const model = globalThis.KapiTomoPagination.paginate(filteredCatalogPlugins, currentCatalogPage);
+  currentCatalogPage = model.page;
+  renderPlugins(model.items);
+  renderCatalogPagination(model);
+  if (scrollToCatalog && list) {
+    const reducedMotion = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    list.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+  }
+}
+
+function goToCatalogPage(page) {
+  const requestedPage = Number.parseInt(page, 10);
+  if (!Number.isFinite(requestedPage) || requestedPage === currentCatalogPage) {
+    return;
+  }
+  currentCatalogPage = requestedPage;
+  renderCatalogPage(true);
+}
+
+function applyTagFilters(resetPage = false) {
+  filteredCatalogPlugins = allPlugins.filter((plugin) => pluginMatchesSelectedTags(plugin)
     && pluginMatchesExcludedTags(plugin)
     && pluginMatchesFavoriteMode(plugin)
     && pluginMatchesSearch(plugin));
+  if (resetPage) {
+    currentCatalogPage = 1;
+  }
   renderTagFilters(availableTags);
   updateFavoritesOnlyButton();
-  renderPlugins(filtered);
-  setTagStatus(filtered.length);
+  renderCatalogPage();
+  setTagStatus(filteredCatalogPlugins.length);
 }
 
 function toggleTagFilter(tag) {
@@ -851,7 +1033,7 @@ function toggleTagFilter(tag) {
   } else {
     selectedTags = [...selectedTags, clean];
   }
-  applyTagFilters();
+  applyTagFilters(true);
 }
 
 function pluginManifestUrl(plugin) {
@@ -1009,10 +1191,16 @@ function loadAllPlugins() {
           allPlugins.flatMap((plugin) => filterTags(plugin.tags))
         ]);
         renderTagFilters(catalogTags);
-        applyTagFilters();
+        applyTagFilters(true);
       });
     })
     .catch((error) => {
+      filteredCatalogPlugins = [];
+      currentCatalogPage = 1;
+      if (catalogPagination) {
+        catalogPagination.hidden = true;
+        catalogPagination.innerHTML = "";
+      }
       list.innerHTML = `<p>${escapeHtml(t("catalog.loadError", { message: error.message }))}</p>`;
     });
 }
@@ -1215,26 +1403,19 @@ function normalizeReportForFingerprint(pluginId, details) {
   const normalizedDetails = String(details || "")
     .normalize("NFKD")
     .replace(/\p{M}/gu, "")
-    .toLocaleLowerCase()
+    .toLowerCase()
     .replace(/[^\p{L}\p{N}]+/gu, " ")
     .trim();
-  return `${String(pluginId || "").trim().toLocaleLowerCase()}|${normalizedDetails}`;
+  return `${String(pluginId || "").trim().toLowerCase()}|${normalizedDetails}`;
 }
 
 async function reportFingerprint(pluginId, details) {
   const normalized = normalizeReportForFingerprint(pluginId, details);
-  if (globalThis.crypto?.subtle && typeof TextEncoder !== "undefined") {
-    const digest = await globalThis.crypto.subtle.digest("SHA-256", new TextEncoder().encode(normalized));
-    return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+  if (!globalThis.crypto?.subtle || typeof TextEncoder === "undefined") {
+    throw new Error("secure_hash_unavailable");
   }
-  let first = 2166136261;
-  let second = 2246822519;
-  for (let index = 0; index < normalized.length; index += 1) {
-    const code = normalized.charCodeAt(index);
-    first = Math.imul(first ^ code, 16777619);
-    second = Math.imul(second ^ code, 3266489917);
-  }
-  return `${(first >>> 0).toString(16).padStart(8, "0")}${(second >>> 0).toString(16).padStart(8, "0")}`;
+  const digest = await globalThis.crypto.subtle.digest("SHA-256", new TextEncoder().encode(normalized));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
 function loadRecentReportHistory() {
@@ -1304,11 +1485,22 @@ async function openReportRequest() {
     setReportStatus(t("report.confirm"));
     return;
   }
-  if (String(reportWebsiteInput?.value || "").trim()) {
-    setReportStatus(t("report.sent"), "success");
+  if (!reportSecurityConfigured()) {
+    setReportStatus(t("report.serviceUnavailable"), "error");
     return;
   }
-  const fingerprint = await reportFingerprint(pluginId, details);
+  if (!reportTurnstileToken) {
+    setReportStatus(t("report.captchaRequired"), "error");
+    initializeReportChallenge();
+    return;
+  }
+  let fingerprint;
+  try {
+    fingerprint = await reportFingerprint(pluginId, details);
+  } catch {
+    setReportStatus(t("report.serviceUnavailable"), "error");
+    return;
+  }
   if (wasReportRecentlySent(fingerprint)) {
     setReportStatus(t("report.duplicate"));
     return;
@@ -1325,17 +1517,13 @@ async function openReportRequest() {
         Accept: "application/json"
       },
       body: JSON.stringify({
-        _subject: `[KapiTomo Plugin Report] ${pluginId}`,
-        _template: "table",
-        _url: "https://nanquimori.github.io/KapiTomo/plugins/?view=report",
         email,
         plugin_id: pluginId,
-        report_group: `plugin:${pluginId}`,
         duplicate_fingerprint: fingerprint,
-        duplicate_policy: "Duplicate reports are grouped; report quantity is not evidence and never causes hiding or removal.",
         reason: details,
-        truthfulness_confirmation: t("report.confirmationLine"),
-        catalog_rules: t("report.rulesLine")
+        truthfulness_confirmation: true,
+        turnstile_token: reportTurnstileToken,
+        website: String(reportWebsiteInput?.value || "").trim()
       })
     });
     let result = null;
@@ -1346,7 +1534,12 @@ async function openReportRequest() {
     }
     const accepted = response.ok && (result?.success === true || result?.success === "true");
     if (!accepted) {
-      setReportStatus(t("report.sendError"), "error");
+      const errorMessage = result?.code === "rate_limited"
+        ? t("report.rateLimited")
+        : ["captcha_required", "captcha_failed"].includes(result?.code)
+          ? t("report.captchaFailed")
+          : t("report.sendError");
+      setReportStatus(errorMessage, "error");
       return;
     }
     rememberSubmittedReport(pluginId, fingerprint);
@@ -1357,6 +1550,7 @@ async function openReportRequest() {
   } catch {
     setReportStatus(t("report.sendError"), "error");
   } finally {
+    resetReportChallenge();
     if (requestReportPluginButton) {
       requestReportPluginButton.disabled = false;
     }
@@ -1440,11 +1634,11 @@ reportPluginIdInput?.addEventListener("input", () => updateReportCreatorLink());
 reportDetailsInput?.addEventListener("input", updateReportDetailsCount);
 pluginSearchInput?.addEventListener("input", () => {
   searchQuery = String(pluginSearchInput.value || "");
-  applyTagFilters();
+  applyTagFilters(true);
 });
 favoritesOnlyButton?.addEventListener("click", () => {
   favoritesOnly = !favoritesOnly;
-  applyTagFilters();
+  applyTagFilters(true);
 });
 discardDraftPluginsButton?.addEventListener("click", () => {
   localStorage.removeItem(LOCAL_PLUGIN_KEY);

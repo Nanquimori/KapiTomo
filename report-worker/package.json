@@ -1,0 +1,14 @@
+{
+  "name": "kapitomo-report-worker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check src/index.js && node --check test/report-worker.test.mjs",
+    "test": "node --test",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "4.128.0"
+  }
+}
