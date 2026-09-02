@@ -6,6 +6,15 @@ This document explains how to create and publish a Nyxovira plugin.
 
 A plugin connects Nyxovira to one reading site. It opens the site, recognizes the work page, shows the chapter list as soon as the user taps download, and prepares only the chapters selected by the user.
 
+## Start With Your Goal
+
+| I want to... | Read first |
+| --- | --- |
+| Create the plugin files | [Plugin Files](#plugin-files) and [`plugin.json`](#pluginjson) |
+| Create a website with its own catalog and Install button | [External Plugin Sites](#external-plugin-sites) |
+| Build chapter lists and downloads | [Instant Chapter List](#instant-chapter-list) |
+| Publish in the official catalog | [Publish in the Official Plugin Hub](#publish-in-the-official-plugin-hub) |
+
 ## How a Plugin Works
 
 1. The creator prepares `plugin.json` and `browser/download_target.js`.
@@ -25,6 +34,21 @@ Nyxovira provides three different plugin entry points:
 An external site is not incorporated into the Plugin Hub, and its plugins are not mixed into the official catalog. Nyxovira stores only the association between the connected page and its catalog.
 
 ## External Plugin Sites
+
+A minimal external store can use this structure:
+
+```text
+plugin-store/
+|-- index.html
+|-- catalog.json
+`-- plugins/
+    `-- my-plugin/
+        |-- plugin.json
+        `-- browser/
+            `-- download_target.js
+```
+
+Host the folder at a public HTTPS address. The appearance, search, and cards belong to the site itself; Nyxovira only needs to discover the catalog and receive the installation request.
 
 ### Catalog discovery
 
@@ -69,18 +93,39 @@ Without a declaration, Nyxovira looks for `catalog.json`, `catalog-store.json`, 
 
 ### Installation from the external page
 
-The store's install button can call the Android bridge provided by the internal browser:
+This complete example creates the button, explains when the page is open outside the app, and shows the result returned by Nyxovira:
 
-```js
-const bridge = globalThis.NyxoviraAndroidBridge
-  || globalThis.ArchiveInkAndroidBridge;
-const catalogUrl = new URL("catalog.json", location.href).href;
+```html
+<button id="install-my-plugin" type="button">Install My Plugin</button>
+<p id="install-status" aria-live="polite"></p>
 
-function installPlugin(id) {
-  return JSON.parse(
-    bridge.installCommunityPlugin(catalogUrl, JSON.stringify({ id }))
-  );
-}
+<script>
+  const catalogUrl = new URL("catalog.json", location.href).href;
+  const status = document.querySelector("#install-status");
+
+  document.querySelector("#install-my-plugin").addEventListener("click", () => {
+    const bridge = globalThis.NyxoviraAndroidBridge
+      || globalThis.ArchiveInkAndroidBridge;
+
+    if (!bridge || typeof bridge.installCommunityPlugin !== "function") {
+      status.textContent = "Open this site from Nyxovira to install.";
+      return;
+    }
+
+    try {
+      const result = JSON.parse(
+        bridge.installCommunityPlugin(
+          catalogUrl,
+          JSON.stringify({ id: "my-plugin" })
+        ) || "{}"
+      );
+      status.textContent = result.message
+        || (result.success ? "Plugin installed." : "Could not install the plugin.");
+    } catch (error) {
+      status.textContent = "Could not complete the installation.";
+    }
+  });
+</script>
 ```
 
 The bridge authorizes installation only while the user remains inside the connected site. Nyxovira downloads the associated catalog again and finds the plugin by `id`; the page cannot replace the connected catalog with an arbitrary URL.
@@ -95,6 +140,14 @@ The bridge authorizes installation only while the user remains inside the connec
 - Duplicate IDs and manifests whose `id` does not match the catalog entry are rejected.
 - Installation permission is removed when the browser leaves the connected site's authorized path.
 - External sites and their plugins are independent and are neither reviewed nor published by KapiTomo.
+
+### Test before sharing
+
+1. Publish every file over HTTPS.
+2. In Nyxovira, open **Sites > External sites** and connect the URL of `index.html` or the store directory.
+3. Open the site from the card created in the app.
+4. Tap **Install** and confirm the returned message.
+5. Navigate outside the store directory and confirm that installation is no longer authorized.
 
 ## Plugin Files
 
@@ -124,6 +177,7 @@ Example:
   "id": "my-plugin",
   "name": "My Plugin",
   "version": "1.0.0",
+  "tags": ["english", "manga"],
   "match": {
     "hosts": ["example.com"]
   },
@@ -308,45 +362,13 @@ Comic chapter:
 
 For image chapters, `pages` is the preferred field. Nyxovira also reads `images` for compatibility.
 
-## Plugin Hub
+## Publish in the Official Plugin Hub
 
-The Plugin Hub installs plugins directly from public GitHub repositories.
+Use this option only when you want the plugin to appear in the official catalog. The public GitHub repository is the installation source; do not manually write a `catalog.json` entry.
 
-Publication requests are validated automatically and technically valid entries that accept the current catalog rules are published immediately. The validation prevents duplicate plugins for the same source, verifies repository ownership, and rejects repositories that do not meet the public technical requirements. Automatic publication is not an endorsement of the source or third-party content.
+Before submitting, `plugin.json` must have a public HTTPS icon and a `tags` list containing one language first, one to three content types, and `adult` last when needed.
 
-The Plugin Hub is a catalog, not a content host. The plugin creator is responsible for the plugin code, site mapping, icon, metadata, permissions, and maintenance. Source sites are responsible for their own pages and content. Nyxovira Pro unlocks app features and does not sell third-party works, pages, chapters, translations, or plugins.
-
-The catalog entry uses:
-
-```json
-{
-  "id": "my-plugin",
-  "name": "My Plugin",
-  "author": "Author",
-  "version": "1.0.0",
-  "description": "Site plugin for Nyxovira.",
-  "site_url": "https://example.com/",
-  "homepage": "https://example.com/",
-  "icon_url": "https://example.com/icon.png",
-  "repository_url": "https://github.com/user/my-plugin",
-  "repository_ref": "main",
-  "plugin_path": ".",
-  "hosts": ["example.com"],
-  "status": "active",
-  "tags": ["english", "manga", "novel"]
-}
-```
-
-| Field | Meaning |
-| --- | --- |
-| `repository_url` | GitHub repository containing `plugin.json`. |
-| `repository_ref` | Branch or ref to install from. Usually `main`. |
-| `plugin_path` | Folder containing `plugin.json`. Use `.` when the manifest is at the repository root. |
-| `hosts` | Domains covered by the plugin. The Hub derives this from `match.hosts`, `browser.home_url`, `site_url`, and `homepage`. A host can only have one visible plugin in the catalog. |
-| `status` | Catalog state. See the status values below. |
-| `tags` | Required. Use one language tag first, then one to three content type tags. Unsupported tags and extra tags are ignored. |
-
-Official public tags:
+Accepted tags:
 
 Language tags:
 
@@ -373,51 +395,42 @@ Content type tags:
 - `novel`
 - `webtoon`
 - `comic`
+- `other`
 
-There is no package URL in the public publishing format. The repository is the source of the plugin.
+Optional classification:
 
-Publishing flow:
+- `adult`: place it last when the source exposes adult-restricted material.
+
+How to publish:
 
 1. Paste the plugin's GitHub repository in the Plugin Hub.
-2. Confirm the generated GitHub request.
-3. Automation validates `plugin.json`, the public icon, official tags, repository, and covered hosts.
-4. If another visible plugin already covers the same host, the request is rejected.
-5. The request author must own the plugin repository.
-6. The generated request must accept the current Plugin Hub catalog rules.
-7. Automation publishes the technically valid catalog entry immediately.
+2. Confirm the generated GitHub request and accept the current rules.
+3. Automation checks the files, icon, tags, hosts, and whether the requester owns the repository.
+4. A technically valid request is published in the catalog.
 
-Review rules:
+Only one visible plugin may cover a host. Responsibility, review, correction, and removal rules are in the [Terms and Plugin Catalog Rules](https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules).
 
-- The Hub checks the repository, icon, official tags, and covered hosts.
-- A visible host can only have one plugin.
-- Only the repository owner can publish or update a community plugin.
-- Technically valid requests that accept the current rules are published automatically.
-- Plugin owners can remove their own plugins automatically. Maintainers can hide, restore, or remove any plugin through an authenticated moderation request.
-- A creator cannot republish over a hidden or moderator-removed entry. A maintainer must review or restore it first. Creator-requested removals may be republished by that creator.
-- If the repository or `plugin.json` is missing for two consecutive checks, the entry is marked as removed.
-- Technical validation does not decide copyright ownership or source authorization. Credible reports are reviewed under the public [Terms and Plugin Catalog Rules](https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules).
+## Final Checklist
 
-Status values:
+For every plugin:
 
-- `active`: appears as Online.
-- `broken`: appears as Offline.
-- `hidden`: does not appear while a credible security, rights, identity, or policy report is reviewed.
-- `removed`: does not appear after an authorized request, confirmed violation, or repeated repository/manifest absence.
-- The Hub checks plugins every 30 minutes. Temporary source failures remain recoverable and do not by themselves cause permanent removal.
+1. `plugin.json` has valid `id`, `version`, `match.hosts`, `browser.home_url`, and `browser.download_target_script_file` values.
+2. `browser/download_target.js` recognizes the work and creates the chapter list.
+3. Novels use `paragraphs`; comics use `pages`.
+4. The plugin contains no malware, does not collect credentials, and does not bypass authentication, paywalls, DRM, or access restrictions.
 
-## Checklist
+For an external site:
 
-Before publishing:
+1. The page and every file use public HTTPS URLs.
+2. `index.html` declares `nyxovira-plugin-catalog`.
+3. `catalog.json` contains `schema_version`, `name`, `hub_url`, and `plugins`.
+4. Every `manifest_url` exists and points to a manifest with the same `id`.
+5. The button handles both the presence and absence of the Android bridge.
+6. Installation was tested inside Nyxovira's internal browser.
 
-1. `plugin.json` has a stable `id`, `version`, `match.hosts`, `browser.home_url`, and `browser.icon_url`.
-2. `plugin.json.tags` has an official language first and at least one official content type after it.
-3. `browser/download_target.js` returns the current work URL.
-4. The first download click creates a chapter plan immediately.
-5. Large chapters prepare their pages through `window.__nyxoviraPrepareDownloadPlan`.
-6. Novel chapters use `paragraphs`.
-7. Comic chapters use `pages`; `images` is accepted for compatibility.
-8. The plugin works from a clean GitHub repository.
-9. No visible plugin in the public catalog already covers the same source host.
-10. The repository is submitted through the online Plugin Hub.
-11. The creator accepts the current catalog rules and responsibility for the plugin code, metadata, permissions, maintenance, and source mapping.
-12. The plugin does not contain malware, steal data or credentials, impersonate another party, or bypass authentication, paywalls, DRM, or access restrictions.
+For the official Plugin Hub:
+
+1. The plugin is in a public GitHub repository owned by the requester.
+2. The icon is public and `plugin.json.tags` uses only accepted values.
+3. No visible plugin already covers the same host.
+4. The request is sent through the Plugin Hub and accepts the current rules.

@@ -544,6 +544,16 @@
 
       <main class="grid">
         <div class="content">
+          <section class="panel">
+            <h2>Start with your goal</h2>
+            <div class="rule-list">
+              <article><h3><a href="#files">Create the plugin files</a></h3><p>Start with the folder layout and <code>plugin.json</code>.</p></article>
+              <article><h3><a href="#external-sites">Create an external plugin site</a></h3><p>Build a website with its own catalog, plugin cards, and Install button.</p></article>
+              <article><h3><a href="#chapter-plan">Build chapter downloads</a></h3><p>Learn the chapter plan and deferred preparation flow.</p></article>
+              <article><h3><a href="#publishing">Publish in the official catalog</a></h3><p>Use the Plugin Hub when the plugin should appear in KapiTomo.</p></article>
+            </div>
+          </section>
+
           <section id="overview" class="panel">
             <h2>How a plugin works</h2>
             <div class="steps">
@@ -575,6 +585,18 @@
 
           <section id="external-sites" class="panel">
             <h2>External plugin sites</h2>
+            <p>A minimal external store can use this structure:</p>
+            <div class="folder">
+              plugin-store/<br>
+              |-- index.html<br>
+              |-- catalog.json<br>
+              `-- plugins/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;`-- my-plugin/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-- plugin.json<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-- browser/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-- download_target.js
+            </div>
+            <p class="panel-copy-after-list">Host the folder at a public HTTPS address. The appearance, search, and plugin cards belong to the site itself; Nyxovira only needs to discover the catalog and receive the installation request.</p>
             <h3 class="api-subheading">Catalog discovery</h3>
             <p>Declare the catalog in the store's main page. A <code>meta</code> tag with the same name and a <code>content</code> URL is also supported.</p>
             <pre><code>&lt;link rel="nyxovira-plugin-catalog" href="catalog.json"&gt;</code></pre>
@@ -587,23 +609,48 @@
   "plugins": [{
     "id": "my-plugin",
     "name": "My Plugin",
+    "author": "Author",
     "version": "1.0.0",
     "manifest_url": "plugins/my-plugin/plugin.json",
+    "icon_url": "https://example.com/icon.png",
     "site_url": "https://example.com/",
+    "tags": ["english", "manga"],
     "status": "active"
   }]
 }</code></pre>
             <p><code>hub_url</code> identifies the storefront when a JSON URL is connected directly. <code>store_url</code> and <code>homepage</code> are accepted aliases. Relative URLs are resolved against the catalog URL. Repository-based entries may use <code>repository_url</code>, <code>repository_ref</code>, and <code>plugin_path</code>.</p>
             <h3 class="api-subheading">Direct installation</h3>
-            <pre><code>const bridge = globalThis.NyxoviraAndroidBridge
-  || globalThis.ArchiveInkAndroidBridge;
-const catalogUrl = new URL("catalog.json", location.href).href;
+            <p>This complete example creates the button, explains when the page is open outside the app, and displays the result returned by Nyxovira.</p>
+            <pre><code>&lt;button id="install-my-plugin" type="button"&gt;Install My Plugin&lt;/button&gt;
+&lt;p id="install-status" aria-live="polite"&gt;&lt;/p&gt;
 
-function installPlugin(id) {
-  return JSON.parse(
-    bridge.installCommunityPlugin(catalogUrl, JSON.stringify({ id }))
-  );
-}</code></pre>
+&lt;script&gt;
+  const catalogUrl = new URL("catalog.json", location.href).href;
+  const status = document.querySelector("#install-status");
+
+  document.querySelector("#install-my-plugin").addEventListener("click", () =&gt; {
+    const bridge = globalThis.NyxoviraAndroidBridge
+      || globalThis.ArchiveInkAndroidBridge;
+
+    if (!bridge || typeof bridge.installCommunityPlugin !== "function") {
+      status.textContent = "Open this site from Nyxovira to install.";
+      return;
+    }
+
+    try {
+      const result = JSON.parse(
+        bridge.installCommunityPlugin(
+          catalogUrl,
+          JSON.stringify({ id: "my-plugin" })
+        ) || "{}"
+      );
+      status.textContent = result.message
+        || (result.success ? "Plugin installed." : "Could not install the plugin.");
+    } catch (error) {
+      status.textContent = "Could not complete the installation.";
+    }
+  });
+&lt;/script&gt;</code></pre>
             <p>The bridge works only while the user remains inside the connected site. Nyxovira downloads the associated catalog again and finds the plugin by <code>id</code>, so the page cannot replace the connected catalog with an arbitrary URL.</p>
             <p><code>getCommunityPluginCatalog(catalogUrl)</code>, <code>getOnlinePluginCatalog()</code>, and <code>installOnlinePlugin(pluginJson)</code> are also available. The last two are compatibility aliases for stores reusing an official-Hub interface.</p>
             <h3 class="api-subheading">Limits and security</h3>
@@ -612,6 +659,13 @@ function installPlugin(id) {
               <article><p>A catalog may contain up to 2 MiB and 1,000 plugins. Each manifest or script may contain up to 4 MiB.</p></article>
               <article><p>Duplicate IDs and manifest/catalog ID mismatches are rejected. Installation permission ends when navigation leaves the connected site's authorized path.</p></article>
               <article><p>External sites and their plugins are independent and are neither reviewed nor published by KapiTomo.</p></article>
+            </div>
+            <h3 class="api-subheading">Test before sharing</h3>
+            <div class="steps">
+              <div class="step"><p>Publish every file over HTTPS.</p></div>
+              <div class="step"><p>In Nyxovira, open <strong>Sites → External sites</strong> and connect the store page or directory.</p></div>
+              <div class="step"><p>Open the connected site from its card and tap <strong>Install</strong>.</p></div>
+              <div class="step"><p>Confirm the returned message, then navigate outside the store directory and verify that installation is blocked.</p></div>
             </div>
           </section>
 
@@ -643,6 +697,7 @@ function installPlugin(id) {
   "id": "my-plugin",
   "name": "My Plugin",
   "version": "1.0.0",
+  "tags": ["english", "manga"],
   "match": { "hosts": ["example.com"] },
   "browser": {
     "home_url": "https://example.com/",
@@ -758,26 +813,9 @@ return "https://example.com/manga/work/";</code></pre>
           </section>
 
           <section id="publishing" class="panel">
-            <h2>Publishing</h2>
-            <p>The Plugin Hub installs plugins from public GitHub repositories. The repository is the plugin source, and technically valid entries that accept the current catalog rules are published automatically.</p>
-            <p>The Plugin Hub is a catalog, not a content host. Plugin creators are responsible for their code, site mapping, icons, metadata, permissions, and maintenance. Source sites are responsible for their own pages and content. Nyxovira Pro unlocks app features and does not sell third-party works, pages, chapters, translations, or plugins.</p>
-            <pre><code>{
-  "id": "my-plugin",
-  "name": "My Plugin",
-  "author": "Author",
-  "version": "1.0.0",
-  "description": "Site plugin for Nyxovira.",
-  "site_url": "https://example.com/",
-  "homepage": "https://example.com/",
-  "icon_url": "https://example.com/icon.png",
-  "repository_url": "https://github.com/user/my-plugin",
-  "repository_ref": "main",
-  "plugin_path": ".",
-  "hosts": ["example.com"],
-  "status": "active",
-  "tags": ["english", "manga", "novel"]
-}</code></pre>
-            <p>Tags are required. Use one language tag first, then one to three content type tags. Unsupported tags and extra tags are ignored.</p>
+            <h2>Publish in the official Plugin Hub</h2>
+            <p>Use this option only when the plugin should appear in the official catalog. The public GitHub repository is the installation source; developers do not manually write a catalog entry.</p>
+            <p><code>plugin.json</code> must contain a public HTTPS icon and a <code>tags</code> list with one language first, one to three content types, and <code>adult</code> last when needed.</p>
             <div class="tag-groups">
               <section class="tag-group">
                 <h3>Language tags</h3>
@@ -788,45 +826,39 @@ return "https://example.com/manga/work/";</code></pre>
               <section class="tag-group">
                 <h3>Content type tags</h3>
                 <div class="tag-list">
-                  <code>manga</code><code>manhua</code><code>manhwa</code><code>novel</code><code>webtoon</code><code>comic</code>
+                  <code>manga</code><code>manhua</code><code>manhwa</code><code>novel</code><code>webtoon</code><code>comic</code><code>other</code>
                 </div>
               </section>
-            </div>
-            <div class="rule-list">
-              <article>
-                <h3>Review</h3>
-                <p>The Hub checks the repository, icon, official tags, covered hosts, and repository ownership. A visible host can only have one plugin.</p>
-              </article>
-              <article>
-                <h3>Publication</h3>
-                <p>Technically valid requests that accept the current rules are published automatically. Plugin owners can remove their own plugins, and maintainers can hide, restore, or remove any plugin.</p>
-              </article>
-              <article>
-                <h3>Removal</h3>
-                <p>A repository or <code>plugin.json</code> missing for two consecutive checks is marked as removed. Credible reports follow the public <a href="../../terms/#plugin-catalog-rules">catalog rules</a>.</p>
-              </article>
+              <section class="tag-group">
+                <h3>Optional classification</h3>
+                <div class="tag-list"><code>adult</code></div>
+                <p>Place it last when the source exposes adult-restricted material.</p>
+              </section>
             </div>
             <div class="steps">
               <div class="step"><p>Keep <code>plugin.json</code> and <code>browser/download_target.js</code> in the repository.</p></div>
               <div class="step"><p>Open the Plugin Hub and paste the GitHub repository URL.</p></div>
-              <div class="step"><p>Confirm the GitHub request and the current catalog rules. Automation publishes technically valid entries immediately.</p></div>
+              <div class="step"><p>Confirm the generated GitHub request and accept the current catalog rules.</p></div>
+              <div class="step"><p>Automation checks the files, icon, tags, hosts, and repository ownership.</p></div>
+              <div class="step"><p>A technically valid request is published in the catalog.</p></div>
             </div>
+            <p class="panel-copy-after-list">Only one visible plugin may cover a host. Responsibility, review, correction, and removal details are kept in the <a href="../../terms/#plugin-catalog-rules">Terms and Plugin Catalog Rules</a>.</p>
+          </section>
+
+          <section class="panel">
+            <h2>Final checklist</h2>
             <div class="rule-list">
               <article>
-                <h3>Online</h3>
-                <p><code>active</code> means the plugin appears as Online.</p>
+                <h3>Every plugin</h3>
+                <p>Valid manifest fields; a working browser script; <code>paragraphs</code> for novels or <code>pages</code> for comics; no malware, credential collection, or access-control bypass.</p>
               </article>
               <article>
-                <h3>Offline</h3>
-                <p><code>broken</code> means the plugin appears as Offline.</p>
+                <h3>External site</h3>
+                <p>Public HTTPS files; catalog declaration; valid <code>hub_url</code> and <code>manifest_url</code>; matching plugin IDs; a button that handles the bridge being absent; installation tested inside Nyxovira.</p>
               </article>
               <article>
-                <h3>Hidden</h3>
-                <p><code>hidden</code> is temporary during review; <code>removed</code> follows an authorized request, confirmed violation, or repeated repository absence. Neither appears publicly.</p>
-              </article>
-              <article>
-                <h3>Automatic checks</h3>
-                <p>The Hub checks plugins every 30 minutes. Temporary source failures remain recoverable and do not by themselves cause permanent removal.</p>
+                <h3>Official Plugin Hub</h3>
+                <p>A public repository owned by the requester; a public icon; accepted tags; no existing visible plugin for the same host; submission through the Plugin Hub.</p>
               </article>
             </div>
           </section>
@@ -850,6 +882,16 @@ return "https://example.com/manga/work/";</code></pre>
 
       <main class="grid">
         <div class="content">
+          <section class="panel">
+            <h2>Comece pelo seu objetivo</h2>
+            <div class="rule-list">
+              <article><h3><a href="#files-pt">Criar os arquivos do plugin</a></h3><p>Comece pela estrutura de pastas e pelo <code>plugin.json</code>.</p></article>
+              <article><h3><a href="#external-sites-pt">Criar um site externo de plugins</a></h3><p>Monte uma página com catálogo próprio, cards e botão Instalar.</p></article>
+              <article><h3><a href="#chapter-plan-pt">Montar downloads de capítulos</a></h3><p>Aprenda o plano de capítulos e a preparação posterior.</p></article>
+              <article><h3><a href="#publishing-pt">Publicar no catálogo oficial</a></h3><p>Use o Plugin Hub quando o plugin deve aparecer no KapiTomo.</p></article>
+            </div>
+          </section>
+
           <section class="panel">
             <h2>Como um plugin funciona</h2>
             <div class="steps">
@@ -879,8 +921,20 @@ return "https://example.com/manga/work/";</code></pre>
             <p class="panel-copy-after-list">Os plugins de um site externo não são misturados ao catálogo oficial. O Nyxovira guarda somente a associação entre a página conectada e seu catálogo.</p>
           </section>
 
-          <section class="panel">
+          <section id="external-sites-pt" class="panel">
             <h2>Sites externos de plugins</h2>
+            <p>Uma loja externa mínima pode usar esta estrutura:</p>
+            <div class="folder">
+              plugin-store/<br>
+              |-- index.html<br>
+              |-- catalog.json<br>
+              `-- plugins/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;`-- my-plugin/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-- plugin.json<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-- browser/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-- download_target.js
+            </div>
+            <p class="panel-copy-after-list">Hospede a pasta em um endereço HTTPS público. A aparência, a busca e os cards pertencem ao próprio site; o Nyxovira precisa apenas descobrir o catálogo e receber a solicitação de instalação.</p>
             <h3 class="api-subheading">Descoberta do catálogo</h3>
             <p>Declare o catálogo na página principal da loja. Também é aceita uma tag <code>meta</code> com o mesmo nome e a URL em <code>content</code>.</p>
             <pre><code>&lt;link rel="nyxovira-plugin-catalog" href="catalog.json"&gt;</code></pre>
@@ -893,23 +947,48 @@ return "https://example.com/manga/work/";</code></pre>
   "plugins": [{
     "id": "my-plugin",
     "name": "My Plugin",
+    "author": "Author",
     "version": "1.0.0",
     "manifest_url": "plugins/my-plugin/plugin.json",
+    "icon_url": "https://example.com/icon.png",
     "site_url": "https://example.com/",
+    "tags": ["portuguese", "manga"],
     "status": "active"
   }]
 }</code></pre>
             <p><code>hub_url</code> identifica a página da loja quando uma URL JSON é conectada diretamente. <code>store_url</code> e <code>homepage</code> são aliases aceitos. URLs relativas são resolvidas a partir do catálogo. Entradas baseadas em repositório podem usar <code>repository_url</code>, <code>repository_ref</code> e <code>plugin_path</code>.</p>
             <h3 class="api-subheading">Instalação direta</h3>
-            <pre><code>const bridge = globalThis.NyxoviraAndroidBridge
-  || globalThis.ArchiveInkAndroidBridge;
-const catalogUrl = new URL("catalog.json", location.href).href;
+            <p>Este exemplo completo cria o botão, informa quando a página está fora do aplicativo e mostra o resultado retornado pelo Nyxovira.</p>
+            <pre><code>&lt;button id="install-my-plugin" type="button"&gt;Instalar My Plugin&lt;/button&gt;
+&lt;p id="install-status" aria-live="polite"&gt;&lt;/p&gt;
 
-function installPlugin(id) {
-  return JSON.parse(
-    bridge.installCommunityPlugin(catalogUrl, JSON.stringify({ id }))
-  );
-}</code></pre>
+&lt;script&gt;
+  const catalogUrl = new URL("catalog.json", location.href).href;
+  const status = document.querySelector("#install-status");
+
+  document.querySelector("#install-my-plugin").addEventListener("click", () =&gt; {
+    const bridge = globalThis.NyxoviraAndroidBridge
+      || globalThis.ArchiveInkAndroidBridge;
+
+    if (!bridge || typeof bridge.installCommunityPlugin !== "function") {
+      status.textContent = "Abra este site pelo Nyxovira para instalar.";
+      return;
+    }
+
+    try {
+      const result = JSON.parse(
+        bridge.installCommunityPlugin(
+          catalogUrl,
+          JSON.stringify({ id: "my-plugin" })
+        ) || "{}"
+      );
+      status.textContent = result.message
+        || (result.success ? "Plugin instalado." : "Não foi possível instalar.");
+    } catch (error) {
+      status.textContent = "Não foi possível concluir a instalação.";
+    }
+  });
+&lt;/script&gt;</code></pre>
             <p>A ponte funciona somente enquanto o usuário navega dentro do site conectado. O Nyxovira baixa novamente o catálogo associado e procura o plugin pelo <code>id</code>, impedindo que a página substitua o catálogo conectado por uma URL arbitrária.</p>
             <p>Também estão disponíveis <code>getCommunityPluginCatalog(catalogUrl)</code>, <code>getOnlinePluginCatalog()</code> e <code>installOnlinePlugin(pluginJson)</code>. Os dois últimos são aliases de compatibilidade para lojas que reaproveitam a interface do Hub oficial.</p>
             <h3 class="api-subheading">Limites e segurança</h3>
@@ -919,9 +998,16 @@ function installPlugin(id) {
               <article><p>IDs duplicados e divergências entre o id do manifesto e do catálogo são recusados. A permissão de instalação termina quando a navegação sai do caminho autorizado.</p></article>
               <article><p>Sites externos e seus plugins são independentes e não são revisados nem publicados pelo KapiTomo.</p></article>
             </div>
+            <h3 class="api-subheading">Teste antes de divulgar</h3>
+            <div class="steps">
+              <div class="step"><p>Publique todos os arquivos em HTTPS.</p></div>
+              <div class="step"><p>No Nyxovira, abra <strong>Sites → Sites externos</strong> e conecte a página ou pasta da loja.</p></div>
+              <div class="step"><p>Abra o site conectado pelo cartão e toque em <strong>Instalar</strong>.</p></div>
+              <div class="step"><p>Confirme a mensagem, saia da pasta da loja e verifique que a instalação foi bloqueada.</p></div>
+            </div>
           </section>
 
-          <section class="panel">
+          <section id="files-pt" class="panel">
             <h2>Arquivos do plugin</h2>
             <p>Coloque o manifesto e o script do navegador em uma pasta com o mesmo nome do id do plugin.</p>
             <div class="folder">
@@ -949,6 +1035,7 @@ function installPlugin(id) {
   "id": "my-plugin",
   "name": "My Plugin",
   "version": "1.0.0",
+  "tags": ["portuguese", "manga"],
   "match": { "hosts": ["example.com"] },
   "browser": {
     "home_url": "https://example.com/",
@@ -991,7 +1078,7 @@ function installPlugin(id) {
 };</code></pre>
           </section>
 
-          <section class="panel">
+          <section id="chapter-plan-pt" class="panel">
             <h2>Lista instantânea de capítulos</h2>
             <p>Quando o usuário toca em baixar, defina <code>window.__nyxoviraChapterPlan</code> imediatamente e retorne a URL canônica da obra.</p>
             <pre><code>window.__nyxoviraChapterPlan = JSON.stringify({
@@ -1063,27 +1150,10 @@ return "https://example.com/manga/work/";</code></pre>
 }</code></pre>
           </section>
 
-          <section class="panel">
-            <h2>Publicação</h2>
-            <p>O Plugin Hub instala plugins a partir de repositórios públicos do GitHub. O repositório é a fonte do plugin, e entradas tecnicamente válidas que aceitam as regras atuais do catálogo são publicadas automaticamente.</p>
-            <p>O Plugin Hub é um catálogo, não um host de conteúdo. Criadores de plugins são responsáveis pelo código, mapeamento do site, ícones, metadados, permissões e manutenção. Os sites de origem são responsáveis por suas próprias páginas e conteúdos. O Nyxovira Pro libera recursos do app e não vende obras, páginas, capítulos, traduções ou plugins de terceiros.</p>
-            <pre><code>{
-  "id": "my-plugin",
-  "name": "My Plugin",
-  "author": "Author",
-  "version": "1.0.0",
-  "description": "Site plugin for Nyxovira.",
-  "site_url": "https://example.com/",
-  "homepage": "https://example.com/",
-  "icon_url": "https://example.com/icon.png",
-  "repository_url": "https://github.com/user/my-plugin",
-  "repository_ref": "main",
-  "plugin_path": ".",
-  "hosts": ["example.com"],
-  "status": "active",
-  "tags": ["english", "manga", "novel"]
-}</code></pre>
-            <p>Tags são obrigatórias. Use uma tag de idioma primeiro e depois uma a três tags de tipo de conteúdo. Tags extras ou não suportadas são ignoradas.</p>
+          <section id="publishing-pt" class="panel">
+            <h2>Publicar no Plugin Hub oficial</h2>
+            <p>Use esta opção somente quando o plugin deve aparecer no catálogo oficial. O repositório GitHub público é a fonte da instalação; o desenvolvedor não escreve manualmente uma entrada no catálogo.</p>
+            <p><code>plugin.json</code> precisa ter um ícone HTTPS público e uma lista <code>tags</code> com um idioma primeiro, de um a três tipos de conteúdo e <code>adult</code> por último quando necessário.</p>
             <div class="tag-groups">
               <section class="tag-group">
                 <h3>Tags de idioma</h3>
@@ -1094,45 +1164,39 @@ return "https://example.com/manga/work/";</code></pre>
               <section class="tag-group">
                 <h3>Tags de tipo de conteúdo</h3>
                 <div class="tag-list">
-                  <code>manga</code><code>manhua</code><code>manhwa</code><code>novel</code><code>webtoon</code><code>comic</code>
+                  <code>manga</code><code>manhua</code><code>manhwa</code><code>novel</code><code>webtoon</code><code>comic</code><code>other</code>
                 </div>
               </section>
-            </div>
-            <div class="rule-list">
-              <article>
-                <h3>Revisão</h3>
-                <p>O Hub verifica repositório, ícone, tags oficiais, hosts cobertos e a propriedade do repositório. Um host visível só pode ter um plugin.</p>
-              </article>
-              <article>
-                <h3>Publicação</h3>
-                <p>Solicitações tecnicamente válidas que aceitam as regras atuais são publicadas automaticamente. Donos removem os próprios plugins, e mantenedores podem ocultar, restaurar ou remover qualquer plugin.</p>
-              </article>
-              <article>
-                <h3>Remoção</h3>
-                <p>Um repositório ou <code>plugin.json</code> ausente em duas verificações consecutivas é marcado como removido. Denúncias confiáveis seguem as <a href="../../terms/#regras-do-catalogo">regras públicas do catálogo</a>.</p>
-              </article>
+              <section class="tag-group">
+                <h3>Classificação opcional</h3>
+                <div class="tag-list"><code>adult</code></div>
+                <p>Use por último quando a fonte expõe material restrito a adultos.</p>
+              </section>
             </div>
             <div class="steps">
               <div class="step"><p>Mantenha <code>plugin.json</code> e <code>browser/download_target.js</code> no repositório.</p></div>
               <div class="step"><p>Abra o Plugin Hub e cole a URL do repositório GitHub.</p></div>
-              <div class="step"><p>Confirme a solicitação no GitHub e as regras atuais do catálogo. A automação publica imediatamente as entradas tecnicamente válidas.</p></div>
+              <div class="step"><p>Confirme a solicitação gerada no GitHub e aceite as regras atuais do catálogo.</p></div>
+              <div class="step"><p>A automação verifica arquivos, ícone, tags, hosts e propriedade do repositório.</p></div>
+              <div class="step"><p>Uma solicitação tecnicamente válida é publicada no catálogo.</p></div>
             </div>
+            <p class="panel-copy-after-list">Um host só pode ter um plugin visível. Responsabilidade, revisão, correção e remoção estão nos <a href="../../terms/#regras-do-catalogo">Termos e Regras do Catálogo de Plugins</a>.</p>
+          </section>
+
+          <section class="panel">
+            <h2>Checklist final</h2>
             <div class="rule-list">
               <article>
-                <h3>Online</h3>
-                <p><code>active</code> significa que o plugin aparece como Online.</p>
+                <h3>Qualquer plugin</h3>
+                <p>Campos válidos no manifesto; script do navegador funcionando; <code>paragraphs</code> para novels ou <code>pages</code> para quadrinhos; sem malware, coleta de credenciais ou quebra de controle de acesso.</p>
               </article>
               <article>
-                <h3>Offline</h3>
-                <p><code>broken</code> significa que o plugin aparece como Offline.</p>
+                <h3>Site externo</h3>
+                <p>Arquivos HTTPS públicos; declaração do catálogo; <code>hub_url</code> e <code>manifest_url</code> válidos; IDs iguais; botão que trata a ausência da ponte; instalação testada dentro do Nyxovira.</p>
               </article>
               <article>
-                <h3>Oculto</h3>
-                <p><code>hidden</code> é temporário durante análise; <code>removed</code> ocorre após solicitação autorizada, violação confirmada ou ausência repetida do repositório. Nenhum aparece publicamente.</p>
-              </article>
-              <article>
-                <h3>Verificações automáticas</h3>
-                <p>O Hub verifica plugins a cada 30 minutos. Falhas temporárias da fonte continuam recuperáveis e não causam, isoladamente, remoção definitiva.</p>
+                <h3>Plugin Hub oficial</h3>
+                <p>Repositório público do solicitante; ícone público; tags aceitas; nenhum plugin visível no mesmo host; envio pelo Plugin Hub.</p>
               </article>
             </div>
           </section>

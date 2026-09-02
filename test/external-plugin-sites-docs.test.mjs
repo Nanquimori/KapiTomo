@@ -43,3 +43,35 @@ test("external-site contract is present in HTML and both Markdown versions", () 
     assert.match(document, /4 MiB/);
   }
 });
+
+test("external-site guide is copyable and understandable outside Nyxovira", () => {
+  const documents = [
+    read("nyxovira/plugin-api/index.html"),
+    read("nyxovira/plugin-api/PLUGIN_API.pt-BR.md"),
+    read("nyxovira/plugin-api/PLUGIN_API.md")
+  ];
+
+  for (const document of documents) {
+    assert.match(document, /plugin-store\//);
+    assert.match(document, /install-my-plugin/);
+    assert.match(document, /typeof bridge\.installCommunityPlugin/);
+    assert.match(document, /install-status/);
+    assert.match(document, /Start [Ww]ith [Yy]our [Gg]oal|Comece pelo seu objetivo/);
+    assert.match(document, /Test before sharing|Teste antes de divulgar/);
+    assert.match(document, /`?other`?/);
+    assert.match(document, /`?adult`?/);
+    assert.doesNotMatch(document, /Nyxovira Pro/);
+    assert.doesNotMatch(document, /0w0-UwU-Hub|0w0 UwU|NexusToons|Pluma Comics|yxz0w0zxy/i);
+  }
+});
+
+test("copyable install-button scripts have valid JavaScript", () => {
+  const html = read("nyxovira/plugin-api/index.html");
+  const scripts = [...html.matchAll(/&lt;script&gt;([\s\S]*?)&lt;\/script&gt;/g)]
+    .map(match => match[1].replaceAll("=&gt;", "=>").replaceAll("&amp;", "&"));
+
+  assert.equal(scripts.length, 2);
+  for (const script of scripts) {
+    assert.doesNotThrow(() => new Function(script));
+  }
+});

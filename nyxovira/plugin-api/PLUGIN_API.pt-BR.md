@@ -6,6 +6,15 @@ Este documento explica como criar e publicar um plugin para o Nyxovira.
 
 Um plugin conecta o Nyxovira a um site de leitura. Ele abre o site, reconhece a página da obra, mostra a lista de capítulos assim que o usuário toca em baixar e prepara apenas os capítulos escolhidos pelo usuário.
 
+## Comece pelo seu objetivo
+
+| Quero... | Leia primeiro |
+| --- | --- |
+| Criar os arquivos de um plugin | [Arquivos do Plugin](#arquivos-do-plugin) e [`plugin.json`](#pluginjson) |
+| Criar um site próprio com catálogo e botão Instalar | [Sites Externos de Plugins](#sites-externos-de-plugins) |
+| Montar a lista de capítulos e downloads | [Lista Instantânea de Capítulos](#lista-instantânea-de-capítulos) |
+| Publicar no catálogo oficial | [Publicar no Plugin Hub Oficial](#publicar-no-plugin-hub-oficial) |
+
 ## Como um Plugin Funciona
 
 1. O criador prepara `plugin.json` e `browser/download_target.js`.
@@ -25,6 +34,21 @@ O Nyxovira oferece três entradas diferentes para plugins:
 Um site externo não é incorporado ao Plugin Hub e seus plugins não aparecem misturados ao catálogo oficial. O Nyxovira guarda somente a associação entre a página conectada e seu catálogo.
 
 ## Sites Externos de Plugins
+
+Uma loja externa mínima pode usar esta estrutura:
+
+```text
+plugin-store/
+|-- index.html
+|-- catalog.json
+`-- plugins/
+    `-- my-plugin/
+        |-- plugin.json
+        `-- browser/
+            `-- download_target.js
+```
+
+Hospede a pasta em um endereço HTTPS público. A aparência, a busca e os cards pertencem ao próprio site; o Nyxovira precisa apenas descobrir o catálogo e receber a solicitação de instalação.
 
 ### Descoberta do catálogo
 
@@ -69,18 +93,39 @@ Sem uma declaração, o Nyxovira procura `catalog.json`, `catalog-store.json` e 
 
 ### Instalação pela página externa
 
-O botão de instalação da loja pode chamar a ponte Android fornecida pelo navegador interno:
+Este exemplo completo cria o botão, informa quando a página foi aberta fora do aplicativo e mostra o resultado retornado pelo Nyxovira:
 
-```js
-const bridge = globalThis.NyxoviraAndroidBridge
-  || globalThis.ArchiveInkAndroidBridge;
-const catalogUrl = new URL("catalog.json", location.href).href;
+```html
+<button id="install-my-plugin" type="button">Instalar My Plugin</button>
+<p id="install-status" aria-live="polite"></p>
 
-function installPlugin(id) {
-  return JSON.parse(
-    bridge.installCommunityPlugin(catalogUrl, JSON.stringify({ id }))
-  );
-}
+<script>
+  const catalogUrl = new URL("catalog.json", location.href).href;
+  const status = document.querySelector("#install-status");
+
+  document.querySelector("#install-my-plugin").addEventListener("click", () => {
+    const bridge = globalThis.NyxoviraAndroidBridge
+      || globalThis.ArchiveInkAndroidBridge;
+
+    if (!bridge || typeof bridge.installCommunityPlugin !== "function") {
+      status.textContent = "Abra este site pelo Nyxovira para instalar.";
+      return;
+    }
+
+    try {
+      const result = JSON.parse(
+        bridge.installCommunityPlugin(
+          catalogUrl,
+          JSON.stringify({ id: "my-plugin" })
+        ) || "{}"
+      );
+      status.textContent = result.message
+        || (result.success ? "Plugin instalado." : "Não foi possível instalar.");
+    } catch (error) {
+      status.textContent = "Não foi possível concluir a instalação.";
+    }
+  });
+</script>
 ```
 
 A ponte só autoriza a instalação enquanto o usuário navega dentro do site conectado. O Nyxovira baixa novamente o catálogo associado e procura o plugin pelo `id`; a página não pode substituir o catálogo conectado por uma URL arbitrária.
@@ -95,6 +140,14 @@ Também estão disponíveis `getCommunityPluginCatalog(catalogUrl)`, `getOnlineP
 - IDs duplicados e manifestos cujo `id` não corresponde à entrada do catálogo são recusados.
 - A permissão de instalação é removida quando o navegador sai do caminho autorizado do site conectado.
 - Sites externos e seus plugins são independentes e não são revisados nem publicados pelo KapiTomo.
+
+### Teste antes de divulgar
+
+1. Publique todos os arquivos em HTTPS.
+2. No Nyxovira, abra **Sites > Sites externos** e conecte a URL de `index.html` ou da pasta da loja.
+3. Abra o site pelo cartão criado no aplicativo.
+4. Toque em **Instalar** e confirme a mensagem retornada.
+5. Abra um endereço fora da pasta da loja e confirme que a instalação deixa de ser autorizada.
 
 ## Arquivos do Plugin
 
@@ -124,6 +177,7 @@ Exemplo:
   "id": "my-plugin",
   "name": "My Plugin",
   "version": "1.0.0",
+  "tags": ["portuguese", "manga"],
   "match": {
     "hosts": ["example.com"]
   },
@@ -308,45 +362,13 @@ Capítulo de quadrinho:
 
 Para capítulos com imagens, `pages` é o campo preferido. O Nyxovira também lê `images` por compatibilidade.
 
-## Plugin Hub
+## Publicar no Plugin Hub Oficial
 
-O Plugin Hub instala plugins diretamente de repositórios públicos do GitHub.
+Use esta opção somente quando quiser que o plugin apareça no catálogo oficial. O repositório GitHub público é a fonte da instalação; não escreva manualmente uma entrada em `catalog.json`.
 
-As solicitações de publicação são validadas automaticamente, e entradas tecnicamente válidas que aceitam as regras atuais do catálogo são publicadas imediatamente. A validação impede plugins duplicados para a mesma fonte, verifica a propriedade do repositório e recusa repositórios que não atendem aos requisitos técnicos públicos. A publicação automática não representa aprovação da fonte ou de conteúdos de terceiros.
+Antes de enviar, `plugin.json` precisa ter um ícone HTTPS público e uma lista `tags` com um idioma primeiro, de um a três tipos de conteúdo e, quando necessário, `adult` por último.
 
-O Plugin Hub é um catálogo, não um host de conteúdo. O criador do plugin é responsável pelo código, mapeamento do site, ícone, metadados, permissões e manutenção. Os sites de origem são responsáveis por suas próprias páginas e conteúdos. O Nyxovira Pro libera recursos do app e não vende obras, páginas, capítulos, traduções ou plugins de terceiros.
-
-A entrada do catálogo usa:
-
-```json
-{
-  "id": "my-plugin",
-  "name": "My Plugin",
-  "author": "Author",
-  "version": "1.0.0",
-  "description": "Site plugin for Nyxovira.",
-  "site_url": "https://example.com/",
-  "homepage": "https://example.com/",
-  "icon_url": "https://example.com/icon.png",
-  "repository_url": "https://github.com/user/my-plugin",
-  "repository_ref": "main",
-  "plugin_path": ".",
-  "hosts": ["example.com"],
-  "status": "active",
-  "tags": ["english", "manga", "novel"]
-}
-```
-
-| Campo | Significado |
-| --- | --- |
-| `repository_url` | Repositório GitHub que contém `plugin.json`. |
-| `repository_ref` | Branch ou ref usado na instalação. Normalmente `main`. |
-| `plugin_path` | Pasta que contém `plugin.json`. Use `.` quando o manifesto está na raiz do repositório. |
-| `hosts` | Domínios cobertos pelo plugin. O Hub deriva isso de `match.hosts`, `browser.home_url`, `site_url` e `homepage`. Um host só pode ter um plugin visível no catálogo. |
-| `status` | Estado no catálogo. Veja os valores abaixo. |
-| `tags` | Obrigatório. Use uma tag de idioma primeiro e depois uma a três tags de tipo de conteúdo. Tags extras ou não suportadas são ignoradas. |
-
-Tags públicas oficiais:
+Tags aceitas:
 
 Tags de idioma:
 
@@ -373,51 +395,42 @@ Tags de tipo de conteúdo:
 - `novel`
 - `webtoon`
 - `comic`
+- `other`
 
-O formato público de publicação usa o repositório como fonte do plugin.
+Classificação opcional:
 
-Fluxo de publicação:
+- `adult`: use por último quando a fonte expõe material restrito a adultos.
+
+Como publicar:
 
 1. Cole o repositório GitHub do plugin no Plugin Hub.
-2. Confirme a solicitação gerada no GitHub.
-3. A automação valida `plugin.json`, ícone público, tags oficiais, repositório e hosts cobertos.
-4. Se outro plugin visível já cobre o mesmo host, a solicitação é recusada.
-5. O autor da solicitação deve ser dono do repositório do plugin.
-6. A solicitação gerada precisa aceitar as regras atuais do catálogo do Plugin Hub.
-7. A automação publica imediatamente a entrada tecnicamente válida no catálogo.
+2. Confirme a solicitação gerada no GitHub e aceite as regras atuais.
+3. A automação verifica os arquivos, o ícone, as tags, os hosts e se o solicitante é dono do repositório.
+4. Uma solicitação tecnicamente válida é publicada no catálogo.
 
-Regras de revisão:
+Um host só pode ter um plugin visível. As regras de responsabilidade, revisão, correção e remoção ficam nos [Termos e Regras do Catálogo de Plugins](https://nanquimori.github.io/KapiTomo/terms/#regras-do-catalogo).
 
-- O Hub verifica repositório, ícone, tags oficiais e hosts cobertos.
-- Um host visível só pode ter um plugin.
-- Somente o dono do repositório pode publicar ou atualizar um plugin da comunidade.
-- Solicitações tecnicamente válidas que aceitam as regras atuais são publicadas automaticamente.
-- Donos podem remover os próprios plugins automaticamente. Mantenedores podem ocultar, restaurar ou remover qualquer plugin por uma solicitação autenticada de moderação.
-- Um criador não pode republicar por cima de uma entrada ocultada ou removida pela moderação. Um mantenedor precisa analisá-la ou restaurá-la primeiro. Remoções solicitadas pelo próprio criador podem ser republicadas por ele.
-- Se o repositório ou `plugin.json` permanecer ausente em duas verificações consecutivas, a entrada é marcada como removida.
-- A validação técnica não decide titularidade de direitos autorais nem autorização da fonte. Denúncias confiáveis são analisadas conforme os [Termos e Regras do Catálogo de Plugins](https://nanquimori.github.io/KapiTomo/terms/#regras-do-catalogo).
+## Checklist Final
 
-Valores de status:
+Para qualquer plugin:
 
-- `active`: aparece como Online.
-- `broken`: aparece como Offline.
-- `hidden`: não aparece enquanto uma denúncia confiável sobre segurança, direitos, identidade ou política é analisada.
-- `removed`: não aparece após solicitação autorizada, violação confirmada ou ausência repetida do repositório/manifesto.
-- O Hub verifica plugins a cada 30 minutos. Falhas temporárias da fonte continuam recuperáveis e não causam, isoladamente, remoção definitiva.
+1. `plugin.json` tem `id`, `version`, `match.hosts`, `browser.home_url` e `browser.download_target_script_file` válidos.
+2. `browser/download_target.js` reconhece a obra e cria a lista de capítulos.
+3. Novels usam `paragraphs`; quadrinhos usam `pages`.
+4. O plugin não contém malware, não coleta credenciais e não contorna autenticação, paywall, DRM ou restrições de acesso.
 
-## Checklist
+Para um site externo:
 
-Antes de publicar:
+1. A página e todos os arquivos usam HTTPS público.
+2. `index.html` declara `nyxovira-plugin-catalog`.
+3. `catalog.json` possui `schema_version`, `name`, `hub_url` e `plugins`.
+4. Cada `manifest_url` existe e aponta para um manifesto com o mesmo `id`.
+5. O botão trata tanto a presença quanto a ausência da ponte Android.
+6. A instalação foi testada pelo navegador interno do Nyxovira.
 
-1. `plugin.json` tem `id`, `version`, `match.hosts`, `browser.home_url` e `browser.icon_url` estáveis.
-2. `plugin.json.tags` tem um idioma oficial primeiro e pelo menos um tipo de conteúdo oficial depois.
-3. `browser/download_target.js` retorna a URL atual da obra.
-4. O primeiro clique em baixar cria um plano de capítulos imediatamente.
-5. Capítulos grandes preparam suas páginas por `window.__nyxoviraPrepareDownloadPlan`.
-6. Capítulos de novel usam `paragraphs`.
-7. Capítulos de quadrinho usam `pages`; `images` é aceito por compatibilidade.
-8. O plugin funciona a partir de um repositório GitHub limpo.
-9. Nenhum plugin visível no catálogo público já cobre o mesmo host de origem.
-10. O repositório é enviado pelo Plugin Hub online.
-11. O criador aceita as regras atuais do catálogo e a responsabilidade pelo código, metadados, permissões, manutenção e mapeamento da fonte.
-12. O plugin não contém malware, não rouba dados ou credenciais, não imita outra parte e não contorna autenticação, paywall, DRM ou restrições de acesso.
+Para o Plugin Hub oficial:
+
+1. O plugin está em um repositório GitHub público pertencente ao solicitante.
+2. O ícone é público e `plugin.json.tags` usa somente valores aceitos.
+3. Nenhum plugin visível já cobre o mesmo host.
+4. A solicitação é enviada pelo Plugin Hub e aceita as regras atuais.
