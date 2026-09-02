@@ -6,14 +6,14 @@ Este documento explica como criar e publicar um plugin para o Nyxovira.
 
 Um plugin conecta o Nyxovira a um site de leitura. Ele abre o site, reconhece a página da obra, mostra a lista de capítulos assim que o usuário toca em baixar e prepara apenas os capítulos escolhidos pelo usuário.
 
-## Comece pelo seu objetivo
+## Escolha o que você quer construir
 
 | Quero... | Leia primeiro |
 | --- | --- |
 | Criar os arquivos de um plugin | [Arquivos do Plugin](#arquivos-do-plugin) e [`plugin.json`](#pluginjson) |
-| Criar uma loja externa para distribuir plugins próprios e de outros criadores | [Loja Externa de Plugins](#loja-externa-de-plugins) |
 | Montar a lista de capítulos e downloads | [Lista Instantânea de Capítulos](#lista-instantânea-de-capítulos) |
 | Publicar no catálogo oficial | [Publicar no Plugin Hub Oficial](#publicar-no-plugin-hub-oficial) |
+| Criar uma loja externa para distribuir plugins próprios e de outros criadores | [Loja Externa de Plugins](#loja-externa-de-plugins) |
 
 ## Como um Plugin Funciona
 
