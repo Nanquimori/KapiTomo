@@ -115,3 +115,12 @@ test("copyable install-button scripts have valid JavaScript", () => {
     assert.doesNotThrow(() => new Function(script));
   }
 });
+
+test("documentation headings stay compact across desktop and mobile", () => {
+  const html = read("nyxovira/plugin-api/index.html");
+
+  assert.match(html, /h1\s*\{[\s\S]*?font-size:\s*clamp\(30px,\s*3\.6vw,\s*44px\)/);
+  assert.match(html, /h2\s*\{[\s\S]*?font-size:\s*clamp\(21px,\s*2\.2vw,\s*28px\)/);
+  assert.match(html, /@media \(max-width: 860px\)[\s\S]*?h1\s*\{[\s\S]*?font-size:\s*22px/);
+  assert.match(html, /@media \(max-width: 860px\)[\s\S]*?h2\s*\{[\s\S]*?font-size:\s*19px/);
+});
