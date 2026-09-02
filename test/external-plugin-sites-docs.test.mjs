@@ -4,34 +4,51 @@ import test from "node:test";
 
 const read = relativePath => readFileSync(new URL(`../${relativePath}`, import.meta.url), "utf8");
 
-test("published Plugin API explains distribution only after plugin creation", () => {
+test("published Plugin API follows the individual developer journey", () => {
   const html = read("nyxovira/plugin-api/index.html");
   const portuguese = read("nyxovira/plugin-api/PLUGIN_API.pt-BR.md");
   const english = read("nyxovira/plugin-api/PLUGIN_API.md");
 
   for (const document of [html, portuguese]) {
-    assert.match(document, /Como [Dd]isponibilizar [Ss]eu [Pp]lugin/);
-    assert.match(document, /Importação manual/);
+    assert.match(document, /Caminho do [Dd]esenvolvedor/);
+    assert.match(document, /Testar (?:por|no Nyxovira)[\s\S]*Importar plugins/);
+    assert.match(document, /somente para você/);
     assert.match(document, /Plugins online/);
-    assert.match(document, /Loja externa/);
+    assert.match(document, /loja externa/i);
+    assert.match(document, /avançad/i);
+    assert.doesNotMatch(document, /Três [Ff]ormas de [Ii]nstalar|Como [Dd]isponibilizar [Ss]eu [Pp]lugin/);
   }
 
   for (const document of [html, english]) {
-    assert.match(document, /How to [Mm]ake [Yy]our [Pp]lugin [Aa]vailable/);
-    assert.match(document, /Manual import/);
+    assert.match(document, /Developer [Pp]ath/);
+    assert.match(document, /Test (?:through|in Nyxovira)[\s\S]*Import plugins/);
+    assert.match(document, /Keep it for yourself/);
     assert.match(document, /Online plugins/);
-    assert.match(document, /External store/);
+    assert.match(document, /external store/i);
+    assert.match(document, /advanced/i);
+    assert.doesNotMatch(document, /Three [Ii]nstallation [Mm]odes|How to [Mm]ake [Yy]our [Pp]lugin [Aa]vailable/);
   }
 
   for (const [document, headings] of [
-    [html, ["Plugin files", "How to make your plugin available", "Publish in the official Plugin Hub", "External plugin store"]],
-    [html, ["Arquivos do plugin", "Como disponibilizar seu plugin", "Publicar no Plugin Hub oficial", "Loja externa de plugins"]],
-    [english, ["## Plugin Files", "## How to Make Your Plugin Available", "## Publish in the Official Plugin Hub", "## External Plugin Store"]],
-    [portuguese, ["## Arquivos do Plugin", "## Como Disponibilizar Seu Plugin", "## Publicar no Plugin Hub Oficial", "## Loja Externa de Plugins"]]
+    [html, ["Plugin files", "Test in Nyxovira", "Publish in the official Plugin Hub", "External plugin store"]],
+    [html, ["Arquivos do plugin", "Testar no Nyxovira", "Publicar no Plugin Hub oficial", "Loja externa de plugins"]],
+    [english, ["## Plugin Files", "## Test in Nyxovira", "## Publish in the Official Plugin Hub", "## External Plugin Store"]],
+    [portuguese, ["## Arquivos do Plugin", "## Testar no Nyxovira", "## Publicar no Plugin Hub Oficial", "## Loja Externa de Plugins"]]
   ]) {
     const positions = headings.map(heading => document.indexOf(heading));
     assert.ok(positions.every(position => position >= 0));
     assert.deepEqual(positions, [...positions].sort((a, b) => a - b));
+  }
+
+  for (const [document, checklistHeading, officialLabel, externalLabel] of [
+    [html, "<h2>Final checklist</h2>", "<h3>Official Plugin Hub</h3>", "<h3>External site</h3>"],
+    [html, "<h2>Checklist final</h2>", "<h3>Plugin Hub oficial</h3>", "<h3>Loja externa</h3>"],
+    [english, "## Final Checklist", "For the official Plugin Hub:", "For an external store:"],
+    [portuguese, "## Checklist Final", "Para o Plugin Hub oficial:", "Para uma loja externa:"]
+  ]) {
+    const checklist = document.slice(document.lastIndexOf(checklistHeading));
+    assert.ok(checklist.indexOf(officialLabel) >= 0);
+    assert.ok(checklist.indexOf(externalLabel) > checklist.indexOf(officialLabel));
   }
 });
 
@@ -64,7 +81,7 @@ test("external-site guide is copyable and understandable outside Nyxovira", () =
     assert.match(document, /install-my-plugin/);
     assert.match(document, /typeof bridge\.installCommunityPlugin/);
     assert.match(document, /install-status/);
-    assert.match(document, /Choose [Ww]hat [Yy]ou [Ww]ant to [Bb]uild|Escolha o que você quer construir/);
+    assert.match(document, /Developer [Pp]ath|Caminho do [Dd]esenvolvedor/);
     assert.match(document, /external plugin store|loja externa (?:de|para distribuir) plugins/i);
     assert.match(document, /other creators|outros criadores/i);
     assert.match(document, /Test before sharing|Teste antes de divulgar/);
@@ -75,12 +92,12 @@ test("external-site guide is copyable and understandable outside Nyxovira", () =
   }
 });
 
-test("external store appears after plugin creation, downloads, and official publication", () => {
+test("quick path keeps private use and community publishing before the advanced external store", () => {
   const html = read("nyxovira/plugin-api/index.html");
 
   for (const labels of [
-    ["Create the plugin files", "Build chapter downloads", "Publish in the official catalog", "Create an external plugin store"],
-    ["Criar os arquivos do plugin", "Montar downloads de capítulos", "Publicar no catálogo oficial", "Criar uma loja externa para distribuir plugins"]
+    ["Create the plugin", "Test through Import plugins", "Keep it for yourself", "Share with the community", "Advanced: create an external store"],
+    ["Criar o plugin", "Testar por Importar plugins", "Usar somente para você", "Compartilhar com a comunidade", "Avançado: criar uma loja externa"]
   ]) {
     const positions = labels.map(label => html.indexOf(label));
     assert.ok(positions.every(position => position >= 0));

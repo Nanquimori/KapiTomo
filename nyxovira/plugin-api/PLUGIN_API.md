@@ -6,20 +6,19 @@ This document explains how to create and publish a Nyxovira plugin.
 
 A plugin connects Nyxovira to one reading site. It opens the site, recognizes the work page, shows the chapter list as soon as the user taps download, and prepares only the chapters selected by the user.
 
-## Choose What You Want to Build
+## Developer Path
 
-| I want to... | Read first |
-| --- | --- |
-| Create the plugin files | [Plugin Files](#plugin-files) and [`plugin.json`](#pluginjson) |
-| Build chapter lists and downloads | [Instant Chapter List](#instant-chapter-list) |
-| Publish in the official catalog | [Publish in the Official Plugin Hub](#publish-in-the-official-plugin-hub) |
-| Create an external store that distributes your plugins and plugins from other creators | [External Plugin Store](#external-plugin-store) |
+1. [Create the plugin](#plugin-files): prepare `plugin.json`, map the site, and build chapter downloads.
+2. [Test through **Import plugins**](#test-in-nyxovira): import the local folder into Nyxovira and repeat the test while developing.
+3. **Keep it for yourself** if you want. No publication, catalog, or website is required.
+4. [Share it with the community](#publish-in-the-official-plugin-hub) if you want other users to find it in the official catalog.
+5. [Create an external store](#external-plugin-store) only as an advanced option for distributing ready plugins from you and other creators.
 
 ## How a Plugin Works
 
 1. The creator prepares `plugin.json` and `browser/download_target.js`.
-2. The plugin can be imported manually, published in the official Plugin Hub, or offered through an external site's catalog.
-3. Nyxovira installs the same files through the entry point selected by the user.
+2. During development, the creator imports the local plugin folder into Nyxovira and tests it on the supported site.
+3. The plugin may remain private. Publication is optional and happens only after testing.
 4. When the user opens a supported site, `browser/download_target.js` reads the current page and creates the chapter list.
 5. After the user chooses chapters, the same script prepares the selected text or image pages for saving on the device.
 
@@ -236,13 +235,21 @@ Comic chapter:
 
 For image chapters, `pages` is the preferred field. Nyxovira also reads `images` for compatibility.
 
-## How to Make Your Plugin Available
+## Test in Nyxovira
 
-Create and test the plugin first. Then choose how Nyxovira users will install it:
+Manual import is the normal development loop and also supports plugins intended only for personal use.
 
-1. **Manual import**: the user selects the plugin files directly, without a public catalog.
-2. **Official Plugin Hub**: publish the plugin in KapiTomo so it appears under **Online plugins**.
-3. **External store**: create your own site only when you want to distribute a catalog containing one or more ready plugins.
+1. Keep `plugin.json` and the `browser` folder together inside the plugin folder.
+2. In Nyxovira, open **Sites**, tap **Import plugins**, and select the plugin folder. You may also select a parent folder containing several plugin folders.
+3. Open the supported site and verify work recognition, the chapter list, and the download.
+4. After changing the files, import the folder again and repeat the test.
+
+**If the plugin is only for you, you are done.** You do not need GitHub, a public catalog, or a plugin website.
+
+If you want to share it, choose one of these later steps:
+
+- [Publish in the official Plugin Hub](#publish-in-the-official-plugin-hub): the community finds the plugin under **Online plugins**.
+- [Maintain an external store](#external-plugin-store): the advanced and more involved option for distributing a catalog of your plugins and plugins from other creators.
 
 ## Publish in the Official Plugin Hub
 
@@ -413,15 +420,15 @@ For every plugin:
 3. Novels use `paragraphs`; comics use `pages`.
 4. The plugin contains no malware, does not collect credentials, and does not bypass authentication, paywalls, DRM, or access restrictions.
 
-For an external store:
-
-1. The page, catalog, and plugin files are published.
-2. Every plugin shows the correct author and source site.
-3. The **Install** button was tested by opening the store from Nyxovira.
-
 For the official Plugin Hub:
 
 1. The plugin is in a public GitHub repository owned by the requester.
 2. The icon is public and `plugin.json.tags` uses only accepted values.
 3. No visible plugin already covers the same host.
 4. The request is sent through the Plugin Hub and accepts the current rules.
+
+For an external store:
+
+1. The page, catalog, and plugin files are published.
+2. Every plugin shows the correct author and source site.
+3. The **Install** button was tested by opening the store from Nyxovira.
