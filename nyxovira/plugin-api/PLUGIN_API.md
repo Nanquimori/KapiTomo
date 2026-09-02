@@ -130,18 +130,13 @@ This complete example creates the button, explains when the page is open outside
 </script>
 ```
 
-The bridge authorizes installation only while the user remains inside the connected site. Nyxovira downloads the associated catalog again and finds the plugin by `id`; the page cannot replace the connected catalog with an arbitrary URL.
+When the store is open in a regular browser, the example tells the person to open it from Nyxovira. Inside the app, the button installs the matching plugin from the connected catalog.
 
-`getCommunityPluginCatalog(catalogUrl)`, `getOnlinePluginCatalog()`, and `installOnlinePlugin(pluginJson)` are also available. The last two are compatibility aliases for stores that reuse an interface originally built for the official Plugin Hub.
+### Before publishing the store
 
-### Limits and security
-
-- A user can keep up to 20 external sites connected.
-- The page, catalog, and every redirect must use HTTPS and public addresses; local networks and `localhost` are rejected.
-- A catalog may contain up to 2 MiB and 1,000 plugins. Each manifest or script may contain up to 4 MiB.
-- Duplicate IDs and manifests whose `id` does not match the catalog entry are rejected.
-- Installation permission is removed when the browser leaves the connected site's authorized path.
-- External sites and their plugins are independent and are neither reviewed nor published by KapiTomo.
+- Host the page, catalog, and plugin files at public HTTPS addresses.
+- For every plugin, accurately identify the author, source site, and manifest path.
+- Test the Install button by opening the store from its card under **External sites** in Nyxovira.
 
 ### Test before sharing
 
@@ -149,7 +144,6 @@ The bridge authorizes installation only while the user remains inside the connec
 2. In Nyxovira, open **Sites > External sites** and connect the URL of `index.html` or the store directory.
 3. Open the site from the card created in the app.
 4. Tap **Install** and confirm the returned message.
-5. Navigate outside the store directory and confirm that installation is no longer authorized.
 
 ## Plugin Files
 
@@ -423,12 +417,9 @@ For every plugin:
 
 For an external store:
 
-1. The page and every file use public HTTPS URLs.
-2. `index.html` declares `nyxovira-plugin-catalog`.
-3. `catalog.json` contains `schema_version`, `name`, `hub_url`, and `plugins`.
-4. Every `manifest_url` exists and points to a manifest with the same `id`.
-5. The button handles both the presence and absence of the Android bridge.
-6. Installation was tested inside Nyxovira's internal browser.
+1. The page, catalog, and plugin files are published.
+2. Every plugin shows the correct author and source site.
+3. The **Install** button was tested by opening the store from Nyxovira.
 
 For the official Plugin Hub:
 
