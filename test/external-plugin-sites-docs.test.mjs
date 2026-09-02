@@ -56,7 +56,7 @@ test("external-site guide is copyable and understandable outside Nyxovira", () =
     assert.match(document, /install-my-plugin/);
     assert.match(document, /typeof bridge\.installCommunityPlugin/);
     assert.match(document, /install-status/);
-    assert.match(document, /Start [Ww]ith [Yy]our [Gg]oal|Comece pelo seu objetivo/);
+    assert.match(document, /Choose [Ww]hat [Yy]ou [Ww]ant to [Bb]uild|Escolha o que você quer construir/);
     assert.match(document, /external plugin store|loja externa (?:de|para distribuir) plugins/i);
     assert.match(document, /other creators|outros criadores/i);
     assert.match(document, /Test before sharing|Teste antes de divulgar/);
@@ -64,6 +64,19 @@ test("external-site guide is copyable and understandable outside Nyxovira", () =
     assert.match(document, /`?adult`?/);
     assert.doesNotMatch(document, /Nyxovira Pro/);
     assert.doesNotMatch(document, /0w0-UwU-Hub|0w0 UwU|NexusToons|Pluma Comics|yxz0w0zxy/i);
+  }
+});
+
+test("external store appears after plugin creation, downloads, and official publication", () => {
+  const html = read("nyxovira/plugin-api/index.html");
+
+  for (const labels of [
+    ["Create the plugin files", "Build chapter downloads", "Publish in the official catalog", "Create an external plugin store"],
+    ["Criar os arquivos do plugin", "Montar downloads de capítulos", "Publicar no catálogo oficial", "Criar uma loja externa para distribuir plugins"]
+  ]) {
+    const positions = labels.map(label => html.indexOf(label));
+    assert.ok(positions.every(position => position >= 0));
+    assert.deepEqual(positions, [...positions].sort((a, b) => a - b));
   }
 });
 
