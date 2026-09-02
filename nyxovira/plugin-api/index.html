@@ -545,12 +545,13 @@
       <main class="grid">
         <div class="content">
           <section class="panel">
-            <h2>Choose what you want to build</h2>
+            <h2>Developer path</h2>
             <div class="rule-list">
-              <article><h3><a href="#files">Create the plugin files</a></h3><p>Start with the folder layout and <code>plugin.json</code>.</p></article>
-              <article><h3><a href="#chapter-plan">Build chapter downloads</a></h3><p>Learn the chapter plan and deferred preparation flow.</p></article>
-              <article><h3><a href="#publishing">Publish in the official catalog</a></h3><p>Use the Plugin Hub when the plugin should appear in KapiTomo.</p></article>
-              <article><h3><a href="#external-sites">Create an external plugin store</a></h3><p>After the plugins are ready, distribute your own and other creators' plugins through an independent catalog.</p></article>
+              <article><h3>1. <a href="#files">Create the plugin</a></h3><p>Prepare <code>plugin.json</code>, map the site, and build chapter downloads.</p></article>
+              <article><h3>2. <a href="#testing">Test through Import plugins</a></h3><p>Import the local folder into Nyxovira and repeat the test while developing.</p></article>
+              <article><h3>3. Keep it for yourself</h3><p>If only you will use the plugin, no publication, catalog, or website is required.</p></article>
+              <article><h3>4. <a href="#publishing">Share with the community</a></h3><p>Publish the finished plugin in the official catalog when you want other users to find it.</p></article>
+              <article><h3>5. <a href="#external-sites">Advanced: create an external store</a></h3><p>Choose this only to maintain your own distribution of ready plugins from you and other creators.</p></article>
             </div>
           </section>
 
@@ -558,8 +559,8 @@
             <h2>How a plugin works</h2>
             <div class="steps">
               <div class="step"><p>The creator prepares <code>plugin.json</code> and <code>browser/download_target.js</code>.</p></div>
-              <div class="step"><p>The plugin is imported manually, published in the official Plugin Hub, or offered through an external site's catalog.</p></div>
-              <div class="step"><p>Nyxovira installs the same files through the entry point selected by the user.</p></div>
+              <div class="step"><p>During development, the creator imports the local plugin folder into Nyxovira and tests it on the supported site.</p></div>
+              <div class="step"><p>The plugin may remain private. Publication is optional and happens only after testing.</p></div>
               <div class="step"><p>On supported pages, the browser script shows chapters immediately and prepares the selected content after confirmation.</p></div>
             </div>
           </section>
@@ -707,21 +708,25 @@ return "https://example.com/manga/work/";</code></pre>
 }</code></pre>
           </section>
 
-          <section id="installation-modes" class="panel">
-            <h2>How to make your plugin available</h2>
-            <p>Create and test the plugin first. Then choose how Nyxovira users will install it:</p>
+          <section id="testing" class="panel">
+            <h2>Test in Nyxovira</h2>
+            <p>Manual import is the normal development loop and also supports plugins intended only for personal use.</p>
+            <div class="steps">
+              <div class="step"><p>Keep <code>plugin.json</code> and the <code>browser</code> folder together inside the plugin folder.</p></div>
+              <div class="step"><p>In Nyxovira, open <strong>Sites</strong>, tap <strong>Import plugins</strong>, and select the plugin folder. You may also select a parent folder containing several plugin folders.</p></div>
+              <div class="step"><p>Open the supported site and verify work recognition, the chapter list, and the download.</p></div>
+              <div class="step"><p>After changing the files, import the folder again and repeat the test.</p></div>
+            </div>
+            <p class="panel-copy-after-list"><strong>If the plugin is only for you, you are done.</strong> You do not need GitHub, a public catalog, or a plugin website.</p>
+            <h3 class="api-subheading">If you want to share it</h3>
             <div class="rule-list">
               <article>
-                <h3>1. Manual import</h3>
-                <p>The user selects the plugin files directly, without a public catalog.</p>
+                <h3>Publish in the official catalog</h3>
+                <p>Use the Plugin Hub so the community can find the plugin under <strong>Online plugins</strong>.</p>
               </article>
               <article>
-                <h3>2. Official Plugin Hub</h3>
-                <p>Publish the plugin in KapiTomo so it appears under <strong>Online plugins</strong>.</p>
-              </article>
-              <article>
-                <h3>3. External store</h3>
-                <p>Create your own site only when you want to distribute a catalog containing one or more ready plugins.</p>
+                <h3>Advanced: maintain an external store</h3>
+                <p>This is the last and most involved option, intended for distributing a catalog of your plugins and plugins from other creators.</p>
               </article>
             </div>
           </section>
@@ -852,12 +857,12 @@ return "https://example.com/manga/work/";</code></pre>
                 <p>Valid manifest fields; a working browser script; <code>paragraphs</code> for novels or <code>pages</code> for comics; no malware, credential collection, or access-control bypass.</p>
               </article>
               <article>
-                <h3>External site</h3>
-                <p>Page, catalog, and plugins published; correct author and source-site information; Install button tested by opening the store from Nyxovira.</p>
-              </article>
-              <article>
                 <h3>Official Plugin Hub</h3>
                 <p>A public repository owned by the requester; a public icon; accepted tags; no existing visible plugin for the same host; submission through the Plugin Hub.</p>
+              </article>
+              <article>
+                <h3>External site</h3>
+                <p>Page, catalog, and plugins published; correct author and source-site information; Install button tested by opening the store from Nyxovira.</p>
               </article>
             </div>
           </section>
@@ -882,12 +887,13 @@ return "https://example.com/manga/work/";</code></pre>
       <main class="grid">
         <div class="content">
           <section class="panel">
-            <h2>Escolha o que você quer construir</h2>
+            <h2>Caminho do desenvolvedor</h2>
             <div class="rule-list">
-              <article><h3><a href="#files-pt">Criar os arquivos do plugin</a></h3><p>Comece pela estrutura de pastas e pelo <code>plugin.json</code>.</p></article>
-              <article><h3><a href="#chapter-plan-pt">Montar downloads de capítulos</a></h3><p>Aprenda o plano de capítulos e a preparação posterior.</p></article>
-              <article><h3><a href="#publishing-pt">Publicar no catálogo oficial</a></h3><p>Use o Plugin Hub quando o plugin deve aparecer no KapiTomo.</p></article>
-              <article><h3><a href="#external-sites-pt">Criar uma loja externa para distribuir plugins</a></h3><p>Depois que os plugins estiverem prontos, distribua plugins próprios e de outros criadores em um catálogo independente.</p></article>
+              <article><h3>1. <a href="#files-pt">Criar o plugin</a></h3><p>Prepare o <code>plugin.json</code>, mapeie o site e monte os downloads de capítulos.</p></article>
+              <article><h3>2. <a href="#testing-pt">Testar por Importar plugins</a></h3><p>Importe a pasta local no Nyxovira e repita o teste enquanto desenvolve.</p></article>
+              <article><h3>3. Usar somente para você</h3><p>Se apenas você usará o plugin, não precisa publicar, criar catálogo nem montar site.</p></article>
+              <article><h3>4. <a href="#publishing-pt">Compartilhar com a comunidade</a></h3><p>Publique o plugin pronto no catálogo oficial quando quiser que outros usuários o encontrem.</p></article>
+              <article><h3>5. <a href="#external-sites-pt">Avançado: criar uma loja externa</a></h3><p>Escolha isso somente para manter uma distribuição própria de plugins prontos, seus e de outros criadores.</p></article>
             </div>
           </section>
 
@@ -895,8 +901,8 @@ return "https://example.com/manga/work/";</code></pre>
             <h2>Como um plugin funciona</h2>
             <div class="steps">
               <div class="step"><p>O criador prepara <code>plugin.json</code> e <code>browser/download_target.js</code>.</p></div>
-              <div class="step"><p>O plugin é importado manualmente, publicado no Plugin Hub oficial ou oferecido pelo catálogo de um site externo.</p></div>
-              <div class="step"><p>O Nyxovira instala os mesmos arquivos pela entrada escolhida pelo usuário.</p></div>
+              <div class="step"><p>Durante o desenvolvimento, o criador importa a pasta local do plugin no Nyxovira e testa no site compatível.</p></div>
+              <div class="step"><p>O plugin pode continuar particular. A publicação é opcional e acontece somente depois dos testes.</p></div>
               <div class="step"><p>Nas páginas compatíveis, o script mostra os capítulos imediatamente e prepara o conteúdo escolhido depois da confirmação.</p></div>
             </div>
           </section>
@@ -1044,21 +1050,25 @@ return "https://example.com/manga/work/";</code></pre>
 }</code></pre>
           </section>
 
-          <section id="installation-modes-pt" class="panel">
-            <h2>Como disponibilizar seu plugin</h2>
-            <p>Primeiro crie e teste o plugin. Depois escolha como os usuários do Nyxovira poderão instalá-lo:</p>
+          <section id="testing-pt" class="panel">
+            <h2>Testar no Nyxovira</h2>
+            <p>A importação manual é o caminho normal durante o desenvolvimento e também permite usar um plugin somente para você.</p>
+            <div class="steps">
+              <div class="step"><p>Mantenha <code>plugin.json</code> e a pasta <code>browser</code> juntos dentro da pasta do plugin.</p></div>
+              <div class="step"><p>No Nyxovira, abra <strong>Sites</strong>, toque em <strong>Importar plugins</strong> e selecione a pasta do plugin. Você também pode selecionar uma pasta que contenha várias pastas de plugins.</p></div>
+              <div class="step"><p>Abra o site compatível e confira o reconhecimento da obra, a lista de capítulos e o download.</p></div>
+              <div class="step"><p>Depois de alterar os arquivos, importe a pasta novamente e repita o teste.</p></div>
+            </div>
+            <p class="panel-copy-after-list"><strong>Se o plugin é somente para você, o processo termina aqui.</strong> Não é necessário usar GitHub, catálogo público ou site de plugins.</p>
+            <h3 class="api-subheading">Se quiser compartilhar</h3>
             <div class="rule-list">
               <article>
-                <h3>1. Importação manual</h3>
-                <p>O usuário seleciona diretamente os arquivos do plugin, sem usar um catálogo público.</p>
+                <h3>Publicar no catálogo oficial</h3>
+                <p>Use o Plugin Hub para a comunidade encontrar o plugin em <strong>Plugins online</strong>.</p>
               </article>
               <article>
-                <h3>2. Plugin Hub oficial</h3>
-                <p>Publique o plugin no KapiTomo para ele aparecer em <strong>Plugins online</strong>.</p>
-              </article>
-              <article>
-                <h3>3. Loja externa</h3>
-                <p>Crie seu próprio site somente quando quiser distribuir um catálogo com um ou vários plugins já prontos.</p>
+                <h3>Avançado: manter uma loja externa</h3>
+                <p>Esta é a última opção e a mais trabalhosa, destinada a distribuir um catálogo com plugins seus e de outros criadores.</p>
               </article>
             </div>
           </section>
@@ -1189,12 +1199,12 @@ return "https://example.com/manga/work/";</code></pre>
                 <p>Campos válidos no manifesto; script do navegador funcionando; <code>paragraphs</code> para novels ou <code>pages</code> para quadrinhos; sem malware, coleta de credenciais ou quebra de controle de acesso.</p>
               </article>
               <article>
-                <h3>Loja externa</h3>
-                <p>Página, catálogo e plugins publicados; informações corretas de autor e site de origem; botão Instalar testado abrindo a loja pelo Nyxovira.</p>
-              </article>
-              <article>
                 <h3>Plugin Hub oficial</h3>
                 <p>Repositório público do solicitante; ícone público; tags aceitas; nenhum plugin visível no mesmo host; envio pelo Plugin Hub.</p>
+              </article>
+              <article>
+                <h3>Loja externa</h3>
+                <p>Página, catálogo e plugins publicados; informações corretas de autor e site de origem; botão Instalar testado abrindo a loja pelo Nyxovira.</p>
               </article>
             </div>
           </section>
