@@ -57,6 +57,8 @@ test("external-site guide is copyable and understandable outside Nyxovira", () =
     assert.match(document, /typeof bridge\.installCommunityPlugin/);
     assert.match(document, /install-status/);
     assert.match(document, /Start [Ww]ith [Yy]our [Gg]oal|Comece pelo seu objetivo/);
+    assert.match(document, /external plugin store|loja externa (?:de|para distribuir) plugins/i);
+    assert.match(document, /other creators|outros criadores/i);
     assert.match(document, /Test before sharing|Teste antes de divulgar/);
     assert.match(document, /`?other`?/);
     assert.match(document, /`?adult`?/);

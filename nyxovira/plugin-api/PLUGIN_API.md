@@ -11,7 +11,7 @@ A plugin connects Nyxovira to one reading site. It opens the site, recognizes th
 | I want to... | Read first |
 | --- | --- |
 | Create the plugin files | [Plugin Files](#plugin-files) and [`plugin.json`](#pluginjson) |
-| Create a website with its own catalog and Install button | [External Plugin Sites](#external-plugin-sites) |
+| Create an external store that distributes your plugins and plugins from other creators | [External Plugin Store](#external-plugin-store) |
 | Build chapter lists and downloads | [Instant Chapter List](#instant-chapter-list) |
 | Publish in the official catalog | [Publish in the Official Plugin Hub](#publish-in-the-official-plugin-hub) |
 
@@ -29,11 +29,13 @@ Nyxovira provides three different plugin entry points:
 
 1. **Import plugins**: manually installs plugin files selected by the user without using a public catalog.
 2. **Online plugins**: opens the official KapiTomo Plugin Hub, which displays and installs plugins published in the official catalog.
-3. **External sites**: connects the HTTPS page of an independent plugin store. The external page displays, searches, and organizes its own plugins and can request direct installation while open inside Nyxovira.
+3. **External sites**: connects the HTTPS page of an independent store that distributes one or more plugins, whether maintained by the store owner or other creators. The store displays, searches, and organizes the catalog and can request direct installation while open inside Nyxovira.
 
 An external site is not incorporated into the Plugin Hub, and its plugins are not mixed into the official catalog. Nyxovira stores only the association between the connected page and its catalog.
 
-## External Plugin Sites
+## External Plugin Store
+
+This mode is for anyone maintaining an independent plugin distribution. A store can offer plugins from its owner and from other creators in the same catalog. Every entry must accurately identify its `author`, manifest, and source site; distributing a third-party plugin does not transfer its authorship or maintenance responsibility to the store.
 
 A minimal external store can use this structure:
 
@@ -48,7 +50,7 @@ plugin-store/
             `-- download_target.js
 ```
 
-Host the folder at a public HTTPS address. The appearance, search, and cards belong to the site itself; Nyxovira only needs to discover the catalog and receive the installation request.
+Host the folder at a public HTTPS address. The appearance, search, and cards belong to the store itself; Nyxovira only needs to discover the catalog and receive the installation request. Add one object to the `plugins` list for every distributed plugin.
 
 ### Catalog discovery
 
@@ -419,7 +421,7 @@ For every plugin:
 3. Novels use `paragraphs`; comics use `pages`.
 4. The plugin contains no malware, does not collect credentials, and does not bypass authentication, paywalls, DRM, or access restrictions.
 
-For an external site:
+For an external store:
 
 1. The page and every file use public HTTPS URLs.
 2. `index.html` declares `nyxovira-plugin-catalog`.

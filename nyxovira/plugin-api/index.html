@@ -548,7 +548,7 @@
             <h2>Start with your goal</h2>
             <div class="rule-list">
               <article><h3><a href="#files">Create the plugin files</a></h3><p>Start with the folder layout and <code>plugin.json</code>.</p></article>
-              <article><h3><a href="#external-sites">Create an external plugin site</a></h3><p>Build a website with its own catalog, plugin cards, and Install button.</p></article>
+              <article><h3><a href="#external-sites">Create an external plugin store</a></h3><p>Distribute your plugins and plugins from other creators through one catalog with its own cards and Install buttons.</p></article>
               <article><h3><a href="#chapter-plan">Build chapter downloads</a></h3><p>Learn the chapter plan and deferred preparation flow.</p></article>
               <article><h3><a href="#publishing">Publish in the official catalog</a></h3><p>Use the Plugin Hub when the plugin should appear in KapiTomo.</p></article>
             </div>
@@ -577,14 +577,15 @@
               </article>
               <article>
                 <h3>3. External sites</h3>
-                <p>Connects an independent HTTPS plugin-store page. That page displays and organizes its own plugins and can request direct installation while open inside Nyxovira.</p>
+                <p>Connects an independent HTTPS store that distributes one or more plugins maintained by its owner or other creators.</p>
               </article>
             </div>
             <p class="panel-copy-after-list">An external site's plugins are not mixed into the official catalog. Nyxovira stores only the association between the connected page and its catalog.</p>
           </section>
 
           <section id="external-sites" class="panel">
-            <h2>External plugin sites</h2>
+            <h2>External plugin store</h2>
+            <p>This mode is for anyone maintaining an independent plugin distribution. A store may offer plugins from its owner and from other creators in the same catalog. Every entry must accurately identify its <code>author</code>, manifest, and source site.</p>
             <p>A minimal external store can use this structure:</p>
             <div class="folder">
               plugin-store/<br>
@@ -596,7 +597,7 @@
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-- browser/<br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-- download_target.js
             </div>
-            <p class="panel-copy-after-list">Host the folder at a public HTTPS address. The appearance, search, and plugin cards belong to the site itself; Nyxovira only needs to discover the catalog and receive the installation request.</p>
+            <p class="panel-copy-after-list">Host the folder at a public HTTPS address. The appearance, search, and plugin cards belong to the store itself; Nyxovira only needs to discover the catalog and receive the installation request. Add one object to the <code>plugins</code> list for every distributed plugin.</p>
             <h3 class="api-subheading">Catalog discovery</h3>
             <p>Declare the catalog in the store's main page. A <code>meta</code> tag with the same name and a <code>content</code> URL is also supported.</p>
             <pre><code>&lt;link rel="nyxovira-plugin-catalog" href="catalog.json"&gt;</code></pre>
@@ -886,7 +887,7 @@ return "https://example.com/manga/work/";</code></pre>
             <h2>Comece pelo seu objetivo</h2>
             <div class="rule-list">
               <article><h3><a href="#files-pt">Criar os arquivos do plugin</a></h3><p>Comece pela estrutura de pastas e pelo <code>plugin.json</code>.</p></article>
-              <article><h3><a href="#external-sites-pt">Criar um site externo de plugins</a></h3><p>Monte uma página com catálogo próprio, cards e botão Instalar.</p></article>
+              <article><h3><a href="#external-sites-pt">Criar uma loja externa para distribuir plugins</a></h3><p>Distribua plugins próprios e de outros criadores em um catálogo com seus próprios cards e botões Instalar.</p></article>
               <article><h3><a href="#chapter-plan-pt">Montar downloads de capítulos</a></h3><p>Aprenda o plano de capítulos e a preparação posterior.</p></article>
               <article><h3><a href="#publishing-pt">Publicar no catálogo oficial</a></h3><p>Use o Plugin Hub quando o plugin deve aparecer no KapiTomo.</p></article>
             </div>
@@ -915,14 +916,15 @@ return "https://example.com/manga/work/";</code></pre>
               </article>
               <article>
                 <h3>3. Sites externos</h3>
-                <p>Conecta a página HTTPS de uma loja independente. A própria página mostra e organiza seus plugins e pode solicitar a instalação direta enquanto estiver aberta pelo Nyxovira.</p>
+                <p>Conecta uma loja HTTPS independente que distribui um ou vários plugins mantidos pelo responsável ou por outros criadores.</p>
               </article>
             </div>
             <p class="panel-copy-after-list">Os plugins de um site externo não são misturados ao catálogo oficial. O Nyxovira guarda somente a associação entre a página conectada e seu catálogo.</p>
           </section>
 
           <section id="external-sites-pt" class="panel">
-            <h2>Sites externos de plugins</h2>
+            <h2>Loja externa de plugins</h2>
+            <p>Este modo é destinado a quem mantém uma distribuição independente. A loja pode oferecer plugins do próprio responsável e de outros criadores no mesmo catálogo. Cada entrada deve identificar corretamente seu <code>author</code>, manifesto e site de origem.</p>
             <p>Uma loja externa mínima pode usar esta estrutura:</p>
             <div class="folder">
               plugin-store/<br>
@@ -934,7 +936,7 @@ return "https://example.com/manga/work/";</code></pre>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-- browser/<br>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-- download_target.js
             </div>
-            <p class="panel-copy-after-list">Hospede a pasta em um endereço HTTPS público. A aparência, a busca e os cards pertencem ao próprio site; o Nyxovira precisa apenas descobrir o catálogo e receber a solicitação de instalação.</p>
+            <p class="panel-copy-after-list">Hospede a pasta em um endereço HTTPS público. A aparência, a busca e os cards pertencem à própria loja; o Nyxovira precisa apenas descobrir o catálogo e receber a solicitação de instalação. Adicione um objeto à lista <code>plugins</code> para cada plugin distribuído.</p>
             <h3 class="api-subheading">Descoberta do catálogo</h3>
             <p>Declare o catálogo na página principal da loja. Também é aceita uma tag <code>meta</code> com o mesmo nome e a URL em <code>content</code>.</p>
             <pre><code>&lt;link rel="nyxovira-plugin-catalog" href="catalog.json"&gt;</code></pre>
@@ -1191,7 +1193,7 @@ return "https://example.com/manga/work/";</code></pre>
                 <p>Campos válidos no manifesto; script do navegador funcionando; <code>paragraphs</code> para novels ou <code>pages</code> para quadrinhos; sem malware, coleta de credenciais ou quebra de controle de acesso.</p>
               </article>
               <article>
-                <h3>Site externo</h3>
+                <h3>Loja externa</h3>
                 <p>Arquivos HTTPS públicos; declaração do catálogo; <code>hub_url</code> e <code>manifest_url</code> válidos; IDs iguais; botão que trata a ausência da ponte; instalação testada dentro do Nyxovira.</p>
               </article>
               <article>
