@@ -35,6 +35,8 @@ Privacy Policy: https://nanquimori.github.io/KapiTomo/privacy/
 
 `plugins/catalog-store.json` is the storefront catalog used by the Plugin Hub. `plugins/catalog.json` is kept as the public catalog alias.
 
+The Plugin API documents all three Nyxovira installation modes: manual import, the official online Plugin Hub, and independent external plugin sites. External sites keep their own storefront interface and catalog instead of adding their plugin cards to KapiTomo.
+
 ## Work Structure
 
 Novel:
@@ -102,7 +104,7 @@ New integrations should use `api/works/index.json`.
 
 The Plugin Hub installs site plugins from GitHub repositories. A plugin repository must contain `plugin.json` and `browser/download_target.js`.
 
-The online catalog displays at most 20 plugins per page. When more entries are available, users can move with Previous and Next, select a numbered page, or choose any page directly from the page selector. Search, tag, and favorites filters reset to the first page and paginate only the matching results.
+The official KapiTomo plugin is pinned in its own section above the community catalog and never consumes a paginated slot. Each page displays at most 20 community plugins, ordered from newest to oldest by their first publication date. Updating an existing plugin preserves that date. When more entries are available, users can move with Previous and Next, select a numbered page, or choose any page directly from the page selector. Search, tag, and favorites filters reset to the first page and paginate only matching community entries.
 
 KapiTomo publishes catalog entries, not third-party works. Plugin creators are responsible for their code, manifest, requested permissions, repository, accurate catalog metadata, and maintenance. Source sites are responsible for their works, translations, advertisements, accounts, pages, availability, and access rules. KapiTomo operates the catalog entry and review process; it does not operate or continuously audit community repositories or source sites. Nyxovira Pro pays for app features and maintenance; it is not a sale of third-party chapters, pages, translations, plugins, manga, comics, or novels.
 
@@ -111,7 +113,9 @@ Public plugin entries include:
 - `repository_url`, `repository_ref`, and `plugin_path` for installation.
 - `hosts` to prevent duplicate visible plugins for the same site.
 - `status`, shown as `Online` or `Offline` in the Hub.
-- official tags only: one language first, then one to three content types.
+- official tags only: one language first, followed by one to three types (`manga`, `manhua`, `manhwa`, `novel`, `webtoon`, `comic`, or `other`).
+- optional `adult` classification last for sources that expose restricted material through the plugin. Adult entries remain cataloged but are hidden from Plugin Hub cards, filters, searches, pagination, and repository availability checks until restricted access is enabled after an 18+ birth-date check.
+- the birth date is evaluated only in the browser and is never stored or sent. The browser stores only the enabled/disabled restricted-access preference, which the user can disable at any time.
 
 Publishing is automatic after validation:
 
