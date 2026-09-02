@@ -35,6 +35,8 @@ Privacy Policy: https://nanquimori.github.io/KapiTomo/privacy/
 
 `plugins/catalog-store.json` is the storefront catalog used by the Plugin Hub. `plugins/catalog.json` is kept as the public catalog alias.
 
+The Plugin API documents all three Nyxovira installation modes: manual import, the official online Plugin Hub, and independent external plugin sites. External sites keep their own storefront interface and catalog instead of adding their plugin cards to KapiTomo.
+
 ## Work Structure
 
 Novel:

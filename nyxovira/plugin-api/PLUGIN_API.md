@@ -8,11 +8,93 @@ A plugin connects Nyxovira to one reading site. It opens the site, recognizes th
 
 ## How a Plugin Works
 
-1. The creator publishes a GitHub repository with the plugin files.
-2. The Plugin Hub reads `plugin.json` to show the plugin name, icon, tags, site, and repository.
-3. Nyxovira installs the plugin from that repository.
+1. The creator prepares `plugin.json` and `browser/download_target.js`.
+2. The plugin can be imported manually, published in the official Plugin Hub, or offered through an external site's catalog.
+3. Nyxovira installs the same files through the entry point selected by the user.
 4. When the user opens a supported site, `browser/download_target.js` reads the current page and creates the chapter list.
 5. After the user chooses chapters, the same script prepares the selected text or image pages for saving on the device.
+
+## Three Installation Modes
+
+Nyxovira provides three different plugin entry points:
+
+1. **Import plugins**: manually installs plugin files selected by the user without using a public catalog.
+2. **Online plugins**: opens the official KapiTomo Plugin Hub, which displays and installs plugins published in the official catalog.
+3. **External sites**: connects the HTTPS page of an independent plugin store. The external page displays, searches, and organizes its own plugins and can request direct installation while open inside Nyxovira.
+
+An external site is not incorporated into the Plugin Hub, and its plugins are not mixed into the official catalog. Nyxovira stores only the association between the connected page and its catalog.
+
+## External Plugin Sites
+
+### Catalog discovery
+
+Add this declaration to the store's main page:
+
+```html
+<link rel="nyxovira-plugin-catalog" href="catalog.json">
+```
+
+This form is also supported:
+
+```html
+<meta name="nyxovira-plugin-catalog" content="catalog.json">
+```
+
+Without a declaration, Nyxovira looks for `catalog.json`, `catalog-store.json`, and `plugins.json` in the page's directory. The user may also connect the JSON URL directly.
+
+### External catalog format
+
+```json
+{
+  "schema_version": 1,
+  "name": "My plugin store",
+  "hub_url": "https://plugins.example.com/",
+  "plugins": [
+    {
+      "id": "my-plugin",
+      "name": "My Plugin",
+      "author": "Author",
+      "version": "1.0.0",
+      "manifest_url": "plugins/my-plugin/plugin.json",
+      "icon_url": "https://example.com/icon.png",
+      "site_url": "https://example.com/",
+      "tags": ["english", "manga"],
+      "status": "active"
+    }
+  ]
+}
+```
+
+`hub_url` tells Nyxovira which page to open when the user connects the JSON URL directly. `store_url` and `homepage` are also accepted. Relative URLs such as `manifest_url` are resolved against the catalog URL. An entry may alternatively use `repository_url`, `repository_ref`, and `plugin_path` in the same format as the Plugin Hub.
+
+### Installation from the external page
+
+The store's install button can call the Android bridge provided by the internal browser:
+
+```js
+const bridge = globalThis.NyxoviraAndroidBridge
+  || globalThis.ArchiveInkAndroidBridge;
+const catalogUrl = new URL("catalog.json", location.href).href;
+
+function installPlugin(id) {
+  return JSON.parse(
+    bridge.installCommunityPlugin(catalogUrl, JSON.stringify({ id }))
+  );
+}
+```
+
+The bridge authorizes installation only while the user remains inside the connected site. Nyxovira downloads the associated catalog again and finds the plugin by `id`; the page cannot replace the connected catalog with an arbitrary URL.
+
+`getCommunityPluginCatalog(catalogUrl)`, `getOnlinePluginCatalog()`, and `installOnlinePlugin(pluginJson)` are also available. The last two are compatibility aliases for stores that reuse an interface originally built for the official Plugin Hub.
+
+### Limits and security
+
+- A user can keep up to 20 external sites connected.
+- The page, catalog, and every redirect must use HTTPS and public addresses; local networks and `localhost` are rejected.
+- A catalog may contain up to 2 MiB and 1,000 plugins. Each manifest or script may contain up to 4 MiB.
+- Duplicate IDs and manifests whose `id` does not match the catalog entry are rejected.
+- Installation permission is removed when the browser leaves the connected site's authorized path.
+- External sites and their plugins are independent and are neither reviewed nor published by KapiTomo.
 
 ## Plugin Files
 
