@@ -4,23 +4,34 @@ import test from "node:test";
 
 const read = relativePath => readFileSync(new URL(`../${relativePath}`, import.meta.url), "utf8");
 
-test("published Plugin API documents the three installation modes", () => {
+test("published Plugin API explains distribution only after plugin creation", () => {
   const html = read("nyxovira/plugin-api/index.html");
   const portuguese = read("nyxovira/plugin-api/PLUGIN_API.pt-BR.md");
   const english = read("nyxovira/plugin-api/PLUGIN_API.md");
 
   for (const document of [html, portuguese]) {
-    assert.match(document, /Três [Ff]ormas de [Ii]nstalar/);
-    assert.match(document, /Importar plugins/);
+    assert.match(document, /Como [Dd]isponibilizar [Ss]eu [Pp]lugin/);
+    assert.match(document, /Importação manual/);
     assert.match(document, /Plugins online/);
-    assert.match(document, /Sites externos/);
+    assert.match(document, /Loja externa/);
   }
 
   for (const document of [html, english]) {
-    assert.match(document, /Three [Ii]nstallation [Mm]odes/);
-    assert.match(document, /Import plugins/);
+    assert.match(document, /How to [Mm]ake [Yy]our [Pp]lugin [Aa]vailable/);
+    assert.match(document, /Manual import/);
     assert.match(document, /Online plugins/);
-    assert.match(document, /External sites/);
+    assert.match(document, /External store/);
+  }
+
+  for (const [document, headings] of [
+    [html, ["Plugin files", "How to make your plugin available", "Publish in the official Plugin Hub", "External plugin store"]],
+    [html, ["Arquivos do plugin", "Como disponibilizar seu plugin", "Publicar no Plugin Hub oficial", "Loja externa de plugins"]],
+    [english, ["## Plugin Files", "## How to Make Your Plugin Available", "## Publish in the Official Plugin Hub", "## External Plugin Store"]],
+    [portuguese, ["## Arquivos do Plugin", "## Como Disponibilizar Seu Plugin", "## Publicar no Plugin Hub Oficial", "## Loja Externa de Plugins"]]
+  ]) {
+    const positions = headings.map(heading => document.indexOf(heading));
+    assert.ok(positions.every(position => position >= 0));
+    assert.deepEqual(positions, [...positions].sort((a, b) => a - b));
   }
 });
 

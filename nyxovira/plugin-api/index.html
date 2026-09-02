@@ -564,110 +564,6 @@
             </div>
           </section>
 
-          <section id="installation-modes" class="panel">
-            <h2>Three installation modes</h2>
-            <div class="rule-list">
-              <article>
-                <h3>1. Import plugins</h3>
-                <p>Manually installs plugin files selected by the user without using a public catalog.</p>
-              </article>
-              <article>
-                <h3>2. Online plugins</h3>
-                <p>Opens the official KapiTomo Plugin Hub and installs plugins published in its catalog.</p>
-              </article>
-              <article>
-                <h3>3. External sites</h3>
-                <p>Connects an independent HTTPS store that distributes one or more plugins maintained by its owner or other creators.</p>
-              </article>
-            </div>
-            <p class="panel-copy-after-list">An external site's plugins are not mixed into the official catalog. Nyxovira stores only the association between the connected page and its catalog.</p>
-          </section>
-
-          <section id="external-sites" class="panel">
-            <h2>External plugin store</h2>
-            <p>This mode is for anyone maintaining an independent plugin distribution. A store may offer plugins from its owner and from other creators in the same catalog. Every entry must accurately identify its <code>author</code>, manifest, and source site.</p>
-            <p>A minimal external store can use this structure:</p>
-            <div class="folder">
-              plugin-store/<br>
-              |-- index.html<br>
-              |-- catalog.json<br>
-              `-- plugins/<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;`-- my-plugin/<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-- plugin.json<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-- browser/<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-- download_target.js
-            </div>
-            <p class="panel-copy-after-list">Host the folder at a public HTTPS address. The appearance, search, and plugin cards belong to the store itself; Nyxovira only needs to discover the catalog and receive the installation request. Add one object to the <code>plugins</code> list for every distributed plugin.</p>
-            <h3 class="api-subheading">Catalog discovery</h3>
-            <p>Declare the catalog in the store's main page. A <code>meta</code> tag with the same name and a <code>content</code> URL is also supported.</p>
-            <pre><code>&lt;link rel="nyxovira-plugin-catalog" href="catalog.json"&gt;</code></pre>
-            <p>Without a declaration, Nyxovira looks for <code>catalog.json</code>, <code>catalog-store.json</code>, and <code>plugins.json</code> in the page's directory. Users may also connect the JSON URL directly.</p>
-            <h3 class="api-subheading">External catalog</h3>
-            <pre><code>{
-  "schema_version": 1,
-  "name": "My plugin store",
-  "hub_url": "https://plugins.example.com/",
-  "plugins": [{
-    "id": "my-plugin",
-    "name": "My Plugin",
-    "author": "Author",
-    "version": "1.0.0",
-    "manifest_url": "plugins/my-plugin/plugin.json",
-    "icon_url": "https://example.com/icon.png",
-    "site_url": "https://example.com/",
-    "tags": ["english", "manga"],
-    "status": "active"
-  }]
-}</code></pre>
-            <p><code>hub_url</code> identifies the storefront when a JSON URL is connected directly. <code>store_url</code> and <code>homepage</code> are accepted aliases. Relative URLs are resolved against the catalog URL. Repository-based entries may use <code>repository_url</code>, <code>repository_ref</code>, and <code>plugin_path</code>.</p>
-            <h3 class="api-subheading">Direct installation</h3>
-            <p>This complete example creates the button, explains when the page is open outside the app, and displays the result returned by Nyxovira.</p>
-            <pre><code>&lt;button id="install-my-plugin" type="button"&gt;Install My Plugin&lt;/button&gt;
-&lt;p id="install-status" aria-live="polite"&gt;&lt;/p&gt;
-
-&lt;script&gt;
-  const catalogUrl = new URL("catalog.json", location.href).href;
-  const status = document.querySelector("#install-status");
-
-  document.querySelector("#install-my-plugin").addEventListener("click", () =&gt; {
-    const bridge = globalThis.NyxoviraAndroidBridge
-      || globalThis.ArchiveInkAndroidBridge;
-
-    if (!bridge || typeof bridge.installCommunityPlugin !== "function") {
-      status.textContent = "Open this site from Nyxovira to install.";
-      return;
-    }
-
-    try {
-      const result = JSON.parse(
-        bridge.installCommunityPlugin(
-          catalogUrl,
-          JSON.stringify({ id: "my-plugin" })
-        ) || "{}"
-      );
-      status.textContent = result.message
-        || (result.success ? "Plugin installed." : "Could not install the plugin.");
-    } catch (error) {
-      status.textContent = "Could not complete the installation.";
-    }
-  });
-&lt;/script&gt;</code></pre>
-            <p>When the store is open in a regular browser, the example tells the person to open it from Nyxovira. Inside the app, the button installs the matching plugin from the connected catalog.</p>
-            <h3 class="api-subheading">Before publishing the store</h3>
-            <div class="rule-list">
-              <article><p>Host the page, catalog, and plugin files at public HTTPS addresses.</p></article>
-              <article><p>For every plugin, accurately identify the author, source site, and manifest path.</p></article>
-              <article><p>Test the Install button by opening the store from its card under <strong>External sites</strong> in Nyxovira.</p></article>
-            </div>
-            <h3 class="api-subheading">Test before sharing</h3>
-            <div class="steps">
-              <div class="step"><p>Publish every file over HTTPS.</p></div>
-              <div class="step"><p>In Nyxovira, open <strong>Sites → External sites</strong> and connect the store page or directory.</p></div>
-              <div class="step"><p>Open the connected site from its card and tap <strong>Install</strong>.</p></div>
-              <div class="step"><p>Confirm the message returned by the installation.</p></div>
-            </div>
-          </section>
-
           <section id="files" class="panel">
             <h2>Plugin files</h2>
             <p>Place the manifest and browser script inside one folder named after the plugin id.</p>
@@ -811,6 +707,25 @@ return "https://example.com/manga/work/";</code></pre>
 }</code></pre>
           </section>
 
+          <section id="installation-modes" class="panel">
+            <h2>How to make your plugin available</h2>
+            <p>Create and test the plugin first. Then choose how Nyxovira users will install it:</p>
+            <div class="rule-list">
+              <article>
+                <h3>1. Manual import</h3>
+                <p>The user selects the plugin files directly, without a public catalog.</p>
+              </article>
+              <article>
+                <h3>2. Official Plugin Hub</h3>
+                <p>Publish the plugin in KapiTomo so it appears under <strong>Online plugins</strong>.</p>
+              </article>
+              <article>
+                <h3>3. External store</h3>
+                <p>Create your own site only when you want to distribute a catalog containing one or more ready plugins.</p>
+              </article>
+            </div>
+          </section>
+
           <section id="publishing" class="panel">
             <h2>Publish in the official Plugin Hub</h2>
             <p>Use this option only when the plugin should appear in the official catalog. The public GitHub repository is the installation source; developers do not manually write a catalog entry.</p>
@@ -842,6 +757,91 @@ return "https://example.com/manga/work/";</code></pre>
               <div class="step"><p>A technically valid request is published in the catalog.</p></div>
             </div>
             <p class="panel-copy-after-list">Only one visible plugin may cover a host. Responsibility, review, correction, and removal details are kept in the <a href="../../terms/#plugin-catalog-rules">Terms and Plugin Catalog Rules</a>.</p>
+          </section>
+
+          <section id="external-sites" class="panel">
+            <h2>External plugin store</h2>
+            <p>Use this option only after the plugins are ready and tested. It is intended for anyone maintaining an independent distribution that may contain their own plugins and plugins from other creators.</p>
+            <p>A minimal external store can use this structure:</p>
+            <div class="folder">
+              plugin-store/<br>
+              |-- index.html<br>
+              |-- catalog.json<br>
+              `-- plugins/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;`-- my-plugin/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-- plugin.json<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-- browser/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-- download_target.js
+            </div>
+            <p class="panel-copy-after-list">Host the folder at a public HTTPS address. The appearance, search, and plugin cards belong to the store itself; Nyxovira only needs to discover the catalog and receive the installation request. Add one object to the <code>plugins</code> list for every distributed plugin and identify its author and source site correctly.</p>
+            <h3 class="api-subheading">Catalog discovery</h3>
+            <p>Declare the catalog in the store's main page. A <code>meta</code> tag with the same name and a <code>content</code> URL is also supported.</p>
+            <pre><code>&lt;link rel="nyxovira-plugin-catalog" href="catalog.json"&gt;</code></pre>
+            <p>Without a declaration, Nyxovira looks for <code>catalog.json</code>, <code>catalog-store.json</code>, and <code>plugins.json</code> in the page's directory. Users may also connect the JSON URL directly.</p>
+            <h3 class="api-subheading">External catalog</h3>
+            <pre><code>{
+  "schema_version": 1,
+  "name": "My plugin store",
+  "hub_url": "https://plugins.example.com/",
+  "plugins": [{
+    "id": "my-plugin",
+    "name": "My Plugin",
+    "author": "Author",
+    "version": "1.0.0",
+    "manifest_url": "plugins/my-plugin/plugin.json",
+    "icon_url": "https://example.com/icon.png",
+    "site_url": "https://example.com/",
+    "tags": ["english", "manga"],
+    "status": "active"
+  }]
+}</code></pre>
+            <p><code>hub_url</code> identifies the storefront when a JSON URL is connected directly. <code>store_url</code> and <code>homepage</code> are accepted aliases. Relative URLs are resolved against the catalog URL. Repository-based entries may use <code>repository_url</code>, <code>repository_ref</code>, and <code>plugin_path</code>.</p>
+            <h3 class="api-subheading">Direct installation</h3>
+            <p>This complete example creates the button, explains when the page is open outside the app, and displays the result returned by Nyxovira.</p>
+            <pre><code>&lt;button id="install-my-plugin" type="button"&gt;Install My Plugin&lt;/button&gt;
+&lt;p id="install-status" aria-live="polite"&gt;&lt;/p&gt;
+
+&lt;script&gt;
+  const catalogUrl = new URL("catalog.json", location.href).href;
+  const status = document.querySelector("#install-status");
+
+  document.querySelector("#install-my-plugin").addEventListener("click", () =&gt; {
+    const bridge = globalThis.NyxoviraAndroidBridge
+      || globalThis.ArchiveInkAndroidBridge;
+
+    if (!bridge || typeof bridge.installCommunityPlugin !== "function") {
+      status.textContent = "Open this site from Nyxovira to install.";
+      return;
+    }
+
+    try {
+      const result = JSON.parse(
+        bridge.installCommunityPlugin(
+          catalogUrl,
+          JSON.stringify({ id: "my-plugin" })
+        ) || "{}"
+      );
+      status.textContent = result.message
+        || (result.success ? "Plugin installed." : "Could not install the plugin.");
+    } catch (error) {
+      status.textContent = "Could not complete the installation.";
+    }
+  });
+&lt;/script&gt;</code></pre>
+            <p>When the store is open in a regular browser, the example tells the person to open it from Nyxovira. Inside the app, the button installs the matching plugin from the connected catalog.</p>
+            <h3 class="api-subheading">Before publishing the store</h3>
+            <div class="rule-list">
+              <article><p>Host the page, catalog, and plugin files at public HTTPS addresses.</p></article>
+              <article><p>For every plugin, accurately identify the author, source site, and manifest path.</p></article>
+              <article><p>Test the Install button by opening the store from its card under <strong>External sites</strong> in Nyxovira.</p></article>
+            </div>
+            <h3 class="api-subheading">Test before sharing</h3>
+            <div class="steps">
+              <div class="step"><p>Publish every file over HTTPS.</p></div>
+              <div class="step"><p>In Nyxovira, open <strong>Sites → External sites</strong> and connect the store page or directory.</p></div>
+              <div class="step"><p>Open the connected site from its card and tap <strong>Install</strong>.</p></div>
+              <div class="step"><p>Confirm the message returned by the installation.</p></div>
+            </div>
           </section>
 
           <section class="panel">
@@ -898,110 +898,6 @@ return "https://example.com/manga/work/";</code></pre>
               <div class="step"><p>O plugin é importado manualmente, publicado no Plugin Hub oficial ou oferecido pelo catálogo de um site externo.</p></div>
               <div class="step"><p>O Nyxovira instala os mesmos arquivos pela entrada escolhida pelo usuário.</p></div>
               <div class="step"><p>Nas páginas compatíveis, o script mostra os capítulos imediatamente e prepara o conteúdo escolhido depois da confirmação.</p></div>
-            </div>
-          </section>
-
-          <section class="panel">
-            <h2>Três formas de instalar</h2>
-            <div class="rule-list">
-              <article>
-                <h3>1. Importar plugins</h3>
-                <p>Instala manualmente os arquivos de um plugin escolhidos pelo usuário, sem usar um catálogo público.</p>
-              </article>
-              <article>
-                <h3>2. Plugins online</h3>
-                <p>Abre o Plugin Hub oficial do KapiTomo e instala os plugins publicados em seu catálogo.</p>
-              </article>
-              <article>
-                <h3>3. Sites externos</h3>
-                <p>Conecta uma loja HTTPS independente que distribui um ou vários plugins mantidos pelo responsável ou por outros criadores.</p>
-              </article>
-            </div>
-            <p class="panel-copy-after-list">Os plugins de um site externo não são misturados ao catálogo oficial. O Nyxovira guarda somente a associação entre a página conectada e seu catálogo.</p>
-          </section>
-
-          <section id="external-sites-pt" class="panel">
-            <h2>Loja externa de plugins</h2>
-            <p>Este modo é destinado a quem mantém uma distribuição independente. A loja pode oferecer plugins do próprio responsável e de outros criadores no mesmo catálogo. Cada entrada deve identificar corretamente seu <code>author</code>, manifesto e site de origem.</p>
-            <p>Uma loja externa mínima pode usar esta estrutura:</p>
-            <div class="folder">
-              plugin-store/<br>
-              |-- index.html<br>
-              |-- catalog.json<br>
-              `-- plugins/<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;`-- my-plugin/<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-- plugin.json<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-- browser/<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-- download_target.js
-            </div>
-            <p class="panel-copy-after-list">Hospede a pasta em um endereço HTTPS público. A aparência, a busca e os cards pertencem à própria loja; o Nyxovira precisa apenas descobrir o catálogo e receber a solicitação de instalação. Adicione um objeto à lista <code>plugins</code> para cada plugin distribuído.</p>
-            <h3 class="api-subheading">Descoberta do catálogo</h3>
-            <p>Declare o catálogo na página principal da loja. Também é aceita uma tag <code>meta</code> com o mesmo nome e a URL em <code>content</code>.</p>
-            <pre><code>&lt;link rel="nyxovira-plugin-catalog" href="catalog.json"&gt;</code></pre>
-            <p>Sem uma declaração, o Nyxovira procura <code>catalog.json</code>, <code>catalog-store.json</code> e <code>plugins.json</code> na mesma pasta da página. O usuário também pode conectar diretamente a URL do JSON.</p>
-            <h3 class="api-subheading">Catálogo externo</h3>
-            <pre><code>{
-  "schema_version": 1,
-  "name": "Minha loja de plugins",
-  "hub_url": "https://plugins.example.com/",
-  "plugins": [{
-    "id": "my-plugin",
-    "name": "My Plugin",
-    "author": "Author",
-    "version": "1.0.0",
-    "manifest_url": "plugins/my-plugin/plugin.json",
-    "icon_url": "https://example.com/icon.png",
-    "site_url": "https://example.com/",
-    "tags": ["portuguese", "manga"],
-    "status": "active"
-  }]
-}</code></pre>
-            <p><code>hub_url</code> identifica a página da loja quando uma URL JSON é conectada diretamente. <code>store_url</code> e <code>homepage</code> são aliases aceitos. URLs relativas são resolvidas a partir do catálogo. Entradas baseadas em repositório podem usar <code>repository_url</code>, <code>repository_ref</code> e <code>plugin_path</code>.</p>
-            <h3 class="api-subheading">Instalação direta</h3>
-            <p>Este exemplo completo cria o botão, informa quando a página está fora do aplicativo e mostra o resultado retornado pelo Nyxovira.</p>
-            <pre><code>&lt;button id="install-my-plugin" type="button"&gt;Instalar My Plugin&lt;/button&gt;
-&lt;p id="install-status" aria-live="polite"&gt;&lt;/p&gt;
-
-&lt;script&gt;
-  const catalogUrl = new URL("catalog.json", location.href).href;
-  const status = document.querySelector("#install-status");
-
-  document.querySelector("#install-my-plugin").addEventListener("click", () =&gt; {
-    const bridge = globalThis.NyxoviraAndroidBridge
-      || globalThis.ArchiveInkAndroidBridge;
-
-    if (!bridge || typeof bridge.installCommunityPlugin !== "function") {
-      status.textContent = "Abra este site pelo Nyxovira para instalar.";
-      return;
-    }
-
-    try {
-      const result = JSON.parse(
-        bridge.installCommunityPlugin(
-          catalogUrl,
-          JSON.stringify({ id: "my-plugin" })
-        ) || "{}"
-      );
-      status.textContent = result.message
-        || (result.success ? "Plugin instalado." : "Não foi possível instalar.");
-    } catch (error) {
-      status.textContent = "Não foi possível concluir a instalação.";
-    }
-  });
-&lt;/script&gt;</code></pre>
-            <p>Quando a loja é aberta em um navegador comum, o exemplo orienta a pessoa a abri-la pelo Nyxovira. Dentro do aplicativo, o botão instala o plugin correspondente no catálogo conectado.</p>
-            <h3 class="api-subheading">Antes de publicar a loja</h3>
-            <div class="rule-list">
-              <article><p>Hospede a página, o catálogo e os arquivos dos plugins em endereços HTTPS públicos.</p></article>
-              <article><p>Para cada plugin, informe corretamente o autor, o site de origem e o caminho do manifesto.</p></article>
-              <article><p>Teste o botão Instalar abrindo a loja pelo cartão criado em <strong>Sites externos</strong> no Nyxovira.</p></article>
-            </div>
-            <h3 class="api-subheading">Teste antes de divulgar</h3>
-            <div class="steps">
-              <div class="step"><p>Publique todos os arquivos em HTTPS.</p></div>
-              <div class="step"><p>No Nyxovira, abra <strong>Sites → Sites externos</strong> e conecte a página ou pasta da loja.</p></div>
-              <div class="step"><p>Abra o site conectado pelo cartão e toque em <strong>Instalar</strong>.</p></div>
-              <div class="step"><p>Confirme a mensagem retornada pela instalação.</p></div>
             </div>
           </section>
 
@@ -1148,6 +1044,25 @@ return "https://example.com/manga/work/";</code></pre>
 }</code></pre>
           </section>
 
+          <section id="installation-modes-pt" class="panel">
+            <h2>Como disponibilizar seu plugin</h2>
+            <p>Primeiro crie e teste o plugin. Depois escolha como os usuários do Nyxovira poderão instalá-lo:</p>
+            <div class="rule-list">
+              <article>
+                <h3>1. Importação manual</h3>
+                <p>O usuário seleciona diretamente os arquivos do plugin, sem usar um catálogo público.</p>
+              </article>
+              <article>
+                <h3>2. Plugin Hub oficial</h3>
+                <p>Publique o plugin no KapiTomo para ele aparecer em <strong>Plugins online</strong>.</p>
+              </article>
+              <article>
+                <h3>3. Loja externa</h3>
+                <p>Crie seu próprio site somente quando quiser distribuir um catálogo com um ou vários plugins já prontos.</p>
+              </article>
+            </div>
+          </section>
+
           <section id="publishing-pt" class="panel">
             <h2>Publicar no Plugin Hub oficial</h2>
             <p>Use esta opção somente quando o plugin deve aparecer no catálogo oficial. O repositório GitHub público é a fonte da instalação; o desenvolvedor não escreve manualmente uma entrada no catálogo.</p>
@@ -1179,6 +1094,91 @@ return "https://example.com/manga/work/";</code></pre>
               <div class="step"><p>Uma solicitação tecnicamente válida é publicada no catálogo.</p></div>
             </div>
             <p class="panel-copy-after-list">Um host só pode ter um plugin visível. Responsabilidade, revisão, correção e remoção estão nos <a href="../../terms/#regras-do-catalogo">Termos e Regras do Catálogo de Plugins</a>.</p>
+          </section>
+
+          <section id="external-sites-pt" class="panel">
+            <h2>Loja externa de plugins</h2>
+            <p>Use esta opção somente depois que os plugins estiverem prontos e testados. Ela é destinada a quem mantém uma distribuição independente com plugins próprios e, se quiser, plugins de outros criadores.</p>
+            <p>Uma loja externa mínima pode usar esta estrutura:</p>
+            <div class="folder">
+              plugin-store/<br>
+              |-- index.html<br>
+              |-- catalog.json<br>
+              `-- plugins/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;`-- my-plugin/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-- plugin.json<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-- browser/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-- download_target.js
+            </div>
+            <p class="panel-copy-after-list">Hospede a pasta em um endereço HTTPS público. A aparência, a busca e os cards pertencem à própria loja; o Nyxovira precisa apenas descobrir o catálogo e receber a solicitação de instalação. Adicione um objeto à lista <code>plugins</code> para cada plugin distribuído e informe corretamente seu autor e site de origem.</p>
+            <h3 class="api-subheading">Descoberta do catálogo</h3>
+            <p>Declare o catálogo na página principal da loja. Também é aceita uma tag <code>meta</code> com o mesmo nome e a URL em <code>content</code>.</p>
+            <pre><code>&lt;link rel="nyxovira-plugin-catalog" href="catalog.json"&gt;</code></pre>
+            <p>Sem uma declaração, o Nyxovira procura <code>catalog.json</code>, <code>catalog-store.json</code> e <code>plugins.json</code> na mesma pasta da página. O usuário também pode conectar diretamente a URL do JSON.</p>
+            <h3 class="api-subheading">Catálogo externo</h3>
+            <pre><code>{
+  "schema_version": 1,
+  "name": "Minha loja de plugins",
+  "hub_url": "https://plugins.example.com/",
+  "plugins": [{
+    "id": "my-plugin",
+    "name": "My Plugin",
+    "author": "Author",
+    "version": "1.0.0",
+    "manifest_url": "plugins/my-plugin/plugin.json",
+    "icon_url": "https://example.com/icon.png",
+    "site_url": "https://example.com/",
+    "tags": ["portuguese", "manga"],
+    "status": "active"
+  }]
+}</code></pre>
+            <p><code>hub_url</code> identifica a página da loja quando uma URL JSON é conectada diretamente. <code>store_url</code> e <code>homepage</code> são aliases aceitos. URLs relativas são resolvidas a partir do catálogo. Entradas baseadas em repositório podem usar <code>repository_url</code>, <code>repository_ref</code> e <code>plugin_path</code>.</p>
+            <h3 class="api-subheading">Instalação direta</h3>
+            <p>Este exemplo completo cria o botão, informa quando a página está fora do aplicativo e mostra o resultado retornado pelo Nyxovira.</p>
+            <pre><code>&lt;button id="install-my-plugin" type="button"&gt;Instalar My Plugin&lt;/button&gt;
+&lt;p id="install-status" aria-live="polite"&gt;&lt;/p&gt;
+
+&lt;script&gt;
+  const catalogUrl = new URL("catalog.json", location.href).href;
+  const status = document.querySelector("#install-status");
+
+  document.querySelector("#install-my-plugin").addEventListener("click", () =&gt; {
+    const bridge = globalThis.NyxoviraAndroidBridge
+      || globalThis.ArchiveInkAndroidBridge;
+
+    if (!bridge || typeof bridge.installCommunityPlugin !== "function") {
+      status.textContent = "Abra este site pelo Nyxovira para instalar.";
+      return;
+    }
+
+    try {
+      const result = JSON.parse(
+        bridge.installCommunityPlugin(
+          catalogUrl,
+          JSON.stringify({ id: "my-plugin" })
+        ) || "{}"
+      );
+      status.textContent = result.message
+        || (result.success ? "Plugin instalado." : "Não foi possível instalar.");
+    } catch (error) {
+      status.textContent = "Não foi possível concluir a instalação.";
+    }
+  });
+&lt;/script&gt;</code></pre>
+            <p>Quando a loja é aberta em um navegador comum, o exemplo orienta a pessoa a abri-la pelo Nyxovira. Dentro do aplicativo, o botão instala o plugin correspondente no catálogo conectado.</p>
+            <h3 class="api-subheading">Antes de publicar a loja</h3>
+            <div class="rule-list">
+              <article><p>Hospede a página, o catálogo e os arquivos dos plugins em endereços HTTPS públicos.</p></article>
+              <article><p>Para cada plugin, informe corretamente o autor, o site de origem e o caminho do manifesto.</p></article>
+              <article><p>Teste o botão Instalar abrindo a loja pelo cartão criado em <strong>Sites externos</strong> no Nyxovira.</p></article>
+            </div>
+            <h3 class="api-subheading">Teste antes de divulgar</h3>
+            <div class="steps">
+              <div class="step"><p>Publique todos os arquivos em HTTPS.</p></div>
+              <div class="step"><p>No Nyxovira, abra <strong>Sites → Sites externos</strong> e conecte a página ou pasta da loja.</p></div>
+              <div class="step"><p>Abra o site conectado pelo cartão e toque em <strong>Instalar</strong>.</p></div>
+              <div class="step"><p>Confirme a mensagem retornada pela instalação.</p></div>
+            </div>
           </section>
 
           <section class="panel">
