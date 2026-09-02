@@ -11,7 +11,7 @@ Um plugin conecta o Nyxovira a um site de leitura. Ele abre o site, reconhece a 
 | Quero... | Leia primeiro |
 | --- | --- |
 | Criar os arquivos de um plugin | [Arquivos do Plugin](#arquivos-do-plugin) e [`plugin.json`](#pluginjson) |
-| Criar um site próprio com catálogo e botão Instalar | [Sites Externos de Plugins](#sites-externos-de-plugins) |
+| Criar uma loja externa para distribuir plugins próprios e de outros criadores | [Loja Externa de Plugins](#loja-externa-de-plugins) |
 | Montar a lista de capítulos e downloads | [Lista Instantânea de Capítulos](#lista-instantânea-de-capítulos) |
 | Publicar no catálogo oficial | [Publicar no Plugin Hub Oficial](#publicar-no-plugin-hub-oficial) |
 
@@ -29,11 +29,13 @@ O Nyxovira oferece três entradas diferentes para plugins:
 
 1. **Importar plugins**: instala manualmente os arquivos de um plugin escolhidos pelo usuário, sem usar um catálogo público.
 2. **Plugins online**: abre o Plugin Hub oficial do KapiTomo, que mostra e instala os plugins publicados no catálogo oficial.
-3. **Sites externos**: conecta a página HTTPS de uma loja de plugins independente. A própria página externa mostra, pesquisa e organiza seus plugins, e pode solicitar a instalação direta enquanto estiver aberta pelo Nyxovira.
+3. **Sites externos**: conecta a página HTTPS de uma loja independente que distribui um ou vários plugins, próprios ou de outros criadores. A loja mostra, pesquisa e organiza o catálogo e pode solicitar a instalação direta enquanto estiver aberta pelo Nyxovira.
 
 Um site externo não é incorporado ao Plugin Hub e seus plugins não aparecem misturados ao catálogo oficial. O Nyxovira guarda somente a associação entre a página conectada e seu catálogo.
 
-## Sites Externos de Plugins
+## Loja Externa de Plugins
+
+Este modo é destinado a quem mantém uma distribuição independente de plugins. A loja pode oferecer plugins do próprio responsável e de outros criadores no mesmo catálogo. Cada entrada deve informar corretamente seu `author`, manifesto e site de origem; distribuir um plugin de terceiros não transfere sua autoria nem responsabilidade de manutenção para a loja.
 
 Uma loja externa mínima pode usar esta estrutura:
 
@@ -48,7 +50,7 @@ plugin-store/
             `-- download_target.js
 ```
 
-Hospede a pasta em um endereço HTTPS público. A aparência, a busca e os cards pertencem ao próprio site; o Nyxovira precisa apenas descobrir o catálogo e receber a solicitação de instalação.
+Hospede a pasta em um endereço HTTPS público. A aparência, a busca e os cards pertencem à própria loja; o Nyxovira precisa apenas descobrir o catálogo e receber a solicitação de instalação. Adicione um objeto à lista `plugins` para cada plugin distribuído.
 
 ### Descoberta do catálogo
 
@@ -419,7 +421,7 @@ Para qualquer plugin:
 3. Novels usam `paragraphs`; quadrinhos usam `pages`.
 4. O plugin não contém malware, não coleta credenciais e não contorna autenticação, paywall, DRM ou restrições de acesso.
 
-Para um site externo:
+Para uma loja externa:
 
 1. A página e todos os arquivos usam HTTPS público.
 2. `index.html` declara `nyxovira-plugin-catalog`.
