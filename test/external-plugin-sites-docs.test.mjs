@@ -36,11 +36,8 @@ test("external-site contract is present in HTML and both Markdown versions", () 
     assert.match(document, /hub_url/);
     assert.match(document, /manifest_url/);
     assert.match(document, /installCommunityPlugin/);
-    assert.match(document, /getCommunityPluginCatalog/);
-    assert.match(document, /installOnlinePlugin/);
-    assert.match(document, /2 MiB/);
-    assert.match(document, /1[.,]000|1\.000/);
-    assert.match(document, /4 MiB/);
+    assert.match(document, /public HTTPS|HTTPS públic/i);
+    assert.doesNotMatch(document, /2 MiB|4 MiB|1[.,]000 plugins|IDs duplicados|Duplicate IDs|IDs iguais|matching plugin IDs|authorized path|caminho autorizado|ausência da ponte|bridge being absent/);
   }
 });
 

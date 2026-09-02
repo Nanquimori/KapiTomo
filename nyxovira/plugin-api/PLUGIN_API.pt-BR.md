@@ -130,18 +130,13 @@ Este exemplo completo cria o botão, informa quando a página foi aberta fora do
 </script>
 ```
 
-A ponte só autoriza a instalação enquanto o usuário navega dentro do site conectado. O Nyxovira baixa novamente o catálogo associado e procura o plugin pelo `id`; a página não pode substituir o catálogo conectado por uma URL arbitrária.
+Quando a loja é aberta em um navegador comum, o exemplo orienta a pessoa a abri-la pelo Nyxovira. Dentro do aplicativo, o botão instala o plugin correspondente no catálogo conectado.
 
-Também estão disponíveis `getCommunityPluginCatalog(catalogUrl)`, `getOnlinePluginCatalog()` e `installOnlinePlugin(pluginJson)`. Os dois últimos são aliases de compatibilidade para lojas que reaproveitam uma interface criada para o Plugin Hub oficial.
+### Antes de publicar a loja
 
-### Limites e segurança
-
-- O usuário pode manter até 20 sites externos conectados.
-- A página, o catálogo e todos os redirecionamentos precisam usar HTTPS e endereços públicos; redes locais e `localhost` são recusados.
-- O catálogo pode ter até 2 MiB e 1.000 plugins. Cada manifesto ou script pode ter até 4 MiB.
-- IDs duplicados e manifestos cujo `id` não corresponde à entrada do catálogo são recusados.
-- A permissão de instalação é removida quando o navegador sai do caminho autorizado do site conectado.
-- Sites externos e seus plugins são independentes e não são revisados nem publicados pelo KapiTomo.
+- Hospede a página, o catálogo e os arquivos dos plugins em endereços HTTPS públicos.
+- Para cada plugin, informe corretamente o autor, o site de origem e o caminho do manifesto.
+- Teste o botão Instalar abrindo a loja pelo cartão criado em **Sites externos** no Nyxovira.
 
 ### Teste antes de divulgar
 
@@ -149,7 +144,6 @@ Também estão disponíveis `getCommunityPluginCatalog(catalogUrl)`, `getOnlineP
 2. No Nyxovira, abra **Sites > Sites externos** e conecte a URL de `index.html` ou da pasta da loja.
 3. Abra o site pelo cartão criado no aplicativo.
 4. Toque em **Instalar** e confirme a mensagem retornada.
-5. Abra um endereço fora da pasta da loja e confirme que a instalação deixa de ser autorizada.
 
 ## Arquivos do Plugin
 
@@ -423,12 +417,9 @@ Para qualquer plugin:
 
 Para uma loja externa:
 
-1. A página e todos os arquivos usam HTTPS público.
-2. `index.html` declara `nyxovira-plugin-catalog`.
-3. `catalog.json` possui `schema_version`, `name`, `hub_url` e `plugins`.
-4. Cada `manifest_url` existe e aponta para um manifesto com o mesmo `id`.
-5. O botão trata tanto a presença quanto a ausência da ponte Android.
-6. A instalação foi testada pelo navegador interno do Nyxovira.
+1. A página, o catálogo e os arquivos dos plugins estão publicados.
+2. O autor e o site de origem de cada plugin estão corretos.
+3. O botão **Instalar** foi testado abrindo a loja pelo Nyxovira.
 
 Para o Plugin Hub oficial:
 

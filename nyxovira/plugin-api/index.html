@@ -652,21 +652,19 @@
     }
   });
 &lt;/script&gt;</code></pre>
-            <p>The bridge works only while the user remains inside the connected site. Nyxovira downloads the associated catalog again and finds the plugin by <code>id</code>, so the page cannot replace the connected catalog with an arbitrary URL.</p>
-            <p><code>getCommunityPluginCatalog(catalogUrl)</code>, <code>getOnlinePluginCatalog()</code>, and <code>installOnlinePlugin(pluginJson)</code> are also available. The last two are compatibility aliases for stores reusing an official-Hub interface.</p>
-            <h3 class="api-subheading">Limits and security</h3>
+            <p>When the store is open in a regular browser, the example tells the person to open it from Nyxovira. Inside the app, the button installs the matching plugin from the connected catalog.</p>
+            <h3 class="api-subheading">Before publishing the store</h3>
             <div class="rule-list">
-              <article><p>Up to 20 external sites can be connected. Pages, catalogs, and redirects must use HTTPS and public addresses; local networks and <code>localhost</code> are rejected.</p></article>
-              <article><p>A catalog may contain up to 2 MiB and 1,000 plugins. Each manifest or script may contain up to 4 MiB.</p></article>
-              <article><p>Duplicate IDs and manifest/catalog ID mismatches are rejected. Installation permission ends when navigation leaves the connected site's authorized path.</p></article>
-              <article><p>External sites and their plugins are independent and are neither reviewed nor published by KapiTomo.</p></article>
+              <article><p>Host the page, catalog, and plugin files at public HTTPS addresses.</p></article>
+              <article><p>For every plugin, accurately identify the author, source site, and manifest path.</p></article>
+              <article><p>Test the Install button by opening the store from its card under <strong>External sites</strong> in Nyxovira.</p></article>
             </div>
             <h3 class="api-subheading">Test before sharing</h3>
             <div class="steps">
               <div class="step"><p>Publish every file over HTTPS.</p></div>
               <div class="step"><p>In Nyxovira, open <strong>Sites → External sites</strong> and connect the store page or directory.</p></div>
               <div class="step"><p>Open the connected site from its card and tap <strong>Install</strong>.</p></div>
-              <div class="step"><p>Confirm the returned message, then navigate outside the store directory and verify that installation is blocked.</p></div>
+              <div class="step"><p>Confirm the message returned by the installation.</p></div>
             </div>
           </section>
 
@@ -855,7 +853,7 @@ return "https://example.com/manga/work/";</code></pre>
               </article>
               <article>
                 <h3>External site</h3>
-                <p>Public HTTPS files; catalog declaration; valid <code>hub_url</code> and <code>manifest_url</code>; matching plugin IDs; a button that handles the bridge being absent; installation tested inside Nyxovira.</p>
+                <p>Page, catalog, and plugins published; correct author and source-site information; Install button tested by opening the store from Nyxovira.</p>
               </article>
               <article>
                 <h3>Official Plugin Hub</h3>
@@ -991,21 +989,19 @@ return "https://example.com/manga/work/";</code></pre>
     }
   });
 &lt;/script&gt;</code></pre>
-            <p>A ponte funciona somente enquanto o usuário navega dentro do site conectado. O Nyxovira baixa novamente o catálogo associado e procura o plugin pelo <code>id</code>, impedindo que a página substitua o catálogo conectado por uma URL arbitrária.</p>
-            <p>Também estão disponíveis <code>getCommunityPluginCatalog(catalogUrl)</code>, <code>getOnlinePluginCatalog()</code> e <code>installOnlinePlugin(pluginJson)</code>. Os dois últimos são aliases de compatibilidade para lojas que reaproveitam a interface do Hub oficial.</p>
-            <h3 class="api-subheading">Limites e segurança</h3>
+            <p>Quando a loja é aberta em um navegador comum, o exemplo orienta a pessoa a abri-la pelo Nyxovira. Dentro do aplicativo, o botão instala o plugin correspondente no catálogo conectado.</p>
+            <h3 class="api-subheading">Antes de publicar a loja</h3>
             <div class="rule-list">
-              <article><p>Até 20 sites externos podem ficar conectados. Páginas, catálogos e redirecionamentos precisam usar HTTPS e endereços públicos; redes locais e <code>localhost</code> são recusados.</p></article>
-              <article><p>O catálogo pode ter até 2 MiB e 1.000 plugins. Cada manifesto ou script pode ter até 4 MiB.</p></article>
-              <article><p>IDs duplicados e divergências entre o id do manifesto e do catálogo são recusados. A permissão de instalação termina quando a navegação sai do caminho autorizado.</p></article>
-              <article><p>Sites externos e seus plugins são independentes e não são revisados nem publicados pelo KapiTomo.</p></article>
+              <article><p>Hospede a página, o catálogo e os arquivos dos plugins em endereços HTTPS públicos.</p></article>
+              <article><p>Para cada plugin, informe corretamente o autor, o site de origem e o caminho do manifesto.</p></article>
+              <article><p>Teste o botão Instalar abrindo a loja pelo cartão criado em <strong>Sites externos</strong> no Nyxovira.</p></article>
             </div>
             <h3 class="api-subheading">Teste antes de divulgar</h3>
             <div class="steps">
               <div class="step"><p>Publique todos os arquivos em HTTPS.</p></div>
               <div class="step"><p>No Nyxovira, abra <strong>Sites → Sites externos</strong> e conecte a página ou pasta da loja.</p></div>
               <div class="step"><p>Abra o site conectado pelo cartão e toque em <strong>Instalar</strong>.</p></div>
-              <div class="step"><p>Confirme a mensagem, saia da pasta da loja e verifique que a instalação foi bloqueada.</p></div>
+              <div class="step"><p>Confirme a mensagem retornada pela instalação.</p></div>
             </div>
           </section>
 
@@ -1194,7 +1190,7 @@ return "https://example.com/manga/work/";</code></pre>
               </article>
               <article>
                 <h3>Loja externa</h3>
-                <p>Arquivos HTTPS públicos; declaração do catálogo; <code>hub_url</code> e <code>manifest_url</code> válidos; IDs iguais; botão que trata a ausência da ponte; instalação testada dentro do Nyxovira.</p>
+                <p>Página, catálogo e plugins publicados; informações corretas de autor e site de origem; botão Instalar testado abrindo a loja pelo Nyxovira.</p>
               </article>
               <article>
                 <h3>Plugin Hub oficial</h3>
