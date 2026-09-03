@@ -97,15 +97,12 @@ const I18N = {
       publish: "Publish",
       report: "Report",
       remove: "Remove",
-      api: "Plugin API",
-      terms: "Rules & terms"
+      api: "Plugin API"
     },
     catalog: {
       kicker: "Catalog",
       title: "Published plugins",
       search: "Search plugins",
-      notice: "Community plugins are source connectors published from their creators' public GitHub repositories. KapiTomo lists the catalog entry and moderates it under the catalog rules.",
-      rulesLink: "Read the catalog rules",
       categories: "Categories",
       tagFilters: "Catalog tag filters",
       tagLegend: "Tag color meanings",
@@ -139,10 +136,7 @@ const I18N = {
         adult: "+18"
       },
       restricted: {
-        title: "Adult plugins (18+)",
-        locked: "Plugins classified as 18+ are hidden until you verify your age.",
-        unlocked: "Plugins classified as 18+ are visible on this browser.",
-        enable: "Verify age",
+        enable: "Show 18+",
         disable: "Hide 18+ plugins",
         prompt: "Select your date of birth. You must be at least 18 years old to view adult plugins.",
         privacy: "KapiTomo checks the selected date only in this browser. It does not save or send your birth date.",
@@ -207,9 +201,7 @@ const I18N = {
     publish: {
       kicker: "Publish",
       title: "Publish a ready plugin",
-      description: "Paste the GitHub repository that already contains plugin.json. The Hub opens a GitHub request and publishes entries that pass the technical checks and accept the catalog rules.",
-      notice: "Publishing confirms that the creator controls the repository and accepts responsibility for the plugin code, metadata, permissions, maintenance, and source mapping. Automatic validation is not an endorsement of third-party content.",
-      rulesLink: "Review the rules before publishing",
+      description: "Paste the GitHub repository that already contains plugin.json. The Hub checks it and prepares the publication request.",
       repository: "GitHub repository",
       load: "Load plugin",
       discard: "Discard drafts",
@@ -252,7 +244,7 @@ const I18N = {
     remove: {
       kicker: "Remove",
       title: "Remove a publication",
-      description: "Enter the published plugin and confirm the GitHub request. Plugin owners can remove their own entries; maintainer actions require a recorded reason under the catalog rules.",
+      description: "Enter the published plugin and confirm the GitHub request. Plugin owners can remove their own entries; maintainer actions require a recorded reason.",
       pluginId: "Plugin ID",
       repository: "GitHub repository",
       request: "Request removal",
@@ -272,7 +264,7 @@ const I18N = {
       joao: "can publish and remove",
       maria: "can publish and remove",
       blocked: "cannot remove Maria's plugin",
-      moderator: "can review both under the catalog rules",
+      moderator: "can review both",
       rule: "The typed link and ID identify the plugin; authorization comes from the GitHub account that creates the issue."
     },
     install: {
@@ -292,15 +284,12 @@ const I18N = {
       publish: "Publicar",
       report: "Denunciar",
       remove: "Remover",
-      api: "API de Plugins",
-      terms: "Regras e termos"
+      api: "API de Plugins"
     },
     catalog: {
       kicker: "Catálogo",
       title: "Plugins publicados",
       search: "Pesquisar plugins",
-      notice: "Plugins da comunidade são conectores de fontes publicados nos repositórios GitHub públicos de seus criadores. O KapiTomo lista a entrada e aplica as regras de moderação do catálogo.",
-      rulesLink: "Leia as regras do catálogo",
       categories: "Categorias",
       tagFilters: "Filtros de tags do catálogo",
       tagLegend: "Significado das cores das tags",
@@ -334,10 +323,7 @@ const I18N = {
         adult: "+18"
       },
       restricted: {
-        title: "Plugins adultos (+18)",
-        locked: "Plugins com classificação +18 ficam ocultos até você verificar sua idade.",
-        unlocked: "Plugins com classificação +18 estão visíveis neste navegador.",
-        enable: "Verificar idade",
+        enable: "Mostrar +18",
         disable: "Ocultar plugins +18",
         prompt: "Selecione sua data de nascimento. Você precisa ter 18 anos completos para visualizar plugins adultos.",
         privacy: "O KapiTomo verifica a data selecionada somente neste navegador. A data de nascimento não é salva nem enviada.",
@@ -402,9 +388,7 @@ const I18N = {
     publish: {
       kicker: "Publicar",
       title: "Publique um plugin pronto",
-      description: "Cole o repositório GitHub que já contém plugin.json. O Hub abre uma solicitação no GitHub e publica entradas que passam nas verificações técnicas e aceitam as regras do catálogo.",
-      notice: "A publicação confirma que o criador controla o repositório e aceita responsabilidade pelo código, metadados, permissões, manutenção e mapeamento da fonte. A validação automática não representa aprovação de conteúdos de terceiros.",
-      rulesLink: "Revise as regras antes de publicar",
+      description: "Cole o repositório GitHub que já contém plugin.json. O Hub verifica o conteúdo e prepara a solicitação de publicação.",
       repository: "Repositório GitHub",
       load: "Carregar plugin",
       discard: "Descartar rascunhos",
@@ -447,7 +431,7 @@ const I18N = {
     remove: {
       kicker: "Remover",
       title: "Remova uma publicação",
-      description: "Informe o plugin publicado e confirme a solicitação no GitHub. Donos podem remover as próprias entradas; ações de mantenedores exigem motivo registrado conforme as regras do catálogo.",
+      description: "Informe o plugin publicado e confirme a solicitação no GitHub. Donos podem remover as próprias entradas; ações de mantenedores exigem motivo registrado.",
       pluginId: "ID do plugin",
       repository: "Repositório GitHub",
       request: "Solicitar remoção",
@@ -467,7 +451,7 @@ const I18N = {
       joao: "pode publicar e remover",
       maria: "pode publicar e remover",
       blocked: "não pode remover o plugin de Maria",
-      moderator: "pode analisar ambos conforme as regras do catálogo",
+      moderator: "pode analisar ambos",
       rule: "O link e o ID informados identificam o plugin; a autorização vem da conta GitHub que cria a issue."
     },
     install: {
@@ -494,6 +478,7 @@ let filteredCatalogPlugins = [];
 let currentCatalogPage = 1;
 let currentLanguage = initialLanguage();
 let restrictedAccessEnabled = loadRestrictedAccess();
+let hasRestrictedPlugins = false;
 let restrictedAccessFormOpen = false;
 let restrictedAccessMessageKey = "";
 
@@ -600,19 +585,20 @@ function populateBirthDateSelectors() {
 }
 
 function renderRestrictedAccess() {
-  if (!restrictedAccessButton || !restrictedAccessForm || !restrictedAccessStatus) {
+  if (!restrictedAccessButton || !restrictedAccessForm) {
     return;
   }
   populateBirthDateSelectors();
+  restrictedAccessButton.hidden = !hasRestrictedPlugins;
   restrictedAccessButton.textContent = t(restrictedAccessEnabled
     ? "catalog.restricted.disable"
     : "catalog.restricted.enable");
   restrictedAccessButton.setAttribute("aria-expanded", restrictedAccessFormOpen ? "true" : "false");
-  restrictedAccessForm.hidden = restrictedAccessEnabled || !restrictedAccessFormOpen;
-  restrictedAccessStatus.textContent = t(restrictedAccessMessageKey || (restrictedAccessEnabled
-    ? "catalog.restricted.unlocked"
-    : "catalog.restricted.locked"));
-  restrictedAccessStatus.classList.toggle("is-error", Boolean(restrictedAccessMessageKey));
+  restrictedAccessForm.hidden = !hasRestrictedPlugins || restrictedAccessEnabled || !restrictedAccessFormOpen;
+  if (restrictedAccessStatus) {
+    restrictedAccessStatus.hidden = !restrictedAccessMessageKey;
+    restrictedAccessStatus.textContent = restrictedAccessMessageKey ? t(restrictedAccessMessageKey) : "";
+  }
 }
 
 function reloadCatalogForRestrictedAccess() {
@@ -1425,12 +1411,16 @@ function renderPlugins(plugins) {
 function loadAllPlugins() {
   fetchCatalog()
     .then((catalog) => {
+      const catalogCandidates = (Array.isArray(catalog.plugins) ? catalog.plugins : [])
+        .filter((plugin) => hasRequiredPluginIcon(plugin) && hasRepository(plugin) && isVisiblePlugin(plugin));
+      const savedDrafts = loadDraftPlugins();
+      hasRestrictedPlugins = [...catalogCandidates, ...savedDrafts]
+        .some((plugin) => globalThis.KapiTomoAdultAccess.isRestrictedPlugin(plugin));
+      renderRestrictedAccess();
       const catalogPlugins = globalThis.KapiTomoAdultAccess.visiblePlugins(
-        (Array.isArray(catalog.plugins) ? catalog.plugins : [])
-          .filter((plugin) => hasRequiredPluginIcon(plugin) && hasRepository(plugin) && isVisiblePlugin(plugin)),
+        catalogCandidates,
         restrictedAccessEnabled
       );
-      const savedDrafts = loadDraftPlugins();
       const visibleDrafts = globalThis.KapiTomoAdultAccess.visiblePlugins(savedDrafts, restrictedAccessEnabled);
       return Promise.all([
         filterAvailablePlugins(catalogPlugins),
@@ -1461,6 +1451,9 @@ function loadAllPlugins() {
       });
     })
     .catch((error) => {
+      hasRestrictedPlugins = false;
+      restrictedAccessFormOpen = false;
+      renderRestrictedAccess();
       pinnedOfficialPlugins = [];
       filteredCatalogPlugins = [];
       currentCatalogPage = 1;
