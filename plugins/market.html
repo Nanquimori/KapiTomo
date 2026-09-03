@@ -312,28 +312,18 @@
         line-height: 1.25;
       }
 
-      .catalog-notice {
-        max-width: 620px;
-        margin: 0;
-        color: #d8cce7;
-        border-left: 2px solid rgba(255, 178, 31, 0.72);
-        padding: 4px 0 4px 8px;
-        font-size: 0.68rem;
-        font-weight: 650;
-        line-height: 1.32;
-      }
-
-      .catalog-policy-link {
+      .report-creator-help {
         margin: 6px 0 0;
         color: var(--accent-soft);
         font-size: 0.68rem;
         font-weight: 850;
       }
 
-      .catalog-policy-link a:hover,
-      .catalog-policy-link a:focus-visible {
+      .report-creator-help a:hover,
+      .report-creator-help a:focus-visible {
         text-decoration: underline;
       }
+
       .ownership-guide {
         display: grid;
         gap: 9px;
@@ -444,21 +434,23 @@
         gap: 5px;
       }
 
-      .restricted-access {
-        display: grid;
-        gap: 7px;
-        border-top: 1px solid var(--line);
-        border-bottom: 1px solid var(--line);
-        padding: 8px 0;
-      }
-
-      .restricted-access-head,
       .restricted-form-actions {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
         gap: 7px;
+      }
+
+      .restricted-toggle {
+        min-height: 24px;
+        border-radius: 7px;
+        padding: 0 9px;
+        font-size: 0.68rem;
+      }
+
+      .restricted-toggle[hidden] {
+        display: none;
       }
 
       .restricted-access-status,
@@ -470,6 +462,10 @@
 
       .restricted-access-status.is-error {
         color: #ff9a9a;
+      }
+
+      .restricted-access-status[hidden] {
+        display: none;
       }
 
       .restricted-access-form {
@@ -1285,7 +1281,6 @@
           <button class="menu-tab" type="button" data-view-target="report" data-i18n="nav.report">Report</button>
           <button class="menu-tab" type="button" data-view-target="remove" data-i18n="nav.remove">Remove</button>
           <a class="menu-tab" href="../nyxovira/plugin-api/" data-i18n="nav.api">Plugin API</a>
-          <a class="menu-tab" href="../terms/#plugin-catalog-rules" data-i18n="nav.terms">Rules &amp; terms</a>
           <div class="language-switch" aria-label="Language">
             <button class="language-button" type="button" data-language-option="en" aria-pressed="true">EN</button>
             <button class="language-button" type="button" data-language-option="pt" aria-pressed="false">PT</button>
@@ -1304,34 +1299,22 @@
           <div class="catalog-search-row">
             <input id="pluginSearchInput" class="text-input catalog-search" type="search" placeholder="Search plugins" aria-label="Search plugins" data-i18n-placeholder="catalog.search" data-i18n-aria="catalog.search">
             <button id="favoritesOnlyButton" class="button favorites-toggle" type="button" aria-pressed="false">Favorites only</button>
+            <button id="restrictedAccessButton" class="button restricted-toggle" type="button" aria-controls="restrictedAccessForm" aria-expanded="false" hidden>Show 18+</button>
           </div>
-          <p class="catalog-notice" data-i18n="catalog.notice">
-            Community plugins are source connectors published from their creators' public GitHub repositories.
-            KapiTomo lists the catalog entry and moderates it under the catalog rules.
-          </p>
-          <p class="catalog-policy-link"><a href="../terms/#plugin-catalog-rules" data-i18n="catalog.rulesLink">Read the catalog rules</a></p>
-          <div class="restricted-access">
-            <div class="restricted-access-head">
-              <div>
-                <p class="kicker" data-i18n="catalog.restricted.title">Adult plugins (18+)</p>
-                <p id="restrictedAccessStatus" class="restricted-access-status" aria-live="polite">Plugins classified as 18+ are hidden until you verify your age.</p>
-              </div>
-              <button id="restrictedAccessButton" class="button" type="button" aria-controls="restrictedAccessForm" aria-expanded="false">Verify age</button>
+          <form id="restrictedAccessForm" class="restricted-access-form" hidden>
+            <p data-i18n="catalog.restricted.prompt">Select your date of birth. You must be at least 18 years old to view adult plugins.</p>
+            <div class="birth-date-fields">
+              <label><span data-i18n="catalog.restricted.day">Day</span><select id="birthDayInput" class="birth-date-input" autocomplete="bday-day" required></select></label>
+              <label><span data-i18n="catalog.restricted.month">Month</span><select id="birthMonthInput" class="birth-date-input" autocomplete="bday-month" required></select></label>
+              <label><span data-i18n="catalog.restricted.year">Year</span><select id="birthYearInput" class="birth-date-input" autocomplete="bday-year" required></select></label>
             </div>
-            <form id="restrictedAccessForm" class="restricted-access-form" hidden>
-              <p data-i18n="catalog.restricted.prompt">Select your date of birth. You must be at least 18 years old to view adult plugins.</p>
-              <div class="birth-date-fields">
-                <label><span data-i18n="catalog.restricted.day">Day</span><select id="birthDayInput" class="birth-date-input" autocomplete="bday-day" required></select></label>
-                <label><span data-i18n="catalog.restricted.month">Month</span><select id="birthMonthInput" class="birth-date-input" autocomplete="bday-month" required></select></label>
-                <label><span data-i18n="catalog.restricted.year">Year</span><select id="birthYearInput" class="birth-date-input" autocomplete="bday-year" required></select></label>
-              </div>
-              <p data-i18n="catalog.restricted.privacy">KapiTomo checks the selected date only in this browser. It does not save or send your birth date.</p>
-              <div class="restricted-form-actions">
-                <button id="confirmRestrictedAccessButton" class="button primary" type="submit" data-i18n="catalog.restricted.confirm">Confirm age and show 18+ plugins</button>
-                <button id="cancelRestrictedAccessButton" class="button" type="button" data-i18n="catalog.restricted.cancel">Cancel</button>
-              </div>
-            </form>
-          </div>
+            <p data-i18n="catalog.restricted.privacy">KapiTomo checks the selected date only in this browser. It does not save or send your birth date.</p>
+            <p id="restrictedAccessStatus" class="restricted-access-status is-error" aria-live="polite" hidden></p>
+            <div class="restricted-form-actions">
+              <button id="confirmRestrictedAccessButton" class="button primary" type="submit" data-i18n="catalog.restricted.confirm">Confirm age and show 18+ plugins</button>
+              <button id="cancelRestrictedAccessButton" class="button" type="button" data-i18n="catalog.restricted.cancel">Cancel</button>
+            </div>
+          </form>
           <div class="filter-head">
             <div>
               <p class="kicker" data-i18n="catalog.categories">Categories</p>
@@ -1363,9 +1346,7 @@
       <section id="publishPanel" class="panel view-panel" data-view-panel="publish" hidden>
         <p class="kicker" data-i18n="publish.kicker">Publish</p>
         <h2 data-i18n="publish.title">Publish a ready plugin</h2>
-        <p data-i18n="publish.description">Paste the GitHub repository that already contains <code>plugin.json</code>. The Hub opens a GitHub request and publishes entries that pass the technical checks and accept the catalog rules.</p>
-        <p class="catalog-notice" data-i18n="publish.notice">Publishing confirms that the creator controls the repository and accepts responsibility for the plugin code, metadata, permissions, maintenance, and source mapping. Automatic validation is not an endorsement of third-party content.</p>
-        <p class="catalog-policy-link"><a href="../terms/#plugin-catalog-rules" data-i18n="publish.rulesLink">Review the rules before publishing</a></p>
+        <p data-i18n="publish.description">Paste the GitHub repository that already contains <code>plugin.json</code>. The Hub checks it and prepares the publication request.</p>
         <div class="publish-form">
           <label class="field-label" for="repoUrlInput" data-i18n="publish.repository">GitHub repository</label>
           <input id="repoUrlInput" class="text-input" type="url" placeholder="https://github.com/user/my-plugin">
@@ -1406,7 +1387,7 @@
         <h2 data-i18n="report.title">Report a plugin</h2>
         <p data-i18n="report.description">Use this form to report a serious problem with a plugin available in the catalog. Every report is reviewed before any decision is made.</p>
         <p class="catalog-notice" data-i18n="report.notFor">Do not use this form to complain about works, missing chapters, translations, advertisements, website availability, or account rules. For common plugin errors, contact its developer.</p>
-        <p id="reportCreatorHelp" class="catalog-policy-link" hidden>
+        <p id="reportCreatorHelp" class="report-creator-help" hidden>
           <span data-i18n="report.technicalHelp">Need help using the plugin? Visit the developer's repository:</span>
           <a id="reportCreatorLink" target="_blank" rel="noopener" data-i18n="report.creatorRepository">Open developer repository</a>
         </p>
@@ -1435,7 +1416,7 @@
       <section id="removePanel" class="panel view-panel" data-view-panel="remove" hidden>
         <p class="kicker" data-i18n="remove.kicker">Remove</p>
         <h2 data-i18n="remove.title">Remove a publication</h2>
-        <p data-i18n="remove.description">Enter the published plugin and confirm the GitHub request. Plugin owners can remove their own entries; maintainer actions require a recorded reason under the catalog rules.</p>
+        <p data-i18n="remove.description">Enter the published plugin and confirm the GitHub request. Plugin owners can remove their own entries; maintainer actions require a recorded reason.</p>
         <aside class="ownership-guide" aria-labelledby="ownershipGuideTitle">
           <div class="ownership-guide-head">
             <span class="ownership-mark" aria-hidden="true">@</span>
@@ -1449,7 +1430,7 @@
             <li><span><code>joao123</code> <span data-i18n="ownership.joao">can publish and remove</span> <code>joao123/PluginManga</code>.</span></li>
             <li><span><code>maria456</code> <span data-i18n="ownership.maria">can publish and remove</span> <code>maria456/PluginNovel</code>.</span></li>
             <li data-tone="blocked"><span><code>joao123</code> <span data-i18n="ownership.blocked">cannot remove Maria's plugin</span> <code>maria456/PluginNovel</code>.</span></li>
-            <li data-tone="moderator"><span><code>Nanquimori</code> <span data-i18n="ownership.moderator">can review both under the catalog rules</span>.</span></li>
+            <li data-tone="moderator"><span><code>Nanquimori</code> <span data-i18n="ownership.moderator">can review both</span>.</span></li>
           </ul>
           <p class="ownership-rule" data-i18n="ownership.rule">The typed link and ID identify the plugin; authorization comes from the GitHub account that creates the issue.</p>
         </aside>
@@ -1466,6 +1447,6 @@
     <script src="report-config.js?v=20260901-secure-reports"></script>
     <script src="adult-access.js?v=20260901-age-gate"></script>
     <script src="catalog-pagination.js?v=20260901-pinned-official"></script>
-    <script src="store.js?v=20260901-age-gated-types"></script>
+    <script src="store.js?v=20260902-clean-hub"></script>
   </body>
 </html>

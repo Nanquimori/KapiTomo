@@ -167,7 +167,11 @@ test("keeps every Plugin Hub page identical and loads pagination before the stor
   assert.doesNotMatch(pages[0], /id="birthDayInput"[^>]*type="number"/);
   assert.match(pages[0], /adult-access\.js\?v=20260901-age-gate/);
   assert.match(pages[0], /catalog-pagination\.js\?v=20260901-pinned-official/);
-  assert.match(pages[0], /store\.js\?v=20260901-age-gated-types/);
+  assert.match(pages[0], /store\.js\?v=20260902-clean-hub/);
+  assert.match(pages[0], /id="restrictedAccessButton"[^>]*hidden/);
+  assert.doesNotMatch(pages[0], /catalog-policy-link|plugin-catalog-rules|Rules &amp; terms/);
+  assert.doesNotMatch(storeSource, /Leia as regras do catálogo|Plugins adultos \(\+18\)|Plugins com classificação \+18 ficam ocultos/);
+  assert.match(storeSource, /hasRestrictedPlugins = \[\.\.\.catalogCandidates, \.\.\.savedDrafts\]/);
   assert.match(storeSource, /Acesso negado: você precisa ter 18 anos completos para visualizar plugins adultos\./);
   assert.doesNotMatch(storeSource, /catalog\.genre/);
   assert.ok(pages[0].indexOf("adult-access.js") < pages[0].indexOf("store.js"));
