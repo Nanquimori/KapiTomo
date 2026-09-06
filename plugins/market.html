@@ -434,78 +434,6 @@
         gap: 5px;
       }
 
-      .restricted-form-actions {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        gap: 7px;
-      }
-
-      .restricted-toggle {
-        min-height: 24px;
-        border-radius: 7px;
-        padding: 0 9px;
-        font-size: 0.68rem;
-      }
-
-      .restricted-toggle[hidden] {
-        display: none;
-      }
-
-      .restricted-access-status,
-      .restricted-access-form p {
-        margin: 2px 0 0;
-        color: var(--muted);
-        font-size: 0.68rem;
-      }
-
-      .restricted-access-status.is-error {
-        color: #ff9a9a;
-      }
-
-      .restricted-access-status[hidden] {
-        display: none;
-      }
-
-      .restricted-access-form {
-        display: grid;
-        gap: 7px;
-        border: 1px solid var(--line);
-        border-radius: 9px;
-        padding: 9px;
-        background: rgba(255, 255, 255, 0.035);
-      }
-
-      .restricted-access-form[hidden] {
-        display: none;
-      }
-
-      .birth-date-fields {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(70px, 100px));
-        gap: 7px;
-      }
-
-      .birth-date-fields label {
-        display: grid;
-        gap: 3px;
-        color: var(--muted);
-        font-size: 0.66rem;
-        font-weight: 850;
-      }
-
-      .birth-date-input {
-        width: 100%;
-        min-height: 34px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        padding: 0 8px;
-        background: #17121d;
-        color: var(--text);
-        font: inherit;
-      }
-
       .tag-filter-legend {
         display: flex;
         flex-wrap: wrap;
@@ -1299,22 +1227,7 @@
           <div class="catalog-search-row">
             <input id="pluginSearchInput" class="text-input catalog-search" type="search" placeholder="Search plugins" aria-label="Search plugins" data-i18n-placeholder="catalog.search" data-i18n-aria="catalog.search">
             <button id="favoritesOnlyButton" class="button favorites-toggle" type="button" aria-pressed="false">Favorites only</button>
-            <button id="restrictedAccessButton" class="button restricted-toggle" type="button" aria-controls="restrictedAccessForm" aria-expanded="false" hidden>Show 18+</button>
           </div>
-          <form id="restrictedAccessForm" class="restricted-access-form" hidden>
-            <p data-i18n="catalog.restricted.prompt">Select your date of birth. You must be at least 18 years old to view adult plugins.</p>
-            <div class="birth-date-fields">
-              <label><span data-i18n="catalog.restricted.day">Day</span><select id="birthDayInput" class="birth-date-input" autocomplete="bday-day" required></select></label>
-              <label><span data-i18n="catalog.restricted.month">Month</span><select id="birthMonthInput" class="birth-date-input" autocomplete="bday-month" required></select></label>
-              <label><span data-i18n="catalog.restricted.year">Year</span><select id="birthYearInput" class="birth-date-input" autocomplete="bday-year" required></select></label>
-            </div>
-            <p data-i18n="catalog.restricted.privacy">KapiTomo checks the selected date only in this browser. It does not save or send your birth date.</p>
-            <p id="restrictedAccessStatus" class="restricted-access-status is-error" aria-live="polite" hidden></p>
-            <div class="restricted-form-actions">
-              <button id="confirmRestrictedAccessButton" class="button primary" type="submit" data-i18n="catalog.restricted.confirm">Confirm age and show 18+ plugins</button>
-              <button id="cancelRestrictedAccessButton" class="button" type="button" data-i18n="catalog.restricted.cancel">Cancel</button>
-            </div>
-          </form>
           <div class="filter-head">
             <div>
               <p class="kicker" data-i18n="catalog.categories">Categories</p>
@@ -1445,8 +1358,7 @@
       </section>
     </main>
     <script src="report-config.js?v=20260901-secure-reports"></script>
-    <script src="adult-access.js?v=20260901-age-gate"></script>
     <script src="catalog-pagination.js?v=20260901-pinned-official"></script>
-    <script src="store.js?v=20260902-clean-hub"></script>
+    <script src="store.js?v=20260906-remove-age-filter"></script>
   </body>
 </html>
