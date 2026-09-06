@@ -2,7 +2,7 @@
   "schema_version": 3,
   "name": "KapiTomo Plugin Hub",
   "description": "Public plugin catalog for Nyxovira.",
-  "catalog_revision": "20260901-age-gated-types",
+  "catalog_revision": "20260906-catalog-filters",
   "publish_model": "github-repository",
   "rules_url": "https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules",
   "suggested_tags": [

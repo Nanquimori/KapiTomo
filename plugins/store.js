@@ -25,13 +25,6 @@ const favoritesOnlyButton = document.getElementById("favoritesOnlyButton");
 const catalogPagination = document.getElementById("catalogPagination");
 const officialCatalogSection = document.getElementById("officialCatalogSection");
 const officialPluginList = document.getElementById("officialPluginList");
-const restrictedAccessButton = document.getElementById("restrictedAccessButton");
-const restrictedAccessForm = document.getElementById("restrictedAccessForm");
-const restrictedAccessStatus = document.getElementById("restrictedAccessStatus");
-const birthDayInput = document.getElementById("birthDayInput");
-const birthMonthInput = document.getElementById("birthMonthInput");
-const birthYearInput = document.getElementById("birthYearInput");
-const cancelRestrictedAccessButton = document.getElementById("cancelRestrictedAccessButton");
 const viewButtons = Array.from(document.querySelectorAll("[data-view-target]"));
 const viewPanels = Array.from(document.querySelectorAll("[data-view-panel]"));
 const languageButtons = Array.from(document.querySelectorAll("[data-language-option]"));
@@ -39,8 +32,7 @@ const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
 const REPORT_HISTORY_KEY = "kapitomo.reportHistory.v1";
-const RESTRICTED_ACCESS_KEY = "kapitomo.restrictedAccess.v1";
-const CATALOG_VERSION = "20260901-age-gated-types";
+const CATALOG_VERSION = "20260906-catalog-filters";
 const REPORT_CONFIG = globalThis.KAPITOMO_REPORT_CONFIG || {};
 const REPORT_ENDPOINT = String(REPORT_CONFIG.endpoint || "").trim();
 const REPORT_TURNSTILE_SITE_KEY = String(REPORT_CONFIG.turnstileSiteKey || "").trim();
@@ -130,23 +122,9 @@ const I18N = {
       loadError: "Could not load the catalog: {message}",
       language: "Language",
       type: "Type",
-      classification: "Classification",
       tagLabels: {
         other: "other",
         adult: "+18"
-      },
-      restricted: {
-        enable: "Show 18+",
-        disable: "Hide 18+ plugins",
-        prompt: "Select your date of birth. You must be at least 18 years old to view adult plugins.",
-        privacy: "KapiTomo checks the selected date only in this browser. It does not save or send your birth date.",
-        day: "Day",
-        month: "Month",
-        year: "Year",
-        confirm: "Confirm age and show 18+ plugins",
-        cancel: "Cancel",
-        invalidDate: "Select a valid date of birth.",
-        underage: "Access denied: you must be at least 18 years old to view adult plugins."
       },
       favorite: "Favorite",
       favorites: "Favorites",
@@ -322,19 +300,6 @@ const I18N = {
         other: "outros",
         adult: "+18"
       },
-      restricted: {
-        enable: "Mostrar +18",
-        disable: "Ocultar plugins +18",
-        prompt: "Selecione sua data de nascimento. Você precisa ter 18 anos completos para visualizar plugins adultos.",
-        privacy: "O KapiTomo verifica a data selecionada somente neste navegador. A data de nascimento não é salva nem enviada.",
-        day: "Dia",
-        month: "Mês",
-        year: "Ano",
-        confirm: "Confirmar idade e mostrar plugins +18",
-        cancel: "Cancelar",
-        invalidDate: "Selecione uma data de nascimento válida.",
-        underage: "Acesso negado: você precisa ter 18 anos completos para visualizar plugins adultos."
-      },
       favorite: "Favoritar",
       favorites: "Favoritos",
       favoriteOnly: "So favoritos",
@@ -477,10 +442,6 @@ let searchQuery = "";
 let filteredCatalogPlugins = [];
 let currentCatalogPage = 1;
 let currentLanguage = initialLanguage();
-let restrictedAccessEnabled = loadRestrictedAccess();
-let hasRestrictedPlugins = false;
-let restrictedAccessFormOpen = false;
-let restrictedAccessMessageKey = "";
 
 function normalizeLanguage(value) {
   const language = String(value ? value : "").toLowerCase();
@@ -527,143 +488,6 @@ function initialLanguage() {
   return detectLanguage();
 }
 
-function loadRestrictedAccess() {
-  try {
-    return localStorage.getItem(RESTRICTED_ACCESS_KEY) === "enabled";
-  } catch {
-    return false;
-  }
-}
-
-function saveRestrictedAccess(enabled) {
-  try {
-    if (enabled) {
-      localStorage.setItem(RESTRICTED_ACCESS_KEY, "enabled");
-    } else {
-      localStorage.removeItem(RESTRICTED_ACCESS_KEY);
-    }
-  } catch {}
-}
-
-function clearBirthDateInputs() {
-  [birthDayInput, birthMonthInput, birthYearInput].forEach((input) => {
-    if (input) {
-      input.value = "";
-    }
-  });
-}
-
-function setBirthDateOptions(select, placeholder, items) {
-  if (!select) {
-    return;
-  }
-  const previous = select.value;
-  select.innerHTML = [
-    `<option value="">${escapeHtml(placeholder)}</option>`,
-    ...items.map((item) => `<option value="${escapeHtml(item.value)}">${escapeHtml(item.label)}</option>`)
-  ].join("");
-  if (items.some((item) => String(item.value) === previous)) {
-    select.value = previous;
-  }
-}
-
-function populateBirthDateSelectors() {
-  setBirthDateOptions(birthDayInput, t("catalog.restricted.day"),
-    Array.from({ length: 31 }, (_, index) => ({ value: index + 1, label: index + 1 })));
-  const locale = currentLanguage === "pt" ? "pt-BR" : "en";
-  setBirthDateOptions(birthMonthInput, t("catalog.restricted.month"),
-    Array.from({ length: 12 }, (_, index) => ({
-      value: index + 1,
-      label: new Intl.DateTimeFormat(locale, { month: "long" }).format(new Date(2024, index, 1))
-    })));
-  const currentYear = new Date().getFullYear();
-  setBirthDateOptions(birthYearInput, t("catalog.restricted.year"),
-    Array.from({ length: currentYear - 1899 }, (_, index) => ({
-      value: currentYear - index,
-      label: currentYear - index
-    })));
-}
-
-function renderRestrictedAccess() {
-  if (!restrictedAccessButton || !restrictedAccessForm) {
-    return;
-  }
-  populateBirthDateSelectors();
-  restrictedAccessButton.hidden = !hasRestrictedPlugins;
-  restrictedAccessButton.textContent = t(restrictedAccessEnabled
-    ? "catalog.restricted.disable"
-    : "catalog.restricted.enable");
-  restrictedAccessButton.setAttribute("aria-expanded", restrictedAccessFormOpen ? "true" : "false");
-  restrictedAccessForm.hidden = !hasRestrictedPlugins || restrictedAccessEnabled || !restrictedAccessFormOpen;
-  if (restrictedAccessStatus) {
-    restrictedAccessStatus.hidden = !restrictedAccessMessageKey;
-    restrictedAccessStatus.textContent = restrictedAccessMessageKey ? t(restrictedAccessMessageKey) : "";
-  }
-}
-
-function reloadCatalogForRestrictedAccess() {
-  pinnedOfficialPlugins = [];
-  allPlugins = [];
-  filteredCatalogPlugins = [];
-  currentCatalogPage = 1;
-  selectedTags = selectedTags.filter((tag) => tag !== "adult");
-  excludedTags = excludedTags.filter((tag) => tag !== "adult");
-  if (officialCatalogSection) {
-    officialCatalogSection.hidden = true;
-  }
-  if (catalogPagination) {
-    catalogPagination.hidden = true;
-    catalogPagination.innerHTML = "";
-  }
-  if (list) {
-    list.innerHTML = `<p>${escapeHtml(t("catalog.loading"))}</p>`;
-  }
-  loadAllPlugins();
-}
-
-function toggleRestrictedAccess() {
-  restrictedAccessMessageKey = "";
-  if (restrictedAccessEnabled) {
-    restrictedAccessEnabled = false;
-    restrictedAccessFormOpen = false;
-    saveRestrictedAccess(false);
-    clearBirthDateInputs();
-    renderRestrictedAccess();
-    reloadCatalogForRestrictedAccess();
-    return;
-  }
-  restrictedAccessFormOpen = !restrictedAccessFormOpen;
-  renderRestrictedAccess();
-  if (restrictedAccessFormOpen) {
-    birthDayInput?.focus();
-  }
-}
-
-function confirmRestrictedAccess() {
-  const assessment = globalThis.KapiTomoAdultAccess.assessBirthDate(
-    birthDayInput?.value,
-    birthMonthInput?.value,
-    birthYearInput?.value
-  );
-  if (!assessment.valid) {
-    restrictedAccessMessageKey = "catalog.restricted.invalidDate";
-    renderRestrictedAccess();
-    return;
-  }
-  if (!assessment.isAdult) {
-    restrictedAccessMessageKey = "catalog.restricted.underage";
-    renderRestrictedAccess();
-    return;
-  }
-  restrictedAccessEnabled = true;
-  restrictedAccessFormOpen = false;
-  restrictedAccessMessageKey = "";
-  saveRestrictedAccess(true);
-  clearBirthDateInputs();
-  renderRestrictedAccess();
-  reloadCatalogForRestrictedAccess();
-}
-
 function t(key, values = {}) {
   const parts = key.split(".");
   let output = I18N[currentLanguage];
@@ -694,7 +518,6 @@ function applyStaticTranslations() {
   languageButtons.forEach((button) => {
     button.setAttribute("aria-pressed", button.dataset.languageOption === currentLanguage ? "true" : "false");
   });
-  renderRestrictedAccess();
 }
 
 function setLanguage(language, persist = true) {
@@ -1108,8 +931,7 @@ function renderTagFilters(tags) {
   availableTags = uniqueTags([
     OFFICIAL_LANGUAGE_TAGS,
     OFFICIAL_TYPE_TAGS,
-    restrictedAccessEnabled ? OFFICIAL_CLASSIFICATION_TAGS : [],
-    restrictedAccessEnabled ? tags : tags.filter((tag) => tag !== "adult")
+    tags.filter((tag) => LANGUAGE_TAGS.has(tag) || TYPE_TAGS.has(tag))
   ]);
   selectedTags = selectedTags.filter((tag) => availableTags.includes(tag));
   excludedTags = excludedTags.filter((tag) => availableTags.includes(tag) && !selectedTags.includes(tag));
@@ -1118,12 +940,10 @@ function renderTagFilters(tags) {
   }
   const languageTags = OFFICIAL_LANGUAGE_TAGS;
   const contentTags = OFFICIAL_TYPE_TAGS;
-  const classificationTags = OFFICIAL_CLASSIFICATION_TAGS;
   tagFilter.innerHTML = availableTags.length
     ? [
       renderTagGroup(t("catalog.language"), languageTags),
-      renderTagGroup(t("catalog.type"), contentTags),
-      restrictedAccessEnabled ? renderTagGroup(t("catalog.classification"), classificationTags) : ""
+      renderTagGroup(t("catalog.type"), contentTags)
     ].join("")
     : `<p class="filter-status">${escapeHtml(t("catalog.noTags"))}</p>`;
   tagFilter.querySelectorAll("[data-filter-tag]").forEach((button) => {
@@ -1414,27 +1234,19 @@ function loadAllPlugins() {
       const catalogCandidates = (Array.isArray(catalog.plugins) ? catalog.plugins : [])
         .filter((plugin) => hasRequiredPluginIcon(plugin) && hasRepository(plugin) && isVisiblePlugin(plugin));
       const savedDrafts = loadDraftPlugins();
-      hasRestrictedPlugins = [...catalogCandidates, ...savedDrafts]
-        .some((plugin) => globalThis.KapiTomoAdultAccess.isRestrictedPlugin(plugin));
-      renderRestrictedAccess();
-      const catalogPlugins = globalThis.KapiTomoAdultAccess.visiblePlugins(
-        catalogCandidates,
-        restrictedAccessEnabled
-      );
-      const visibleDrafts = globalThis.KapiTomoAdultAccess.visiblePlugins(savedDrafts, restrictedAccessEnabled);
       return Promise.all([
-        filterAvailablePlugins(catalogPlugins),
-        filterAvailablePlugins(visibleDrafts)
+        filterAvailablePlugins(catalogCandidates),
+        filterAvailablePlugins(savedDrafts)
       ]).then(([availableCatalogPlugins, availableDrafts]) => {
         const drafts = availableDrafts.filter((draft) => (
           !availableCatalogPlugins.some((published) => isSamePluginPublication(published, draft))
         ));
-        const removedVisibleDrafts = visibleDrafts.filter((draft) => (
+        const removedDrafts = savedDrafts.filter((draft) => (
           !drafts.some((retained) => isSamePluginPublication(retained, draft))
         ));
-        if (removedVisibleDrafts.length) {
+        if (removedDrafts.length) {
           saveDraftPlugins(savedDrafts.filter((draft) => (
-            !removedVisibleDrafts.some((removed) => isSamePluginPublication(removed, draft))
+            !removedDrafts.some((removed) => isSamePluginPublication(removed, draft))
           )));
         }
         const partitionedCatalog = globalThis.KapiTomoPagination.partitionCatalogPlugins(availableCatalogPlugins);
@@ -1451,9 +1263,6 @@ function loadAllPlugins() {
       });
     })
     .catch((error) => {
-      hasRestrictedPlugins = false;
-      restrictedAccessFormOpen = false;
-      renderRestrictedAccess();
       pinnedOfficialPlugins = [];
       filteredCatalogPlugins = [];
       currentCatalogPage = 1;
@@ -1903,22 +1712,15 @@ favoritesOnlyButton?.addEventListener("click", () => {
   favoritesOnly = !favoritesOnly;
   applyTagFilters(true);
 });
-restrictedAccessButton?.addEventListener("click", toggleRestrictedAccess);
-restrictedAccessForm?.addEventListener("submit", (event) => {
-  event.preventDefault();
-  confirmRestrictedAccess();
-});
-cancelRestrictedAccessButton?.addEventListener("click", () => {
-  restrictedAccessFormOpen = false;
-  restrictedAccessMessageKey = "";
-  clearBirthDateInputs();
-  renderRestrictedAccess();
-});
 discardDraftPluginsButton?.addEventListener("click", () => {
   localStorage.removeItem(LOCAL_PLUGIN_KEY);
   setPublishStatus(t("publish.draftsRemoved"));
   loadAllPlugins();
 });
+// Remove the preference left by the retired age filter.
+try {
+  localStorage.removeItem("kapitomo.restrictedAccess.v1");
+} catch {}
 applyStaticTranslations();
 updateFavoritesOnlyButton();
 updateReportDetailsCount();

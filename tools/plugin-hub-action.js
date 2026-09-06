@@ -444,7 +444,7 @@ function loadCatalog() {
 function writeCatalogs(catalog) {
   catalog.schema_version = 3;
   catalog.publish_model = "github-repository";
-  catalog.catalog_revision = "20260901-age-gated-types";
+  catalog.catalog_revision = "20260906-catalog-filters";
   catalog.rules_url = "https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules";
   const text = JSON.stringify(catalog, null, 2) + "\n";
   for (const catalogPath of CATALOG_PATHS) {

@@ -10,7 +10,6 @@ const pagination = globalThis.KapiTomoPagination;
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const require = createRequire(import.meta.url);
 const pluginHubAction = require("../tools/plugin-hub-action.js");
-const adultAccess = require("../plugins/adult-access.js");
 
 test("keeps up to 20 plugins on the first page", () => {
   const result = pagination.paginate(Array.from({ length: 20 }, (_, index) => index + 1), 1);
@@ -124,21 +123,6 @@ test("discards unsupported tags and keeps the adult classification last", () => 
   );
 });
 
-test("requires a valid birth date indicating age 18 or older", () => {
-  const today = new Date(2026, 8, 1, 12, 0, 0, 0);
-  assert.deepEqual(adultAccess.assessBirthDate(1, 9, 2008, today), { valid: true, isAdult: true });
-  assert.deepEqual(adultAccess.assessBirthDate(2, 9, 2008, today), { valid: true, isAdult: false });
-  assert.deepEqual(adultAccess.assessBirthDate(31, 2, 2000, today), { valid: false, isAdult: false });
-  assert.deepEqual(adultAccess.assessBirthDate("", 9, 2000, today), { valid: false, isAdult: false });
-});
-
-test("hides adult plugins until restricted access is enabled", () => {
-  const regular = { id: "regular", tags: ["portuguese", "manga"] };
-  const restricted = { id: "restricted", tags: ["portuguese", "manga", "adult"] };
-  assert.deepEqual(adultAccess.visiblePlugins([regular, restricted], false), [regular]);
-  assert.deepEqual(adultAccess.visiblePlugins([regular, restricted], true), [regular, restricted]);
-});
-
 test("keeps catalog taxonomy metadata synchronized with automation", () => {
   const catalogs = ["catalog-store.json", "catalog.json"]
     .map((name) => JSON.parse(fs.readFileSync(path.join(projectRoot, "plugins", name), "utf8")));
@@ -147,7 +131,7 @@ test("keeps catalog taxonomy metadata synchronized with automation", () => {
     assert.deepEqual(catalog.official_tags.types, pluginHubAction.OFFICIAL_TYPE_TAGS);
     assert.deepEqual(catalog.official_tags.classifications, pluginHubAction.OFFICIAL_CLASSIFICATION_TAGS);
     assert.deepEqual(Object.keys(catalog.official_tags), ["languages", "types", "classifications"]);
-    assert.equal(catalog.catalog_revision, "20260901-age-gated-types");
+    assert.equal(catalog.catalog_revision, "20260906-catalog-filters");
   });
   assert.deepEqual(catalogs[1], catalogs[0]);
 });
@@ -160,20 +144,12 @@ test("keeps every Plugin Hub page identical and loads pagination before the stor
   assert.match(pages[0], /id="officialCatalogSection"/);
   assert.match(pages[0], /id="officialPluginList"/);
   assert.match(pages[0], /id="catalogPagination"/);
-  assert.match(pages[0], /id="restrictedAccessForm"/);
-  assert.match(pages[0], /<select id="birthDayInput"/);
-  assert.match(pages[0], /<select id="birthMonthInput"/);
-  assert.match(pages[0], /<select id="birthYearInput"/);
-  assert.doesNotMatch(pages[0], /id="birthDayInput"[^>]*type="number"/);
-  assert.match(pages[0], /adult-access\.js\?v=20260901-age-gate/);
+  assert.doesNotMatch(pages[0], /restrictedAccess|birth(Day|Month|Year)Input|adult-access\.js|birth-date|restricted-/);
   assert.match(pages[0], /catalog-pagination\.js\?v=20260901-pinned-official/);
-  assert.match(pages[0], /store\.js\?v=20260902-clean-hub/);
-  assert.match(pages[0], /id="restrictedAccessButton"[^>]*hidden/);
+  assert.match(pages[0], /store\.js\?v=20260906-remove-age-filter/);
   assert.doesNotMatch(pages[0], /catalog-policy-link|plugin-catalog-rules|Rules &amp; terms/);
   assert.doesNotMatch(storeSource, /Leia as regras do catálogo|Plugins adultos \(\+18\)|Plugins com classificação \+18 ficam ocultos/);
-  assert.match(storeSource, /hasRestrictedPlugins = \[\.\.\.catalogCandidates, \.\.\.savedDrafts\]/);
-  assert.match(storeSource, /Acesso negado: você precisa ter 18 anos completos para visualizar plugins adultos\./);
-  assert.doesNotMatch(storeSource, /catalog\.genre/);
-  assert.ok(pages[0].indexOf("adult-access.js") < pages[0].indexOf("store.js"));
+  assert.doesNotMatch(storeSource, /catalog\.genre|KapiTomoAdultAccess|restrictedAccessEnabled|assessBirthDate|catalog\.restricted/);
+  assert.equal(fs.existsSync(path.join(projectRoot, "plugins", "adult-access.js")), false);
   assert.ok(pages[0].indexOf("catalog-pagination.js") < pages[0].indexOf("store.js"));
 });
