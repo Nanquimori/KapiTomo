@@ -1262,7 +1262,7 @@
         <p data-i18n="publish.description">Paste the GitHub repository that already contains <code>plugin.json</code>. The Hub checks it and prepares the publication request.</p>
         <div class="publish-form">
           <label class="field-label" for="repoUrlInput" data-i18n="publish.repository">GitHub repository</label>
-          <input id="repoUrlInput" class="text-input" type="url" placeholder="https://github.com/user/my-plugin">
+          <input id="repoUrlInput" class="text-input" type="url" autocomplete="off" placeholder="https://github.com/user/my-plugin">
           <div class="button-row">
             <button id="loadRepoPluginButton" class="button primary" type="button" data-i18n="publish.load">Load plugin</button>
             <button id="discardDraftPluginsButton" class="button" type="button" data-i18n="publish.discard">Discard drafts</button>
@@ -1351,7 +1351,7 @@
           <label class="field-label" for="removePluginIdInput" data-i18n="remove.pluginId">Plugin ID</label>
           <input id="removePluginIdInput" class="text-input" type="text" placeholder="my-plugin">
           <label class="field-label" for="removeRepoUrlInput" data-i18n="remove.repository">GitHub repository</label>
-          <input id="removeRepoUrlInput" class="text-input" type="url" placeholder="https://github.com/user/my-plugin">
+          <input id="removeRepoUrlInput" class="text-input" type="url" autocomplete="off" placeholder="https://github.com/user/my-plugin">
           <button id="requestRemovePluginButton" class="button primary" type="button" data-i18n="remove.request">Request removal</button>
           <p id="removeStatus" class="publish-status" aria-live="polite"></p>
         </div>
