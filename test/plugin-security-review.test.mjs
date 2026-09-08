@@ -110,6 +110,9 @@ test("publication workflow and public documentation require the complete securit
   const actionSource = fs.readFileSync(new URL("../tools/plugin-hub-action.js", import.meta.url), "utf8");
   const terms = fs.readFileSync(new URL("../terms/index.html", import.meta.url), "utf8");
   const catalog = JSON.parse(fs.readFileSync(new URL("../plugins/catalog.json", import.meta.url), "utf8"));
+  assert.match(workflow, /actions\/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7\.0\.1/);
+  assert.match(workflow, /actions\/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7\.0\.0/);
+  assert.match(workflow, /node-version: "24"/);
   assert.match(workflow, /sudo freshclam --stdout/);
   assert.match(actionSource, /reviewRepositorySecurity\(plugin\)/);
   assert.match(actionSource, /plugin\.repository_ref = securityReview\.commitSha/);
