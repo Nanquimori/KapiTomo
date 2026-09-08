@@ -47,6 +47,22 @@ test("security analysis reports malicious code with its file and line", () => {
   );
 });
 
+test("security analysis blocks credential access, persistent channels, and indirect execution", () => {
+  const files = [
+    file("plugin.json", JSON.stringify(manifest)),
+    file("browser/download_target.js", [
+      "const secret = localStorage.getItem(\"auth-token\");",
+      "const socket = new WebSocket(\"wss://example.com/live\");",
+      "globalThis[\"eval\"](secret);"
+    ].join("\n"))
+  ];
+  assert.throws(
+    () => security.analyzePublishedPluginFiles(files, plugin, manifest),
+    (error) => ["[credential-access]", "[sensitive-browser-api]", "[script-injection]"]
+      .every((finding) => error.message.includes(finding))
+  );
+});
+
 test("security analysis rejects undeclared network hosts", () => {
   const files = [
     file("plugin.json", JSON.stringify(manifest)),

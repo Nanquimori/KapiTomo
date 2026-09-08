@@ -32,11 +32,11 @@ const SECURITY_BLOCKED_FILENAMES = new Set([".env", "id_dsa", "id_ecdsa", "id_ed
 const SECURITY_CODE_RULES = [
   { code: "dynamic-code", reason: "dynamic code execution is not allowed", pattern: /\beval\s*\(|\bnew\s+Function\s*\(|\bFunction\s*\(\s*["'`]|\b(?:setTimeout|setInterval)\s*\(\s*["'`]|\.constructor\s*\.\s*constructor\s*\(|\bWebAssembly\./ },
   { code: "system-command", reason: "system-command or native runtime access is not allowed", pattern: /(?:require\s*\(\s*["'](?:node:)?child_process["']|from\s+["'](?:node:)?child_process["']|process\.(?:binding|mainModule|getBuiltinModule)\b|\bDeno\.(?:run|Command)\b|\bBun\.(?:spawn|spawnSync)\b|ActiveXObject\s*\(|WScript\.Shell)/ },
-  { code: "credential-access", reason: "reading browser credentials or cookies is not allowed", pattern: /document\.cookie\b|\b(?:password|passwd|authorization)\s*(?:Input|Field)?\b.*(?:value|addEventListener)|querySelector\s*\(\s*["'][^"']*(?:password|current-password)/i },
-  { code: "sensitive-browser-api", reason: "this sensitive browser capability is not allowed", pattern: /navigator\.(?:sendBeacon|geolocation)|mediaDevices\.getUserMedia|serviceWorker\.register|Notification\.requestPermission|navigator\.clipboard\.(?:read|readText)/ },
+  { code: "credential-access", reason: "reading browser credentials or cookies is not allowed", pattern: /document\.cookie\b|(?:localStorage|sessionStorage)\.getItem\s*\([^)]*(?:token|auth|session|credential|password)|\b(?:password|passwd|authorization)\s*(?:Input|Field)?\b.*(?:value|addEventListener)|querySelector\s*\(\s*["'][^"']*(?:password|current-password)/i },
+  { code: "sensitive-browser-api", reason: "this sensitive browser capability is not allowed", pattern: /navigator\.(?:sendBeacon|geolocation)|mediaDevices\.getUserMedia|serviceWorker\.register|Notification\.requestPermission|navigator\.clipboard\.(?:read|readText)|\b(?:WebSocket|EventSource)\s*\(/ },
   { code: "forced-navigation", reason: "forced navigation or popup behavior is not allowed", pattern: /(?:window\.)?location\.(?:assign|replace)\s*\(|(?:window\.)?location(?:\.href)?\s*=|window\.open\s*\(/ },
   { code: "obfuscated-code", reason: "encoded or obfuscated executable code requires manual review", pattern: /\b(?:atob|String\.fromCharCode)\s*\(|\b_0x[a-f0-9]{3,}\b|["'`][A-Za-z0-9+/]{400,}={0,2}["'`]/i },
-  { code: "script-injection", reason: "injecting executable browser content is not allowed", pattern: /createElement\s*\(\s*["'](?:script|iframe)["']|\.srcdoc\s*=|import\s*\(\s*["']data:/i },
+  { code: "script-injection", reason: "injecting executable browser content is not allowed", pattern: /createElement\s*\(\s*["'](?:script|iframe)["']|\.srcdoc\s*=|import\s*\(\s*["']data:|(?:window|globalThis|self)\s*\[\s*["'](?:eval|Function)["']\s*\]/i },
   { code: "script-url", reason: "javascript URLs are not allowed", pattern: /javascript\s*:/i }
 ];
 const OFFICIAL_LANGUAGE_TAGS = [
