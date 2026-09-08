@@ -16,10 +16,10 @@ A plugin connects Nyxovira to one reading site. It opens the site, recognizes th
 
 ## How a Plugin Works
 
-1. The creator prepares `plugin.json` and `browser/download_target.js`.
+1. The creator starts with the small `plugin.json` that Nyxovira needs. A site-specific browser script is added when generic page recognition is not enough.
 2. During development, the creator imports the local plugin folder into Nyxovira and tests it on the supported site.
 3. The plugin may remain private. Publication is optional and happens only after testing.
-4. When the user opens a supported site, `browser/download_target.js` reads the current page and creates the chapter list.
+4. When present, `browser/download_target.js` handles site-specific work and chapter recognition. Without it, Nyxovira tries its generic page detector.
 5. After the user chooses chapters, the same script prepares the selected text or image pages for saving on the device.
 
 ## Plugin Files
@@ -35,58 +35,45 @@ my-plugin/
 
 | File | Purpose |
 | --- | --- |
-| `plugin.json` | Defines the plugin id, name, version, supported hosts, browser entry, icon, and parser. |
-| `browser/download_target.js` | Runs inside the page opened by Nyxovira and returns the work download plan. |
+| `plugin.json` | Identifies the supported site. Only a few fields are needed for a personal plugin. |
+| `browser/download_target.js` | Optional for import, but recommended when the generic detector cannot build the correct chapter plan. |
 
-Use the same stable id in the folder name and in `plugin.json`.
+For predictable updates, use the same stable id in the folder name and in `plugin.json`.
 
 ## plugin.json
 
-Example:
+### Minimum for personal use
+
+This is the smallest practical manifest for a plugin imported directly into Nyxovira:
 
 ```json
 {
-  "schema_version": 1,
   "id": "my-plugin",
-  "name": "My Plugin",
-  "version": "1.0.0",
-  "tags": ["english", "manga"],
   "match": {
     "hosts": ["example.com"]
   },
   "browser": {
     "home_url": "https://example.com/",
-    "icon_url": "https://example.com/icon.png",
-    "icon_mode": "pinned",
-    "short_label": "Source",
     "download_target_script_file": "browser/download_target.js"
-  },
-  "parser": {
-    "adapter": "html_series",
-    "base_url": "https://example.com",
-    "static_works_script": "https://example.com/data/works.js",
-    "base_path_prefix": "",
-    "series_path_prefix": "manga",
-    "hash_series_path_prefixes": ["work", "read"],
-    "chapter_path_prefix": "chapter",
-    "chapter_slug_pattern": ".+"
   }
 }
 ```
 
-Main fields:
+Nyxovira only needs valid JSON, a non-empty folder name or `id`, at least one `match.hosts` entry, and `browser.home_url` to load the source. The example also names `browser/download_target.js` because a site-specific script is the reliable way to recognize works and chapters. If that field and file are omitted, Nyxovira tries its generic page detector, which may not understand every site.
+
+For a plugin that stays on your device, these fields are **not required**: `schema_version`, `name`, `version`, `tags`, `browser.icon_url`, `browser.icon_mode`, `browser.short_label`, and `parser`. GitHub, a public catalog, and a plugin website are not required either.
+
+Fields and scope:
 
 | Field | Meaning |
 | --- | --- |
-| `id` | Stable plugin id. Use lowercase letters, numbers, dashes, dots, or underscores. |
-| `name` | Name displayed in the app. |
-| `version` | Plugin version. Increase it whenever publishing a fix. |
-| `match.hosts` | Domains recognized by this plugin. |
-| `browser.home_url` | Page opened by the app browser. |
-| `browser.icon_url` | Public icon image. Online plugins must have one. |
-| `browser.download_target_script_file` | Browser script that detects the open work. |
-| `parser.adapter` | Site parser type. Use `html_series` for simple sites or JS indexes. |
-| `parser.base_url` | Base URL used to resolve relative links. |
+| `id` | Stable plugin id. Strongly recommended; otherwise Nyxovira uses the folder name. |
+| `match.hosts` | Required. Domains recognized by this plugin. |
+| `browser.home_url` | Required. Page opened by the app browser. |
+| `browser.download_target_script_file` | Optional, but recommended for reliable site-specific work and chapter detection. |
+| `name`, `version` | Optional for personal import; useful when sharing and updating the plugin. |
+| `tags`, `browser.icon_url` | Not needed for personal use. Required only by the official Plugin Hub publication process. |
+| `parser` | Optional advanced native-parser configuration. It is not needed when the browser script provides the chapter plan and content. |
 
 ## Site Mapping
 
@@ -237,14 +224,14 @@ For image chapters, `pages` is the preferred field. Nyxovira also reads `images`
 
 ## Test in Nyxovira
 
-Manual import is the normal development loop and also supports plugins intended only for personal use.
+Manual import is the normal development loop and also supports plugins intended only for personal use. Personal import does not validate catalog tags or require a public icon.
 
 1. Keep `plugin.json` and the `browser` folder together inside the plugin folder.
 2. In Nyxovira, open **Sites**, tap **Import plugins**, and select the plugin folder. You may also select a parent folder containing several plugin folders.
 3. Open the supported site and verify work recognition, the chapter list, and the download.
 4. After changing the files, import the folder again and repeat the test.
 
-**If the plugin is only for you, you are done.** You do not need GitHub, a public catalog, or a plugin website.
+**If the plugin is only for you, you are done.** You do not need tags, a public icon, `schema_version`, GitHub, a public catalog, or a plugin website.
 
 If you want to share it, choose one of these later steps:
 
@@ -255,7 +242,7 @@ If you want to share it, choose one of these later steps:
 
 Use this option only when you want the plugin to appear in the official catalog. The public GitHub repository is the installation source; do not manually write a `catalog.json` entry.
 
-Before submitting, `plugin.json` must have a public HTTPS icon and a `tags` list containing one language first, one to three content types, and `adult` last when needed.
+The requirements below apply only to publication in the official catalog. Before submitting, `plugin.json` must have a public HTTPS icon and a `tags` list containing one language first, followed by one to three content types.
 
 Accepted tags:
 
@@ -285,10 +272,6 @@ Content type tags:
 - `webtoon`
 - `comic`
 - `other`
-
-Optional classification:
-
-- `adult`: place it last when the source exposes adult-restricted material.
 
 How to publish:
 
@@ -350,7 +333,6 @@ Without a declaration, Nyxovira looks for `catalog.json`, `catalog-store.json`, 
       "manifest_url": "plugins/my-plugin/plugin.json",
       "icon_url": "https://example.com/icon.png",
       "site_url": "https://example.com/",
-      "tags": ["english", "manga"],
       "status": "active"
     }
   ]
@@ -413,10 +395,10 @@ When the store is open in a regular browser, the example tells the person to ope
 
 ## Final Checklist
 
-For every plugin:
+For a plugin imported for personal use:
 
-1. `plugin.json` has valid `id`, `version`, `match.hosts`, `browser.home_url`, and `browser.download_target_script_file` values.
-2. `browser/download_target.js` recognizes the work and creates the chapter list.
+1. `plugin.json` is valid JSON, its folder name (or `id`) is not empty, it has at least one `match.hosts` value, and `browser.home_url` is valid.
+2. If generic recognition is insufficient, `browser/download_target.js` recognizes the work and creates the chapter list.
 3. Novels use `paragraphs`; comics use `pages`.
 4. The plugin contains no malware, does not collect credentials, and does not bypass authentication, paywalls, DRM, or access restrictions.
 

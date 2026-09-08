@@ -16,10 +16,10 @@ Um plugin conecta o Nyxovira a um site de leitura. Ele abre o site, reconhece a 
 
 ## Como um Plugin Funciona
 
-1. O criador prepara `plugin.json` e `browser/download_target.js`.
+1. O criador começa pelo pequeno `plugin.json` de que o Nyxovira precisa. Um script específico do site é adicionado quando o reconhecimento genérico da página não é suficiente.
 2. Durante o desenvolvimento, o criador importa a pasta local do plugin no Nyxovira e testa no site compatível.
 3. O plugin pode continuar particular. A publicação é opcional e acontece somente depois dos testes.
-4. Quando o usuário abre um site compatível, `browser/download_target.js` lê a página atual e cria a lista de capítulos.
+4. Quando existe, `browser/download_target.js` cuida do reconhecimento específico da obra e dos capítulos. Sem ele, o Nyxovira tenta usar o detector genérico da página.
 5. Depois que o usuário escolhe os capítulos, o mesmo script prepara textos ou páginas de imagem para salvar no dispositivo.
 
 ## Arquivos do Plugin
@@ -35,58 +35,45 @@ my-plugin/
 
 | Arquivo | Função |
 | --- | --- |
-| `plugin.json` | Define id, nome, versão, hosts compatíveis, entrada do navegador, ícone e parser. |
-| `browser/download_target.js` | Executa dentro da página aberta pelo Nyxovira e retorna o plano de download da obra. |
+| `plugin.json` | Identifica o site compatível. Poucos campos são necessários para um plugin pessoal. |
+| `browser/download_target.js` | Opcional para importar, mas recomendado quando o detector genérico não consegue montar o plano correto de capítulos. |
 
-Use o mesmo id estável no nome da pasta e em `plugin.json`.
+Para que as atualizações sejam previsíveis, use o mesmo id estável no nome da pasta e em `plugin.json`.
 
 ## plugin.json
 
-Exemplo:
+### Mínimo para uso pessoal
+
+Este é o menor manifesto prático para importar um plugin diretamente no Nyxovira:
 
 ```json
 {
-  "schema_version": 1,
   "id": "my-plugin",
-  "name": "My Plugin",
-  "version": "1.0.0",
-  "tags": ["portuguese", "manga"],
   "match": {
     "hosts": ["example.com"]
   },
   "browser": {
     "home_url": "https://example.com/",
-    "icon_url": "https://example.com/icon.png",
-    "icon_mode": "pinned",
-    "short_label": "Source",
     "download_target_script_file": "browser/download_target.js"
-  },
-  "parser": {
-    "adapter": "html_series",
-    "base_url": "https://example.com",
-    "static_works_script": "https://example.com/data/works.js",
-    "base_path_prefix": "",
-    "series_path_prefix": "manga",
-    "hash_series_path_prefixes": ["work", "read"],
-    "chapter_path_prefix": "chapter",
-    "chapter_slug_pattern": ".+"
   }
 }
 ```
 
-Campos principais:
+Para carregar a fonte, o Nyxovira precisa somente de JSON válido, nome de pasta ou `id` não vazio, pelo menos um item em `match.hosts` e `browser.home_url`. O exemplo também indica `browser/download_target.js` porque um script próprio é a forma confiável de reconhecer obras e capítulos. Se esse campo e o arquivo forem omitidos, o Nyxovira tenta usar o detector genérico da página, que pode não compreender todos os sites.
+
+Em um plugin que ficará apenas no seu aparelho, estes campos **não são obrigatórios**: `schema_version`, `name`, `version`, `tags`, `browser.icon_url`, `browser.icon_mode`, `browser.short_label` e `parser`. GitHub, catálogo público e site de plugins também não são necessários.
+
+Campos e alcance:
 
 | Campo | Significado |
 | --- | --- |
-| `id` | Id estável do plugin. Use letras minúsculas, números, hífens, pontos ou underscores. |
-| `name` | Nome exibido no app. |
-| `version` | Versão do plugin. Aumente sempre que publicar uma correção. |
-| `match.hosts` | Domínios reconhecidos pelo plugin. |
-| `browser.home_url` | Página aberta pelo navegador interno do app. |
-| `browser.icon_url` | Imagem pública do ícone. Plugins online precisam ter uma. |
-| `browser.download_target_script_file` | Script do navegador que detecta a obra aberta. |
-| `parser.adapter` | Tipo de parser do site. Use `html_series` para sites simples ou índices JS. |
-| `parser.base_url` | URL base usada para resolver links relativos. |
+| `id` | Id estável do plugin. Fortemente recomendado; se faltar, o Nyxovira usa o nome da pasta. |
+| `match.hosts` | Obrigatório. Domínios reconhecidos pelo plugin. |
+| `browser.home_url` | Obrigatório. Página aberta pelo navegador interno do app. |
+| `browser.download_target_script_file` | Opcional, mas recomendado para reconhecer com segurança as obras e os capítulos daquele site. |
+| `name`, `version` | Opcionais na importação pessoal; úteis ao compartilhar e atualizar o plugin. |
+| `tags`, `browser.icon_url` | Desnecessários no uso pessoal. Exigidos somente pelo processo de publicação no Plugin Hub oficial. |
+| `parser` | Configuração avançada e opcional do parser nativo. Não é necessária quando o script do navegador fornece o plano e o conteúdo dos capítulos. |
 
 ## Mapeamento do Site
 
@@ -237,14 +224,14 @@ Para capítulos com imagens, `pages` é o campo preferido. O Nyxovira também l�
 
 ## Testar no Nyxovira
 
-A importação manual é o caminho normal durante o desenvolvimento e também permite usar um plugin somente para você.
+A importação manual é o caminho normal durante o desenvolvimento e também permite usar um plugin somente para você. A importação pessoal não valida tags de catálogo nem exige ícone público.
 
 1. Mantenha `plugin.json` e a pasta `browser` juntos dentro da pasta do plugin.
 2. No Nyxovira, abra **Sites**, toque em **Importar plugins** e selecione a pasta do plugin. Você também pode selecionar uma pasta que contenha várias pastas de plugins.
 3. Abra o site compatível e confira o reconhecimento da obra, a lista de capítulos e o download.
 4. Depois de alterar os arquivos, importe a pasta novamente e repita o teste.
 
-**Se o plugin é somente para você, o processo termina aqui.** Não é necessário usar GitHub, catálogo público ou site de plugins.
+**Se o plugin é somente para você, o processo termina aqui.** Não é necessário ter tags, ícone público, `schema_version`, GitHub, catálogo público ou site de plugins.
 
 Se quiser compartilhar, escolha uma destas etapas posteriores:
 
@@ -255,7 +242,7 @@ Se quiser compartilhar, escolha uma destas etapas posteriores:
 
 Use esta opção somente quando quiser que o plugin apareça no catálogo oficial. O repositório GitHub público é a fonte da instalação; não escreva manualmente uma entrada em `catalog.json`.
 
-Antes de enviar, `plugin.json` precisa ter um ícone HTTPS público e uma lista `tags` com um idioma primeiro, de um a três tipos de conteúdo e, quando necessário, `adult` por último.
+Os requisitos abaixo valem somente para publicar no catálogo oficial. Antes de enviar, `plugin.json` precisa ter um ícone HTTPS público e uma lista `tags` com um idioma primeiro, seguido de um a três tipos de conteúdo.
 
 Tags aceitas:
 
@@ -285,10 +272,6 @@ Tags de tipo de conteúdo:
 - `webtoon`
 - `comic`
 - `other`
-
-Classificação opcional:
-
-- `adult`: use por último quando a fonte expõe material restrito a adultos.
 
 Como publicar:
 
@@ -350,7 +333,6 @@ Sem uma declaração, o Nyxovira procura `catalog.json`, `catalog-store.json` e 
       "manifest_url": "plugins/my-plugin/plugin.json",
       "icon_url": "https://example.com/icon.png",
       "site_url": "https://example.com/",
-      "tags": ["portuguese", "manga"],
       "status": "active"
     }
   ]
@@ -413,10 +395,10 @@ Quando a loja é aberta em um navegador comum, o exemplo orienta a pessoa a abri
 
 ## Checklist Final
 
-Para qualquer plugin:
+Para um plugin importado para uso pessoal:
 
-1. `plugin.json` tem `id`, `version`, `match.hosts`, `browser.home_url` e `browser.download_target_script_file` válidos.
-2. `browser/download_target.js` reconhece a obra e cria a lista de capítulos.
+1. `plugin.json` é um JSON válido, o nome da pasta (ou `id`) não está vazio, há pelo menos um valor em `match.hosts` e `browser.home_url` é válido.
+2. Se o reconhecimento genérico não for suficiente, `browser/download_target.js` reconhece a obra e cria a lista de capítulos.
 3. Novels usam `paragraphs`; quadrinhos usam `pages`.
 4. O plugin não contém malware, não coleta credenciais e não contorna autenticação, paywall, DRM ou restrições de acesso.
 

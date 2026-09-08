@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Nyxovira Plugin API</title>
     <meta name="description" content="Online documentation for creating Nyxovira plugins.">
+    <meta name="kapitomo-doc-revision" content="20260907-plugin-contract">
     <link rel="icon" type="image/png" href="../../assets/kapitomo-logo.png?v=20260704-plugin-api-en">
     <link rel="apple-touch-icon" href="../../assets/kapitomo-logo.png?v=20260704-plugin-api-en">
     <style>
@@ -561,16 +562,16 @@
           <section id="overview" class="panel">
             <h2>How a plugin works</h2>
             <div class="steps">
-              <div class="step"><p>The creator prepares <code>plugin.json</code> and <code>browser/download_target.js</code>.</p></div>
+              <div class="step"><p>The creator starts with the small <code>plugin.json</code> that Nyxovira needs. A site-specific script is added when generic page recognition is not enough.</p></div>
               <div class="step"><p>During development, the creator imports the local plugin folder into Nyxovira and tests it on the supported site.</p></div>
               <div class="step"><p>The plugin may remain private. Publication is optional and happens only after testing.</p></div>
-              <div class="step"><p>On supported pages, the browser script shows chapters immediately and prepares the selected content after confirmation.</p></div>
+              <div class="step"><p>When present, the browser script handles site-specific work and chapter recognition. Without it, Nyxovira tries its generic page detector.</p></div>
             </div>
           </section>
 
           <section id="files" class="panel">
             <h2>Plugin files</h2>
-            <p>Place the manifest and browser script inside one folder named after the plugin id.</p>
+            <p>Start with the manifest in a non-empty plugin folder. Add the browser script when site-specific recognition is needed.</p>
             <div class="folder">
               my-plugin/<br>
               |-- plugin.json<br>
@@ -581,8 +582,8 @@
               <table>
                 <thead><tr><th>File</th><th>Purpose</th></tr></thead>
                 <tbody>
-                  <tr><td><code>plugin.json</code></td><td>Defines the plugin id, version, host, browser entry, icon, and parser.</td></tr>
-                  <tr><td><code>browser/download_target.js</code></td><td>Runs inside the open page and builds the work download plan.</td></tr>
+                  <tr><td><code>plugin.json</code></td><td>Identifies the supported site. Only a few fields are needed for a personal plugin.</td></tr>
+                  <tr><td><code>browser/download_target.js</code></td><td>Optional for import, but recommended when generic detection cannot build the correct chapter plan.</td></tr>
                 </tbody>
               </table>
             </div>
@@ -590,26 +591,32 @@
 
           <section id="manifest" class="panel">
             <h2>plugin.json</h2>
-            <p>The manifest describes the site and tells Nyxovira which browser script to run.</p>
+            <h3 class="api-subheading">Minimum for personal use</h3>
+            <p>This is the smallest practical manifest for a plugin imported directly into Nyxovira:</p>
             <pre><code>{
-  "schema_version": 1,
   "id": "my-plugin",
-  "name": "My Plugin",
-  "version": "1.0.0",
-  "tags": ["english", "manga"],
   "match": { "hosts": ["example.com"] },
   "browser": {
     "home_url": "https://example.com/",
-    "icon_url": "https://example.com/icon.png",
-    "icon_mode": "pinned",
-    "short_label": "Source",
     "download_target_script_file": "browser/download_target.js"
-  },
-  "parser": {
-    "adapter": "html_series",
-    "base_url": "https://example.com"
   }
 }</code></pre>
+            <p>To load the source, Nyxovira only needs valid JSON, a non-empty folder name or <code>id</code>, at least one <code>match.hosts</code> entry, and <code>browser.home_url</code>. The example also names the browser script because it is the reliable way to recognize works and chapters. Without it, Nyxovira tries generic page detection, which may not understand every site.</p>
+            <p><strong>Not required for personal use:</strong> <code>schema_version</code>, <code>name</code>, <code>version</code>, <code>tags</code>, <code>browser.icon_url</code>, <code>browser.icon_mode</code>, <code>browser.short_label</code>, <code>parser</code>, GitHub, a catalog, or a plugin website.</p>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Field</th><th>When it is needed</th></tr></thead>
+                <tbody>
+                  <tr><td><code>id</code></td><td>Strongly recommended; otherwise Nyxovira uses the folder name.</td></tr>
+                  <tr><td><code>match.hosts</code></td><td>Required. Domains recognized by the plugin.</td></tr>
+                  <tr><td><code>browser.home_url</code></td><td>Required. Page opened by the app browser.</td></tr>
+                  <tr><td><code>browser.download_target_script_file</code></td><td>Optional, but recommended for reliable site-specific detection.</td></tr>
+                  <tr><td><code>name</code>, <code>version</code></td><td>Optional for personal use; useful when sharing and updating.</td></tr>
+                  <tr><td><code>tags</code>, <code>browser.icon_url</code></td><td>Not needed for personal use; required only for official catalog publication.</td></tr>
+                  <tr><td><code>parser</code></td><td>Optional advanced native-parser configuration.</td></tr>
+                </tbody>
+              </table>
+            </div>
           </section>
 
           <section id="mapping" class="panel">
@@ -713,14 +720,14 @@ return "https://example.com/manga/work/";</code></pre>
 
           <section id="testing" class="panel">
             <h2>Test in Nyxovira</h2>
-            <p>Manual import is the normal development loop and also supports plugins intended only for personal use.</p>
+            <p>Manual import is the normal development loop and also supports plugins intended only for personal use. Personal import does not validate catalog tags or require a public icon.</p>
             <div class="steps">
               <div class="step"><p>Keep <code>plugin.json</code> and the <code>browser</code> folder together inside the plugin folder.</p></div>
               <div class="step"><p>In Nyxovira, open <strong>Sites</strong>, tap <strong>Import plugins</strong>, and select the plugin folder. You may also select a parent folder containing several plugin folders.</p></div>
               <div class="step"><p>Open the supported site and verify work recognition, the chapter list, and the download.</p></div>
               <div class="step"><p>After changing the files, import the folder again and repeat the test.</p></div>
             </div>
-            <p class="panel-copy-after-list"><strong>If the plugin is only for you, you are done.</strong> You do not need GitHub, a public catalog, or a plugin website.</p>
+            <p class="panel-copy-after-list"><strong>If the plugin is only for you, you are done.</strong> You do not need tags, a public icon, <code>schema_version</code>, GitHub, a public catalog, or a plugin website.</p>
             <h3 class="api-subheading">If you want to share it</h3>
             <div class="rule-list">
               <article>
@@ -737,7 +744,7 @@ return "https://example.com/manga/work/";</code></pre>
           <section id="publishing" class="panel">
             <h2>Publish in the official Plugin Hub</h2>
             <p>Use this option only when the plugin should appear in the official catalog. The public GitHub repository is the installation source; developers do not manually write a catalog entry.</p>
-            <p><code>plugin.json</code> must contain a public HTTPS icon and a <code>tags</code> list with one language first, one to three content types, and <code>adult</code> last when needed.</p>
+            <p>The requirements below apply only to publication in the official catalog. <code>plugin.json</code> must contain a public HTTPS icon and a <code>tags</code> list with one language first, followed by one to three content types.</p>
             <div class="tag-groups">
               <section class="tag-group">
                 <h3>Language tags</h3>
@@ -750,11 +757,6 @@ return "https://example.com/manga/work/";</code></pre>
                 <div class="tag-list">
                   <code>manga</code><code>manhua</code><code>manhwa</code><code>novel</code><code>webtoon</code><code>comic</code><code>other</code>
                 </div>
-              </section>
-              <section class="tag-group">
-                <h3>Optional classification</h3>
-                <div class="tag-list"><code>adult</code></div>
-                <p>Place it last when the source exposes adult-restricted material.</p>
               </section>
             </div>
             <div class="steps">
@@ -798,9 +800,8 @@ return "https://example.com/manga/work/";</code></pre>
     "version": "1.0.0",
     "manifest_url": "plugins/my-plugin/plugin.json",
     "icon_url": "https://example.com/icon.png",
-    "site_url": "https://example.com/",
-    "tags": ["english", "manga"],
-    "status": "active"
+      "site_url": "https://example.com/",
+      "status": "active"
   }]
 }</code></pre>
             <p><code>hub_url</code> identifies the storefront when a JSON URL is connected directly. <code>store_url</code> and <code>homepage</code> are accepted aliases. Relative URLs are resolved against the catalog URL. Repository-based entries may use <code>repository_url</code>, <code>repository_ref</code>, and <code>plugin_path</code>.</p>
@@ -856,8 +857,8 @@ return "https://example.com/manga/work/";</code></pre>
             <h2>Final checklist</h2>
             <div class="rule-list">
               <article>
-                <h3>Every plugin</h3>
-                <p>Valid manifest fields; a working browser script; <code>paragraphs</code> for novels or <code>pages</code> for comics; no malware, credential collection, or access-control bypass.</p>
+                <h3>Personal plugin</h3>
+                <p>Valid JSON, a non-empty folder name (or id), at least one supported host, and a valid home URL. Add a browser script only when generic recognition is insufficient; use <code>paragraphs</code> for novels or <code>pages</code> for comics.</p>
               </article>
               <article>
                 <h3>Official Plugin Hub</h3>
@@ -903,16 +904,16 @@ return "https://example.com/manga/work/";</code></pre>
           <section class="panel">
             <h2>Como um plugin funciona</h2>
             <div class="steps">
-              <div class="step"><p>O criador prepara <code>plugin.json</code> e <code>browser/download_target.js</code>.</p></div>
+              <div class="step"><p>O criador começa pelo pequeno <code>plugin.json</code> de que o Nyxovira precisa. Um script específico do site é adicionado quando o reconhecimento genérico da página não é suficiente.</p></div>
               <div class="step"><p>Durante o desenvolvimento, o criador importa a pasta local do plugin no Nyxovira e testa no site compatível.</p></div>
               <div class="step"><p>O plugin pode continuar particular. A publicação é opcional e acontece somente depois dos testes.</p></div>
-              <div class="step"><p>Nas páginas compatíveis, o script mostra os capítulos imediatamente e prepara o conteúdo escolhido depois da confirmação.</p></div>
+              <div class="step"><p>Quando existe, o script cuida do reconhecimento específico da obra e dos capítulos. Sem ele, o Nyxovira tenta usar o detector genérico da página.</p></div>
             </div>
           </section>
 
           <section id="files-pt" class="panel">
             <h2>Arquivos do plugin</h2>
-            <p>Coloque o manifesto e o script do navegador em uma pasta com o mesmo nome do id do plugin.</p>
+            <p>Comece pelo manifesto em uma pasta de plugin com nome não vazio. Adicione o script quando o site exigir reconhecimento específico.</p>
             <div class="folder">
               my-plugin/<br>
               |-- plugin.json<br>
@@ -923,8 +924,8 @@ return "https://example.com/manga/work/";</code></pre>
               <table>
                 <thead><tr><th>Arquivo</th><th>Função</th></tr></thead>
                 <tbody>
-                  <tr><td><code>plugin.json</code></td><td>Define id, versão, host, entrada do navegador, ícone e parser.</td></tr>
-                  <tr><td><code>browser/download_target.js</code></td><td>Executa dentro da página aberta e monta o plano de download da obra.</td></tr>
+                  <tr><td><code>plugin.json</code></td><td>Identifica o site compatível. Poucos campos são necessários para um plugin pessoal.</td></tr>
+                  <tr><td><code>browser/download_target.js</code></td><td>Opcional para importar, mas recomendado quando o detector genérico não monta o plano correto de capítulos.</td></tr>
                 </tbody>
               </table>
             </div>
@@ -932,26 +933,32 @@ return "https://example.com/manga/work/";</code></pre>
 
           <section class="panel">
             <h2>plugin.json</h2>
-            <p>O manifesto descreve o site e informa ao Nyxovira qual script deve rodar no navegador interno.</p>
+            <h3 class="api-subheading">Mínimo para uso pessoal</h3>
+            <p>Este é o menor manifesto prático para importar um plugin diretamente no Nyxovira:</p>
             <pre><code>{
-  "schema_version": 1,
   "id": "my-plugin",
-  "name": "My Plugin",
-  "version": "1.0.0",
-  "tags": ["portuguese", "manga"],
   "match": { "hosts": ["example.com"] },
   "browser": {
     "home_url": "https://example.com/",
-    "icon_url": "https://example.com/icon.png",
-    "icon_mode": "pinned",
-    "short_label": "Source",
     "download_target_script_file": "browser/download_target.js"
-  },
-  "parser": {
-    "adapter": "html_series",
-    "base_url": "https://example.com"
   }
 }</code></pre>
+            <p>Para carregar a fonte, o Nyxovira precisa somente de JSON válido, nome de pasta ou <code>id</code> não vazio, pelo menos um item em <code>match.hosts</code> e <code>browser.home_url</code>. O exemplo também indica o script do navegador porque ele é a forma confiável de reconhecer obras e capítulos. Sem ele, o Nyxovira tenta usar o detector genérico da página, que pode não compreender todos os sites.</p>
+            <p><strong>Não exigidos no uso pessoal:</strong> <code>schema_version</code>, <code>name</code>, <code>version</code>, <code>tags</code>, <code>browser.icon_url</code>, <code>browser.icon_mode</code>, <code>browser.short_label</code>, <code>parser</code>, GitHub, catálogo ou site de plugins.</p>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Campo</th><th>Quando é necessário</th></tr></thead>
+                <tbody>
+                  <tr><td><code>id</code></td><td>Fortemente recomendado; se faltar, o Nyxovira usa o nome da pasta.</td></tr>
+                  <tr><td><code>match.hosts</code></td><td>Obrigatório. Domínios reconhecidos pelo plugin.</td></tr>
+                  <tr><td><code>browser.home_url</code></td><td>Obrigatório. Página aberta pelo navegador interno.</td></tr>
+                  <tr><td><code>browser.download_target_script_file</code></td><td>Opcional, mas recomendado para reconhecer corretamente aquele site.</td></tr>
+                  <tr><td><code>name</code>, <code>version</code></td><td>Opcionais no uso pessoal; úteis ao compartilhar e atualizar.</td></tr>
+                  <tr><td><code>tags</code>, <code>browser.icon_url</code></td><td>Desnecessários no uso pessoal; exigidos somente na publicação no catálogo oficial.</td></tr>
+                  <tr><td><code>parser</code></td><td>Configuração avançada e opcional do parser nativo.</td></tr>
+                </tbody>
+              </table>
+            </div>
           </section>
 
           <section class="panel">
@@ -1055,14 +1062,14 @@ return "https://example.com/manga/work/";</code></pre>
 
           <section id="testing-pt" class="panel">
             <h2>Testar no Nyxovira</h2>
-            <p>A importação manual é o caminho normal durante o desenvolvimento e também permite usar um plugin somente para você.</p>
+            <p>A importação manual é o caminho normal durante o desenvolvimento e também permite usar um plugin somente para você. A importação pessoal não valida tags de catálogo nem exige ícone público.</p>
             <div class="steps">
               <div class="step"><p>Mantenha <code>plugin.json</code> e a pasta <code>browser</code> juntos dentro da pasta do plugin.</p></div>
               <div class="step"><p>No Nyxovira, abra <strong>Sites</strong>, toque em <strong>Importar plugins</strong> e selecione a pasta do plugin. Você também pode selecionar uma pasta que contenha várias pastas de plugins.</p></div>
               <div class="step"><p>Abra o site compatível e confira o reconhecimento da obra, a lista de capítulos e o download.</p></div>
               <div class="step"><p>Depois de alterar os arquivos, importe a pasta novamente e repita o teste.</p></div>
             </div>
-            <p class="panel-copy-after-list"><strong>Se o plugin é somente para você, o processo termina aqui.</strong> Não é necessário usar GitHub, catálogo público ou site de plugins.</p>
+            <p class="panel-copy-after-list"><strong>Se o plugin é somente para você, o processo termina aqui.</strong> Não é necessário ter tags, ícone público, <code>schema_version</code>, GitHub, catálogo público ou site de plugins.</p>
             <h3 class="api-subheading">Se quiser compartilhar</h3>
             <div class="rule-list">
               <article>
@@ -1079,7 +1086,7 @@ return "https://example.com/manga/work/";</code></pre>
           <section id="publishing-pt" class="panel">
             <h2>Publicar no Plugin Hub oficial</h2>
             <p>Use esta opção somente quando o plugin deve aparecer no catálogo oficial. O repositório GitHub público é a fonte da instalação; o desenvolvedor não escreve manualmente uma entrada no catálogo.</p>
-            <p><code>plugin.json</code> precisa ter um ícone HTTPS público e uma lista <code>tags</code> com um idioma primeiro, de um a três tipos de conteúdo e <code>adult</code> por último quando necessário.</p>
+            <p>Os requisitos abaixo valem somente para publicar no catálogo oficial. <code>plugin.json</code> precisa ter um ícone HTTPS público e uma lista <code>tags</code> com um idioma primeiro, seguido de um a três tipos de conteúdo.</p>
             <div class="tag-groups">
               <section class="tag-group">
                 <h3>Tags de idioma</h3>
@@ -1092,11 +1099,6 @@ return "https://example.com/manga/work/";</code></pre>
                 <div class="tag-list">
                   <code>manga</code><code>manhua</code><code>manhwa</code><code>novel</code><code>webtoon</code><code>comic</code><code>other</code>
                 </div>
-              </section>
-              <section class="tag-group">
-                <h3>Classificação opcional</h3>
-                <div class="tag-list"><code>adult</code></div>
-                <p>Use por último quando a fonte expõe material restrito a adultos.</p>
               </section>
             </div>
             <div class="steps">
@@ -1140,9 +1142,8 @@ return "https://example.com/manga/work/";</code></pre>
     "version": "1.0.0",
     "manifest_url": "plugins/my-plugin/plugin.json",
     "icon_url": "https://example.com/icon.png",
-    "site_url": "https://example.com/",
-    "tags": ["portuguese", "manga"],
-    "status": "active"
+      "site_url": "https://example.com/",
+      "status": "active"
   }]
 }</code></pre>
             <p><code>hub_url</code> identifica a página da loja quando uma URL JSON é conectada diretamente. <code>store_url</code> e <code>homepage</code> são aliases aceitos. URLs relativas são resolvidas a partir do catálogo. Entradas baseadas em repositório podem usar <code>repository_url</code>, <code>repository_ref</code> e <code>plugin_path</code>.</p>
@@ -1198,8 +1199,8 @@ return "https://example.com/manga/work/";</code></pre>
             <h2>Checklist final</h2>
             <div class="rule-list">
               <article>
-                <h3>Qualquer plugin</h3>
-                <p>Campos válidos no manifesto; script do navegador funcionando; <code>paragraphs</code> para novels ou <code>pages</code> para quadrinhos; sem malware, coleta de credenciais ou quebra de controle de acesso.</p>
+                <h3>Plugin pessoal</h3>
+                <p>JSON válido, nome de pasta (ou id) não vazio, pelo menos um host compatível e URL inicial válida. Adicione script do navegador somente quando o reconhecimento genérico não bastar; use <code>paragraphs</code> para novels ou <code>pages</code> para quadrinhos.</p>
               </article>
               <article>
                 <h3>Plugin Hub oficial</h3>

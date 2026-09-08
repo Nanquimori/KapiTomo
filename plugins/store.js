@@ -32,7 +32,7 @@ const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
 const REPORT_HISTORY_KEY = "kapitomo.reportHistory.v1";
-const CATALOG_VERSION = "20260906-catalog-filters";
+const CATALOG_VERSION = "20260907-plugin-contract";
 const REPORT_CONFIG = globalThis.KAPITOMO_REPORT_CONFIG || {};
 const REPORT_ENDPOINT = String(REPORT_CONFIG.endpoint || "").trim();
 const REPORT_TURNSTILE_SITE_KEY = String(REPORT_CONFIG.turnstileSiteKey || "").trim();
@@ -72,14 +72,11 @@ const OFFICIAL_TYPE_TAGS = [
   "comic",
   "other"
 ];
-const OFFICIAL_CLASSIFICATION_TAGS = ["adult"];
 const LANGUAGE_TAGS = new Set(OFFICIAL_LANGUAGE_TAGS);
 const TYPE_TAGS = new Set(OFFICIAL_TYPE_TAGS);
-const CLASSIFICATION_TAGS = new Set(OFFICIAL_CLASSIFICATION_TAGS);
 const PUBLIC_TAGS = new Set([
   ...OFFICIAL_LANGUAGE_TAGS,
-  ...OFFICIAL_TYPE_TAGS,
-  ...OFFICIAL_CLASSIFICATION_TAGS
+  ...OFFICIAL_TYPE_TAGS
 ]);
 const I18N = {
   en: {
@@ -123,8 +120,7 @@ const I18N = {
       language: "Language",
       type: "Type",
       tagLabels: {
-        other: "other",
-        adult: "+18"
+        other: "other"
       },
       favorite: "Favorite",
       favorites: "Favorites",
@@ -210,9 +206,8 @@ const I18N = {
       repositoryLine: "Repository: {url}",
       tagMinimum: "plugin.json must declare at least 2 tags: language first, then type.",
       firstTag: "The first public tag must be one of: {tags}.",
-      nextTags: "After language, use one to three types from: {types}. The optional adult classification must be last.",
+      nextTags: "After language, use one to three types from: {types}.",
       typeLimit: "Use no more than three content types.",
-      classificationLast: "The adult classification must appear last.",
       validUrl: "Paste a valid GitHub URL.",
       githubOnly: "Use a github.com repository.",
       ownerRepo: "The URL must include an owner and repository.",
@@ -295,10 +290,8 @@ const I18N = {
       loadError: "Não foi possível carregar o catálogo: {message}",
       language: "Idioma",
       type: "Tipo",
-      classification: "Classificação",
       tagLabels: {
-        other: "outros",
-        adult: "+18"
+        other: "outros"
       },
       favorite: "Favoritar",
       favorites: "Favoritos",
@@ -384,9 +377,8 @@ const I18N = {
       repositoryLine: "Repositório: {url}",
       tagMinimum: "plugin.json precisa declarar pelo menos 2 tags: idioma primeiro, depois tipo.",
       firstTag: "A primeira tag pública precisa ser uma destas: {tags}.",
-      nextTags: "Depois do idioma, use de um a três tipos entre: {types}. A classificação opcional adult deve ficar por último.",
+      nextTags: "Depois do idioma, use de um a três tipos entre: {types}.",
       typeLimit: "Use no máximo três tipos de conteúdo.",
-      classificationLast: "A classificação adult deve aparecer por último.",
       validUrl: "Cole uma URL válida do GitHub.",
       githubOnly: "Use um repositório github.com.",
       ownerRepo: "A URL precisa incluir usuário e repositório.",
@@ -810,22 +802,17 @@ function normalizePublicationTags(tags) {
     throw new Error(t("publish.firstTag", { tags: OFFICIAL_LANGUAGE_TAGS.join(", ") }));
   }
   const contentTags = publicTags.slice(1);
-  const invalidTag = contentTags.find((tag) => !TYPE_TAGS.has(tag) && !CLASSIFICATION_TAGS.has(tag));
+  const invalidTag = contentTags.find((tag) => !TYPE_TAGS.has(tag));
   if (invalidTag) {
     throw new Error(t("publish.nextTags", {
       types: OFFICIAL_TYPE_TAGS.join(", ")
     }));
   }
-  const typeTags = contentTags.filter((tag) => TYPE_TAGS.has(tag));
-  if (!typeTags.length) {
+  if (!contentTags.length) {
     throw new Error(t("publish.tagMinimum"));
   }
-  if (typeTags.length > MAX_TYPE_TAGS) {
+  if (contentTags.length > MAX_TYPE_TAGS) {
     throw new Error(t("publish.typeLimit"));
-  }
-  const firstClassificationIndex = contentTags.findIndex((tag) => CLASSIFICATION_TAGS.has(tag));
-  if (firstClassificationIndex >= 0 && contentTags.slice(firstClassificationIndex + 1).some((tag) => TYPE_TAGS.has(tag))) {
-    throw new Error(t("publish.classificationLast"));
   }
   return output;
 }
