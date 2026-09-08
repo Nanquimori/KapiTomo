@@ -997,6 +997,8 @@ return "https://example.com/manga/work/";</code></pre>
             <h2>Publish in the official Plugin Hub</h2>
             <p>Use this option only when the plugin should appear in the official catalog. The public GitHub repository is the installation source; developers do not manually write a catalog entry.</p>
             <p>The requirements below apply only to publication in the official catalog. <code>plugin.json</code> must contain a public HTTPS icon and a <code>tags</code> list with one language first, followed by one to three content types.</p>
+            <p>Keep <code>plugin_path</code> limited to the files that Nyxovira must install. Before publication, the Hub inventories and verifies every file in that folder, examines browser scripts line by line, checks explicit network destinations, and runs ClamAV over the complete snapshot. Executables, archives, symbolic links, disguised binaries, oversized packages, suspicious or obfuscated code, malware detections, and incomplete scans are blocked.</p>
+            <p>The accepted entry is pinned to the exact reviewed commit. Any later code update needs a new publication request. Automated checks reduce risk but cannot guarantee that software is harmless; rejected requests remain open for correction or manual review.</p>
             <div class="tag-groups">
               <section class="tag-group">
                 <h3>Language tags</h3>
@@ -1016,7 +1018,7 @@ return "https://example.com/manga/work/";</code></pre>
               <div class="step"><p>Initialize Git in the plugin folder, commit all plugin files, connect the public repository as <code>origin</code>, and push the main branch.</p></div>
               <div class="step"><p>Open the Plugin Hub and paste the public GitHub repository URL.</p></div>
               <div class="step"><p>Confirm the generated GitHub request and accept the current catalog rules.</p></div>
-              <div class="step"><p>Automation checks the files, icon, tags, hosts, and repository ownership.</p></div>
+              <div class="step"><p>Automation reviews every file and code line, runs antivirus checks, validates metadata and ownership, and pins the exact approved commit.</p></div>
               <div class="step"><p>A technically valid request is published in the catalog.</p></div>
             </div>
             <pre><code>git init
@@ -1387,6 +1389,8 @@ return "https://example.com/manga/work/";</code></pre>
             <h2>Publicar no Plugin Hub oficial</h2>
             <p>Use esta opção somente quando o plugin deve aparecer no catálogo oficial. O repositório GitHub público é a fonte da instalação; o desenvolvedor não escreve manualmente uma entrada no catálogo.</p>
             <p>Os requisitos abaixo valem somente para publicar no catálogo oficial. <code>plugin.json</code> precisa ter um ícone HTTPS público e uma lista <code>tags</code> com um idioma primeiro, seguido de um a três tipos de conteúdo.</p>
+            <p>Mantenha <code>plugin_path</code> limitado aos arquivos que o Nyxovira precisa instalar. Antes da publicação, o Hub inventaria e confere cada arquivo dessa pasta, examina os scripts do navegador linha por linha, verifica destinos de rede explícitos e executa o ClamAV no conjunto exato dos arquivos. Executáveis, compactados, links simbólicos, binários disfarçados, pacotes grandes demais, código suspeito ou ofuscado, detecções de malware e análises incompletas são bloqueados.</p>
+            <p>A entrada aceita fica presa ao commit exato que foi analisado. Qualquer atualização posterior do código exige uma nova solicitação de publicação. As verificações automáticas reduzem o risco, mas não garantem que um software seja inofensivo; solicitações recusadas continuam abertas para correção ou análise manual.</p>
             <div class="tag-groups">
               <section class="tag-group">
                 <h3>Tags de idioma</h3>
@@ -1406,7 +1410,7 @@ return "https://example.com/manga/work/";</code></pre>
               <div class="step"><p>Inicialize o Git na pasta do plugin, faça commit de todos os arquivos, conecte o repositório público como <code>origin</code> e envie a branch principal com push.</p></div>
               <div class="step"><p>Abra o Plugin Hub e cole a URL do repositório público no GitHub.</p></div>
               <div class="step"><p>Confirme a solicitação gerada no GitHub e aceite as regras atuais do catálogo.</p></div>
-              <div class="step"><p>A automação verifica arquivos, ícone, tags, hosts e propriedade do repositório.</p></div>
+              <div class="step"><p>A automação revisa todos os arquivos e linhas de código, executa o antivírus, valida metadados e propriedade e fixa o commit exato aprovado.</p></div>
               <div class="step"><p>Uma solicitação tecnicamente válida é publicada no catálogo.</p></div>
             </div>
             <pre><code>git init

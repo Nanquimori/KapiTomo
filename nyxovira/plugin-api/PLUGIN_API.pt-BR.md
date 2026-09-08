@@ -260,6 +260,10 @@ Use esta opção somente quando quiser que o plugin apareça no catálogo oficia
 
 Os requisitos abaixo valem somente para publicar no catálogo oficial. Antes de enviar, `plugin.json` precisa ter um ícone HTTPS público e uma lista `tags` com um idioma primeiro, seguido de um a três tipos de conteúdo.
 
+Mantenha `plugin_path` limitado aos arquivos que o Nyxovira precisa instalar. Antes da publicação, o Hub inventaria e confere cada arquivo dessa pasta, examina os scripts do navegador linha por linha, verifica destinos de rede explícitos e executa o ClamAV no conjunto exato dos arquivos. Executáveis, compactados, links simbólicos, binários disfarçados, pacotes grandes demais, código suspeito ou ofuscado, detecções de malware e análises incompletas são bloqueados.
+
+A entrada aceita fica presa ao commit exato que foi analisado. Qualquer atualização posterior do código exige uma nova solicitação de publicação. As verificações automáticas reduzem o risco, mas não garantem que um software seja inofensivo; solicitações recusadas continuam abertas para correção ou análise manual.
+
 Tags aceitas:
 
 Tags de idioma:
@@ -295,7 +299,7 @@ Como publicar:
 2. Inicialize o Git na pasta do plugin, faça commit de todos os arquivos, conecte o repositório público como `origin` e envie a branch principal com push.
 3. Cole a URL do repositório público no GitHub no Plugin Hub.
 4. Confirme a solicitação gerada no GitHub e aceite as regras atuais.
-5. A automação verifica os arquivos, o ícone, as tags, os hosts e se o solicitante é dono do repositório.
+5. A automação revisa todos os arquivos e linhas de código, executa o antivírus, valida metadados e propriedade e fixa o commit exato aprovado.
 6. Uma solicitação tecnicamente válida é publicada no catálogo.
 
 ```bash

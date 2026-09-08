@@ -32,7 +32,7 @@ const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
 const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
 const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
 const REPORT_HISTORY_KEY = "kapitomo.reportHistory.v1";
-const CATALOG_VERSION = "20260907-plugin-contract";
+const CATALOG_VERSION = "20260908-security-review";
 const REPORT_CONFIG = globalThis.KAPITOMO_REPORT_CONFIG || {};
 const REPORT_ENDPOINT = String(REPORT_CONFIG.endpoint || "").trim();
 const REPORT_TURNSTILE_SITE_KEY = String(REPORT_CONFIG.turnstileSiteKey || "").trim();
@@ -179,6 +179,13 @@ const I18N = {
       repository: "GitHub repository",
       load: "Load plugin",
       discard: "Discard drafts",
+      securityTitle: "Security review before publication",
+      securityDescription: "The catalog is updated only after the exact repository snapshot passes every check.",
+      securityFiles: "Every plugin file is inventoried; executables, archives, symbolic links, disguised files, and oversized packages are rejected.",
+      securityCode: "Browser scripts are inspected line by line for malicious or obfuscated behavior and undeclared network hosts.",
+      securityAntivirus: "ClamAV scans the complete plugin snapshot with current official signatures. A detection or incomplete scan blocks publication.",
+      securityPinned: "The approved catalog entry is pinned to the reviewed commit, so later repository changes require a new review.",
+      securityLimits: "Automated checks reduce risk but cannot prove that software is harmless. Reports and manual moderation remain available.",
       how: "How publishing works",
       step1: {
         title: "Prepare the plugin",
@@ -194,12 +201,12 @@ const I18N = {
       },
       reading: "Reading plugin.json from the repository...",
       preparing: "Preparing the publication request...",
-      loaded: "Plugin loaded. Confirm the GitHub request and the catalog automation will validate the repository before publishing.",
+      loaded: "Plugin loaded. Confirm the GitHub request; file, code, and antivirus checks run before publication.",
       failed: "Could not load the plugin.",
       outdated: "This draft is outdated. Load the GitHub repository again before requesting publication.",
       draftsRemoved: "Drafts removed from this browser.",
       requestTitle: "Plugin publication request for the Nyxovira catalog.",
-      requestDescription: "After submission, the catalog automation validates the repository, ownership, manifest, icon, tags, hosts, and acceptance of the current catalog rules.",
+      requestDescription: "After submission, the catalog automation reviews every plugin file, scans browser code and network hosts, runs antivirus checks, and validates ownership, manifest, icon, tags, hosts, and acceptance of the current catalog rules.",
       responsibility: "By submitting this plugin, I confirm that I control its repository, accept the current Plugin Hub catalog rules, and am responsible for the plugin code, metadata, icon, permissions requested by the plugin, maintenance, and source mapping. I understand that automatic publication is not approval of third-party content.",
       acceptanceLine: "Catalog rules accepted: yes",
       rulesLine: "Catalog rules: https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules",
@@ -350,6 +357,13 @@ const I18N = {
       repository: "Repositório GitHub",
       load: "Carregar plugin",
       discard: "Descartar rascunhos",
+      securityTitle: "Análise de segurança antes da publicação",
+      securityDescription: "O catálogo só é atualizado depois que a versão exata dos arquivos do repositório passa por todas as verificações.",
+      securityFiles: "Todos os arquivos do plugin são inventariados; executáveis, compactados, links simbólicos, arquivos disfarçados e pacotes grandes demais são recusados.",
+      securityCode: "Os scripts do navegador são examinados linha por linha contra comportamento malicioso ou ofuscado e domínios de rede não declarados.",
+      securityAntivirus: "O ClamAV verifica todo o plugin com assinaturas oficiais atuais. Uma detecção ou análise incompleta bloqueia a publicação.",
+      securityPinned: "A entrada aprovada fica presa ao commit analisado; mudanças posteriores no repositório exigem nova análise.",
+      securityLimits: "As verificações automáticas reduzem o risco, mas não provam que um software seja inofensivo. Denúncias e moderação manual continuam disponíveis.",
       how: "Como a publicação funciona",
       step1: {
         title: "Prepare o plugin",
@@ -365,12 +379,12 @@ const I18N = {
       },
       reading: "Lendo plugin.json do repositório...",
       preparing: "Preparando a solicitação de publicação...",
-      loaded: "Plugin carregado. Confirme a solicitação no GitHub e a automação do catálogo validará o repositório antes de publicar.",
+      loaded: "Plugin carregado. Confirme a solicitação no GitHub; as verificações de arquivos, código e antivírus acontecem antes da publicação.",
       failed: "Não foi possível carregar o plugin.",
       outdated: "Este rascunho está desatualizado. Carregue o repositório GitHub novamente antes de solicitar publicação.",
       draftsRemoved: "Rascunhos removidos deste navegador.",
       requestTitle: "Solicitação de publicação de plugin para o catálogo do Nyxovira.",
-      requestDescription: "Depois do envio, a automação valida repositório, propriedade, manifesto, ícone, tags, domínios e aceitação das regras atuais do catálogo.",
+      requestDescription: "Depois do envio, a automação analisa todos os arquivos do plugin, examina o código do navegador e os domínios de rede, executa o antivírus e valida propriedade, manifesto, ícone, tags, hosts e aceitação das regras atuais do catálogo.",
       responsibility: "Ao enviar este plugin, confirmo que controlo seu repositório, aceito as regras atuais do catálogo do Plugin Hub e sou responsável pelo código, metadados, ícone, permissões solicitadas pelo plugin, manutenção e mapeamento da fonte. Entendo que a publicação automática não representa aprovação de conteúdos de terceiros.",
       acceptanceLine: "Regras do catálogo aceitas: sim",
       rulesLine: "Regras do catálogo: https://nanquimori.github.io/KapiTomo/terms/#regras-do-catalogo",
