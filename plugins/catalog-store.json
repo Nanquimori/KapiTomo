@@ -73,27 +73,29 @@
     {
       "id": "kapitomo",
       "name": "KapiTomo",
+      "description": "Plugin oficial do KapiTomo para baixar obras pelo Nyxovira.",
       "author": "Nanquimori",
       "version": "1.0.17",
       "site_url": "https://nanquimori.github.io/KapiTomo/",
       "homepage": "https://nanquimori.github.io/KapiTomo/",
       "icon_url": "https://nanquimori.github.io/KapiTomo/assets/kapitomo-logo.png?v=20260626",
       "repository_url": "https://github.com/Nanquimori/KapiTomo",
-      "repository_ref": "9a536f8409aa2251cfffaee696d31b7095f1f3a1",
+      "repository_ref": "cdcc21ecb038587ab4cb669f3622554dd1873940",
       "plugin_path": "nyxovira/plugin-api/kapitomo",
+      "tags": [
+        "official",
+        "portuguese",
+        "manhwa",
+        "novel"
+      ],
       "hosts": [
         "nanquimori.github.io"
       ],
       "status": "active",
       "consecutive_failures": 0,
       "last_error": "",
-      "last_checked_at": "2026-08-17T16:27:03.111Z",
-      "tags": [
-        "official",
-        "portuguese",
-        "manhwa",
-        "novel"
-      ]
+      "published_at": "2026-09-08T13:07:54.320Z",
+      "last_checked_at": "2026-09-08T13:07:54.320Z"
     },
     {
       "id": "nexustoons",
