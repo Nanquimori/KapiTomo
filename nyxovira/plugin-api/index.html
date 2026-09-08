@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Nyxovira Plugin API</title>
     <meta name="description" content="Online documentation for creating Nyxovira plugins.">
-    <meta name="kapitomo-doc-revision" content="20260907-prompt-icon-git">
+    <meta name="kapitomo-doc-revision" content="20260907-prompt-api-discovery">
     <link rel="icon" type="image/png" href="../../assets/kapitomo-logo.png?v=20260704-plugin-api-en">
     <link rel="apple-touch-icon" href="../../assets/kapitomo-logo.png?v=20260704-plugin-api-en">
     <style>
@@ -868,6 +868,12 @@
           <section id="mapping" class="panel">
             <h2>Site mapping</h2>
             <p>Map the site's names to the fields Nyxovira expects: title, cover, chapters, text, and page images.</p>
+            <h3 class="api-subheading">Discover the data source first</h3>
+            <ul>
+              <li>Look for official developer documentation, a public API, OpenAPI or Swagger files, GraphQL, JSON feeds, and documented endpoints.</li>
+              <li>If the API is not linked or documented, inspect the page source, loaded scripts, and the browser's network requests to identify the endpoints used by the site's own interface.</li>
+              <li>Compare the API data with the rendered HTML and use the most complete and stable source for works, chapters, text, and images.</li>
+            </ul>
             <pre><code>var plugin = {
   siteBaseUrl: "https://example.com",
   siteVariable: "EXAMPLE_WORK_INDEX",
@@ -1252,6 +1258,12 @@ git push -u origin main</code></pre>
           <section class="panel">
             <h2>Mapeamento do site</h2>
             <p>Relacione os nomes usados pelo site com os campos que o Nyxovira espera: título, capa, capítulos, texto e imagens.</p>
+            <h3 class="api-subheading">Descubra primeiro de onde vêm os dados</h3>
+            <ul>
+              <li>Procure documentação oficial para desenvolvedores, API pública, arquivos OpenAPI ou Swagger, GraphQL, feeds JSON e endpoints documentados.</li>
+              <li>Se a API não estiver visível ou documentada, examine o código da página, os scripts carregados e as requisições de rede do navegador para identificar os endpoints usados pela própria interface do site.</li>
+              <li>Compare os dados da API com o HTML renderizado e use a fonte mais completa e estável para obras, capítulos, textos e imagens.</li>
+            </ul>
             <pre><code>var plugin = {
   siteBaseUrl: "https://example.com",
   siteVariable: "EXAMPLE_WORK_INDEX",
@@ -1536,6 +1548,9 @@ git push -u origin main</code></pre>
               "Crie e prepare um plugin Nyxovira para publicar no Plugin Hub oficial para o site \"" + site + "\", seguindo integralmente a documentação oficial: \"" + promptDocumentationUrl + "\".",
               "",
               "Antes de implementar, mapeie e analise o site: rotas, domínio e subdomínios, página da obra, lista e ordem dos capítulos, conteúdo de texto ou imagens, paginação, carregamento dinâmico, seletores, dados embutidos e limitações.",
+              "- Procure documentação oficial para desenvolvedores, API pública, OpenAPI ou Swagger, GraphQL, feeds JSON e endpoints documentados.",
+              "- Se a API não estiver visível ou documentada, examine o código da página, os scripts carregados e as requisições de rede do navegador para descobrir os endpoints usados pela própria interface do site.",
+              "- Compare a API com o HTML renderizado e escolha a fonte de dados mais completa e estável para o plugin.",
               "",
               "Requisitos deste modo:",
               "- Crie e entregue todos os arquivos completos do plugin; não responda apenas com explicações.",
@@ -1544,7 +1559,6 @@ git push -u origin main</code></pre>
               "- Procure o favicon ou logo público fornecido pelo próprio site e use-o como browser.icon_url. Se o site não fornecer um ícone adequado, prepare outro ícone HTTPS público.",
               "- Adicione as tags aceitas pelo catálogo: um idioma primeiro e de um a três tipos de conteúdo.",
               "- Crie um repositório público no GitHub para o plugin, inicialize o Git, faça commit de todos os arquivos e envie a branch principal com push.",
-              "- Depois do push, envie o repositório pelo Plugin Hub. Não edite catalog.json manualmente.",
               "- Valide a importação no Nyxovira, a lista de capítulos e um download completo, incluindo o formato final de textos ou imagens.",
               "",
               "Ao final, informe os arquivos criados, as decisões de mapeamento, as limitações encontradas, os testes executados e o que ainda exige validação no aplicativo."
@@ -1556,6 +1570,9 @@ git push -u origin main</code></pre>
               "Crie um plugin Nyxovira para uso pessoal para o site \"" + site + "\", seguindo integralmente a documentação oficial: \"" + promptDocumentationUrl + "\".",
               "",
               "Antes de implementar, mapeie e analise o site: rotas, domínio e subdomínios, página da obra, lista e ordem dos capítulos, conteúdo de texto ou imagens, paginação, carregamento dinâmico, seletores, dados embutidos e limitações.",
+              "- Procure documentação oficial para desenvolvedores, API pública, OpenAPI ou Swagger, GraphQL, feeds JSON e endpoints documentados.",
+              "- Se a API não estiver visível ou documentada, examine o código da página, os scripts carregados e as requisições de rede do navegador para descobrir os endpoints usados pela própria interface do site.",
+              "- Compare a API com o HTML renderizado e escolha a fonte de dados mais completa e estável para o plugin.",
               "",
               "Requisitos deste modo:",
               "- Faça somente o necessário para importar e usar o plugin no meu aparelho.",
@@ -1575,6 +1592,9 @@ git push -u origin main</code></pre>
               "Create and prepare a Nyxovira plugin for publication in the official Plugin Hub for the site \"" + site + "\", following the official documentation completely: \"" + promptDocumentationUrl + "\".",
               "",
               "Before implementing it, map and analyze the site: routes, domains and subdomains, work page, chapter list and order, text or image content, pagination, dynamic loading, selectors, embedded data, and limitations.",
+              "- Look for official developer documentation, a public API, OpenAPI or Swagger files, GraphQL, JSON feeds, and documented endpoints.",
+              "- If the API is not visible or documented, inspect the page source, loaded scripts, and browser network requests to discover the endpoints used by the site's own interface.",
+              "- Compare the API with the rendered HTML and choose the most complete and stable data source for the plugin.",
               "",
               "Requirements for this mode:",
               "- Create and deliver all complete plugin files; do not respond with explanations only.",
@@ -1583,7 +1603,6 @@ git push -u origin main</code></pre>
               "- Find the public favicon or logo provided by the site and use it as browser.icon_url. If the site has no suitable icon, prepare another public HTTPS icon.",
               "- Add accepted catalog tags: one language first and one to three content types.",
               "- Create a public GitHub repository for the plugin, initialize Git, commit every file, and push the main branch.",
-              "- After the push, submit the repository through the Plugin Hub. Do not edit catalog.json manually.",
               "- Validate Nyxovira import, the chapter list, and one complete download, including final text or image formats.",
               "",
               "Finish by reporting the created files, mapping decisions, discovered limitations, tests performed, and anything that still requires in-app validation."
@@ -1594,6 +1613,9 @@ git push -u origin main</code></pre>
             "Create a Nyxovira plugin for personal use for the site \"" + site + "\", following the official documentation completely: \"" + promptDocumentationUrl + "\".",
             "",
             "Before implementing it, map and analyze the site: routes, domains and subdomains, work page, chapter list and order, text or image content, pagination, dynamic loading, selectors, embedded data, and limitations.",
+            "- Look for official developer documentation, a public API, OpenAPI or Swagger files, GraphQL, JSON feeds, and documented endpoints.",
+            "- If the API is not visible or documented, inspect the page source, loaded scripts, and browser network requests to discover the endpoints used by the site's own interface.",
+            "- Compare the API with the rendered HTML and choose the most complete and stable data source for the plugin.",
             "",
             "Requirements for this mode:",
             "- Include only what is needed to import and use the plugin on my device.",
