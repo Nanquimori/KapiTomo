@@ -10,8 +10,8 @@ Um plugin conecta o Nyxovira a um site de leitura. Ele abre o site, reconhece a 
 
 O [gerador interativo de prompt para IA](https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/?lang=pt#gerador-de-prompt) aparece no início da documentação online. Informe a URL do site da fonte, escolha um modo, use **Copiar prompt** e cole o resultado na conversa com a IA que criará o plugin:
 
-- **Uso pessoal:** pede somente o mínimo necessário para importação local. Exclui explicitamente tags de catálogo, ícone público, GitHub e metadados de publicação, salvo necessidade técnica.
-- **Publicar no Plugin Hub:** acrescenta repositório público, ícone HTTPS, tags aceitas, verificações de publicação e validação completa no aplicativo.
+- **Uso pessoal:** pede somente o mínimo necessário para importação local. Usa o favicon ou logo público do próprio site quando estiver disponível, sem exigir que um ícone separado seja hospedado.
+- **Publicar no Plugin Hub:** manda a IA criar e enviar um repositório GitHub público, usar o ícone do site, adicionar as tags aceitas, validar o plugin e enviá-lo pelo Hub.
 
 O pedido gerado também manda a IA mapear rotas, seletores, ordem dos capítulos, conteúdo de texto ou imagens, carregamento dinâmico e limitações antes de implementar o plugin.
 
@@ -70,7 +70,7 @@ Este é o menor manifesto prático para importar um plugin diretamente no Nyxovi
 
 Para carregar a fonte, o Nyxovira precisa somente de JSON válido, nome de pasta ou `id` não vazio, pelo menos um item em `match.hosts` e `browser.home_url`. O exemplo também indica `browser/download_target.js` porque um script próprio é a forma confiável de reconhecer obras e capítulos. Se esse campo e o arquivo forem omitidos, o Nyxovira tenta usar o detector genérico da página, que pode não compreender todos os sites.
 
-Em um plugin que ficará apenas no seu aparelho, estes campos **não são obrigatórios**: `schema_version`, `name`, `version`, `tags`, `browser.icon_url`, `browser.icon_mode`, `browser.short_label` e `parser`. GitHub, catálogo público e site de plugins também não são necessários.
+Em um plugin que ficará apenas no seu aparelho, estes campos **não são obrigatórios**: `schema_version`, `name`, `version`, `tags`, `browser.icon_mode`, `browser.short_label` e `parser`. GitHub, catálogo público e site de plugins também não são necessários. Se o site fornecer um favicon ou logo público e estável, use essa URL em `browser.icon_url`; se não houver, o ícone pode ser omitido no uso pessoal.
 
 Campos e alcance:
 
@@ -81,7 +81,8 @@ Campos e alcance:
 | `browser.home_url` | Obrigatório. Página aberta pelo navegador interno do app. |
 | `browser.download_target_script_file` | Opcional, mas recomendado para reconhecer com segurança as obras e os capítulos daquele site. |
 | `name`, `version` | Opcionais na importação pessoal; úteis ao compartilhar e atualizar o plugin. |
-| `tags`, `browser.icon_url` | Desnecessários no uso pessoal. Exigidos somente pelo processo de publicação no Plugin Hub oficial. |
+| `tags` | Desnecessárias no uso pessoal. Exigidas somente pelo processo de publicação no Plugin Hub oficial. |
+| `browser.icon_url` | Opcional no uso pessoal: prefira o favicon ou logo público do próprio site quando estiver disponível. Exigido na publicação no catálogo oficial. |
 | `parser` | Configuração avançada e opcional do parser nativo. Não é necessária quando o script do navegador fornece o plano e o conteúdo dos capítulos. |
 
 ## Mapeamento do Site
@@ -233,14 +234,14 @@ Para capítulos com imagens, `pages` é o campo preferido. O Nyxovira também l�
 
 ## Testar no Nyxovira
 
-A importação manual é o caminho normal durante o desenvolvimento e também permite usar um plugin somente para você. A importação pessoal não valida tags de catálogo nem exige ícone público.
+A importação manual é o caminho normal durante o desenvolvimento e também permite usar um plugin somente para você. A importação pessoal não valida tags de catálogo nem exige que você hospede um ícone. Quando o site já fornecer favicon ou logo público, use-o em `browser.icon_url`.
 
 1. Mantenha `plugin.json` e a pasta `browser` juntos dentro da pasta do plugin.
 2. No Nyxovira, abra **Sites**, toque em **Importar plugins** e selecione a pasta do plugin. Você também pode selecionar uma pasta que contenha várias pastas de plugins.
 3. Abra o site compatível e confira o reconhecimento da obra, a lista de capítulos e o download.
 4. Depois de alterar os arquivos, importe a pasta novamente e repita o teste.
 
-**Se o plugin é somente para você, o processo termina aqui.** Não é necessário ter tags, ícone público, `schema_version`, GitHub, catálogo público ou site de plugins.
+**Se o plugin é somente para você, o processo termina aqui.** Não é necessário ter tags, `schema_version`, GitHub, catálogo público ou site de plugins. Use o favicon ou logo do próprio site quando existir; você não precisa hospedar um ícone separado.
 
 Se quiser compartilhar, escolha uma destas etapas posteriores:
 
@@ -284,10 +285,21 @@ Tags de tipo de conteúdo:
 
 Como publicar:
 
-1. Cole o repositório GitHub do plugin no Plugin Hub.
-2. Confirme a solicitação gerada no GitHub e aceite as regras atuais.
-3. A automação verifica os arquivos, o ícone, as tags, os hosts e se o solicitante é dono do repositório.
-4. Uma solicitação tecnicamente válida é publicada no catálogo.
+1. Crie um repositório público no GitHub para o plugin.
+2. Inicialize o Git na pasta do plugin, faça commit de todos os arquivos, conecte o repositório público como `origin` e envie a branch principal com push.
+3. Cole a URL do repositório público no GitHub no Plugin Hub.
+4. Confirme a solicitação gerada no GitHub e aceite as regras atuais.
+5. A automação verifica os arquivos, o ícone, as tags, os hosts e se o solicitante é dono do repositório.
+6. Uma solicitação tecnicamente válida é publicada no catálogo.
+
+```bash
+git init
+git add .
+git commit -m "Add Nyxovira plugin"
+git branch -M main
+git remote add origin https://github.com/SEU-USUARIO/SEU-PLUGIN.git
+git push -u origin main
+```
 
 Um host só pode ter um plugin visível. As regras de responsabilidade, revisão, correção e remoção ficam nos [Termos e Regras do Catálogo de Plugins](https://nanquimori.github.io/KapiTomo/terms/#regras-do-catalogo).
 

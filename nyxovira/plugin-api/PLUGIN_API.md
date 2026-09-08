@@ -10,8 +10,8 @@ A plugin connects Nyxovira to one reading site. It opens the site, recognizes th
 
 The [interactive AI prompt generator](https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/#prompt-builder) is displayed at the top of the online documentation. Enter the source-site URL, choose a mode, use **Copy prompt**, and paste the result into the conversation with the AI that will create the plugin:
 
-- **Personal use:** requests only the minimum needed for a local import. It explicitly excludes catalog tags, a public icon, GitHub, and publication metadata unless technically necessary.
-- **Publish in the Plugin Hub:** adds the public repository, HTTPS icon, accepted catalog tags, publication checks, and complete in-app validation.
+- **Personal use:** requests only the minimum needed for a local import. It uses the site's public favicon or logo when available, without requiring a separately hosted icon.
+- **Publish in the Plugin Hub:** tells the AI to create and push a public GitHub repository, use the site icon, add accepted catalog tags, validate the plugin, and submit it through the Hub.
 
 The generated request also tells the AI to map the site's routes, selectors, chapter order, text or image content, dynamic loading, and limitations before implementing the plugin.
 
@@ -70,7 +70,7 @@ This is the smallest practical manifest for a plugin imported directly into Nyxo
 
 Nyxovira only needs valid JSON, a non-empty folder name or `id`, at least one `match.hosts` entry, and `browser.home_url` to load the source. The example also names `browser/download_target.js` because a site-specific script is the reliable way to recognize works and chapters. If that field and file are omitted, Nyxovira tries its generic page detector, which may not understand every site.
 
-For a plugin that stays on your device, these fields are **not required**: `schema_version`, `name`, `version`, `tags`, `browser.icon_url`, `browser.icon_mode`, `browser.short_label`, and `parser`. GitHub, a public catalog, and a plugin website are not required either.
+For a plugin that stays on your device, these fields are **not required**: `schema_version`, `name`, `version`, `tags`, `browser.icon_mode`, `browser.short_label`, and `parser`. GitHub, a public catalog, and a plugin website are not required either. If the site provides a stable public favicon or logo, use its URL in `browser.icon_url`; otherwise the icon may be omitted for personal use.
 
 Fields and scope:
 
@@ -81,7 +81,8 @@ Fields and scope:
 | `browser.home_url` | Required. Page opened by the app browser. |
 | `browser.download_target_script_file` | Optional, but recommended for reliable site-specific work and chapter detection. |
 | `name`, `version` | Optional for personal import; useful when sharing and updating the plugin. |
-| `tags`, `browser.icon_url` | Not needed for personal use. Required only by the official Plugin Hub publication process. |
+| `tags` | Not needed for personal use. Required only by the official Plugin Hub publication process. |
+| `browser.icon_url` | Optional for personal use: prefer the site's public favicon or logo when available. Required for official catalog publication. |
 | `parser` | Optional advanced native-parser configuration. It is not needed when the browser script provides the chapter plan and content. |
 
 ## Site Mapping
@@ -233,14 +234,14 @@ For image chapters, `pages` is the preferred field. Nyxovira also reads `images`
 
 ## Test in Nyxovira
 
-Manual import is the normal development loop and also supports plugins intended only for personal use. Personal import does not validate catalog tags or require a public icon.
+Manual import is the normal development loop and also supports plugins intended only for personal use. Personal import does not validate catalog tags or require you to host an icon. When the site already provides a public favicon or logo, use it in `browser.icon_url`.
 
 1. Keep `plugin.json` and the `browser` folder together inside the plugin folder.
 2. In Nyxovira, open **Sites**, tap **Import plugins**, and select the plugin folder. You may also select a parent folder containing several plugin folders.
 3. Open the supported site and verify work recognition, the chapter list, and the download.
 4. After changing the files, import the folder again and repeat the test.
 
-**If the plugin is only for you, you are done.** You do not need tags, a public icon, `schema_version`, GitHub, a public catalog, or a plugin website.
+**If the plugin is only for you, you are done.** You do not need tags, `schema_version`, GitHub, a public catalog, or a plugin website. Use the site's favicon or logo when available; you do not need to host a separate icon.
 
 If you want to share it, choose one of these later steps:
 
@@ -284,10 +285,21 @@ Content type tags:
 
 How to publish:
 
-1. Paste the plugin's GitHub repository in the Plugin Hub.
-2. Confirm the generated GitHub request and accept the current rules.
-3. Automation checks the files, icon, tags, hosts, and whether the requester owns the repository.
-4. A technically valid request is published in the catalog.
+1. Create a public GitHub repository for the plugin.
+2. Initialize Git in the plugin folder, commit every plugin file, connect the public repository as `origin`, and push the main branch.
+3. Paste the public GitHub repository URL in the Plugin Hub.
+4. Confirm the generated GitHub request and accept the current rules.
+5. Automation checks the files, icon, tags, hosts, and whether the requester owns the repository.
+6. A technically valid request is published in the catalog.
+
+```bash
+git init
+git add .
+git commit -m "Add Nyxovira plugin"
+git branch -M main
+git remote add origin https://github.com/USERNAME/PLUGIN.git
+git push -u origin main
+```
 
 Only one visible plugin may cover a host. Responsibility, review, correction, and removal rules are in the [Terms and Plugin Catalog Rules](https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules).
 
