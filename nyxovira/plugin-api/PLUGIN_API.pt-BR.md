@@ -8,12 +8,12 @@ Um plugin conecta o Nyxovira a um site de leitura. Ele abre o site, reconhece a 
 
 ## Prompt Pronto para Copiar
 
-O [gerador interativo de prompt](https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/?lang=pt#gerador-de-prompt) aparece no início da documentação online. Informe a URL do site da fonte, escolha um modo e use **Copiar prompt**:
+O [gerador interativo de prompt para IA](https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/?lang=pt#gerador-de-prompt) aparece no início da documentação online. Informe a URL do site da fonte, escolha um modo, use **Copiar prompt** e cole o resultado na conversa com a IA que criará o plugin:
 
 - **Uso pessoal:** pede somente o mínimo necessário para importação local. Exclui explicitamente tags de catálogo, ícone público, GitHub e metadados de publicação, salvo necessidade técnica.
 - **Publicar no Plugin Hub:** acrescenta repositório público, ícone HTTPS, tags aceitas, verificações de publicação e validação completa no aplicativo.
 
-O pedido gerado também manda mapear rotas, seletores, ordem dos capítulos, conteúdo de texto ou imagens, carregamento dinâmico, limitações e autenticação legítima antes de implementar o plugin.
+O pedido gerado também manda a IA mapear rotas, seletores, ordem dos capítulos, conteúdo de texto ou imagens, carregamento dinâmico e limitações antes de implementar o plugin.
 
 ## Caminho do Desenvolvedor
 
@@ -409,7 +409,6 @@ Para um plugin importado para uso pessoal:
 1. `plugin.json` é um JSON válido, o nome da pasta (ou `id`) não está vazio, há pelo menos um valor em `match.hosts` e `browser.home_url` é válido.
 2. Se o reconhecimento genérico não for suficiente, `browser/download_target.js` reconhece a obra e cria a lista de capítulos.
 3. Novels usam `paragraphs`; quadrinhos usam `pages`.
-4. O plugin não contém malware, não coleta credenciais e não contorna autenticação, paywall, DRM ou restrições de acesso.
 
 Para o Plugin Hub oficial:
 

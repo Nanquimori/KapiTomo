@@ -137,8 +137,9 @@ test("interactive prompt builder is prominent, mode-aware, and copyable", () => 
   assert.equal((html.match(/<button[^>]+data-copy-prompt/g) || []).length, 2);
   assert.equal((html.match(/data-prompt-mode-option="personal"/g) || []).length, 2);
   assert.equal((html.match(/data-prompt-mode-option="catalog"/g) || []).length, 2);
-  assert.match(html, /Start here · copy in one click/);
-  assert.match(html, /Comece aqui · copie em um clique/);
+  assert.match(html, /AI prompt · copy in one click/);
+  assert.match(html, /Prompt para IA · copie em um clique/);
+  assert.match(html, /Gere um prompt para uma IA criar seu plugin/);
   assert.match(html, /Não adicione tags de catálogo/);
   assert.match(html, /Prepare um ícone HTTPS público e tags aceitas pelo catálogo/);
   assert.match(html, /navigator\.clipboard\.writeText/);
@@ -163,12 +164,23 @@ test("interactive prompt builder is prominent, mode-aware, and copyable", () => 
     assert.match(prompt, /https:\/\/nanquimori\.github\.io\/KapiTomo\/nyxovira\/plugin-api\//);
   }
   assert.match(personalPt, /Não adicione tags de catálogo/);
-  assert.match(personalPt, /Não publique o plugin/);
+  assert.match(personalPt, /Crie e entregue todos os arquivos completos do plugin/);
   assert.match(catalogPt, /ícone HTTPS público/);
   assert.match(catalogPt, /publicação deve passar pelo Plugin Hub/);
   assert.match(personalEn, /Do not add catalog tags/);
+  assert.match(personalEn, /Create and deliver all complete plugin files/);
   assert.match(catalogEn, /public HTTPS icon/);
   assert.notEqual(personalPt, catalogPt);
+
+  for (const document of [
+    html,
+    read("nyxovira/plugin-api/PLUGIN_API.pt-BR.md"),
+    read("nyxovira/plugin-api/PLUGIN_API.md")
+  ]) {
+    assert.doesNotMatch(document, /Se você tiver acesso à pasta de trabalho|If you have workspace access/i);
+    assert.doesNotMatch(document, /não contorne login|Do not bypass login|paywalls?|DRM/i);
+    assert.doesNotMatch(document, /Não publique o plugin nem altere o catálogo oficial|Do not publish the plugin or change the official catalog/i);
+  }
 });
 
 test("quick path keeps private use and community publishing before the advanced external store", () => {

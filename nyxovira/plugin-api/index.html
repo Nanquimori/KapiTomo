@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Nyxovira Plugin API</title>
     <meta name="description" content="Online documentation for creating Nyxovira plugins.">
-    <meta name="kapitomo-doc-revision" content="20260907-prompt-builder">
+    <meta name="kapitomo-doc-revision" content="20260907-prompt-builder-clear">
     <link rel="icon" type="image/png" href="../../assets/kapitomo-logo.png?v=20260704-plugin-api-en">
     <link rel="apple-touch-icon" href="../../assets/kapitomo-logo.png?v=20260704-plugin-api-en">
     <style>
@@ -760,9 +760,9 @@
       <main class="grid">
         <div class="content">
           <section id="prompt-builder" class="panel prompt-panel" data-prompt-builder data-prompt-language="en" data-prompt-mode="personal">
-            <span class="prompt-kicker">Start here · copy in one click</span>
-            <h2>Generate a clear plugin request</h2>
-            <p class="prompt-intro">Enter the source site and choose how the plugin will be used. The prompt automatically separates a minimal personal plugin from a plugin prepared for the official catalog.</p>
+            <span class="prompt-kicker">AI prompt · copy in one click</span>
+            <h2>Generate an AI prompt to create your plugin</h2>
+            <p class="prompt-intro">Enter the source site and choose how the plugin will be used. Copy the result into the conversation with the AI that will create the plugin. Personal and official-catalog requirements stay clearly separated.</p>
             <div class="prompt-grid">
               <div class="prompt-controls">
                 <label class="prompt-field-label">Source site URL
@@ -1136,9 +1136,9 @@ return "https://example.com/manga/work/";</code></pre>
       <main class="grid">
         <div class="content">
           <section id="gerador-de-prompt" class="panel prompt-panel" data-prompt-builder data-prompt-language="pt" data-prompt-mode="personal">
-            <span class="prompt-kicker">Comece aqui · copie em um clique</span>
-            <h2>Gere um pedido claro para criar seu plugin</h2>
-            <p class="prompt-intro">Informe o site da fonte e escolha como o plugin será usado. O prompt separa automaticamente um plugin pessoal mínimo de um plugin preparado para o catálogo oficial.</p>
+            <span class="prompt-kicker">Prompt para IA · copie em um clique</span>
+            <h2>Gere um prompt para uma IA criar seu plugin</h2>
+            <p class="prompt-intro">Informe o site da fonte e escolha como o plugin será usado. Copie o resultado na conversa com a IA que criará o plugin. Os requisitos de uso pessoal e do catálogo oficial ficam claramente separados.</p>
             <div class="prompt-grid">
               <div class="prompt-controls">
                 <label class="prompt-field-label">URL do site da fonte
@@ -1519,16 +1519,15 @@ return "https://example.com/manga/work/";</code></pre>
             return [
               "Crie e prepare um plugin Nyxovira para publicar no Plugin Hub oficial para o site \"" + site + "\", seguindo integralmente a documentação oficial: \"" + promptDocumentationUrl + "\".",
               "",
-              "Antes de implementar, mapeie e analise o site: rotas, domínio e subdomínios, página da obra, lista e ordem dos capítulos, conteúdo de texto ou imagens, paginação, carregamento dinâmico, seletores, dados embutidos, limitações e autenticação legítima.",
+              "Antes de implementar, mapeie e analise o site: rotas, domínio e subdomínios, página da obra, lista e ordem dos capítulos, conteúdo de texto ou imagens, paginação, carregamento dinâmico, seletores, dados embutidos e limitações.",
               "",
               "Requisitos deste modo:",
-              "- Crie a estrutura completa do plugin e implemente os arquivos se você tiver acesso à pasta de trabalho; não entregue apenas uma explicação.",
+              "- Crie e entregue todos os arquivos completos do plugin; não responda apenas com explicações.",
               "- Use id estável, nome, versão, match.hosts e browser.home_url corretos.",
               "- Adicione browser/download_target.js quando necessário para reconhecer a obra e baixar capítulos de forma confiável.",
               "- Prepare um ícone HTTPS público e tags aceitas pelo catálogo: um idioma primeiro e de um a três tipos de conteúdo.",
               "- Prepare o plugin para um repositório GitHub público e não edite catalog.json manualmente; a publicação deve passar pelo Plugin Hub.",
               "- Valide a importação no Nyxovira, a lista de capítulos e um download completo, incluindo o formato final de textos ou imagens.",
-              "- Não contorne login, paywall, DRM ou outras restrições de acesso.",
               "",
               "Ao final, informe os arquivos criados, as decisões de mapeamento, as limitações encontradas, os testes executados e o que ainda exige validação no aplicativo."
             ].join("\n");
@@ -1538,17 +1537,17 @@ return "https://example.com/manga/work/";</code></pre>
             return [
               "Crie um plugin Nyxovira para uso pessoal para o site \"" + site + "\", seguindo integralmente a documentação oficial: \"" + promptDocumentationUrl + "\".",
               "",
-              "Antes de implementar, mapeie e analise o site: rotas, domínio e subdomínios, página da obra, lista e ordem dos capítulos, conteúdo de texto ou imagens, paginação, carregamento dinâmico, seletores, dados embutidos, limitações e autenticação legítima.",
+              "Antes de implementar, mapeie e analise o site: rotas, domínio e subdomínios, página da obra, lista e ordem dos capítulos, conteúdo de texto ou imagens, paginação, carregamento dinâmico, seletores, dados embutidos e limitações.",
               "",
               "Requisitos deste modo:",
               "- Faça somente o necessário para importar e usar o plugin no meu aparelho.",
               "- O plugin.json precisa ser um JSON válido, com pasta ou id não vazio, pelo menos um match.hosts e browser.home_url.",
               "- Não adicione tags de catálogo, ícone público, GitHub, site de plugins ou outros metadados de publicação sem necessidade técnica.",
               "- Adicione browser/download_target.js somente se a detecção genérica do Nyxovira não reconhecer corretamente a obra e os capítulos.",
-              "- Se você tiver acesso à pasta de trabalho, implemente os arquivos em vez de apenas explicar.",
-              "- Teste a importação, a lista de capítulos e um download completo; não contorne login, paywall, DRM ou restrições de acesso.",
+              "- Crie e entregue todos os arquivos completos do plugin; não responda apenas com explicações.",
+              "- Teste a importação, a lista de capítulos e um download completo.",
               "",
-              "Ao final, informe os arquivos criados, as decisões de mapeamento, as limitações encontradas, os testes executados e o que ainda exige validação no aplicativo. Não publique o plugin nem altere o catálogo oficial."
+              "Ao final, informe os arquivos criados, as decisões de mapeamento, as limitações encontradas, os testes executados e o que ainda exige validação no aplicativo."
             ].join("\n");
           }
 
@@ -1556,16 +1555,15 @@ return "https://example.com/manga/work/";</code></pre>
             return [
               "Create and prepare a Nyxovira plugin for publication in the official Plugin Hub for the site \"" + site + "\", following the official documentation completely: \"" + promptDocumentationUrl + "\".",
               "",
-              "Before implementing it, map and analyze the site: routes, domains and subdomains, work page, chapter list and order, text or image content, pagination, dynamic loading, selectors, embedded data, limitations, and legitimate authentication.",
+              "Before implementing it, map and analyze the site: routes, domains and subdomains, work page, chapter list and order, text or image content, pagination, dynamic loading, selectors, embedded data, and limitations.",
               "",
               "Requirements for this mode:",
-              "- Create the complete plugin structure and implement the files when you have workspace access; do not provide only an explanation.",
+              "- Create and deliver all complete plugin files; do not respond with explanations only.",
               "- Use a stable id, name, version, correct match.hosts, and browser.home_url.",
               "- Add browser/download_target.js when needed for reliable work recognition and chapter downloads.",
               "- Prepare a public HTTPS icon and accepted catalog tags: one language first and one to three content types.",
               "- Prepare the plugin for a public GitHub repository and do not edit catalog.json manually; publication must go through the Plugin Hub.",
               "- Validate Nyxovira import, the chapter list, and one complete download, including final text or image formats.",
-              "- Do not bypass login, paywalls, DRM, or other access restrictions.",
               "",
               "Finish by reporting the created files, mapping decisions, discovered limitations, tests performed, and anything that still requires in-app validation."
             ].join("\n");
@@ -1574,17 +1572,17 @@ return "https://example.com/manga/work/";</code></pre>
           return [
             "Create a Nyxovira plugin for personal use for the site \"" + site + "\", following the official documentation completely: \"" + promptDocumentationUrl + "\".",
             "",
-            "Before implementing it, map and analyze the site: routes, domains and subdomains, work page, chapter list and order, text or image content, pagination, dynamic loading, selectors, embedded data, limitations, and legitimate authentication.",
+            "Before implementing it, map and analyze the site: routes, domains and subdomains, work page, chapter list and order, text or image content, pagination, dynamic loading, selectors, embedded data, and limitations.",
             "",
             "Requirements for this mode:",
             "- Include only what is needed to import and use the plugin on my device.",
             "- plugin.json must be valid JSON with a non-empty folder or id, at least one match.hosts entry, and browser.home_url.",
             "- Do not add catalog tags, a public icon, GitHub, a plugin website, or other publication metadata without a technical need.",
             "- Add browser/download_target.js only if Nyxovira's generic detection cannot recognize the work and chapters correctly.",
-            "- If you have workspace access, implement the files instead of only explaining them.",
-            "- Test import, the chapter list, and one complete download; do not bypass login, paywalls, DRM, or access restrictions.",
+            "- Create and deliver all complete plugin files; do not respond with explanations only.",
+            "- Test import, the chapter list, and one complete download.",
             "",
-            "Finish by reporting the created files, mapping decisions, discovered limitations, tests performed, and anything that still requires in-app validation. Do not publish the plugin or change the official catalog."
+            "Finish by reporting the created files, mapping decisions, discovered limitations, tests performed, and anything that still requires in-app validation."
           ].join("\n");
         }
 
