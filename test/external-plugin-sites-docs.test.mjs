@@ -141,7 +141,9 @@ test("interactive prompt builder is prominent, mode-aware, and copyable", () => 
   assert.match(html, /Prompt para IA · copie em um clique/);
   assert.match(html, /Gere um prompt para uma IA criar seu plugin/);
   assert.match(html, /Não adicione tags de catálogo/);
-  assert.match(html, /Prepare um ícone HTTPS público e tags aceitas pelo catálogo/);
+  assert.match(html, /favicon ou logo público fornecido pelo próprio site/);
+  assert.match(html, /Crie um repositório público no GitHub/);
+  assert.match(html, /git push -u origin main/);
   assert.match(html, /navigator\.clipboard\.writeText/);
   assert.match(html, /document\.execCommand\("copy"\)/);
   assert.match(html, /autocomplete="off"/);
@@ -164,12 +166,23 @@ test("interactive prompt builder is prominent, mode-aware, and copyable", () => 
     assert.match(prompt, /https:\/\/nanquimori\.github\.io\/KapiTomo\/nyxovira\/plugin-api\//);
   }
   assert.match(personalPt, /Não adicione tags de catálogo/);
+  assert.doesNotMatch(personalPt, /Não adicione[^\n]*ícone público/);
+  assert.match(personalPt, /favicon ou logo público/);
+  assert.match(personalPt, /browser\.icon_url/);
   assert.match(personalPt, /Crie e entregue todos os arquivos completos do plugin/);
-  assert.match(catalogPt, /ícone HTTPS público/);
-  assert.match(catalogPt, /publicação deve passar pelo Plugin Hub/);
+  assert.match(catalogPt, /favicon ou logo público fornecido pelo próprio site/);
+  assert.match(catalogPt, /Crie um repositório público no GitHub/);
+  assert.match(catalogPt, /inicialize o Git/);
+  assert.match(catalogPt, /faça commit/);
+  assert.match(catalogPt, /push/);
+  assert.match(catalogPt, /Depois do push, envie o repositório pelo Plugin Hub/);
   assert.match(personalEn, /Do not add catalog tags/);
+  assert.doesNotMatch(personalEn, /Do not add[^\n]*public icon/);
+  assert.match(personalEn, /public favicon or logo/);
   assert.match(personalEn, /Create and deliver all complete plugin files/);
-  assert.match(catalogEn, /public HTTPS icon/);
+  assert.match(catalogEn, /Create a public GitHub repository/);
+  assert.match(catalogEn, /commit every file/);
+  assert.match(catalogEn, /push the main branch/);
   assert.notEqual(personalPt, catalogPt);
 
   for (const document of [

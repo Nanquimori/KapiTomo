@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Nyxovira Plugin API</title>
     <meta name="description" content="Online documentation for creating Nyxovira plugins.">
-    <meta name="kapitomo-doc-revision" content="20260907-prompt-builder-clear">
+    <meta name="kapitomo-doc-revision" content="20260907-prompt-icon-git">
     <link rel="icon" type="image/png" href="../../assets/kapitomo-logo.png?v=20260704-plugin-api-en">
     <link rel="apple-touch-icon" href="../../assets/kapitomo-logo.png?v=20260704-plugin-api-en">
     <style>
@@ -777,7 +777,7 @@
                     </button>
                     <button class="prompt-mode" type="button" data-prompt-mode-option="catalog" aria-pressed="false">
                       <strong>Publish in the Plugin Hub</strong>
-                      <span>Includes the repository, icon, catalog tags, validation, and publication requirements.</span>
+                      <span>Creates and pushes a public GitHub repository, adds the site icon and catalog tags, then prepares the Plugin Hub submission.</span>
                     </button>
                   </div>
                 </fieldset>
@@ -847,7 +847,7 @@
   }
 }</code></pre>
             <p>To load the source, Nyxovira only needs valid JSON, a non-empty folder name or <code>id</code>, at least one <code>match.hosts</code> entry, and <code>browser.home_url</code>. The example also names the browser script because it is the reliable way to recognize works and chapters. Without it, Nyxovira tries generic page detection, which may not understand every site.</p>
-            <p><strong>Not required for personal use:</strong> <code>schema_version</code>, <code>name</code>, <code>version</code>, <code>tags</code>, <code>browser.icon_url</code>, <code>browser.icon_mode</code>, <code>browser.short_label</code>, <code>parser</code>, GitHub, a catalog, or a plugin website.</p>
+            <p><strong>Not required for personal use:</strong> <code>schema_version</code>, <code>name</code>, <code>version</code>, <code>tags</code>, <code>browser.icon_mode</code>, <code>browser.short_label</code>, <code>parser</code>, GitHub, a catalog, or a plugin website. If the site provides a stable public favicon or logo, use its URL in <code>browser.icon_url</code>; otherwise the icon may be omitted for personal use.</p>
             <div class="table-wrap">
               <table>
                 <thead><tr><th>Field</th><th>When it is needed</th></tr></thead>
@@ -857,7 +857,8 @@
                   <tr><td><code>browser.home_url</code></td><td>Required. Page opened by the app browser.</td></tr>
                   <tr><td><code>browser.download_target_script_file</code></td><td>Optional, but recommended for reliable site-specific detection.</td></tr>
                   <tr><td><code>name</code>, <code>version</code></td><td>Optional for personal use; useful when sharing and updating.</td></tr>
-                  <tr><td><code>tags</code>, <code>browser.icon_url</code></td><td>Not needed for personal use; required only for official catalog publication.</td></tr>
+                  <tr><td><code>tags</code></td><td>Not needed for personal use; required only for official catalog publication.</td></tr>
+                  <tr><td><code>browser.icon_url</code></td><td>Optional for personal use: prefer the site's public favicon or logo when available. Required for official catalog publication.</td></tr>
                   <tr><td><code>parser</code></td><td>Optional advanced native-parser configuration.</td></tr>
                 </tbody>
               </table>
@@ -965,14 +966,14 @@ return "https://example.com/manga/work/";</code></pre>
 
           <section id="testing" class="panel">
             <h2>Test in Nyxovira</h2>
-            <p>Manual import is the normal development loop and also supports plugins intended only for personal use. Personal import does not validate catalog tags or require a public icon.</p>
+            <p>Manual import is the normal development loop and also supports plugins intended only for personal use. Personal import does not validate catalog tags or require you to host an icon. When the site already provides a public favicon or logo, use it in <code>browser.icon_url</code>.</p>
             <div class="steps">
               <div class="step"><p>Keep <code>plugin.json</code> and the <code>browser</code> folder together inside the plugin folder.</p></div>
               <div class="step"><p>In Nyxovira, open <strong>Sites</strong>, tap <strong>Import plugins</strong>, and select the plugin folder. You may also select a parent folder containing several plugin folders.</p></div>
               <div class="step"><p>Open the supported site and verify work recognition, the chapter list, and the download.</p></div>
               <div class="step"><p>After changing the files, import the folder again and repeat the test.</p></div>
             </div>
-            <p class="panel-copy-after-list"><strong>If the plugin is only for you, you are done.</strong> You do not need tags, a public icon, <code>schema_version</code>, GitHub, a public catalog, or a plugin website.</p>
+            <p class="panel-copy-after-list"><strong>If the plugin is only for you, you are done.</strong> You do not need tags, <code>schema_version</code>, GitHub, a public catalog, or a plugin website. Use the site's favicon or logo when available; you do not need to host a separate icon.</p>
             <h3 class="api-subheading">If you want to share it</h3>
             <div class="rule-list">
               <article>
@@ -1005,12 +1006,19 @@ return "https://example.com/manga/work/";</code></pre>
               </section>
             </div>
             <div class="steps">
-              <div class="step"><p>Keep <code>plugin.json</code> and <code>browser/download_target.js</code> in the repository.</p></div>
-              <div class="step"><p>Open the Plugin Hub and paste the GitHub repository URL.</p></div>
+              <div class="step"><p>Create a public GitHub repository for the plugin.</p></div>
+              <div class="step"><p>Initialize Git in the plugin folder, commit all plugin files, connect the public repository as <code>origin</code>, and push the main branch.</p></div>
+              <div class="step"><p>Open the Plugin Hub and paste the public GitHub repository URL.</p></div>
               <div class="step"><p>Confirm the generated GitHub request and accept the current catalog rules.</p></div>
               <div class="step"><p>Automation checks the files, icon, tags, hosts, and repository ownership.</p></div>
               <div class="step"><p>A technically valid request is published in the catalog.</p></div>
             </div>
+            <pre><code>git init
+git add .
+git commit -m "Add Nyxovira plugin"
+git branch -M main
+git remote add origin https://github.com/USERNAME/PLUGIN.git
+git push -u origin main</code></pre>
             <p class="panel-copy-after-list">Only one visible plugin may cover a host. Responsibility, review, correction, and removal details are kept in the <a href="../../terms/#plugin-catalog-rules">Terms and Plugin Catalog Rules</a>.</p>
           </section>
 
@@ -1153,7 +1161,7 @@ return "https://example.com/manga/work/";</code></pre>
                     </button>
                     <button class="prompt-mode" type="button" data-prompt-mode-option="catalog" aria-pressed="false">
                       <strong>Publicar no Plugin Hub</strong>
-                      <span>Inclui repositório, ícone, tags do catálogo, validações e requisitos de publicação.</span>
+                      <span>Cria e envia um repositório GitHub público, adiciona o ícone do site e as tags, depois prepara o envio pelo Plugin Hub.</span>
                     </button>
                   </div>
                 </fieldset>
@@ -1223,7 +1231,7 @@ return "https://example.com/manga/work/";</code></pre>
   }
 }</code></pre>
             <p>Para carregar a fonte, o Nyxovira precisa somente de JSON válido, nome de pasta ou <code>id</code> não vazio, pelo menos um item em <code>match.hosts</code> e <code>browser.home_url</code>. O exemplo também indica o script do navegador porque ele é a forma confiável de reconhecer obras e capítulos. Sem ele, o Nyxovira tenta usar o detector genérico da página, que pode não compreender todos os sites.</p>
-            <p><strong>Não exigidos no uso pessoal:</strong> <code>schema_version</code>, <code>name</code>, <code>version</code>, <code>tags</code>, <code>browser.icon_url</code>, <code>browser.icon_mode</code>, <code>browser.short_label</code>, <code>parser</code>, GitHub, catálogo ou site de plugins.</p>
+            <p><strong>Não exigidos no uso pessoal:</strong> <code>schema_version</code>, <code>name</code>, <code>version</code>, <code>tags</code>, <code>browser.icon_mode</code>, <code>browser.short_label</code>, <code>parser</code>, GitHub, catálogo ou site de plugins. Se o site fornecer um favicon ou logo público e estável, use essa URL em <code>browser.icon_url</code>; se não houver, o ícone pode ser omitido no uso pessoal.</p>
             <div class="table-wrap">
               <table>
                 <thead><tr><th>Campo</th><th>Quando é necessário</th></tr></thead>
@@ -1233,7 +1241,8 @@ return "https://example.com/manga/work/";</code></pre>
                   <tr><td><code>browser.home_url</code></td><td>Obrigatório. Página aberta pelo navegador interno.</td></tr>
                   <tr><td><code>browser.download_target_script_file</code></td><td>Opcional, mas recomendado para reconhecer corretamente aquele site.</td></tr>
                   <tr><td><code>name</code>, <code>version</code></td><td>Opcionais no uso pessoal; úteis ao compartilhar e atualizar.</td></tr>
-                  <tr><td><code>tags</code>, <code>browser.icon_url</code></td><td>Desnecessários no uso pessoal; exigidos somente na publicação no catálogo oficial.</td></tr>
+                  <tr><td><code>tags</code></td><td>Desnecessárias no uso pessoal; exigidas somente na publicação no catálogo oficial.</td></tr>
+                  <tr><td><code>browser.icon_url</code></td><td>Opcional no uso pessoal: prefira o favicon ou logo público do próprio site quando estiver disponível. Exigido na publicação no catálogo oficial.</td></tr>
                   <tr><td><code>parser</code></td><td>Configuração avançada e opcional do parser nativo.</td></tr>
                 </tbody>
               </table>
@@ -1341,14 +1350,14 @@ return "https://example.com/manga/work/";</code></pre>
 
           <section id="testing-pt" class="panel">
             <h2>Testar no Nyxovira</h2>
-            <p>A importação manual é o caminho normal durante o desenvolvimento e também permite usar um plugin somente para você. A importação pessoal não valida tags de catálogo nem exige ícone público.</p>
+            <p>A importação manual é o caminho normal durante o desenvolvimento e também permite usar um plugin somente para você. A importação pessoal não valida tags de catálogo nem exige que você hospede um ícone. Quando o site já fornecer favicon ou logo público, use-o em <code>browser.icon_url</code>.</p>
             <div class="steps">
               <div class="step"><p>Mantenha <code>plugin.json</code> e a pasta <code>browser</code> juntos dentro da pasta do plugin.</p></div>
               <div class="step"><p>No Nyxovira, abra <strong>Sites</strong>, toque em <strong>Importar plugins</strong> e selecione a pasta do plugin. Você também pode selecionar uma pasta que contenha várias pastas de plugins.</p></div>
               <div class="step"><p>Abra o site compatível e confira o reconhecimento da obra, a lista de capítulos e o download.</p></div>
               <div class="step"><p>Depois de alterar os arquivos, importe a pasta novamente e repita o teste.</p></div>
             </div>
-            <p class="panel-copy-after-list"><strong>Se o plugin é somente para você, o processo termina aqui.</strong> Não é necessário ter tags, ícone público, <code>schema_version</code>, GitHub, catálogo público ou site de plugins.</p>
+            <p class="panel-copy-after-list"><strong>Se o plugin é somente para você, o processo termina aqui.</strong> Não é necessário ter tags, <code>schema_version</code>, GitHub, catálogo público ou site de plugins. Use o favicon ou logo do próprio site quando existir; você não precisa hospedar um ícone separado.</p>
             <h3 class="api-subheading">Se quiser compartilhar</h3>
             <div class="rule-list">
               <article>
@@ -1381,12 +1390,19 @@ return "https://example.com/manga/work/";</code></pre>
               </section>
             </div>
             <div class="steps">
-              <div class="step"><p>Mantenha <code>plugin.json</code> e <code>browser/download_target.js</code> no repositório.</p></div>
-              <div class="step"><p>Abra o Plugin Hub e cole a URL do repositório GitHub.</p></div>
+              <div class="step"><p>Crie um repositório público no GitHub para o plugin.</p></div>
+              <div class="step"><p>Inicialize o Git na pasta do plugin, faça commit de todos os arquivos, conecte o repositório público como <code>origin</code> e envie a branch principal com push.</p></div>
+              <div class="step"><p>Abra o Plugin Hub e cole a URL do repositório público no GitHub.</p></div>
               <div class="step"><p>Confirme a solicitação gerada no GitHub e aceite as regras atuais do catálogo.</p></div>
               <div class="step"><p>A automação verifica arquivos, ícone, tags, hosts e propriedade do repositório.</p></div>
               <div class="step"><p>Uma solicitação tecnicamente válida é publicada no catálogo.</p></div>
             </div>
+            <pre><code>git init
+git add .
+git commit -m "Add Nyxovira plugin"
+git branch -M main
+git remote add origin https://github.com/SEU-USUARIO/SEU-PLUGIN.git
+git push -u origin main</code></pre>
             <p class="panel-copy-after-list">Um host só pode ter um plugin visível. Responsabilidade, revisão, correção e remoção estão nos <a href="../../terms/#regras-do-catalogo">Termos e Regras do Catálogo de Plugins</a>.</p>
           </section>
 
@@ -1525,8 +1541,10 @@ return "https://example.com/manga/work/";</code></pre>
               "- Crie e entregue todos os arquivos completos do plugin; não responda apenas com explicações.",
               "- Use id estável, nome, versão, match.hosts e browser.home_url corretos.",
               "- Adicione browser/download_target.js quando necessário para reconhecer a obra e baixar capítulos de forma confiável.",
-              "- Prepare um ícone HTTPS público e tags aceitas pelo catálogo: um idioma primeiro e de um a três tipos de conteúdo.",
-              "- Prepare o plugin para um repositório GitHub público e não edite catalog.json manualmente; a publicação deve passar pelo Plugin Hub.",
+              "- Procure o favicon ou logo público fornecido pelo próprio site e use-o como browser.icon_url. Se o site não fornecer um ícone adequado, prepare outro ícone HTTPS público.",
+              "- Adicione as tags aceitas pelo catálogo: um idioma primeiro e de um a três tipos de conteúdo.",
+              "- Crie um repositório público no GitHub para o plugin, inicialize o Git, faça commit de todos os arquivos e envie a branch principal com push.",
+              "- Depois do push, envie o repositório pelo Plugin Hub. Não edite catalog.json manualmente.",
               "- Valide a importação no Nyxovira, a lista de capítulos e um download completo, incluindo o formato final de textos ou imagens.",
               "",
               "Ao final, informe os arquivos criados, as decisões de mapeamento, as limitações encontradas, os testes executados e o que ainda exige validação no aplicativo."
@@ -1542,7 +1560,8 @@ return "https://example.com/manga/work/";</code></pre>
               "Requisitos deste modo:",
               "- Faça somente o necessário para importar e usar o plugin no meu aparelho.",
               "- O plugin.json precisa ser um JSON válido, com pasta ou id não vazio, pelo menos um match.hosts e browser.home_url.",
-              "- Não adicione tags de catálogo, ícone público, GitHub, site de plugins ou outros metadados de publicação sem necessidade técnica.",
+              "- Não adicione tags de catálogo, GitHub, site de plugins ou outros metadados de publicação sem necessidade técnica.",
+              "- Se o site disponibilizar um favicon ou logo público, use essa URL como browser.icon_url. Se não houver, o ícone pode ser omitido no uso pessoal.",
               "- Adicione browser/download_target.js somente se a detecção genérica do Nyxovira não reconhecer corretamente a obra e os capítulos.",
               "- Crie e entregue todos os arquivos completos do plugin; não responda apenas com explicações.",
               "- Teste a importação, a lista de capítulos e um download completo.",
@@ -1561,8 +1580,10 @@ return "https://example.com/manga/work/";</code></pre>
               "- Create and deliver all complete plugin files; do not respond with explanations only.",
               "- Use a stable id, name, version, correct match.hosts, and browser.home_url.",
               "- Add browser/download_target.js when needed for reliable work recognition and chapter downloads.",
-              "- Prepare a public HTTPS icon and accepted catalog tags: one language first and one to three content types.",
-              "- Prepare the plugin for a public GitHub repository and do not edit catalog.json manually; publication must go through the Plugin Hub.",
+              "- Find the public favicon or logo provided by the site and use it as browser.icon_url. If the site has no suitable icon, prepare another public HTTPS icon.",
+              "- Add accepted catalog tags: one language first and one to three content types.",
+              "- Create a public GitHub repository for the plugin, initialize Git, commit every file, and push the main branch.",
+              "- After the push, submit the repository through the Plugin Hub. Do not edit catalog.json manually.",
               "- Validate Nyxovira import, the chapter list, and one complete download, including final text or image formats.",
               "",
               "Finish by reporting the created files, mapping decisions, discovered limitations, tests performed, and anything that still requires in-app validation."
@@ -1577,7 +1598,8 @@ return "https://example.com/manga/work/";</code></pre>
             "Requirements for this mode:",
             "- Include only what is needed to import and use the plugin on my device.",
             "- plugin.json must be valid JSON with a non-empty folder or id, at least one match.hosts entry, and browser.home_url.",
-            "- Do not add catalog tags, a public icon, GitHub, a plugin website, or other publication metadata without a technical need.",
+            "- Do not add catalog tags, GitHub, a plugin website, or other publication metadata without a technical need.",
+            "- If the site provides a public favicon or logo, use that URL as browser.icon_url. If none exists, the icon may be omitted for personal use.",
             "- Add browser/download_target.js only if Nyxovira's generic detection cannot recognize the work and chapters correctly.",
             "- Create and deliver all complete plugin files; do not respond with explanations only.",
             "- Test import, the chapter list, and one complete download.",
