@@ -8,12 +8,12 @@ A plugin connects Nyxovira to one reading site. It opens the site, recognizes th
 
 ## Ready-to-copy Prompt
 
-The [interactive prompt generator](https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/#prompt-builder) is displayed at the top of the online documentation. Enter the source-site URL, choose a mode, and use **Copy prompt**:
+The [interactive AI prompt generator](https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/#prompt-builder) is displayed at the top of the online documentation. Enter the source-site URL, choose a mode, use **Copy prompt**, and paste the result into the conversation with the AI that will create the plugin:
 
 - **Personal use:** requests only the minimum needed for a local import. It explicitly excludes catalog tags, a public icon, GitHub, and publication metadata unless technically necessary.
 - **Publish in the Plugin Hub:** adds the public repository, HTTPS icon, accepted catalog tags, publication checks, and complete in-app validation.
 
-The generated request also tells the assistant to map the site's routes, selectors, chapter order, text or image content, dynamic loading, limitations, and legitimate authentication before implementing the plugin.
+The generated request also tells the AI to map the site's routes, selectors, chapter order, text or image content, dynamic loading, and limitations before implementing the plugin.
 
 ## Developer Path
 
@@ -409,7 +409,6 @@ For a plugin imported for personal use:
 1. `plugin.json` is valid JSON, its folder name (or `id`) is not empty, it has at least one `match.hosts` value, and `browser.home_url` is valid.
 2. If generic recognition is insufficient, `browser/download_target.js` recognizes the work and creates the chapter list.
 3. Novels use `paragraphs`; comics use `pages`.
-4. The plugin contains no malware, does not collect credentials, and does not bypass authentication, paywalls, DRM, or access restrictions.
 
 For the official Plugin Hub:
 
