@@ -113,8 +113,7 @@ Public plugin entries include:
 - `repository_url`, `repository_ref`, and `plugin_path` for installation.
 - `hosts` to prevent duplicate visible plugins for the same site.
 - `status`, shown as `Online` or `Offline` in the Hub.
-- official tags only: one language first, followed by one to three types (`manga`, `manhua`, `manhwa`, `novel`, `webtoon`, `comic`, or `other`).
-- optional `adult` classification last for sources that expose restricted material through the plugin. This metadata does not hide entries or add a catalog filter. The Hub filters by language and content type and does not request a birth date.
+- official catalog tags only: one language first, followed by one to three types (`manga`, `manhua`, `manhwa`, `novel`, `webtoon`, `comic`, or `other`). These tags are required only when publishing in the Plugin Hub; a plugin imported for personal use does not need them.
 
 Publishing is automatic after validation:
 

@@ -38,14 +38,11 @@ const OFFICIAL_TYPE_TAGS = [
   "comic",
   "other"
 ];
-const OFFICIAL_CLASSIFICATION_TAGS = ["adult"];
 const LANGUAGE_TAGS = new Set(OFFICIAL_LANGUAGE_TAGS);
 const TYPE_TAGS = new Set(OFFICIAL_TYPE_TAGS);
-const CLASSIFICATION_TAGS = new Set(OFFICIAL_CLASSIFICATION_TAGS);
 const PUBLIC_TAGS = new Set([
   ...OFFICIAL_LANGUAGE_TAGS,
-  ...OFFICIAL_TYPE_TAGS,
-  ...OFFICIAL_CLASSIFICATION_TAGS
+  ...OFFICIAL_TYPE_TAGS
 ]);
 
 const env = process.env;
@@ -78,7 +75,6 @@ PORTUGUESE_ERRORS.set("Moderation action must be hide, restore, or remove.", "A 
 PORTUGUESE_ERRORS.set("Moderation reason is required.", "O motivo da moderação é obrigatório.");
 PORTUGUESE_ERRORS.set("This catalog entry is under moderation review. The creator may submit corrections, and a maintainer must review them before the listing returns to the catalog.", "Esta entrada está em análise de moderação. O criador pode enviar correções, e um mantenedor precisa analisá-las antes que a entrada volte ao catálogo.");
 PORTUGUESE_ERRORS.set("tags may include at most 3 content types.", "As tags podem incluir no máximo 3 tipos de conteúdo.");
-PORTUGUESE_ERRORS.set("classification tags must appear last.", "As tags de classificação devem aparecer por último.");
 
 function issueLanguage(issue) {
   const body = String(issue && issue.body || "");
@@ -133,9 +129,9 @@ function translateRequestError(message, language) {
   if (match) {
     return `A primeira tag pública deve ser uma destas: ${match[1]}`;
   }
-  match = text.match(/^invalid catalog tag after language: (.+)\. Allowed types: (.+)\. Optional classifications: (.+)$/);
+  match = text.match(/^invalid catalog tag after language: (.+)\. Allowed types: (.+)$/);
   if (match) {
-    return `Tag de catálogo inválida depois do idioma: ${match[1]}. Tipos permitidos: ${match[2]}. Classificações opcionais: ${match[3]}`;
+    return `Tag de catálogo inválida depois do idioma: ${match[1]}. Tipos permitidos: ${match[2]}`;
   }
   return `Erro de validação: ${text}`;
 }
@@ -297,20 +293,15 @@ function normalizeTags(value) {
     throw new Error(`the first public tag must be one of: ${OFFICIAL_LANGUAGE_TAGS.join(", ")}.`);
   }
   const contentTags = publicTags.slice(1);
-  const invalidTag = contentTags.find((tag) => !TYPE_TAGS.has(tag) && !CLASSIFICATION_TAGS.has(tag));
+  const invalidTag = contentTags.find((tag) => !TYPE_TAGS.has(tag));
   if (invalidTag) {
-    throw new Error(`invalid catalog tag after language: ${invalidTag}. Allowed types: ${OFFICIAL_TYPE_TAGS.join(", ")}. Optional classifications: ${OFFICIAL_CLASSIFICATION_TAGS.join(", ")}.`);
+    throw new Error(`invalid catalog tag after language: ${invalidTag}. Allowed types: ${OFFICIAL_TYPE_TAGS.join(", ")}.`);
   }
-  const typeTags = contentTags.filter((tag) => TYPE_TAGS.has(tag));
-  if (!typeTags.length) {
+  if (!contentTags.length) {
     throw new Error("tags must include at least 2 public tags: language first, then type.");
   }
-  if (typeTags.length > MAX_TYPE_TAGS) {
+  if (contentTags.length > MAX_TYPE_TAGS) {
     throw new Error("tags may include at most 3 content types.");
-  }
-  const firstClassificationIndex = contentTags.findIndex((tag) => CLASSIFICATION_TAGS.has(tag));
-  if (firstClassificationIndex >= 0 && contentTags.slice(firstClassificationIndex + 1).some((tag) => TYPE_TAGS.has(tag))) {
-    throw new Error("classification tags must appear last.");
   }
   return output;
 }
@@ -444,7 +435,7 @@ function loadCatalog() {
 function writeCatalogs(catalog) {
   catalog.schema_version = 3;
   catalog.publish_model = "github-repository";
-  catalog.catalog_revision = "20260906-catalog-filters";
+  catalog.catalog_revision = "20260907-plugin-contract";
   catalog.rules_url = "https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules";
   const text = JSON.stringify(catalog, null, 2) + "\n";
   for (const catalogPath of CATALOG_PATHS) {
@@ -926,7 +917,6 @@ if (require.main === module) {
 }
 
 module.exports = {
-  OFFICIAL_CLASSIFICATION_TAGS,
   OFFICIAL_LANGUAGE_TAGS,
   OFFICIAL_TYPE_TAGS,
   normalizeTags,

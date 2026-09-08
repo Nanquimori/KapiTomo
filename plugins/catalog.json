@@ -2,7 +2,7 @@
   "schema_version": 3,
   "name": "KapiTomo Plugin Hub",
   "description": "Public plugin catalog for Nyxovira.",
-  "catalog_revision": "20260906-catalog-filters",
+  "catalog_revision": "20260907-plugin-contract",
   "publish_model": "github-repository",
   "rules_url": "https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules",
   "suggested_tags": [
@@ -26,13 +26,12 @@
     "novel",
     "webtoon",
     "comic",
-    "other",
-    "adult"
+    "other"
   ],
   "requirements": {
     "icon_url": "Required. Every online plugin must point to a public icon image.",
     "repository_url": "Required. Every online plugin must be hosted in a public GitHub repository.",
-    "tags": "Required. Use one language first, one to three types, and optional adult last. Unsupported and extra tags are ignored.",
+    "tags": "Required for catalog publication only. Use one language first, followed by one to three types. Unsupported and extra tags are ignored.",
     "policy_acceptance": "Required. Publication requests must accept the current Plugin Hub catalog rules."
   },
   "moderation": {
@@ -66,9 +65,6 @@
       "webtoon",
       "comic",
       "other"
-    ],
-    "classifications": [
-      "adult"
     ]
   },
   "plugins": [

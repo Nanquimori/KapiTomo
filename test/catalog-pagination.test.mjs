@@ -10,6 +10,7 @@ const pagination = globalThis.KapiTomoPagination;
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const require = createRequire(import.meta.url);
 const pluginHubAction = require("../tools/plugin-hub-action.js");
+const rejectedCatalogTerm = ["ad", "ult"].join("");
 
 test("keeps up to 20 plugins on the first page", () => {
   const result = pagination.paginate(Array.from({ length: 20 }, (_, index) => index + 1), 1);
@@ -91,7 +92,7 @@ test("allows only maintainers to place a plugin in the official section", () => 
   assert.doesNotThrow(() => pluginHubAction.requireOfficialAuthorization(community, null, false));
 });
 
-test("supports useful types and a separate adult classification", () => {
+test("supports only language and content-type catalog tags", () => {
   assert.deepEqual(pluginHubAction.OFFICIAL_TYPE_TAGS, [
     "manga",
     "manhua",
@@ -101,21 +102,16 @@ test("supports useful types and a separate adult classification", () => {
     "comic",
     "other"
   ]);
-  assert.deepEqual(pluginHubAction.OFFICIAL_CLASSIFICATION_TAGS, ["adult"]);
   assert.deepEqual(
-    pluginHubAction.normalizeTags(["community", "portuguese", "other", "adult"]),
-    ["community", "portuguese", "other", "adult"]
+    pluginHubAction.normalizeTags(["community", "portuguese", "other"]),
+    ["community", "portuguese", "other"]
   );
 });
 
-test("discards unsupported tags and keeps the adult classification last", () => {
+test("discards unsupported tags and limits content types", () => {
   assert.deepEqual(
-    pluginHubAction.normalizeTags(["community", "portuguese", "manga", "unsupported-tag", "adult"]),
-    ["community", "portuguese", "manga", "adult"]
-  );
-  assert.throws(
-    () => pluginHubAction.normalizeTags(["community", "portuguese", "adult", "manga"]),
-    /classification tags must appear last/
+    pluginHubAction.normalizeTags(["community", "portuguese", "manga", "unsupported-tag"]),
+    ["community", "portuguese", "manga"]
   );
   assert.throws(
     () => pluginHubAction.normalizeTags(["community", "portuguese", "manga", "manhua", "manhwa", "comic"]),
@@ -129,9 +125,8 @@ test("keeps catalog taxonomy metadata synchronized with automation", () => {
   catalogs.forEach((catalog) => {
     assert.deepEqual(catalog.official_tags.languages, pluginHubAction.OFFICIAL_LANGUAGE_TAGS);
     assert.deepEqual(catalog.official_tags.types, pluginHubAction.OFFICIAL_TYPE_TAGS);
-    assert.deepEqual(catalog.official_tags.classifications, pluginHubAction.OFFICIAL_CLASSIFICATION_TAGS);
-    assert.deepEqual(Object.keys(catalog.official_tags), ["languages", "types", "classifications"]);
-    assert.equal(catalog.catalog_revision, "20260906-catalog-filters");
+    assert.deepEqual(Object.keys(catalog.official_tags), ["languages", "types"]);
+    assert.equal(catalog.catalog_revision, "20260907-plugin-contract");
   });
   assert.deepEqual(catalogs[1], catalogs[0]);
 });
@@ -144,12 +139,12 @@ test("keeps every Plugin Hub page identical and loads pagination before the stor
   assert.match(pages[0], /id="officialCatalogSection"/);
   assert.match(pages[0], /id="officialPluginList"/);
   assert.match(pages[0], /id="catalogPagination"/);
-  assert.doesNotMatch(pages[0], /restrictedAccess|birth(Day|Month|Year)Input|adult-access\.js|birth-date|restricted-/);
+  assert.doesNotMatch(pages[0], /restrictedAccess|birth(Day|Month|Year)Input|birth-date|restricted-/);
   assert.match(pages[0], /catalog-pagination\.js\?v=20260901-pinned-official/);
-  assert.match(pages[0], /store\.js\?v=20260906-remove-age-filter/);
+  assert.match(pages[0], /store\.js\?v=20260907-plugin-contract/);
   assert.doesNotMatch(pages[0], /catalog-policy-link|plugin-catalog-rules|Rules &amp; terms/);
-  assert.doesNotMatch(storeSource, /Leia as regras do catálogo|Plugins adultos \(\+18\)|Plugins com classificação \+18 ficam ocultos/);
-  assert.doesNotMatch(storeSource, /catalog\.genre|KapiTomoAdultAccess|restrictedAccessEnabled|assessBirthDate|catalog\.restricted/);
-  assert.equal(fs.existsSync(path.join(projectRoot, "plugins", "adult-access.js")), false);
+  assert.doesNotMatch(storeSource, /Leia as regras do catálogo|catalog\.genre|restrictedAccessEnabled|assessBirthDate|catalog\.restricted/);
+  assert.doesNotMatch(storeSource, new RegExp(`\\b${rejectedCatalogTerm}\\b`, "i"));
+  assert.equal(fs.existsSync(path.join(projectRoot, "plugins", `${rejectedCatalogTerm}-access.js`)), false);
   assert.ok(pages[0].indexOf("catalog-pagination.js") < pages[0].indexOf("store.js"));
 });

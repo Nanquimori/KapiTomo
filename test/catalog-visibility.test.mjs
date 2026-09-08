@@ -13,15 +13,15 @@ function plugin(id, tags = ["community", "english", "manga"], status = "active")
 async function openCatalog(previousAccess) {
   const nodes = new Map();
   const storage = new Map([
-    ["kapitomo.pluginDrafts.v3", JSON.stringify([plugin("adult-draft", ["english", "novel", "adult"])])]
+    ["kapitomo.pluginDrafts.v3", JSON.stringify([plugin("novel-draft", ["english", "novel"])])]
   ]);
   if (previousAccess !== null) storage.set("kapitomo.restrictedAccess.v1", previousAccess);
   const catalog = { plugins: [
     ...Array.from({ length: 20 }, (_, i) => plugin(`regular-${i}`)),
-    plugin("adult-community", ["community", "english", "novel", "adult"]),
-    plugin("adult-official", ["official", "english", "novel", "adult"]),
-    plugin("moderated", ["community", "english", "novel", "adult"], "hidden"),
-    plugin("unavailable", ["community", "english", "novel", "adult"])
+    plugin("novel-community", ["community", "english", "novel"]),
+    plugin("novel-official", ["official", "english", "novel"]),
+    plugin("moderated", ["community", "english", "novel"], "hidden"),
+    plugin("unavailable", ["community", "english", "novel"])
   ] };
   function node(id) {
     if (!nodes.has(id)) nodes.set(id, {
@@ -57,29 +57,27 @@ async function openCatalog(previousAccess) {
 }
 
 for (const previousAccess of [null, "enabled", "disabled"]) {
-  test(`loads classified plugins and drafts without an age gate (previous preference: ${previousAccess})`, async () => {
+  test(`loads plugins and drafts while clearing the obsolete access preference (${previousAccess})`, async () => {
     const { context, nodes, storage, requested, read } = await openCatalog(previousAccess);
     assert.equal(storage.has("kapitomo.restrictedAccess.v1"), false);
     assert.equal(read("allPlugins.length"), 22);
-    assert.ok(read("allPlugins.map(plugin => plugin.id)").includes("adult-community"));
-    assert.ok(read("allPlugins.map(plugin => plugin.id)").includes("adult-draft"));
-    assert.deepEqual(read("pinnedOfficialPlugins.map(plugin => plugin.id)"), ["adult-official"]);
-    assert.ok(requested.some(url => url.includes("/adult-community/")));
+    assert.ok(read("allPlugins.map(plugin => plugin.id)").includes("novel-community"));
+    assert.ok(read("allPlugins.map(plugin => plugin.id)").includes("novel-draft"));
+    assert.deepEqual(read("pinnedOfficialPlugins.map(plugin => plugin.id)"), ["novel-official"]);
+    assert.ok(requested.some(url => url.includes("/novel-community/")));
     assert.ok(!requested.some(url => url.includes("/moderated/")));
-    assert.doesNotMatch(nodes.get("tagFilter").innerHTML, /data-filter-tag="adult"/);
     assert.match(nodes.get("tagFilter").innerHTML, /data-filter-tag="english"/);
     assert.match(nodes.get("tagFilter").innerHTML, /data-filter-tag="novel"/);
     vm.runInContext("goToCatalogPage(2)", context);
     assert.equal(read("currentCatalogPage"), 2);
     assert.equal(read("renderedPlugins.length"), 3); // One pinned plugin and two community entries.
-    vm.runInContext('searchQuery = "adult-community"; applyTagFilters(true)', context);
-    assert.deepEqual(read("filteredCatalogPlugins.map(plugin => plugin.id)"), ["adult-community"]);
+    vm.runInContext('searchQuery = "novel-community"; applyTagFilters(true)', context);
+    assert.deepEqual(read("filteredCatalogPlugins.map(plugin => plugin.id)"), ["novel-community"]);
     vm.runInContext('searchQuery = ""; toggleTagFilter("novel")', context);
-    assert.deepEqual(read("filteredCatalogPlugins.map(plugin => plugin.id).sort()"), ["adult-community", "adult-draft"]);
-    vm.runInContext('toggleFavoritePlugin(allPlugins.find(plugin => plugin.id === "adult-community")); favoritesOnly = true; applyTagFilters(true)', context);
-    assert.deepEqual(read("filteredCatalogPlugins.map(plugin => plugin.id)"), ["adult-community"]);
+    assert.deepEqual(read("filteredCatalogPlugins.map(plugin => plugin.id).sort()"), ["novel-community", "novel-draft"]);
+    vm.runInContext('toggleFavoritePlugin(allPlugins.find(plugin => plugin.id === "novel-community")); favoritesOnly = true; applyTagFilters(true)', context);
+    assert.deepEqual(read("filteredCatalogPlugins.map(plugin => plugin.id)"), ["novel-community"]);
     vm.runInContext('setLanguage("pt")', context);
-    assert.doesNotMatch(nodes.get("tagFilter").innerHTML, /data-filter-tag="adult"/);
-    assert.deepEqual(read("filteredCatalogPlugins.map(plugin => plugin.id)"), ["adult-community"]);
+    assert.deepEqual(read("filteredCatalogPlugins.map(plugin => plugin.id)"), ["novel-community"]);
   });
 }

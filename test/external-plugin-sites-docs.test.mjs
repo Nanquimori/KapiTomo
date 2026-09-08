@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const read = relativePath => readFileSync(new URL(`../${relativePath}`, import.meta.url), "utf8");
+const rejectedCatalogTerm = new RegExp(`\\b${["ad", "ult"].join("")}\\b`, "i");
 
 test("published Plugin API follows the individual developer journey", () => {
   const html = read("nyxovira/plugin-api/index.html");
@@ -86,9 +87,38 @@ test("external-site guide is copyable and understandable outside Nyxovira", () =
     assert.match(document, /other creators|outros criadores/i);
     assert.match(document, /Test before sharing|Teste antes de divulgar/);
     assert.match(document, /`?other`?/);
-    assert.match(document, /`?adult`?/);
+    assert.doesNotMatch(document, rejectedCatalogTerm);
     assert.doesNotMatch(document, /Nyxovira Pro/);
     assert.doesNotMatch(document, /0w0-UwU-Hub|0w0 UwU|NexusToons|Pluma Comics|yxz0w0zxy/i);
+  }
+});
+
+test("personal plugins document the real Nyxovira minimum separately from catalog publication", () => {
+  const documents = [
+    read("nyxovira/plugin-api/index.html"),
+    read("nyxovira/plugin-api/PLUGIN_API.pt-BR.md"),
+    read("nyxovira/plugin-api/PLUGIN_API.md")
+  ];
+
+  for (const document of documents) {
+    assert.match(document, /Minimum for personal use|Mínimo para uso pessoal/);
+    assert.match(document, /match\.hosts/);
+    assert.match(document, /browser\.home_url/);
+    assert.match(document, /generic page (?:detection|detector)|detector genérico da página/);
+    assert.match(document, /tags[\s\S]{0,180}(?:not required|não (?:são |é )?necessári|desnecessári)/i);
+    assert.doesNotMatch(document, rejectedCatalogTerm);
+  }
+
+  for (const file of [
+    "README.md",
+    "privacy/index.html",
+    "terms/index.html",
+    "plugins/catalog.json",
+    "plugins/catalog-store.json",
+    "plugins/store.js",
+    "tools/plugin-hub-action.js"
+  ]) {
+    assert.doesNotMatch(read(file), rejectedCatalogTerm, file);
   }
 });
 
