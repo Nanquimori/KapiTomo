@@ -144,6 +144,8 @@ test("interactive prompt builder is prominent, mode-aware, and copyable", () => 
   assert.match(html, /favicon ou logo público fornecido pelo próprio site/);
   assert.match(html, /Crie um repositório público no GitHub/);
   assert.match(html, /git push -u origin main/);
+  assert.match(html, /OpenAPI ou Swagger/);
+  assert.match(html, /requisições de rede do navegador/);
   assert.match(html, /navigator\.clipboard\.writeText/);
   assert.match(html, /document\.execCommand\("copy"\)/);
   assert.match(html, /autocomplete="off"/);
@@ -175,7 +177,7 @@ test("interactive prompt builder is prominent, mode-aware, and copyable", () => 
   assert.match(catalogPt, /inicialize o Git/);
   assert.match(catalogPt, /faça commit/);
   assert.match(catalogPt, /push/);
-  assert.match(catalogPt, /Depois do push, envie o repositório pelo Plugin Hub/);
+  assert.doesNotMatch(catalogPt, /Depois do push|catalog\.json/);
   assert.match(personalEn, /Do not add catalog tags/);
   assert.doesNotMatch(personalEn, /Do not add[^\n]*public icon/);
   assert.match(personalEn, /public favicon or logo/);
@@ -183,16 +185,41 @@ test("interactive prompt builder is prominent, mode-aware, and copyable", () => 
   assert.match(catalogEn, /Create a public GitHub repository/);
   assert.match(catalogEn, /commit every file/);
   assert.match(catalogEn, /push the main branch/);
+  assert.doesNotMatch(catalogEn, /After the push|catalog\.json/);
   assert.notEqual(personalPt, catalogPt);
+
+  for (const prompt of [personalPt, catalogPt]) {
+    assert.match(prompt, /documentação oficial para desenvolvedores/);
+    assert.match(prompt, /API pública/);
+    assert.match(prompt, /OpenAPI ou Swagger/);
+    assert.match(prompt, /GraphQL/);
+    assert.match(prompt, /API não estiver visível ou documentada/);
+    assert.match(prompt, /scripts carregados/);
+    assert.match(prompt, /requisições de rede do navegador/);
+  }
+  for (const prompt of [personalEn, catalogEn]) {
+    assert.match(prompt, /official developer documentation/);
+    assert.match(prompt, /public API/);
+    assert.match(prompt, /OpenAPI or Swagger/);
+    assert.match(prompt, /GraphQL/);
+    assert.match(prompt, /API is not visible or documented/);
+    assert.match(prompt, /loaded scripts/);
+    assert.match(prompt, /browser network requests/);
+  }
 
   for (const document of [
     html,
     read("nyxovira/plugin-api/PLUGIN_API.pt-BR.md"),
     read("nyxovira/plugin-api/PLUGIN_API.md")
   ]) {
+    assert.match(document, /OpenAPI (?:ou|or) Swagger/);
+    assert.match(document, /GraphQL/);
+    assert.match(document, /requisições de rede do navegador|browser network requests/);
+    assert.match(document, /API não estiver visível ou documentada|API is not (?:linked|visible) or documented/);
     assert.doesNotMatch(document, /Se você tiver acesso à pasta de trabalho|If you have workspace access/i);
     assert.doesNotMatch(document, /não contorne login|Do not bypass login|paywalls?|DRM/i);
     assert.doesNotMatch(document, /Não publique o plugin nem altere o catálogo oficial|Do not publish the plugin or change the official catalog/i);
+    assert.doesNotMatch(document, /Depois do push, envie o repositório pelo Plugin Hub|After the push, submit the repository through the Plugin Hub/i);
   }
 });
 

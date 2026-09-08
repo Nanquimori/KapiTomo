@@ -13,7 +13,7 @@ O [gerador interativo de prompt para IA](https://nanquimori.github.io/KapiTomo/n
 - **Uso pessoal:** pede somente o mínimo necessário para importação local. Usa o favicon ou logo público do próprio site quando estiver disponível, sem exigir que um ícone separado seja hospedado.
 - **Publicar no Plugin Hub:** manda a IA criar e enviar um repositório GitHub público, usar o ícone do site, adicionar as tags aceitas, validar o plugin e enviá-lo pelo Hub.
 
-O pedido gerado também manda a IA mapear rotas, seletores, ordem dos capítulos, conteúdo de texto ou imagens, carregamento dinâmico e limitações antes de implementar o plugin.
+O pedido gerado também manda a IA mapear rotas, seletores, ordem dos capítulos, conteúdo de texto ou imagens, carregamento dinâmico e limitações. Primeiro ela deve verificar documentação oficial e APIs públicas; depois, examinar scripts da página e requisições de rede do navegador para encontrar APIs ou endpoints usados pelo site que não estejam documentados de forma visível.
 
 ## Caminho do Desenvolvedor
 
@@ -88,6 +88,12 @@ Campos e alcance:
 ## Mapeamento do Site
 
 Relacione os nomes usados pelo site com os campos que o Nyxovira espera. Cada plugin fica responsável pelo site que suporta.
+
+Descubra a fonte dos dados antes de escolher a implementação:
+
+- Procure documentação oficial para desenvolvedores, API pública, arquivos OpenAPI ou Swagger, GraphQL, feeds JSON e endpoints documentados.
+- Se a API não estiver visível ou documentada, examine o código da página, os scripts carregados e as requisições de rede do navegador para identificar os endpoints usados pela própria interface do site.
+- Compare os dados da API com o HTML renderizado e use a fonte mais completa e estável para obras, capítulos, textos e imagens.
 
 Exemplo:
 

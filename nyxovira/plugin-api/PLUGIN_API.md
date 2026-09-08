@@ -13,7 +13,7 @@ The [interactive AI prompt generator](https://nanquimori.github.io/KapiTomo/nyxo
 - **Personal use:** requests only the minimum needed for a local import. It uses the site's public favicon or logo when available, without requiring a separately hosted icon.
 - **Publish in the Plugin Hub:** tells the AI to create and push a public GitHub repository, use the site icon, add accepted catalog tags, validate the plugin, and submit it through the Hub.
 
-The generated request also tells the AI to map the site's routes, selectors, chapter order, text or image content, dynamic loading, and limitations before implementing the plugin.
+The generated request also tells the AI to map routes, selectors, chapter order, text or image content, dynamic loading, and limitations. It must check official documentation and public APIs first, then inspect page scripts and browser network requests for APIs or endpoints that are used by the site but are not visibly documented.
 
 ## Developer Path
 
@@ -88,6 +88,12 @@ Fields and scope:
 ## Site Mapping
 
 Map the site's names to the fields Nyxovira expects. This keeps each plugin responsible for the site it supports.
+
+Discover the data source before choosing an implementation:
+
+- Look for official developer documentation, a public API, OpenAPI or Swagger files, GraphQL, JSON feeds, and documented endpoints.
+- If the API is not linked or documented, inspect the page source, loaded scripts, and browser network requests to identify the endpoints used by the site's own interface.
+- Compare the API data with the rendered HTML and use the most complete and stable source for works, chapters, text, and images.
 
 Example:
 
