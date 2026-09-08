@@ -1,7 +1,8 @@
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
-const { execFileSync } = require("child_process");
+const crypto = require("crypto");
+const { execFileSync, spawnSync } = require("child_process");
 const { sortCatalogPlugins } = require("../plugins/catalog-pagination.js");
 
 const CATALOG_PATHS = ["plugins/catalog-store.json", "plugins/catalog.json"];
@@ -13,6 +14,31 @@ const MAX_TYPE_TAGS = 3;
 const MIN_PUBLIC_TAGS = 2;
 const POLICY_ACCEPTANCE_MARKER = "plugin-hub-policy: accepted-v1";
 const POLICY_ACCEPTANCE_ERROR = "The publication request must accept the current Plugin Hub catalog rules. Read https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules and add `Catalog rules accepted: yes` to the request.";
+const SECURITY_SCAN_MAX_FILES = 50;
+const SECURITY_SCAN_MAX_FILE_BYTES = 2 * 1024 * 1024;
+const SECURITY_SCAN_MAX_TOTAL_BYTES = 10 * 1024 * 1024;
+const SECURITY_SCAN_MAX_FINDINGS = 20;
+const SECURITY_TEXT_EXTENSIONS = new Set([".cjs", ".css", ".js", ".json", ".lock", ".md", ".mjs", ".toml", ".ts", ".txt", ".yaml", ".yml"]);
+const SECURITY_IMAGE_EXTENSIONS = new Set([".gif", ".ico", ".jpeg", ".jpg", ".png", ".webp"]);
+const SECURITY_ALLOWED_EXTENSIONLESS = new Set(["license", "readme"]);
+const SECURITY_ALLOWED_FILENAMES = new Set([".gitattributes", ".gitignore"]);
+const SECURITY_BLOCKED_EXTENSIONS = new Set([
+  ".7z", ".aab", ".apk", ".app", ".appx", ".bat", ".bin", ".cab", ".cmd", ".com", ".deb", ".dex",
+  ".dll", ".dmg", ".elf", ".exe", ".hta", ".html", ".htm", ".img", ".iso", ".jar", ".jsb", ".lnk",
+  ".msi", ".msix", ".p12", ".pem", ".pfx", ".php", ".ps1", ".py", ".rar", ".rb", ".reg", ".rpm",
+  ".sh", ".so", ".svg", ".tar", ".vbs", ".wasm", ".xpi", ".zip"
+]);
+const SECURITY_BLOCKED_FILENAMES = new Set([".env", "id_dsa", "id_ecdsa", "id_ed25519", "id_rsa"]);
+const SECURITY_CODE_RULES = [
+  { code: "dynamic-code", reason: "dynamic code execution is not allowed", pattern: /\beval\s*\(|\bnew\s+Function\s*\(|\bFunction\s*\(\s*["'`]|\b(?:setTimeout|setInterval)\s*\(\s*["'`]|\.constructor\s*\.\s*constructor\s*\(|\bWebAssembly\./ },
+  { code: "system-command", reason: "system-command or native runtime access is not allowed", pattern: /(?:require\s*\(\s*["'](?:node:)?child_process["']|from\s+["'](?:node:)?child_process["']|process\.(?:binding|mainModule|getBuiltinModule)\b|\bDeno\.(?:run|Command)\b|\bBun\.(?:spawn|spawnSync)\b|ActiveXObject\s*\(|WScript\.Shell)/ },
+  { code: "credential-access", reason: "reading browser credentials or cookies is not allowed", pattern: /document\.cookie\b|\b(?:password|passwd|authorization)\s*(?:Input|Field)?\b.*(?:value|addEventListener)|querySelector\s*\(\s*["'][^"']*(?:password|current-password)/i },
+  { code: "sensitive-browser-api", reason: "this sensitive browser capability is not allowed", pattern: /navigator\.(?:sendBeacon|geolocation)|mediaDevices\.getUserMedia|serviceWorker\.register|Notification\.requestPermission|navigator\.clipboard\.(?:read|readText)/ },
+  { code: "forced-navigation", reason: "forced navigation or popup behavior is not allowed", pattern: /(?:window\.)?location\.(?:assign|replace)\s*\(|(?:window\.)?location(?:\.href)?\s*=|window\.open\s*\(/ },
+  { code: "obfuscated-code", reason: "encoded or obfuscated executable code requires manual review", pattern: /\b(?:atob|String\.fromCharCode)\s*\(|\b_0x[a-f0-9]{3,}\b|["'`][A-Za-z0-9+/]{400,}={0,2}["'`]/i },
+  { code: "script-injection", reason: "injecting executable browser content is not allowed", pattern: /createElement\s*\(\s*["'](?:script|iframe)["']|\.srcdoc\s*=|import\s*\(\s*["']data:/i },
+  { code: "script-url", reason: "javascript URLs are not allowed", pattern: /javascript\s*:/i }
+];
 const OFFICIAL_LANGUAGE_TAGS = [
   "english",
   "portuguese",
@@ -85,10 +111,53 @@ function issueLanguage(issue) {
   return /Solicitação|Repositório|catálogo|Confirmo que|Depois de enviar/i.test(body) ? "pt" : "en";
 }
 
+function translateSecurityError(text) {
+  if (text.startsWith("Plugin security review blocked publication:")) {
+    return text
+      .replace("Plugin security review blocked publication:", "A an\u00e1lise de seguran\u00e7a bloqueou a publica\u00e7\u00e3o:")
+      .replaceAll("dynamic code execution is not allowed", "execu\u00e7\u00e3o din\u00e2mica de c\u00f3digo n\u00e3o \u00e9 permitida")
+      .replaceAll("system-command or native runtime access is not allowed", "comandos do sistema ou acesso ao ambiente nativo n\u00e3o s\u00e3o permitidos")
+      .replaceAll("reading browser credentials or cookies is not allowed", "leitura de credenciais ou cookies do navegador n\u00e3o \u00e9 permitida")
+      .replaceAll("this sensitive browser capability is not allowed", "esta capacidade sens\u00edvel do navegador n\u00e3o \u00e9 permitida")
+      .replaceAll("forced navigation or popup behavior is not allowed", "navega\u00e7\u00e3o for\u00e7ada ou abertura de pop-up n\u00e3o \u00e9 permitida")
+      .replaceAll("encoded or obfuscated executable code requires manual review", "c\u00f3digo execut\u00e1vel codificado ou ofuscado exige an\u00e1lise manual")
+      .replaceAll("injecting executable browser content is not allowed", "inje\u00e7\u00e3o de conte\u00fado execut\u00e1vel no navegador n\u00e3o \u00e9 permitida")
+      .replaceAll("javascript URLs are not allowed", "URLs javascript n\u00e3o s\u00e3o permitidas")
+      .replaceAll("a network request targets an undeclared host", "uma requisi\u00e7\u00e3o de rede aponta para um dom\u00ednio n\u00e3o declarado")
+      .replaceAll("minified or excessively long code requires manual review", "c\u00f3digo minificado ou excessivamente longo exige an\u00e1lise manual")
+      .replaceAll("Git LFS pointers are not accepted because their payload was not scanned", "ponteiros do Git LFS n\u00e3o s\u00e3o aceitos porque seu conte\u00fado n\u00e3o foi analisado")
+      .replaceAll("the file type is not accepted in a published plugin", "este tipo de arquivo n\u00e3o \u00e9 aceito em um plugin publicado")
+      .replaceAll("files marked as operating-system executables are not accepted", "arquivos marcados como execut\u00e1veis do sistema operacional n\u00e3o s\u00e3o aceitos")
+      .replaceAll("symbolic links and submodules are not accepted", "links simb\u00f3licos e subm\u00f3dulos n\u00e3o s\u00e3o aceitos")
+      .replaceAll("binary content does not match the declared image type", "o conte\u00fado bin\u00e1rio n\u00e3o corresponde ao tipo de imagem declarado")
+      .replaceAll("binary content is not accepted for this file type", "conte\u00fado bin\u00e1rio n\u00e3o \u00e9 aceito para este tipo de arquivo")
+      .replaceAll("the repository contains an unsafe file path", "o reposit\u00f3rio cont\u00e9m um caminho de arquivo inseguro")
+      .replaceAll("the repository tree is too large to review completely", "a estrutura do reposit\u00f3rio \u00e9 grande demais para ser analisada por completo")
+      .replaceAll("file paths must also be unique when letter case is ignored", "os caminhos tamb\u00e9m precisam ser \u00fanicos sem diferenciar mai\u00fasculas de min\u00fasculas")
+      .replaceAll("no plugin files were found at plugin_path", "nenhum arquivo de plugin foi encontrado em plugin_path")
+      .replaceAll("a published plugin may contain at most", "um plugin publicado pode conter no m\u00e1ximo")
+      .replaceAll("each file must be no larger than", "cada arquivo pode ter no m\u00e1ximo")
+      .replaceAll("more finding(s)", "outro(s) alerta(s)");
+  }
+  let match = text.match(/^Antivirus scan found malware: (.+)$/s);
+  if (match) {
+    return `A verifica\u00e7\u00e3o antiv\u00edrus encontrou malware: ${match[1]}`;
+  }
+  match = text.match(/^Antivirus scan could not be completed; publication was blocked: (.+)$/s);
+  if (match) {
+    return `A verifica\u00e7\u00e3o antiv\u00edrus n\u00e3o p\u00f4de ser conclu\u00edda; a publica\u00e7\u00e3o foi bloqueada: ${match[1]}`;
+  }
+  return "";
+}
+
 function translateRequestError(message, language) {
   const text = String(message || "");
   if (language !== "pt") {
     return text;
+  }
+  const securityTranslation = translateSecurityError(text);
+  if (securityTranslation) {
+    return securityTranslation;
   }
   if (PORTUGUESE_ERRORS.has(text)) {
     return PORTUGUESE_ERRORS.get(text);
@@ -112,6 +181,16 @@ function translateRequestError(message, language) {
   match = text.match(/^The repository plugin\.json is invalid: (.+)$/);
   if (match) {
     return `O plugin.json do repositório é inválido: ${match[1]}`;
+  }
+  match = text.match(/^Could not inspect the repository snapshot: (.+)$/);
+  if (match) {
+    return `Não foi possível analisar a versão exata do repositório: ${match[1]}`;
+  }
+  if (text === "browser.download_target_script_file must point to a JavaScript file inside the plugin folder.") {
+    return "browser.download_target_script_file precisa apontar para um arquivo JavaScript dentro da pasta do plugin.";
+  }
+  if (text === "browser.download_target_script_file was not found in the reviewed plugin files.") {
+    return "O arquivo indicado por browser.download_target_script_file não foi encontrado entre os arquivos analisados do plugin.";
   }
   match = text.match(/^The request JSON is invalid: (.+)$/);
   if (match) {
@@ -327,6 +406,242 @@ function rawPluginJsonUrl(repositoryUrl, ref, pluginPath) {
   return `https://raw.githubusercontent.com/${owner}/${repo}/${encodeURIComponent(ref)}/${manifestPath}`;
 }
 
+function repositoryCoordinates(repositoryUrl) {
+  const url = new URL(repositoryUrl);
+  const [owner, repository] = url.pathname.split("/").filter(Boolean);
+  return { owner, repository: String(repository || "").replace(/\.git$/i, "") };
+}
+
+async function fetchPublicGitHubJson(repositoryUrl, requestPath) {
+  const coordinates = repositoryCoordinates(repositoryUrl);
+  const ownRepository = String(env.GITHUB_REPOSITORY || "").toLowerCase();
+  const targetRepository = `${coordinates.owner}/${coordinates.repository}`.toLowerCase();
+  const url = `https://api.github.com/repos/${coordinates.owner}/${coordinates.repository}${requestPath}`;
+  const request = async (withAuthorization) => {
+    const headers = {
+      "Accept": "application/vnd.github+json",
+      "User-Agent": "kapitomo-plugin-hub",
+      "X-GitHub-Api-Version": "2022-11-28"
+    };
+    if (withAuthorization && env.GITHUB_TOKEN) {
+      headers.Authorization = `Bearer ${env.GITHUB_TOKEN}`;
+    }
+    return fetch(url, { headers });
+  };
+
+  let response = await request(Boolean(env.GITHUB_TOKEN));
+  if (env.GITHUB_TOKEN && targetRepository !== ownRepository && [403, 404].includes(response.status)) {
+    response = await request(false);
+  }
+  if (!response.ok) {
+    const error = new Error(`Could not inspect the repository snapshot: GitHub API HTTP ${response.status}.`);
+    error.status = response.status;
+    error.transientRepositoryFailure = response.status === 403 || response.status === 429 || response.status >= 500;
+    throw error;
+  }
+  return response.json();
+}
+
+function safeRepositoryFilePath(relativePath) {
+  const value = String(relativePath || "");
+  if (!value || value.includes("\\") || value.includes("\0") || value.split("/").some((part) => !part || part === "." || part === "..")) {
+    throw new Error(`Plugin security review blocked publication:\n- ${value || "(empty path)"} [unsafe-path] the repository contains an unsafe file path`);
+  }
+  return value;
+}
+
+function securityFinding(filePath, line, code, reason, detail = "") {
+  const location = line ? `${filePath}:${line}` : filePath;
+  return `- ${location} [${code}] ${reason}${detail ? `: ${detail}` : ""}`;
+}
+
+function throwSecurityFindings(findings) {
+  if (findings.length) {
+    const visible = findings.slice(0, SECURITY_SCAN_MAX_FINDINGS);
+    if (findings.length > visible.length) {
+      visible.push(`- ... and ${findings.length - visible.length} more finding(s)`);
+    }
+    throw new Error(`Plugin security review blocked publication:\n${visible.join("\n")}`);
+  }
+}
+
+function isAllowedPublishedFile(filePath) {
+  const basename = path.posix.basename(filePath).toLowerCase();
+  const extension = path.posix.extname(basename);
+  if (SECURITY_BLOCKED_FILENAMES.has(basename) || SECURITY_BLOCKED_EXTENSIONS.has(extension)) return false;
+  if (SECURITY_ALLOWED_FILENAMES.has(basename)) return true;
+  if (!extension) return SECURITY_ALLOWED_EXTENSIONLESS.has(basename);
+  return SECURITY_TEXT_EXTENSIONS.has(extension) || SECURITY_IMAGE_EXTENSIONS.has(extension);
+}
+
+function imageSignatureMatches(extension, buffer) {
+  const hex = buffer.subarray(0, 16).toString("hex");
+  if (extension === ".png") return hex.startsWith("89504e470d0a1a0a");
+  if ([".jpg", ".jpeg"].includes(extension)) return hex.startsWith("ffd8ff");
+  if (extension === ".gif") return buffer.subarray(0, 6).toString("ascii") === "GIF87a" || buffer.subarray(0, 6).toString("ascii") === "GIF89a";
+  if (extension === ".webp") return buffer.subarray(0, 4).toString("ascii") === "RIFF" && buffer.subarray(8, 12).toString("ascii") === "WEBP";
+  if (extension === ".ico") return hex.startsWith("00000100");
+  return false;
+}
+
+function declaredSecurityHosts(plugin, manifest) {
+  const hosts = new Set(pluginHostsFromManifest(plugin, manifest));
+  const iconHost = hostFromUrl(manifest && manifest.browser && manifest.browser.icon_url);
+  if (iconHost) hosts.add(iconHost);
+  return Array.from(hosts);
+}
+
+function hostIsDeclared(host, declaredHosts) {
+  const clean = normalizeHost(host);
+  return declaredHosts.some((declared) => clean === declared || clean.endsWith(`.${declared}`));
+}
+
+function analyzePublishedPluginFiles(files, plugin, manifest) {
+  const findings = [];
+  const declaredHosts = declaredSecurityHosts(plugin, manifest);
+  const scriptExtensions = new Set([".cjs", ".js", ".mjs", ".ts"]);
+  for (const file of files) {
+    const filePath = safeRepositoryFilePath(file.path);
+    const basename = path.posix.basename(filePath).toLowerCase();
+    const extension = path.posix.extname(basename);
+    if (!isAllowedPublishedFile(filePath)) {
+      findings.push(securityFinding(filePath, 0, "forbidden-file", "the file type is not accepted in a published plugin"));
+      continue;
+    }
+    if (SECURITY_IMAGE_EXTENSIONS.has(extension)) {
+      if (!imageSignatureMatches(extension, file.content)) findings.push(securityFinding(filePath, 0, "invalid-image", "binary content does not match the declared image type"));
+      continue;
+    }
+    if (file.content.includes(0)) {
+      findings.push(securityFinding(filePath, 0, "unexpected-binary", "binary content is not accepted for this file type"));
+      continue;
+    }
+    const source = file.content.toString("utf8");
+    if (source.startsWith("#!")) {
+      findings.push(securityFinding(filePath, 1, "executable-script", "files marked as operating-system executables are not accepted"));
+      continue;
+    }
+    if (source.startsWith("version https://git-lfs.github.com/spec/v1")) {
+      findings.push(securityFinding(filePath, 1, "git-lfs", "Git LFS pointers are not accepted because their payload was not scanned"));
+      continue;
+    }
+    if (!scriptExtensions.has(extension)) continue;
+    const lines = source.split(/\r?\n/);
+    for (let index = 0; index < lines.length; index += 1) {
+      const line = lines[index];
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("//")) continue;
+      if (line.length > 12000) findings.push(securityFinding(filePath, index + 1, "minified-code", "minified or excessively long code requires manual review"));
+      for (const rule of SECURITY_CODE_RULES) {
+        if (rule.pattern.test(line)) findings.push(securityFinding(filePath, index + 1, rule.code, rule.reason));
+      }
+      if (/\bfetch\s*\(|\.open\s*\(\s*["'](?:GET|POST|PUT|PATCH|DELETE)["']/i.test(line)) {
+        const urls = line.match(/https?:\/\/[^\s"'`)\\]+/gi) || [];
+        for (const rawUrl of urls) {
+          try {
+            const targetHost = normalizeHost(new URL(rawUrl).hostname);
+            if (targetHost && !hostIsDeclared(targetHost, declaredHosts)) findings.push(securityFinding(filePath, index + 1, "undeclared-network-host", "a network request targets an undeclared host", targetHost));
+          } catch {}
+        }
+      }
+    }
+  }
+  throwSecurityFindings(findings);
+  return { fileCount: files.length, totalBytes: files.reduce((sum, file) => sum + file.content.length, 0) };
+}
+
+function runAntivirusScan(scanRoot, runner = spawnSync) {
+  const result = runner("clamscan", ["--recursive", "--infected", "--no-summary", "--official-db-only=yes", "--fail-if-cvd-older-than=3", "--follow-dir-symlinks=0", "--follow-file-symlinks=0", "--max-files=60", "--max-filesize=3M", "--max-scansize=12M", scanRoot], { encoding: "utf8", maxBuffer: 2 * 1024 * 1024 });
+  const output = String(result && (result.stdout || result.stderr) || "").trim().slice(0, 2000);
+  if (result && result.status === 0) return;
+  if (result && result.status === 1) throw new Error(`Antivirus scan found malware: ${output || "ClamAV reported an infected file."}`);
+  const reason = result && result.error ? result.error.message : output || `ClamAV exited with status ${result && result.status}.`;
+  throw new Error(`Antivirus scan could not be completed; publication was blocked: ${reason}`);
+}
+
+async function downloadRepositorySnapshot(plugin) {
+  const commit = await fetchPublicGitHubJson(plugin.repository_url, `/commits/${encodeURIComponent(plugin.repository_ref)}`);
+  const commitSha = String(commit && commit.sha || "");
+  const treeSha = String(commit && commit.commit && commit.commit.tree && commit.commit.tree.sha || "");
+  if (!/^[a-f0-9]{40}$/i.test(commitSha) || !/^[a-f0-9]{40}$/i.test(treeSha)) throw new Error("Could not inspect the repository snapshot: GitHub returned an invalid commit or tree.");
+  const tree = await fetchPublicGitHubJson(plugin.repository_url, `/git/trees/${treeSha}?recursive=1`);
+  if (tree && tree.truncated) throw new Error("Plugin security review blocked publication:\n- repository [repository-too-large] the repository tree is too large to review completely");
+  const prefix = plugin.plugin_path ? `${plugin.plugin_path}/` : "";
+  const entries = Array.isArray(tree && tree.tree) ? tree.tree.filter((entry) => prefix ? String(entry && entry.path || "").startsWith(prefix) : true) : [];
+  const findings = [];
+  const blobs = [];
+  let declaredBytes = 0;
+  const seenPaths = new Set();
+  for (const entry of entries) {
+    const relativePath = prefix ? String(entry.path).slice(prefix.length) : String(entry.path);
+    if (!relativePath) continue;
+    safeRepositoryFilePath(relativePath);
+    const comparisonPath = relativePath.toLowerCase();
+    if (seenPaths.has(comparisonPath)) {
+      findings.push(securityFinding(relativePath, 0, "path-collision", "file paths must also be unique when letter case is ignored"));
+      continue;
+    }
+    seenPaths.add(comparisonPath);
+    if (entry.type === "tree") continue;
+    if (entry.type !== "blob" || entry.mode === "120000" || entry.mode === "160000") {
+      findings.push(securityFinding(relativePath, 0, "linked-content", "symbolic links and submodules are not accepted"));
+      continue;
+    }
+    if (entry.mode === "100755") {
+      findings.push(securityFinding(relativePath, 0, "executable-mode", "files marked as operating-system executables are not accepted"));
+      continue;
+    }
+    const size = Number(entry.size || 0);
+    if (!Number.isSafeInteger(size) || size < 0 || size > SECURITY_SCAN_MAX_FILE_BYTES) {
+      findings.push(securityFinding(relativePath, 0, "file-too-large", `each file must be no larger than ${SECURITY_SCAN_MAX_FILE_BYTES} bytes`));
+      continue;
+    }
+    declaredBytes += size;
+    blobs.push({ path: relativePath, sha: String(entry.sha || ""), size });
+  }
+  if (!blobs.length) findings.push(securityFinding(plugin.plugin_path || "repository", 0, "empty-plugin", "no plugin files were found at plugin_path"));
+  if (blobs.length > SECURITY_SCAN_MAX_FILES) findings.push(securityFinding(plugin.plugin_path || "repository", 0, "too-many-files", `a published plugin may contain at most ${SECURITY_SCAN_MAX_FILES} files`));
+  if (declaredBytes > SECURITY_SCAN_MAX_TOTAL_BYTES) findings.push(securityFinding(plugin.plugin_path || "repository", 0, "plugin-too-large", `a published plugin may contain at most ${SECURITY_SCAN_MAX_TOTAL_BYTES} bytes`));
+  throwSecurityFindings(findings);
+  const files = [];
+  for (const blob of blobs) {
+    const payload = await fetchPublicGitHubJson(plugin.repository_url, `/git/blobs/${blob.sha}`);
+    if (!payload || payload.encoding !== "base64" || typeof payload.content !== "string") throw new Error(`Could not inspect the repository snapshot: GitHub did not return file content for ${blob.path}.`);
+    const content = Buffer.from(payload.content.replace(/\s/g, ""), "base64");
+    const objectHash = crypto.createHash("sha1").update(`blob ${content.length}\0`).update(content).digest("hex");
+    if (content.length !== blob.size || objectHash !== blob.sha) throw new Error(`Could not inspect the repository snapshot: content verification failed for ${blob.path}.`);
+    files.push({ path: blob.path, content });
+  }
+  return { commitSha: commitSha.toLowerCase(), files };
+}
+
+async function reviewRepositorySecurity(plugin, options = {}) {
+  const snapshot = options.snapshot || await downloadRepositorySnapshot(plugin);
+  const manifestFile = snapshot.files.find((file) => file.path.toLowerCase() === "plugin.json");
+  if (!manifestFile) throw new Error("Could not read plugin.json from the repository: HTTP 404.");
+  let manifest;
+  try {
+    manifest = JSON.parse(manifestFile.content.toString("utf8"));
+  } catch (error) {
+    throw new Error("The repository plugin.json is invalid: " + error.message);
+  }
+  const analysis = analyzePublishedPluginFiles(snapshot.files, plugin, manifest);
+  const scanRoot = fs.mkdtempSync(path.join(os.tmpdir(), "kapitomo-plugin-scan-"));
+  try {
+    for (const file of snapshot.files) {
+      const target = path.resolve(scanRoot, ...file.path.split("/"));
+      const relative = path.relative(scanRoot, target);
+      if (!relative || relative.startsWith("..") || path.isAbsolute(relative)) throw new Error("Plugin security review blocked publication:\n- repository [unsafe-path] the repository contains an unsafe file path");
+      fs.mkdirSync(path.dirname(target), { recursive: true });
+      fs.writeFileSync(target, file.content, { flag: "wx" });
+    }
+    (options.antivirusScan || runAntivirusScan)(scanRoot);
+  } finally {
+    fs.rmSync(scanRoot, { recursive: true, force: true });
+  }
+  return { ...analysis, manifest, commitSha: snapshot.commitSha, filePaths: snapshot.files.map((file) => file.path) };
+}
+
 function pluginHostsFromManifest(plugin, manifest) {
   const hosts = new Set();
   const matchHosts = manifest && manifest.match && Array.isArray(manifest.match.hosts) ? manifest.match.hosts : [];
@@ -396,8 +711,8 @@ function normalizePlugin(input) {
   };
 }
 
-async function validateRepositoryPlugin(plugin) {
-  const manifest = await fetchRepositoryManifest(plugin);
+async function validateRepositoryPlugin(plugin, reviewedManifest, reviewedFilePaths = []) {
+  const manifest = reviewedManifest || await fetchRepositoryManifest(plugin);
   if (normalizeId(manifest.id || plugin.id) !== plugin.id) {
     throw new Error("The plugin.json id does not match the request id.");
   }
@@ -406,6 +721,15 @@ async function validateRepositoryPlugin(plugin) {
   }
   if (!manifest.browser || !manifest.browser.icon_url) {
     throw new Error("plugin.json must declare browser.icon_url.");
+  }
+  if (manifest.browser.download_target_script_file) {
+    const scriptPath = String(manifest.browser.download_target_script_file).replace(/\\/g, "/").replace(/^\/+/, "");
+    if (!/^[A-Za-z0-9._/-]+\.js$/i.test(scriptPath) || scriptPath.includes("..")) {
+      throw new Error("browser.download_target_script_file must point to a JavaScript file inside the plugin folder.");
+    }
+    if (reviewedFilePaths.length && !reviewedFilePaths.includes(scriptPath)) {
+      throw new Error("browser.download_target_script_file was not found in the reviewed plugin files.");
+    }
   }
   const manifestTags = normalizeTags(manifest.tags);
   const requestTags = plugin.tags.filter((tag) => tag !== "official" && tag !== "community");
@@ -435,7 +759,7 @@ function loadCatalog() {
 function writeCatalogs(catalog) {
   catalog.schema_version = 3;
   catalog.publish_model = "github-repository";
-  catalog.catalog_revision = "20260907-plugin-contract";
+  catalog.catalog_revision = "20260908-security-review";
   catalog.rules_url = "https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules";
   const text = JSON.stringify(catalog, null, 2) + "\n";
   for (const catalogPath of CATALOG_PATHS) {
@@ -515,7 +839,9 @@ async function publishPlugin(issue) {
   if (existing && !maintainer && (existingStatus === "hidden" || (existingStatus === "removed" && !removedByRequester))) {
     throw new Error("This catalog entry is under moderation review. The creator may submit corrections, and a maintainer must review them before the listing returns to the catalog.");
   }
-  await validateRepositoryPlugin(plugin);
+  const securityReview = await reviewRepositorySecurity(plugin);
+  plugin.repository_ref = securityReview.commitSha;
+  await validateRepositoryPlugin(plugin, securityReview.manifest, securityReview.filePaths);
   if (!maintainer) {
     plugin.author = actor;
   }
@@ -919,8 +1245,12 @@ if (require.main === module) {
 module.exports = {
   OFFICIAL_LANGUAGE_TAGS,
   OFFICIAL_TYPE_TAGS,
+  analyzePublishedPluginFiles,
+  isAllowedPublishedFile,
   normalizeTags,
   publicationDate,
   requireOfficialAuthorization,
+  reviewRepositorySecurity,
+  runAntivirusScan,
   sortPlugins
 };

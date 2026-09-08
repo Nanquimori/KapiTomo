@@ -126,7 +126,9 @@ test("keeps catalog taxonomy metadata synchronized with automation", () => {
     assert.deepEqual(catalog.official_tags.languages, pluginHubAction.OFFICIAL_LANGUAGE_TAGS);
     assert.deepEqual(catalog.official_tags.types, pluginHubAction.OFFICIAL_TYPE_TAGS);
     assert.deepEqual(Object.keys(catalog.official_tags), ["languages", "types"]);
-    assert.equal(catalog.catalog_revision, "20260907-plugin-contract");
+    assert.equal(catalog.catalog_revision, "20260908-security-review");
+    assert.match(catalog.requirements.security_review, /ClamAV/);
+    assert.match(catalog.requirements.immutable_ref, /reviewed commit/);
   });
   assert.deepEqual(catalogs[1], catalogs[0]);
 });
@@ -141,7 +143,8 @@ test("keeps every Plugin Hub page identical and loads pagination before the stor
   assert.match(pages[0], /id="catalogPagination"/);
   assert.doesNotMatch(pages[0], /restrictedAccess|birth(Day|Month|Year)Input|birth-date|restricted-/);
   assert.match(pages[0], /catalog-pagination\.js\?v=20260901-pinned-official/);
-  assert.match(pages[0], /store\.js\?v=20260907-plugin-contract/);
+  assert.match(pages[0], /store\.js\?v=20260908-security-review/);
+  assert.match(pages[0], /class="security-review-card"/);
   assert.doesNotMatch(pages[0], /catalog-policy-link|plugin-catalog-rules|Rules &amp; terms/);
   assert.doesNotMatch(storeSource, /Leia as regras do catálogo|catalog\.genre|restrictedAccessEnabled|assessBirthDate|catalog\.restricted/);
   assert.doesNotMatch(storeSource, new RegExp(`\\b${rejectedCatalogTerm}\\b`, "i"));

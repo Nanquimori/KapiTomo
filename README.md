@@ -102,7 +102,7 @@ New integrations should use `api/works/index.json`.
 
 ## Plugin Hub
 
-The Plugin Hub installs site plugins from GitHub repositories. A plugin repository must contain `plugin.json` and `browser/download_target.js`.
+The Plugin Hub installs site plugins from GitHub repositories. A plugin folder must contain `plugin.json`; `browser/download_target.js` is optional when Nyxovira's generic detector is sufficient.
 
 The official KapiTomo plugin is pinned in its own section above the community catalog and never consumes a paginated slot. Each page displays at most 20 community plugins, ordered from newest to oldest by their first publication date. Updating an existing plugin preserves that date. When more entries are available, users can move with Previous and Next, select a numbered page, or choose any page directly from the page selector. Search, tag, and favorites filters reset to the first page and paginate only matching community entries.
 
@@ -119,12 +119,16 @@ Publishing is automatic after validation:
 
 1. Paste the plugin GitHub repository in the Hub.
 2. Confirm the generated GitHub publication request.
-3. Automation validates the repository, manifest, icon, tags, and hosts.
+3. Automation resolves the requested ref to an immutable commit and inventories every file under `plugin_path`.
 4. The request author must own the plugin repository.
 5. The request must include acceptance of the current Plugin Hub catalog rules.
-6. Technically valid requests are added to the catalog and published to GitHub Pages.
-7. Automatic publication is not an endorsement of the source or third-party content.
-8. Plugin owners can remove their own plugins automatically, and maintainers can moderate any plugin.
+6. The review rejects executable or archived files, links and submodules, disguised binaries, oversized packages, suspicious or obfuscated browser code, and explicit network destinations outside declared hosts.
+7. ClamAV scans the complete plugin snapshot with current official signatures. Malware, scanner errors, incomplete scans, or static-analysis findings block publication.
+8. A valid request is published with `repository_ref` pinned to the reviewed commit. Later code changes require a new publication request and review.
+9. Automatic checks reduce risk but cannot guarantee that software is harmless or endorse the source or third-party content.
+10. Plugin owners can remove their own plugins automatically, and maintainers can moderate any plugin.
+
+Only files below `plugin_path` are installed and reviewed. Keep that folder limited to the distributable plugin: readable JSON/JavaScript and supporting text or standard image files. The automated review accepts at most 50 files, 2 MiB per file, and 10 MiB in total. It reports static-analysis findings with file and line, leaves rejected requests open for correction or manual review, and fails closed when any required check cannot finish.
 
 If a source site fails health checks, the plugin appears as `Offline`. If the repository or `plugin.json` remains missing for two consecutive checks, the plugin is marked as removed. Reports open a manual review and never change the catalog automatically. A maintainer may apply a documented preventive restriction only after independently verifying preliminary evidence of an urgent security or catalog-integrity risk, restore a corrected entry, or remove it after a confirmed violation or authorized request.
 

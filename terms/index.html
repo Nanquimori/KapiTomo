@@ -40,7 +40,7 @@
       <article class="legal-document" data-policy-language="en">
         <p class="eyebrow">KapiTomo / Nyxovira</p>
         <h1>Terms and Plugin Catalog Rules</h1>
-        <p class="legal-updated">Last updated: August 26, 2026</p>
+        <p class="legal-updated">Last updated: September 8, 2026</p>
 
         <h2>Purpose of KapiTomo and Nyxovira</h2>
         <p>
@@ -86,10 +86,18 @@
           <li>The plugin does not bypass authentication, paywalls, DRM, access restrictions, or other technical protections.</li>
         </ul>
         <p>
-          Automatic publication validates technical requirements and repository ownership. It does not certify
-          ownership of third-party content or replace later moderation. KapiTomo may review a plugin after publication
-          and examine reports submitted through the Plugin Hub. A report opens a manual review and does not change the
-          plugin's availability by itself.
+          Before automatic publication, the Hub resolves the requested repository reference to an immutable commit,
+          inventories every file under <code>plugin_path</code>, verifies the downloaded Git objects, and rejects
+          executable or archived files, symbolic links, disguised binaries, oversized packages, suspicious or
+          obfuscated browser code, and explicit network destinations outside the declared hosts. ClamAV then scans the
+          complete plugin snapshot with current official signatures. A detection, scanner error, incomplete inventory,
+          or static-analysis finding blocks publication and leaves the request open for correction or manual review.
+          The catalog stores the reviewed commit, so later repository changes require a new publication review.
+        </p>
+        <p>
+          These automated checks reduce risk but cannot prove that software is harmless. They do not certify ownership
+          of third-party content or replace later moderation. KapiTomo may examine reports submitted through the Plugin
+          Hub; a report opens a manual review and does not change the plugin's availability by itself.
         </p>
         <p>
           Publication does not require the community creator to own the works or represent the connected source site,
@@ -195,7 +203,7 @@
       <article class="legal-document" data-policy-language="pt" lang="pt-BR" hidden>
         <p class="eyebrow">KapiTomo / Nyxovira</p>
         <h1>Termos e Regras do Catálogo de Plugins</h1>
-        <p class="legal-updated">Última atualização: 26 de agosto de 2026</p>
+        <p class="legal-updated">Última atualização: 8 de setembro de 2026</p>
 
         <h2>Finalidade do KapiTomo e do Nyxovira</h2>
         <p>
@@ -242,10 +250,20 @@
           <li>O plugin não contorna autenticação, assinatura, paywall, DRM, restrições de acesso ou outras proteções técnicas.</li>
         </ul>
         <p>
-          A publicação automática valida requisitos técnicos e a propriedade do repositório. Ela não certifica a
-          titularidade de conteúdos de terceiros nem substitui a moderação posterior. O KapiTomo pode revisar um
-          plugin após a publicação e analisar denúncias enviadas pelo Plugin Hub. Uma denúncia abre uma análise manual
-          e não altera, por si só, a disponibilidade do plugin.
+          Antes da publicação automática, o Hub transforma a referência solicitada do repositório em um commit
+          imutável, inventaria todos os arquivos dentro de <code>plugin_path</code>, confere os objetos Git baixados e
+          recusa executáveis ou arquivos compactados, links simbólicos, binários disfarçados, pacotes grandes demais,
+          código de navegador suspeito ou ofuscado e destinos de rede explícitos fora dos domínios declarados. Em
+          seguida, o ClamAV verifica o conjunto exato dos arquivos do plugin com assinaturas oficiais atuais. Uma detecção, erro do
+          antivírus, inventário incompleto ou alerta da análise estática bloqueia a publicação e mantém a solicitação
+          aberta para correção ou análise manual. O catálogo guarda o commit analisado; mudanças posteriores no
+          repositório exigem uma nova análise de publicação.
+        </p>
+        <p>
+          Essas verificações automáticas reduzem o risco, mas não provam que um software seja inofensivo. Elas não
+          certificam a titularidade de conteúdos de terceiros nem substituem a moderação posterior. O KapiTomo pode
+          analisar denúncias enviadas pelo Plugin Hub; uma denúncia abre uma análise manual e não altera, por si só, a
+          disponibilidade do plugin.
         </p>
         <p>
           A publicação não exige que o criador da comunidade seja proprietário das obras ou represente o site conectado,

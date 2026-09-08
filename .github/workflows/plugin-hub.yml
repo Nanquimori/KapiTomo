@@ -31,6 +31,16 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Prepare current antivirus signatures
+        if: github.event_name == 'issues' && startsWith(github.event.issue.title, '[plugin]')
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes clamav clamav-freshclam
+          sudo systemctl stop clamav-freshclam.service || true
+          sudo freshclam --stdout
+          clamscan --version
+
       - name: Process plugin request
         run: node tools/plugin-hub-action.js
         env:

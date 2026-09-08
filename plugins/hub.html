@@ -853,6 +853,41 @@
         gap: 8px;
       }
 
+      .security-review-card {
+        display: grid;
+        gap: 7px;
+        margin-top: 12px;
+        border: 1px solid rgba(121, 221, 167, 0.55);
+        border-left: 4px solid #79dda7;
+        border-radius: 10px;
+        padding: 11px 12px;
+        background: linear-gradient(135deg, rgba(121, 221, 167, 0.11), rgba(255, 178, 31, 0.045));
+      }
+
+      .security-review-card h3,
+      .security-review-card p,
+      .security-review-card ul {
+        margin: 0;
+      }
+
+      .security-review-card h3 {
+        color: #a9f2ca;
+        font-size: 0.94rem;
+      }
+
+      .security-review-card p,
+      .security-review-card li {
+        color: var(--muted);
+        font-size: 0.76rem;
+        line-height: 1.45;
+      }
+
+      .security-review-card ul {
+        display: grid;
+        gap: 3px;
+        padding-left: 18px;
+      }
+
       .field-label {
         color: var(--muted);
         font-size: 0.78rem;
@@ -1270,6 +1305,18 @@
           <p id="publishStatus" class="publish-status" aria-live="polite"></p>
         </div>
 
+        <aside class="security-review-card" aria-labelledby="securityReviewTitle">
+          <h3 id="securityReviewTitle" data-i18n="publish.securityTitle">Security review before publication</h3>
+          <p data-i18n="publish.securityDescription">The catalog is updated only after the exact repository snapshot passes every check.</p>
+          <ul>
+            <li data-i18n="publish.securityFiles">Every plugin file is inventoried; executables, archives, symbolic links, disguised files, and oversized packages are rejected.</li>
+            <li data-i18n="publish.securityCode">Browser scripts are inspected line by line for malicious or obfuscated behavior and undeclared network hosts.</li>
+            <li data-i18n="publish.securityAntivirus">ClamAV scans the complete plugin snapshot with current official signatures. A detection or incomplete scan blocks publication.</li>
+            <li data-i18n="publish.securityPinned">The approved catalog entry is pinned to the reviewed commit, so later repository changes require a new review.</li>
+          </ul>
+          <p data-i18n="publish.securityLimits">Automated checks reduce risk but cannot prove that software is harmless. Reports and manual moderation remain available.</p>
+        </aside>
+
         <details class="steps">
           <summary data-i18n="publish.how">How publishing works</summary>
           <div class="step-list">
@@ -1359,6 +1406,6 @@
     </main>
     <script src="report-config.js?v=20260901-secure-reports"></script>
     <script src="catalog-pagination.js?v=20260901-pinned-official"></script>
-    <script src="store.js?v=20260907-plugin-contract"></script>
+    <script src="store.js?v=20260908-security-review"></script>
   </body>
 </html>

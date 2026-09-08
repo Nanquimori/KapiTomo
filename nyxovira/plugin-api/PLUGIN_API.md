@@ -260,6 +260,10 @@ Use this option only when you want the plugin to appear in the official catalog.
 
 The requirements below apply only to publication in the official catalog. Before submitting, `plugin.json` must have a public HTTPS icon and a `tags` list containing one language first, followed by one to three content types.
 
+Keep `plugin_path` limited to the files Nyxovira must install. Before publication, the Hub inventories and verifies every file in that folder, examines browser scripts line by line, checks explicit network destinations, and runs ClamAV over the complete snapshot. Executables, archives, symbolic links, disguised binaries, oversized packages, suspicious or obfuscated code, malware detections, and incomplete scans are blocked.
+
+The accepted catalog entry is pinned to the exact reviewed commit. Any later code update needs a new publication request. Automated checks reduce risk but cannot guarantee that software is harmless; rejected requests remain open for correction or manual review.
+
 Accepted tags:
 
 Language tags:
@@ -295,7 +299,7 @@ How to publish:
 2. Initialize Git in the plugin folder, commit every plugin file, connect the public repository as `origin`, and push the main branch.
 3. Paste the public GitHub repository URL in the Plugin Hub.
 4. Confirm the generated GitHub request and accept the current rules.
-5. Automation checks the files, icon, tags, hosts, and whether the requester owns the repository.
+5. Automation reviews every file and code line, runs antivirus checks, validates metadata and ownership, and pins the exact approved commit.
 6. A technically valid request is published in the catalog.
 
 ```bash
