@@ -6,6 +6,15 @@ This document explains how to create and publish a Nyxovira plugin.
 
 A plugin connects Nyxovira to one reading site. It opens the site, recognizes the work page, shows the chapter list as soon as the user taps download, and prepares only the chapters selected by the user.
 
+## Ready-to-copy Prompt
+
+The [interactive prompt generator](https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/#prompt-builder) is displayed at the top of the online documentation. Enter the source-site URL, choose a mode, and use **Copy prompt**:
+
+- **Personal use:** requests only the minimum needed for a local import. It explicitly excludes catalog tags, a public icon, GitHub, and publication metadata unless technically necessary.
+- **Publish in the Plugin Hub:** adds the public repository, HTTPS icon, accepted catalog tags, publication checks, and complete in-app validation.
+
+The generated request also tells the assistant to map the site's routes, selectors, chapter order, text or image content, dynamic loading, limitations, and legitimate authentication before implementing the plugin.
+
 ## Developer Path
 
 1. [Create the plugin](#plugin-files): prepare `plugin.json`, map the site, and build chapter downloads.

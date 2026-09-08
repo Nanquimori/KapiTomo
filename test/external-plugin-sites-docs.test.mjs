@@ -122,6 +122,55 @@ test("personal plugins document the real Nyxovira minimum separately from catalo
   }
 });
 
+test("interactive prompt builder is prominent, mode-aware, and copyable", () => {
+  const html = read("nyxovira/plugin-api/index.html");
+  const englishBuilder = html.indexOf('id="prompt-builder"');
+  const englishPath = html.indexOf("<h2>Developer path</h2>");
+  const portugueseBuilder = html.indexOf('id="gerador-de-prompt"');
+  const portuguesePath = html.indexOf("<h2>Caminho do desenvolvedor</h2>");
+
+  assert.ok(englishBuilder >= 0 && englishBuilder < englishPath);
+  assert.ok(portugueseBuilder >= 0 && portugueseBuilder < portuguesePath);
+  assert.equal((html.match(/<section[^>]+data-prompt-builder/g) || []).length, 2);
+  assert.equal((html.match(/<input[^>]+data-prompt-url/g) || []).length, 2);
+  assert.equal((html.match(/<textarea[^>]+data-prompt-output/g) || []).length, 2);
+  assert.equal((html.match(/<button[^>]+data-copy-prompt/g) || []).length, 2);
+  assert.equal((html.match(/data-prompt-mode-option="personal"/g) || []).length, 2);
+  assert.equal((html.match(/data-prompt-mode-option="catalog"/g) || []).length, 2);
+  assert.match(html, /Start here · copy in one click/);
+  assert.match(html, /Comece aqui · copie em um clique/);
+  assert.match(html, /Não adicione tags de catálogo/);
+  assert.match(html, /Prepare um ícone HTTPS público e tags aceitas pelo catálogo/);
+  assert.match(html, /navigator\.clipboard\.writeText/);
+  assert.match(html, /document\.execCommand\("copy"\)/);
+  assert.match(html, /autocomplete="off"/);
+
+  const pageScripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(match => match[1]);
+  assert.equal(pageScripts.length, 1);
+  assert.doesNotThrow(() => new Function(pageScripts[0]));
+
+  const helperStart = pageScripts[0].indexOf("var promptDocumentationUrl");
+  const helperEnd = pageScripts[0].indexOf("function updatePromptBuilder");
+  assert.ok(helperStart >= 0 && helperEnd > helperStart);
+  const helpers = new Function(`${pageScripts[0].slice(helperStart, helperEnd)}; return { buildPluginPrompt, normalizePromptSite };`)();
+  const personalPt = helpers.buildPluginPrompt("pt", "personal", "example.org");
+  const catalogPt = helpers.buildPluginPrompt("pt", "catalog", "example.org");
+  const personalEn = helpers.buildPluginPrompt("en", "personal", "example.org");
+  const catalogEn = helpers.buildPluginPrompt("en", "catalog", "example.org");
+
+  for (const prompt of [personalPt, catalogPt, personalEn, catalogEn]) {
+    assert.match(prompt, /https:\/\/example\.org\//);
+    assert.match(prompt, /https:\/\/nanquimori\.github\.io\/KapiTomo\/nyxovira\/plugin-api\//);
+  }
+  assert.match(personalPt, /Não adicione tags de catálogo/);
+  assert.match(personalPt, /Não publique o plugin/);
+  assert.match(catalogPt, /ícone HTTPS público/);
+  assert.match(catalogPt, /publicação deve passar pelo Plugin Hub/);
+  assert.match(personalEn, /Do not add catalog tags/);
+  assert.match(catalogEn, /public HTTPS icon/);
+  assert.notEqual(personalPt, catalogPt);
+});
+
 test("quick path keeps private use and community publishing before the advanced external store", () => {
   const html = read("nyxovira/plugin-api/index.html");
 

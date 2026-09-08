@@ -6,6 +6,15 @@ Este documento explica como criar e publicar um plugin para o Nyxovira.
 
 Um plugin conecta o Nyxovira a um site de leitura. Ele abre o site, reconhece a página da obra, mostra a lista de capítulos assim que o usuário toca em baixar e prepara apenas os capítulos escolhidos pelo usuário.
 
+## Prompt Pronto para Copiar
+
+O [gerador interativo de prompt](https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/?lang=pt#gerador-de-prompt) aparece no início da documentação online. Informe a URL do site da fonte, escolha um modo e use **Copiar prompt**:
+
+- **Uso pessoal:** pede somente o mínimo necessário para importação local. Exclui explicitamente tags de catálogo, ícone público, GitHub e metadados de publicação, salvo necessidade técnica.
+- **Publicar no Plugin Hub:** acrescenta repositório público, ícone HTTPS, tags aceitas, verificações de publicação e validação completa no aplicativo.
+
+O pedido gerado também manda mapear rotas, seletores, ordem dos capítulos, conteúdo de texto ou imagens, carregamento dinâmico, limitações e autenticação legítima antes de implementar o plugin.
+
 ## Caminho do Desenvolvedor
 
 1. [Crie o plugin](#arquivos-do-plugin): prepare o `plugin.json`, mapeie o site e monte os downloads de capítulos.
