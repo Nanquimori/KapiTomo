@@ -48,7 +48,10 @@ test("keeps the four catalog URLs identical and free of removed controls", () =>
     .map(name => fs.readFileSync(path.join(projectRoot, "plugins", name), "utf8"));
   pages.slice(1).forEach(page => assert.equal(page, pages[0]));
   for (const page of pages) {
-    assert.match(page, /Plugins published by Nanquimori/);
+    assert.match(page, /Published plugins/);
+    assert.match(page, /--panel: rgba\(18, 10, 36, 0\.9\)/);
+    assert.match(page, /grid-template-columns: repeat\(auto-fill, minmax\(min\(190px, 100%\), 230px\)\)/);
+    assert.doesNotMatch(page, /class="hero"|scope-card/);
     assert.match(page, /Plugin API/);
     assert.doesNotMatch(page, /Plugin Hub|Community plugins|Plugins da comunidade|data-view-target|reportPanel|publishPanel|removePanel/i);
   }

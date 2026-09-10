@@ -15,6 +15,7 @@ test("loads, searches, and renders only entries supplied by the official catalog
   function node(id) {
     if (!nodes.has(id)) nodes.set(id, {
       innerHTML: "", textContent: "", value: "", hidden: false, dataset: {},
+      classList: { toggle() {} },
       setAttribute() {}, addEventListener() {}, querySelectorAll: () => []
     });
     return nodes.get(id);
