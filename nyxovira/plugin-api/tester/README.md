@@ -11,9 +11,9 @@ Use a real URL supported by the plugin, not the reserved example URL. Results ar
 
 - `work.json`
 - `chapter-plan.json`
-- `chapter-001/chapter.json` for a novel, or the first downloaded image for image content
+- `chapter-001/chapter.json` for a novel, or every downloaded page for image content
 - `report.json`
 
-Exit code `0` and `PLUGIN_VALID` mean that the tester resolved a work, preserved the exact selected chapter ID, resolved content, downloaded or serialized it, saved it, and reopened the saved file. Network, login, access, HTTP, decryption, parser, or empty-output failures return `PLUGIN_INVALID` and a nonzero exit code.
+Exit code `0` and `PLUGIN_VALID` mean that the tester resolved a work, preserved the exact selected chapter ID, resolved content, downloaded or serialized the complete selected chapter, saved every output, and reopened the saved files. Network, login, access, HTTP, decryption, parser, or empty-output failures return `PLUGIN_INVALID` and a nonzero exit code.
 
 Options: `--output <directory>`, `--chapter-id <exact-id>`, and `--headed`.

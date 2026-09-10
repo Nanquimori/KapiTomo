@@ -977,6 +977,18 @@ return "https://source.invalid/manga/work/";</code></pre>
             <p><a href="PLUGIN_API.md">Open the complete parser field reference</a> · <a href="plugin.schema.json">Open plugin.schema.json</a></p>
           </section>
 
+          <section id="advanced-sources" class="panel">
+            <h2>Headers, dynamic APIs, and encrypted APIs</h2>
+            <h3 class="api-subheading">Authentication / headers</h3>
+            <p>Map referer, cookies, login, static headers, and per-page tokens separately. Never assume WebView cookies reach native requests and never embed personal credentials.</p>
+            <h3 class="api-subheading">Dynamic APIs</h3>
+            <p>Keep discovery light, resolve only selected chapters, and exercise pagination or rotating tokens through the last page. The current in-app prepare hook must finish synchronously.</p>
+            <h3 class="api-subheading">Encrypted APIs</h3>
+            <p>Declare only legitimately observed formats and key material. A declared format is not proof; content must decode and the complete chapter must be saved.</p>
+            <h3 class="api-subheading">Troubleshooting</h3>
+            <p>For 401/403 check transport requirements; for missing chapters check selectors, pagination and mapping; for empty pages check URL bases, CDN and decoding. If page one works but a later page fails, the plugin is not valid.</p>
+          </section>
+
           <section id="formats" class="panel">
             <h2>Chapter formats</h2>
             <p>Use <code>paragraphs</code> for novels and <code>pages</code> for image chapters. The app also reads <code>images</code> for compatibility.</p>
@@ -1347,6 +1359,18 @@ return "https://source.invalid/manga/work/";</code></pre>
             <h2>Contrato do parser nativo</h2>
             <p>Os adaptadores aceitos são <code>next_payload</code>, <code>html_series</code> e <code>aes_json_api</code>. Campos de rota montam requisições de obra, capítulo, leitor, bootstrap, página e CDN; <code>request_headers</code> fornece headers estáticos; <code>map</code> e <code>*_keys</code> ligam os caminhos reais do JSON; prefixos e dicas de imagem controlam o reconhecimento; campos de criptografia ativam a decodificação com material de chave mapeado. O Markdown descreve o efeito operacional de cada campo.</p>
             <p><a href="PLUGIN_API.pt-BR.md">Abrir referência completa do parser</a> · <a href="plugin.schema.json">Abrir plugin.schema.json</a></p>
+          </section>
+
+          <section id="advanced-sources-pt" class="panel">
+            <h2>Headers, APIs dinâmicas e APIs criptografadas</h2>
+            <h3 class="api-subheading">Autenticação / headers</h3>
+            <p>Mapeie referer, cookies, login, headers estáticos e tokens por página separadamente. Não suponha que cookies da WebView chegam às requisições nativas e nunca inclua credenciais pessoais.</p>
+            <h3 class="api-subheading">APIs dinâmicas</h3>
+            <p>Mantenha a descoberta leve, resolva somente capítulos selecionados e percorra paginação ou tokens rotativos até a última página. O hook de preparação atual do app deve terminar de forma síncrona.</p>
+            <h3 class="api-subheading">APIs criptografadas</h3>
+            <p>Declare somente formatos e material de chave observados legitimamente. Declarar o formato não prova nada; o conteúdo deve ser decodificado e o capítulo completo precisa ser salvo.</p>
+            <h3 class="api-subheading">Solução de problemas</h3>
+            <p>Em 401/403 confira transporte; sem capítulos confira seletores, paginação e mapeamento; sem páginas confira URL base, CDN e decodificação. Se a página 1 funciona e outra falha, o plugin não é válido.</p>
           </section>
 
           <section class="panel">
