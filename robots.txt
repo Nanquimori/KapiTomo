@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nanquimori.github.io/KapiTomo/sitemap.xml

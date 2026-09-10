@@ -3,23 +3,22 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="KapiTomo terms, content policy, and Plugin Hub catalog rules.">
+    <meta name="description" content="Terms for KapiTomo, Nyxovira, Nyxalira, official plugins, and external catalogs.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://nanquimori.github.io/KapiTomo/terms/">
-    <script>
-      if (window.location.pathname.endsWith("/index.html")) {
-        window.history.replaceState(null, "", window.location.pathname.slice(0, -"index.html".length) + window.location.search + window.location.hash);
-      }
-    </script>
     <meta property="og:site_name" content="KapiTomo">
-    <meta property="og:title" content="KapiTomo Terms and Plugin Catalog Rules">
-    <meta property="og:description" content="Rules for KapiTomo, Nyxovira, community plugins, moderation, and removal requests.">
+    <meta property="og:title" content="KapiTomo Terms">
+    <meta property="og:description" content="Terms for the KapiTomo site and its apps.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://nanquimori.github.io/KapiTomo/terms/">
-    <title>KapiTomo Terms and Plugin Catalog Rules</title>
-    <link rel="icon" type="image/png" href="../assets/kapitomo-logo.png?v=20260710-policy-icons">
-    <link rel="apple-touch-icon" href="../assets/kapitomo-logo.png?v=20260710-policy-icons">
-    <link rel="stylesheet" href="../styles.css?v=20260826-catalog-rules">
+    <title>KapiTomo Terms</title>
+    <link rel="icon" type="image/png" href="../assets/kapitomo-logo.png">
+    <link rel="stylesheet" href="../styles.css?v=20260910-official-only">
+    <style>
+      .policy-language { display:flex; justify-content:flex-end; gap:8px; max-width:900px; margin:18px auto 0; padding:0 18px; }
+      .policy-language button { border:1px solid rgba(255,255,255,.18); border-radius:999px; padding:7px 12px; color:inherit; background:transparent; cursor:pointer; }
+      .policy-language button[aria-pressed="true"] { color:#111; border-color:#ff6534; background:#ff6534; }
+    </style>
   </head>
   <body>
     <header class="site-header">
@@ -28,387 +27,109 @@
         <span>KapiTomo</span>
       </a>
     </header>
+    <div class="policy-language" aria-label="Language">
+      <button type="button" data-policy-language-option="en" aria-pressed="true">EN</button>
+      <button type="button" data-policy-language-option="pt" aria-pressed="false">PT</button>
+    </div>
 
     <main class="legal-page">
-      <div class="legal-language-bar">
-        <div class="language-switch" aria-label="Policy language">
-          <button class="language-button" type="button" data-policy-language-option="en" aria-pressed="true">EN</button>
-          <button class="language-button" type="button" data-policy-language-option="pt" aria-pressed="false">PT</button>
-        </div>
-      </div>
+      <article class="legal-document" data-policy-language="en" lang="en">
+        <p class="eyebrow">KapiTomo / Nyxovira / Nyxalira</p>
+        <h1>Terms</h1>
+        <p class="legal-updated">Last updated: September 10, 2026</p>
 
-      <article class="legal-document" data-policy-language="en">
-        <p class="eyebrow">KapiTomo / Nyxovira</p>
-        <h1>Terms and Plugin Catalog Rules</h1>
-        <p class="legal-updated">Last updated: September 8, 2026</p>
+        <h2>Purpose</h2>
+        <p>KapiTomo is Nanquimori's official website for publishing original works, public reading data, and official plugins. Nyxovira manages plugins, downloads, updates, and local files. Nyxalira reads compatible files stored on the user's device.</p>
 
-        <h2>Purpose of KapiTomo and Nyxovira</h2>
-        <p>
-          KapiTomo is an author-run site that publishes its own original works for free reading and provides public
-          catalogs used by the apps. Nyxovira is a plugin, download, update, and local-library management app. It
-          prepares compatible files for readers such as Nyxalira; Nyxovira is not the reading app.
-        </p>
-        <p>
-          Nyxovira can open user-selected sources, install compatible plugins, identify works and chapters, download
-          selected files, and organize them on the user's device. Neither KapiTomo nor Nyxovira claims ownership of
-          content supplied by third-party source sites.
-        </p>
+        <h2>Original works</h2>
+        <p>Works on KapiTomo are available for free reading. Copyright remains with Nanquimori or the holder identified on a work. Free access does not grant permission to copy, sell, redistribute, republish, modify, or claim authorship unless a separate license expressly allows it.</p>
 
-        <h2>Community plugins and source sites</h2>
-        <p>
-          The Plugin Hub catalogs source connectors published from public GitHub repositories. The plugin stays in
-          its creator's repository; KapiTomo stores and displays only the catalog entry needed to find and install it.
-          A listing is not a transfer of ownership, a guarantee of source availability, or an endorsement of every
-          item that may appear on the connected site.
-        </p>
-        <p>
-          Plugin creators control their code and site mapping. Source sites control their own pages, content,
-          availability, and access rules. Temporary source failures, missing pages, or site changes do not by
-          themselves prove that a plugin violates these rules.
-        </p>
-        <p>
-          The creator is responsible for the plugin code, manifest, requested permissions, repository, accurate
-          catalog metadata, and maintenance. The source site is responsible for its works, translations, advertisements,
-          accounts, availability, pages, and access rules. KapiTomo is responsible for operating the catalog entry and
-          review process; it does not operate or continuously audit community repositories or source sites.
-        </p>
+        <h2>Official plugin catalog</h2>
+        <p>The KapiTomo catalog contains only plugins maintained and published by Nanquimori. Catalog entries may change or become unavailable when the app, site, or supported format changes.</p>
 
-        <h2 id="plugin-catalog-rules">Plugin catalog rules</h2>
-        <p>A community plugin may be published only when:</p>
-        <ul>
-          <li>The request is made by the owner of its public GitHub repository.</li>
-          <li>The repository contains a valid <code>plugin.json</code>, public icon, supported tags, and declared source hosts.</li>
-          <li>Catalog tags describe only language and content type. They are publication metadata and are not required for plugins kept for personal use.</li>
-          <li>No other visible plugin already covers the same source host.</li>
-          <li>Its name, description, icon, tags, repository, and source mapping are accurate and not misleading.</li>
-          <li>The creator accepts responsibility for the plugin code, manifest, permissions requested by the plugin, maintenance, and accurate source mapping.</li>
-          <li>The plugin does not contain malware, steal data or credentials, impersonate another creator, or enable harmful behavior.</li>
-          <li>The plugin does not bypass authentication, paywalls, DRM, access restrictions, or other technical protections.</li>
-        </ul>
-        <p>
-          Before automatic publication, the Hub resolves the requested repository reference to an immutable commit,
-          inventories every file under <code>plugin_path</code>, verifies the downloaded Git objects, and rejects
-          executable or archived files, symbolic links, disguised binaries, oversized packages, suspicious or
-          obfuscated browser code, and explicit network destinations outside the declared hosts. ClamAV then scans the
-          complete plugin snapshot with current official signatures. A detection, scanner error, incomplete inventory,
-          or static-analysis finding blocks publication and leaves the request open for correction or manual review.
-          The catalog stores the reviewed commit, so later repository changes require a new publication review.
-        </p>
-        <p>
-          These automated checks reduce risk but cannot prove that software is harmless. They do not certify ownership
-          of third-party content or replace later moderation. KapiTomo may examine reports submitted through the Plugin
-          Hub; a report opens a manual review and does not change the plugin's availability by itself.
-        </p>
-        <p>
-          Publication does not require the community creator to own the works or represent the connected source site,
-          and it does not declare the plugin official. The catalog does not decide the legality, quality, authorship, or
-          availability of content hosted by a source site. A specific formal notice from a verifiable rights holder or
-          source owner is handled separately through the contact channel below.
-        </p>
+        <h2>Personal plugins and independent catalogs</h2>
+        <p>Nyxovira allows users to import a local plugin or manually connect an external catalog URL. Those plugins and catalogs remain independent from KapiTomo. Their presence in the app does not make them official, reviewed, hosted, approved, or maintained by KapiTomo.</p>
+        <p>The person who operates an independent catalog is responsible for its files, descriptions, availability, security, and permissions. Users decide which external address to connect and should review its origin before installing anything.</p>
 
-        <h2>Catalog statuses and moderation</h2>
-        <ul>
-          <li><strong>Active:</strong> the plugin is visible and its required public files respond to automated checks.</li>
-          <li><strong>Broken:</strong> the plugin remains listed as offline after repeated technical failures and may return when fixed.</li>
-          <li><strong>Temporarily unavailable:</strong> a maintainer has documented preliminary evidence of an urgent security risk or another catalog-integrity issue that requires a preventive measure while the review is completed. A report alone does not cause this status.</li>
-          <li><strong>Removed:</strong> the listing no longer appears because removal was authorized or a violation was confirmed.</li>
-        </ul>
-        <p>
-          A plugin is not removed solely because it is community-made, connects to a third-party site, points to a
-          site that contains copyrighted material, experiences a temporary outage, or receives an unsupported report.
-          Decisions are based on the plugin's conduct, a verified request, or evidence of a catalog-rule violation.
-        </p>
+        <h2>User responsibilities</h2>
+        <p>Users are responsible for the sources, plugins, catalogs, and files they choose. They must follow applicable law, respect copyright, privacy, and the rules of each service they access. Technical access to a file does not by itself grant permission to keep, redistribute, or sell it.</p>
 
-        <h2>When a plugin may be rejected, temporarily restricted, or removed</h2>
-        <p>KapiTomo may reject a publication, request a correction, apply a documented preventive restriction, or remove a listing after manual review when:</p>
-        <ul>
-          <li>The creator requests removal or no longer controls the repository.</li>
-          <li>The repository or <code>plugin.json</code> is deleted, becomes unavailable, or no longer contains the published plugin.</li>
-          <li>Malware, credential theft, harmful redirects, data misuse, or other malicious behavior is confirmed.</li>
-          <li>The plugin bypasses access controls or technical protections.</li>
-          <li>A verified rights holder or source owner demonstrates that the plugin or listing violates their rights or authorization.</li>
-          <li>The plugin uses misleading metadata, impersonates another party, or maps to a different source than advertised.</li>
-          <li>The creator repeatedly refuses to correct a material rules violation.</li>
-        </ul>
-        <p>
-          Recoverable metadata errors should normally be corrected. Temporary technical failures should normally be
-          marked broken. Reports normally leave the listing visible while evidence is reviewed. Temporary unavailability
-          is exceptional and requires a maintainer to independently verify preliminary evidence of an immediate security
-          or catalog-integrity risk and record the reason. Confirmed violations, authorized owner requests, and
-          permanently missing repositories may result in removal.
-        </p>
-        <p>
-          Creators may submit corrections and new versions at any time. If a listing is temporarily unavailable or was
-          removed after moderation, a new publication request is treated as a correction request and does not restore
-          visibility automatically; a maintainer reviews the change and restores the listing when the identified issue
-          has been resolved. A creator who voluntarily removed their own plugin may publish it again normally.
-        </p>
+        <h2>External services</h2>
+        <p>The site and apps may open GitHub, Google Play, source websites, or other addresses selected by the user. Each service controls its own availability, terms, accounts, and data practices. KapiTomo cannot guarantee that an external service or independently hosted plugin will continue to work.</p>
 
-        <h2>Creator and user responsibilities</h2>
-        <p>
-          Plugin creators must keep their code, manifest, requested permissions, repository, and catalog metadata
-          accurate, maintain the integration when the source changes, and update or remove plugins they can no longer
-          maintain. They are not responsible for third-party works, translations, advertisements, pages, or outages
-          that they do not control.
-        </p>
-        <p>
-          Users are responsible for how they use sites, plugins, and downloaded files. Nyxovira must not be used to
-          infringe rights or bypass access restrictions. The ability to access or download a file does not by itself
-          grant permission to keep or redistribute it.
-        </p>
+        <h2>Pro purchases</h2>
+        <p>Nyxovira Pro and Nyxalira Pro unlock app features and support development. They do not sell external works, chapters, translations, plugins, or access to external websites.</p>
 
-        <h2>Reports, review, and correction</h2>
-        <p>
-          Anyone may use the <a href="../plugins/?view=report">Report</a> option in the Plugin Hub to request a manual
-          review of a serious plugin problem. The form requires the plugin ID, a valid contact email, a reason written
-          in Portuguese or English with at least 200 characters and 20 words, and confirmation that the reporter read
-          the guidance and believes the provided information is true. It then sends the private report through the form-delivery
-          service identified in the Privacy Policy and confirms when that service accepts the submission.
-          The contact email is used only to ask questions or communicate the outcome of that report.
-        </p>
-        <p>
-          This report channel is not for the legality or quality of works on a source site, missing chapters,
-          translations, advertisements, source outages, account rules, or ordinary download and compatibility bugs.
-          Source-content and account matters belong to the source site. Technical plugin problems belong in the
-          creator's repository. A formal rights or source-owner notice requiring identity verification, and any
-          confidential evidence, should be sent to <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a>.
-        </p>
-        <ol>
-          <li>The report is recorded, grouped with reports concerning the same plugin, and checked for a specific, verifiable catalog-rule issue.</li>
-          <li>The maintainer may request more evidence or contact the plugin creator before deciding.</li>
-          <li>The result may be no action, a technical-status correction, a request for changes, a documented preventive restriction in an urgent case, restoration, or removal after confirmation.</li>
-        </ol>
-        <p>
-          Reports concerning the same plugin or behavior are grouped into one review. Their quantity is never treated as
-          evidence and never, by itself, justifies hiding or removing a plugin. Reports never cause automatic hiding or
-          removal. Unsupported, duplicated, abusive, or unverifiable reports do not change the listing. Creators may use
-          the same report channel or email address to provide a correction,
-          respond with evidence, or request review of a moderation decision.
-        </p>
+        <h2>Availability and changes</h2>
+        <p>KapiTomo may correct, update, replace, or discontinue its pages, APIs, catalogs, plugins, and app integrations. These terms may be updated when the projects change. The date above identifies the current version.</p>
 
-        <h2>Pro purchase and external availability</h2>
-        <p>
-          Nyxovira Pro unlocks app features and supports development. It is not payment for third-party works,
-          chapters, pages, translations, source sites, or community plugins. External sites and repositories may
-          change or disappear without notice, so their continued availability cannot be guaranteed.
-        </p>
-
-        <h2>Changes</h2>
-        <p>
-          These terms may be updated as the app, site, catalog, or plugin system changes. The current published
-          version applies to new catalog activity after it becomes available.
-        </p>
+        <h2>Contact</h2>
+        <p>For questions about these terms or KapiTomo's own content, contact <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a>.</p>
       </article>
 
       <article class="legal-document" data-policy-language="pt" lang="pt-BR" hidden>
-        <p class="eyebrow">KapiTomo / Nyxovira</p>
-        <h1>Termos e Regras do Catálogo de Plugins</h1>
-        <p class="legal-updated">Última atualização: 8 de setembro de 2026</p>
+        <p class="eyebrow">KapiTomo / Nyxovira / Nyxalira</p>
+        <h1>Termos</h1>
+        <p class="legal-updated">Última atualização: 10 de setembro de 2026</p>
 
-        <h2>Finalidade do KapiTomo e do Nyxovira</h2>
-        <p>
-          KapiTomo é um site mantido pelo autor que publica obras originais próprias para leitura gratuita e fornece
-          catálogos públicos utilizados pelos aplicativos. Nyxovira é um aplicativo de plugins, downloads,
-          atualizações e gerenciamento de biblioteca local. Ele prepara arquivos compatíveis para leitores como o
-          Nyxalira; o Nyxovira não é o aplicativo de leitura.
-        </p>
-        <p>
-          O Nyxovira pode abrir fontes escolhidas pelo usuário, instalar plugins compatíveis, identificar obras e
-          capítulos, baixar arquivos selecionados e organizá-los no dispositivo. Nem o KapiTomo nem o Nyxovira
-          reivindicam propriedade sobre conteúdos fornecidos por fontes de terceiros.
-        </p>
+        <h2>Finalidade</h2>
+        <p>KapiTomo é o site oficial de Nanquimori para publicar obras originais, dados públicos de leitura e plugins oficiais. O Nyxovira gerencia plugins, downloads, atualizações e arquivos locais. O Nyxalira lê arquivos compatíveis armazenados no dispositivo do usuário.</p>
 
-        <h2>Plugins da comunidade e sites de origem</h2>
-        <p>
-          O Plugin Hub cataloga conectores de fontes publicados em repositórios públicos do GitHub. O plugin permanece
-          no repositório de seu criador; o KapiTomo armazena e exibe apenas a entrada de catálogo necessária para
-          encontrá-lo e instalá-lo. A presença no catálogo não transfere propriedade, não garante a disponibilidade da
-          fonte e não representa aprovação de cada item que possa aparecer no site conectado.
-        </p>
-        <p>
-          Criadores de plugins controlam o código e o mapeamento da fonte. Os sites de origem controlam suas páginas,
-          conteúdos, disponibilidade e regras de acesso. Falhas temporárias, páginas ausentes ou mudanças no site não
-          demonstram, isoladamente, que um plugin viola estas regras.
-        </p>
-        <p>
-          O criador é responsável pelo código do plugin, manifesto, permissões solicitadas, repositório, metadados
-          corretos no catálogo e manutenção. O site de origem é responsável por suas obras, traduções, anúncios, contas,
-          disponibilidade, páginas e regras de acesso. O KapiTomo é responsável pelo funcionamento da entrada e pelo
-          processo de análise do catálogo; ele não opera nem audita continuamente repositórios da comunidade ou sites de origem.
-        </p>
+        <h2>Obras originais</h2>
+        <p>As obras do KapiTomo estão disponíveis para leitura gratuita. Os direitos autorais continuam pertencendo a Nanquimori ou ao titular indicado na obra. O acesso gratuito não concede permissão para copiar, vender, redistribuir, republicar, modificar ou reivindicar autoria, salvo quando uma licença separada permitir expressamente.</p>
 
-        <h2 id="regras-do-catalogo">Regras do catálogo de plugins</h2>
-        <p>Um plugin da comunidade só pode ser publicado quando:</p>
-        <ul>
-          <li>A solicitação é feita pelo proprietário de seu repositório público no GitHub.</li>
-          <li>O repositório contém <code>plugin.json</code> válido, ícone público, tags aceitas e domínios de origem declarados.</li>
-          <li>As tags do catálogo descrevem somente idioma e tipo de conteúdo. Elas são metadados de publicação e não são exigidas em plugins mantidos para uso pessoal.</li>
-          <li>Nenhum outro plugin visível já atende ao mesmo domínio de origem.</li>
-          <li>Nome, descrição, ícone, tags, repositório e mapeamento da fonte são verdadeiros e não enganosos.</li>
-          <li>O criador aceita responsabilidade pelo código, manifesto, permissões solicitadas pelo plugin, manutenção e mapeamento correto da fonte.</li>
-          <li>O plugin não contém malware, não rouba dados ou credenciais, não imita outro criador e não permite comportamento prejudicial.</li>
-          <li>O plugin não contorna autenticação, assinatura, paywall, DRM, restrições de acesso ou outras proteções técnicas.</li>
-        </ul>
-        <p>
-          Antes da publicação automática, o Hub transforma a referência solicitada do repositório em um commit
-          imutável, inventaria todos os arquivos dentro de <code>plugin_path</code>, confere os objetos Git baixados e
-          recusa executáveis ou arquivos compactados, links simbólicos, binários disfarçados, pacotes grandes demais,
-          código de navegador suspeito ou ofuscado e destinos de rede explícitos fora dos domínios declarados. Em
-          seguida, o ClamAV verifica o conjunto exato dos arquivos do plugin com assinaturas oficiais atuais. Uma detecção, erro do
-          antivírus, inventário incompleto ou alerta da análise estática bloqueia a publicação e mantém a solicitação
-          aberta para correção ou análise manual. O catálogo guarda o commit analisado; mudanças posteriores no
-          repositório exigem uma nova análise de publicação.
-        </p>
-        <p>
-          Essas verificações automáticas reduzem o risco, mas não provam que um software seja inofensivo. Elas não
-          certificam a titularidade de conteúdos de terceiros nem substituem a moderação posterior. O KapiTomo pode
-          analisar denúncias enviadas pelo Plugin Hub; uma denúncia abre uma análise manual e não altera, por si só, a
-          disponibilidade do plugin.
-        </p>
-        <p>
-          A publicação não exige que o criador da comunidade seja proprietário das obras ou represente o site conectado,
-          nem declara o plugin oficial. O catálogo não decide a legalidade, qualidade, autoria ou disponibilidade de
-          conteúdos hospedados pelo site de origem. Uma notificação formal e específica de titular ou proprietário da
-          fonte verificável é tratada separadamente pelo canal de contato abaixo.
-        </p>
+        <h2>Catálogo oficial de plugins</h2>
+        <p>O catálogo do KapiTomo contém somente plugins mantidos e publicados por Nanquimori. As entradas podem mudar ou ficar indisponíveis quando o aplicativo, o site ou o formato compatível mudar.</p>
 
-        <h2>Estados do catálogo e moderação</h2>
-        <ul>
-          <li><strong>Ativo:</strong> o plugin está visível e seus arquivos públicos obrigatórios respondem às verificações automáticas.</li>
-          <li><strong>Com falha:</strong> o plugin continua listado como offline após falhas técnicas repetidas e pode retornar quando for corrigido.</li>
-          <li><strong>Indisponível temporariamente:</strong> um mantenedor registrou evidências preliminares de risco urgente de segurança ou de outro problema de integridade do catálogo que exige medida preventiva até a conclusão da análise. A denúncia sozinha não causa esse estado.</li>
-          <li><strong>Removido:</strong> a entrada deixa de aparecer porque a remoção foi autorizada ou uma violação foi confirmada.</li>
-        </ul>
-        <p>
-          Um plugin não é removido apenas por ter sido criado pela comunidade, conectar um site de terceiros, apontar
-          para um site que contenha material protegido por direitos autorais, sofrer indisponibilidade temporária ou
-          receber uma denúncia sem elementos verificáveis. As decisões consideram o comportamento do plugin, uma
-          solicitação confirmada ou evidências de violação das regras do catálogo.
-        </p>
+        <h2>Plugins pessoais e catálogos independentes</h2>
+        <p>O Nyxovira permite importar um plugin local ou conectar manualmente a URL de um catálogo externo. Esses plugins e catálogos permanecem independentes do KapiTomo. A presença deles no aplicativo não significa que sejam oficiais, analisados, hospedados, aprovados ou mantidos pelo KapiTomo.</p>
+        <p>A pessoa que mantém um catálogo independente é responsável por seus arquivos, descrições, disponibilidade, segurança e permissões. O usuário escolhe qual endereço externo conectar e deve conferir sua origem antes de instalar qualquer coisa.</p>
 
-        <h2>Quando um plugin pode ser recusado, restringido temporariamente ou removido</h2>
-        <p>O KapiTomo pode recusar a publicação, pedir correção, aplicar uma restrição preventiva documentada ou remover uma entrada após análise manual quando:</p>
-        <ul>
-          <li>O criador solicita a remoção ou deixa de controlar o repositório.</li>
-          <li>O repositório ou o <code>plugin.json</code> é excluído, fica indisponível ou deixa de conter o plugin publicado.</li>
-          <li>Malware, roubo de credenciais, redirecionamentos perigosos, uso indevido de dados ou outro comportamento malicioso é confirmado.</li>
-          <li>O plugin contorna controles de acesso ou proteções técnicas.</li>
-          <li>Um titular de direitos ou proprietário da fonte demonstra de forma verificável que o plugin ou a entrada viola seus direitos ou sua autorização.</li>
-          <li>O plugin utiliza metadados enganosos, imita outra parte ou mapeia uma fonte diferente da anunciada.</li>
-          <li>O criador se recusa repetidamente a corrigir uma violação relevante.</li>
-        </ul>
-        <p>
-          Erros recuperáveis de metadados normalmente devem ser corrigidos. Falhas técnicas temporárias normalmente
-          devem resultar no estado offline. Denúncias normalmente mantêm a entrada visível enquanto as evidências são
-          analisadas. A indisponibilidade temporária é excepcional e exige que um mantenedor verifique evidências
-          preliminares de risco imediato à segurança ou à integridade do catálogo e registre o motivo. Violações
-          confirmadas, solicitações autorizadas do proprietário e repositórios permanentemente ausentes podem resultar em remoção.
-        </p>
-        <p>
-          Criadores podem enviar correções e novas versões a qualquer momento. Se uma entrada estiver temporariamente
-          indisponível ou tiver sido removida após moderação, a nova solicitação de publicação será tratada como pedido
-          de correção e não restaurará a visibilidade automaticamente; um mantenedor analisará a mudança e restaurará a
-          entrada quando o problema identificado estiver resolvido. O criador que removeu voluntariamente o próprio
-          plugin pode publicá-lo novamente normalmente.
-        </p>
+        <h2>Responsabilidades do usuário</h2>
+        <p>O usuário é responsável pelas fontes, plugins, catálogos e arquivos que escolher. Deve cumprir a legislação aplicável, respeitar direitos autorais, privacidade e as regras de cada serviço acessado. O acesso técnico a um arquivo não concede, por si só, permissão para guardá-lo, redistribuí-lo ou vendê-lo.</p>
 
-        <h2>Responsabilidades do criador e do usuário</h2>
-        <p>
-          Criadores devem manter código, manifesto, permissões solicitadas, repositório e metadados do catálogo corretos,
-          atualizar a integração quando a fonte mudar e atualizar ou remover plugins que não possam mais manter. Eles
-          não são responsáveis por obras, traduções, anúncios, páginas ou indisponibilidades de terceiros que não controlam.
-        </p>
-        <p>
-          Usuários são responsáveis pelo modo como utilizam sites, plugins e arquivos baixados. O Nyxovira não deve
-          ser usado para violar direitos ou contornar restrições de acesso. A possibilidade técnica de acessar ou
-          baixar um arquivo não concede, por si só, permissão para mantê-lo ou redistribuí-lo.
-        </p>
+        <h2>Serviços externos</h2>
+        <p>O site e os aplicativos podem abrir GitHub, Google Play, sites de origem ou outros endereços escolhidos pelo usuário. Cada serviço controla sua própria disponibilidade, termos, contas e práticas de dados. O KapiTomo não pode garantir que um serviço externo ou plugin hospedado independentemente continuará funcionando.</p>
 
-        <h2>Denúncias, análise e correção</h2>
-        <p>
-          Qualquer pessoa pode usar a opção <a href="../plugins/?view=report">Denunciar</a> no Plugin Hub para solicitar
-          análise manual de um problema sério com um plugin. O formulário exige o ID do plugin, e-mail válido para
-          contato e motivo escrito em português ou inglês com pelo menos 200 caracteres e 20 palavras, além da
-          confirmação de que a pessoa leu as orientações e acredita que as informações fornecidas são verdadeiras.
-          Depois, ele envia a denúncia
-          privada pelo serviço de formulário identificado na Política de Privacidade e confirma quando o serviço aceita
-          o envio. O e-mail informado será usado somente para pedir
-          esclarecimentos ou comunicar o resultado dessa denúncia.
-        </p>
-        <p>
-          Este canal de denúncia não serve para legalidade ou qualidade das obras do site de origem, capítulos ausentes,
-          traduções, anúncios, indisponibilidade da fonte, regras de conta ou erros comuns de download e compatibilidade.
-          Assuntos de conteúdo e conta pertencem ao site de origem. Problemas técnicos do plugin pertencem ao repositório
-          do criador. Uma notificação formal de titular ou proprietário da fonte que exija verificação de identidade, e
-          qualquer prova confidencial, deve ser enviada para <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a>.
-        </p>
-        <ol>
-          <li>A denúncia é registrada, agrupada com denúncias sobre o mesmo plugin e verificada quanto a um problema específico e comprovável das regras do catálogo.</li>
-          <li>O mantenedor pode pedir mais evidências ou contatar o criador do plugin antes da decisão.</li>
-          <li>O resultado pode ser nenhuma ação, correção do estado técnico, pedido de ajustes, restrição preventiva documentada em caso urgente, restauração ou remoção após confirmação.</li>
-        </ol>
-        <p>
-          Denúncias sobre o mesmo plugin ou comportamento são agrupadas em uma única análise. A quantidade nunca é
-          considerada prova e nunca justifica, por si só, ocultar ou remover um plugin. Denúncias nunca causam ocultação
-          ou remoção automática. Denúncias sem elementos, duplicadas, abusivas ou não verificáveis não alteram a entrada.
-          Criadores podem usar o mesmo canal de denúncia ou o e-mail para apresentar
-          uma correção, responder com evidências ou pedir revisão de uma decisão de moderação.
-        </p>
+        <h2>Compras Pro</h2>
+        <p>Nyxovira Pro e Nyxalira Pro liberam recursos dos aplicativos e apoiam o desenvolvimento. Eles não vendem obras externas, capítulos, traduções, plugins nem acesso a sites externos.</p>
 
-        <h2>Compra Pro e disponibilidade externa</h2>
-        <p>
-          O Nyxovira Pro desbloqueia recursos do aplicativo e apoia seu desenvolvimento. Ele não representa pagamento
-          por obras, capítulos, páginas, traduções, fontes ou plugins da comunidade. Sites e repositórios externos podem
-          mudar ou desaparecer sem aviso, portanto sua disponibilidade contínua não pode ser garantida.
-        </p>
+        <h2>Disponibilidade e alterações</h2>
+        <p>O KapiTomo pode corrigir, atualizar, substituir ou encerrar suas páginas, APIs, catálogos, plugins e integrações. Estes termos podem ser atualizados quando os projetos mudarem. A data acima identifica a versão atual.</p>
 
-        <h2>Alterações</h2>
-        <p>
-          Estes termos podem ser atualizados conforme o aplicativo, o site, o catálogo ou o sistema de plugins evoluir.
-          A versão publicada mais recente aplica-se às novas atividades do catálogo após sua disponibilização.
-        </p>
+        <h2>Contato</h2>
+        <p>Para dúvidas sobre estes termos ou sobre conteúdo próprio do KapiTomo, escreva para <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a>.</p>
       </article>
     </main>
 
     <footer class="site-footer">
-      <p>KapiTomo is an official space for publishing and reading free original works.</p>
-      <p class="footer-policy-title">Policies</p>
+      <p>KapiTomo is Nanquimori's official space for original works and official plugins.</p>
       <nav class="footer-policy-links" aria-label="Policies">
-        <a href="https://nanquimori.github.io/KapiTomo/terms/">Terms</a>
-        <a href="https://nanquimori.github.io/KapiTomo/privacy/">KapiTomo Privacy</a>
-        <a href="https://nanquimori.github.io/KapiTomo/nyxovira/privacy/">Nyxovira Privacy</a>
-        <a href="https://nanquimori.github.io/KapiTomo/nyxalira/privacy/">Nyxalira Privacy</a>
+        <a href="../terms/">Terms</a>
+        <a href="../privacy/">KapiTomo Privacy</a>
+        <a href="../nyxovira/privacy/">Nyxovira Privacy</a>
+        <a href="../nyxalira/privacy/">Nyxalira Privacy</a>
       </nav>
     </footer>
-
     <script>
       (() => {
-        const storageKey = "kapitomo.pluginHubLanguage.v1";
-        const normalize = (value) => String(value || "").toLowerCase().startsWith("pt") ? "pt" : "en";
-        const queryLanguage = new URLSearchParams(window.location.search).get("lang");
-        let storedLanguage = "";
-        try { storedLanguage = localStorage.getItem(storageKey) || ""; } catch (error) {}
-        let language = normalize(queryLanguage || storedLanguage || navigator.language);
-        const documents = Array.from(document.querySelectorAll("[data-policy-language]"));
-        const buttons = Array.from(document.querySelectorAll("[data-policy-language-option]"));
-        const catalogRuleHashes = new Set(["#plugin-catalog-rules", "#regras-do-catalogo"]);
-        const applyLanguage = (nextLanguage) => {
-          language = normalize(nextLanguage);
+        const key = "kapitomo.policyLanguage.v2";
+        const normalize = value => String(value || "").toLowerCase().startsWith("pt") ? "pt" : "en";
+        const query = new URLSearchParams(location.search).get("lang");
+        let saved = "";
+        try { saved = localStorage.getItem(key) || ""; } catch {}
+        let language = normalize(query || saved || navigator.language);
+        const documents = [...document.querySelectorAll("[data-policy-language]")];
+        const buttons = [...document.querySelectorAll("[data-policy-language-option]")];
+        function apply(next) {
+          language = normalize(next);
           document.documentElement.lang = language === "pt" ? "pt-BR" : "en";
-          documents.forEach((documentBlock) => {
-            documentBlock.hidden = documentBlock.dataset.policyLanguage !== language;
-          });
-          buttons.forEach((button) => {
-            button.setAttribute("aria-pressed", String(button.dataset.policyLanguageOption === language));
-          });
-          try { localStorage.setItem(storageKey, language); } catch (error) {}
-          if (catalogRuleHashes.has(window.location.hash)) {
-            const heading = document.getElementById(language === "pt" ? "regras-do-catalogo" : "plugin-catalog-rules");
-            window.requestAnimationFrame(() => heading?.scrollIntoView({ block: "start" }));
-          }
-        };
-        buttons.forEach((button) => button.addEventListener("click", () => applyLanguage(button.dataset.policyLanguageOption)));
-        applyLanguage(language);
+          documents.forEach(node => { node.hidden = node.dataset.policyLanguage !== language; });
+          buttons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.policyLanguageOption === language)));
+          try { localStorage.setItem(key, language); } catch {}
+        }
+        buttons.forEach(button => button.addEventListener("click", () => apply(button.dataset.policyLanguageOption)));
+        apply(language);
       })();
     </script>
   </body>

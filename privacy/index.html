@@ -3,23 +3,22 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="KapiTomo website Privacy Policy.">
+    <meta name="description" content="How the KapiTomo website handles data.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://nanquimori.github.io/KapiTomo/privacy/">
-    <script>
-      if (window.location.pathname.endsWith("/index.html")) {
-        window.history.replaceState(null, "", window.location.pathname.slice(0, -"index.html".length) + window.location.search + window.location.hash);
-      }
-    </script>
     <meta property="og:site_name" content="KapiTomo">
     <meta property="og:title" content="KapiTomo Privacy Policy">
-    <meta property="og:description" content="How the KapiTomo website handles data while publishing free original works.">
+    <meta property="og:description" content="How the KapiTomo website handles data while serving original works, APIs, and official plugins.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://nanquimori.github.io/KapiTomo/privacy/">
     <title>KapiTomo Privacy Policy</title>
-    <link rel="icon" type="image/png" href="../assets/kapitomo-logo.png?v=20260710-policy-icons">
-    <link rel="apple-touch-icon" href="../assets/kapitomo-logo.png?v=20260710-policy-icons">
-    <link rel="stylesheet" href="../styles.css?v=20260826-catalog-rules">
+    <link rel="icon" type="image/png" href="../assets/kapitomo-logo.png">
+    <link rel="stylesheet" href="../styles.css?v=20260910-official-only">
+    <style>
+      .policy-language { display:flex; justify-content:flex-end; gap:8px; max-width:900px; margin:18px auto 0; padding:0 18px; }
+      .policy-language button { border:1px solid rgba(255,255,255,.18); border-radius:999px; padding:7px 12px; color:inherit; background:transparent; cursor:pointer; }
+      .policy-language button[aria-pressed="true"] { color:#111; border-color:#ff6534; background:#ff6534; }
+    </style>
   </head>
   <body>
     <header class="site-header">
@@ -28,125 +27,96 @@
         <span>KapiTomo</span>
       </a>
     </header>
+    <div class="policy-language" aria-label="Language">
+      <button type="button" data-policy-language-option="en" aria-pressed="true">EN</button>
+      <button type="button" data-policy-language-option="pt" aria-pressed="false">PT</button>
+    </div>
 
     <main class="legal-page">
-      <article class="legal-document">
+      <article class="legal-document" data-policy-language="en" lang="en">
         <p class="eyebrow">KapiTomo</p>
         <h1>Privacy Policy</h1>
-        <p class="legal-updated">Last updated: September 1, 2026</p>
+        <p class="legal-updated">Last updated: September 10, 2026</p>
 
-        <p>
-          KapiTomo is an author-run website created to publish free reading works, including novels,
-          comics, and chapters organized for online reading. This policy explains how the site handles
-          data during browsing.
-        </p>
+        <h2>What KapiTomo is</h2>
+        <p>KapiTomo is a static website operated by Nanquimori to publish original works, public JSON APIs, and official Nyxovira plugins.</p>
 
-        <h2>Data collected directly</h2>
-        <p>
-          KapiTomo does not require registration, login, or personal data submission to read works published
-          on the site. A user who voluntarily submits a Plugin Hub report provides a contact email and the report
-          text as described below. The site does not sell user personal data.
-        </p>
+        <h2>Data submitted to KapiTomo</h2>
+        <p>The website does not provide accounts, login, or web forms that collect personal data. KapiTomo does not sell personal data.</p>
 
-        <h2>Hosting technical data</h2>
-        <p>
-          The site is hosted on GitHub Pages. When users access pages, images, chapters, JSON files, or plugins,
-          hosting services may process normal technical access data such as IP address, browser type, date, time,
-          accessed URL, and diagnostic information needed to deliver the content.
-        </p>
+        <h2>Local browser preferences</h2>
+        <p>The site may save the selected language and favorite official plugins in the browser's local storage. This information stays in that browser and is not sent to KapiTomo. It can be removed by clearing site data in the browser.</p>
 
-        <h2>How the site uses data</h2>
-        <p>KapiTomo uses technical data only to:</p>
-        <ul>
-          <li>Deliver pages, covers, chapters, and catalog files.</li>
-          <li>Allow online reading of free original works.</li>
-          <li>Provide catalogs and plugins used by Nyxovira and Nyxalira.</li>
-          <li>Publish and maintain the Plugin Hub catalog.</li>
-          <li>Keep the site accessible and fix technical problems.</li>
-        </ul>
-
-        <h2>Plugin Hub publication requests</h2>
-        <p>
-          The Plugin Hub lets developers submit public GitHub repositories for automatic technical validation and
-          catalog publication. Publication, removal, and moderation requests are opened on GitHub and may include the
-          plugin id, name, author, repository URL, icon URL, source site URL, version, tags, policy acceptance, and
-          other manifest or moderation metadata. These requests are handled through GitHub's own systems and may be
-          visible according to GitHub's settings.
-        </p>
-
-        <h2>Private Plugin Hub reports</h2>
-        <p>
-          The report form asks for a plugin ID, contact email, report reason, and confirmation that the reporter read
-          the guidance and believes the provided information is true. The form also uses Cloudflare Turnstile to
-          distinguish legitimate submissions from automated abuse. When the reporter selects Send, a KapiTomo
-          Cloudflare Worker validates the form and the single-use Turnstile token and applies a short-term request
-          limit using normal connection information such as the IP address. Cloudflare's
-          <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">privacy policy</a>
-          applies to that processing. An accepted report is stored privately in a Cloudflare D1 database available
-          only to the KapiTomo account. The report and Turnstile token are not published as a GitHub issue, and the
-          Turnstile token is not stored with the report. Report records expire after 90 days and are removed by a
-          scheduled cleanup process.
-          Each submission includes a plugin grouping key and a one-way fingerprint derived from the plugin ID and
-          normalized report reason so duplicate reports can be recognized. After an accepted submission, the browser
-          stores only that fingerprint, the plugin ID, and the submission time for up to 30 days to prevent an identical
-          report from being resent from that browser; the report text and contact email are not stored there.
-          KapiTomo uses the contact email and report text to verify the report, request clarification, communicate the
-          result, prevent abuse, and keep a necessary review record. Reporters may request correction or deletion of
-          their contact data by using the contact address below, subject to records that must be retained for security,
-          legal, or abuse-prevention purposes.
-        </p>
-
-        <h2>Third-party plugins and content responsibility</h2>
-        <p>
-          Plugins published by community developers may connect to external sites that KapiTomo does not own or
-          control. The plugin remains in its creator's public repository, while KapiTomo publishes its catalog entry.
-          Reports do not change a listing automatically. KapiTomo may mark entries offline after technical checks,
-          correct them, apply a documented preventive restriction after preliminary evidence of urgent risk is verified,
-          restore corrected entries, or remove them when an authorized request or catalog-rule violation is confirmed.
-        </p>
-
-        <h2>Plugin health checks</h2>
-        <p>
-          KapiTomo may run automated checks against public plugin repositories, icon URLs, and source home pages to
-          show whether a plugin is online or offline, and to remove entries whose public repository or plugin
-          manifest disappears.
-        </p>
-
-        <h2>Original free content</h2>
-        <p>
-          Works published on KapiTomo are available for free reading. Nyxovira can prepare and organize compatible
-          files, while Nyxalira provides the local reading experience.
-        </p>
+        <h2>Hosting data</h2>
+        <p>KapiTomo is hosted on GitHub Pages. GitHub may process normal technical access data, such as IP address, browser information, requested URL, date, time, and diagnostic records needed to deliver and protect the service. GitHub controls that processing under its own privacy terms.</p>
 
         <h2>External links</h2>
-        <p>
-          The site may contain links to external services such as YouTube, GitHub Pages, plugin files, or other
-          project-related addresses. These services may have their own privacy policies and data practices.
-        </p>
+        <p>Pages may link to GitHub, Google Play, YouTube, or another external address. When a user opens an external service, that service may process data according to its own policy. KapiTomo does not control independently hosted catalogs or plugins connected manually in Nyxovira.</p>
 
         <h2>Cookies and analytics</h2>
-        <p>
-          KapiTomo does not use its own login system, ads, or custom analytics. If a hosting service or external
-          platform processes technical data, that processing follows that service's policies.
-        </p>
+        <p>KapiTomo does not operate its own account cookie, advertising system, or custom analytics service. Hosting providers and external services may use their own necessary technologies.</p>
 
         <h2>Contact</h2>
-        <p>
-          For questions about this Privacy Policy, contact
-          <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a>.
-        </p>
+        <p>For privacy questions, contact <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a>.</p>
+      </article>
+
+      <article class="legal-document" data-policy-language="pt" lang="pt-BR" hidden>
+        <p class="eyebrow">KapiTomo</p>
+        <h1>Política de Privacidade</h1>
+        <p class="legal-updated">Última atualização: 10 de setembro de 2026</p>
+
+        <h2>O que é o KapiTomo</h2>
+        <p>KapiTomo é um site estático mantido por Nanquimori para publicar obras originais, APIs JSON públicas e plugins oficiais do Nyxovira.</p>
+
+        <h2>Dados enviados ao KapiTomo</h2>
+        <p>O site não oferece contas, login nem formulários que coletem dados pessoais. O KapiTomo não vende dados pessoais.</p>
+
+        <h2>Preferências locais do navegador</h2>
+        <p>O site pode salvar no armazenamento local do navegador o idioma escolhido e os plugins oficiais marcados como favoritos. Essas informações permanecem no navegador e não são enviadas ao KapiTomo. Elas podem ser apagadas ao limpar os dados do site no navegador.</p>
+
+        <h2>Dados da hospedagem</h2>
+        <p>O KapiTomo é hospedado no GitHub Pages. O GitHub pode processar dados técnicos normais de acesso, como endereço IP, informações do navegador, URL solicitada, data, horário e registros de diagnóstico necessários para entregar e proteger o serviço. O GitHub controla esse tratamento conforme seus próprios termos de privacidade.</p>
+
+        <h2>Links externos</h2>
+        <p>As páginas podem apontar para GitHub, Google Play, YouTube ou outro endereço externo. Quando o usuário abre um serviço externo, esse serviço pode tratar dados conforme sua própria política. O KapiTomo não controla catálogos ou plugins hospedados independentemente e conectados manualmente no Nyxovira.</p>
+
+        <h2>Cookies e análise</h2>
+        <p>O KapiTomo não mantém cookie próprio de conta, sistema de anúncios nem serviço personalizado de análise. Provedores de hospedagem e serviços externos podem usar suas próprias tecnologias necessárias.</p>
+
+        <h2>Contato</h2>
+        <p>Para dúvidas sobre privacidade, escreva para <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a>.</p>
       </article>
     </main>
 
     <footer class="site-footer">
-      <p>KapiTomo is an official space for publishing and reading free original works.</p>
-      <p class="footer-policy-title">Policies</p>
+      <p>KapiTomo is Nanquimori's official space for original works and official plugins.</p>
       <nav class="footer-policy-links" aria-label="Policies">
-        <a href="https://nanquimori.github.io/KapiTomo/terms/">Terms</a>
-        <a href="https://nanquimori.github.io/KapiTomo/privacy/">KapiTomo Privacy</a>
-        <a href="https://nanquimori.github.io/KapiTomo/nyxovira/privacy/">Nyxovira Privacy</a>
-        <a href="https://nanquimori.github.io/KapiTomo/nyxalira/privacy/">Nyxalira Privacy</a>
+        <a href="../terms/">Terms</a>
+        <a href="../privacy/">KapiTomo Privacy</a>
+        <a href="../nyxovira/privacy/">Nyxovira Privacy</a>
+        <a href="../nyxalira/privacy/">Nyxalira Privacy</a>
       </nav>
     </footer>
+    <script>
+      (() => {
+        const key = "kapitomo.policyLanguage.v2";
+        const normalize = value => String(value || "").toLowerCase().startsWith("pt") ? "pt" : "en";
+        const query = new URLSearchParams(location.search).get("lang");
+        let saved = "";
+        try { saved = localStorage.getItem(key) || ""; } catch {}
+        let language = normalize(query || saved || navigator.language);
+        const documents = [...document.querySelectorAll("[data-policy-language]")];
+        const buttons = [...document.querySelectorAll("[data-policy-language-option]")];
+        function apply(next) {
+          language = normalize(next);
+          document.documentElement.lang = language === "pt" ? "pt-BR" : "en";
+          documents.forEach(node => { node.hidden = node.dataset.policyLanguage !== language; });
+          buttons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.policyLanguageOption === language)));
+          try { localStorage.setItem(key, language); } catch {}
+        }
+        buttons.forEach(button => button.addEventListener("click", () => apply(button.dataset.policyLanguageOption)));
+        apply(language);
+      })();
+    </script>
   </body>
 </html>

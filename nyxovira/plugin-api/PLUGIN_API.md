@@ -2,7 +2,7 @@
 
 Portuguese version: [PLUGIN_API.pt-BR.md](PLUGIN_API.pt-BR.md)
 
-This document explains how to create and publish a Nyxovira plugin.
+This document explains how to create, test, and distribute a Nyxovira plugin.
 
 A plugin connects Nyxovira to one reading site. It opens the site, recognizes the work page, shows the chapter list as soon as the user taps download, and prepares only the chapters selected by the user.
 
@@ -11,7 +11,7 @@ A plugin connects Nyxovira to one reading site. It opens the site, recognizes th
 The [interactive AI prompt generator](https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/#prompt-builder) is displayed at the top of the online documentation. Enter the source-site URL, choose a mode, use **Copy prompt**, and paste the result into the conversation with the AI that will create the plugin:
 
 - **Personal use:** requests only the minimum needed for a local import. It uses the site's public favicon or logo when available, without requiring a separately hosted icon.
-- **Publish in the Plugin Hub:** tells the AI to create and push a public GitHub repository, use the site icon, add accepted catalog tags, validate the plugin, and submit it through the Hub.
+- **External catalog:** tells the AI to create the plugin, an independent catalog, and an HTTPS page with an installation button for Nyxovira.
 
 The generated request also tells the AI to map routes, selectors, chapter order, text or image content, dynamic loading, and limitations. It must check official documentation and public APIs first, then inspect page scripts and browser network requests for APIs or endpoints that are used by the site but are not visibly documented.
 
@@ -20,8 +20,7 @@ The generated request also tells the AI to map routes, selectors, chapter order,
 1. [Create the plugin](#plugin-files): prepare `plugin.json`, map the site, and build chapter downloads.
 2. [Test through **Import plugins**](#test-in-nyxovira): import the local folder into Nyxovira and repeat the test while developing.
 3. **Keep it for yourself** if you want. No publication, catalog, or website is required.
-4. [Share it with the community](#publish-in-the-official-plugin-hub) if you want other users to find it in the official catalog.
-5. [Create an external store](#external-plugin-store) only as an advanced option for distributing ready plugins from you and other creators.
+4. [Create an external store](#external-plugin-store) if you want to distribute your plugins through an independent catalog that each user connects manually.
 
 ## How a Plugin Works
 
@@ -81,8 +80,8 @@ Fields and scope:
 | `browser.home_url` | Required. Page opened by the app browser. |
 | `browser.download_target_script_file` | Optional, but recommended for reliable site-specific work and chapter detection. |
 | `name`, `version` | Optional for personal import; useful when sharing and updating the plugin. |
-| `tags` | Not needed for personal use. Required only by the official Plugin Hub publication process. |
-| `browser.icon_url` | Optional for personal use: prefer the site's public favicon or logo when available. Required for official catalog publication. |
+| `tags` | Not needed for personal use. Optional in an external catalog, where they only support search or filters in the page you create. |
+| `browser.icon_url` | Optional for personal use: prefer the site's public favicon or logo when available. Recommended when distributing the plugin. |
 | `parser` | Optional advanced native-parser configuration. It is not needed when the browser script provides the chapter plan and content. |
 
 ## Site Mapping
@@ -249,73 +248,11 @@ Manual import is the normal development loop and also supports plugins intended 
 
 **If the plugin is only for you, you are done.** You do not need tags, `schema_version`, GitHub, a public catalog, or a plugin website. Use the site's favicon or logo when available; you do not need to host a separate icon.
 
-If you want to share it, choose one of these later steps:
-
-- [Publish in the official Plugin Hub](#publish-in-the-official-plugin-hub): the community finds the plugin under **Online plugins**.
-- [Maintain an external store](#external-plugin-store): the advanced and more involved option for distributing a catalog of your plugins and plugins from other creators.
-
-## Publish in the Official Plugin Hub
-
-Use this option only when you want the plugin to appear in the official catalog. The public GitHub repository is the installation source; do not manually write a `catalog.json` entry.
-
-The requirements below apply only to publication in the official catalog. Before submitting, `plugin.json` must have a public HTTPS icon and a `tags` list containing one language first, followed by one to three content types.
-
-Keep `plugin_path` limited to the files Nyxovira must install. Before publication, the Hub inventories and verifies every file in that folder, examines browser scripts line by line, checks explicit network destinations, and runs ClamAV over the complete snapshot. Executables, archives, symbolic links, disguised binaries, oversized packages, suspicious or obfuscated code, malware detections, and incomplete scans are blocked.
-
-The accepted catalog entry is pinned to the exact reviewed commit. Any later code update needs a new publication request. Automated checks reduce risk but cannot guarantee that software is harmless; rejected requests remain open for correction or manual review.
-
-Accepted tags:
-
-Language tags:
-
-- `english`
-- `portuguese`
-- `spanish`
-- `japanese`
-- `korean`
-- `chinese`
-- `indonesian`
-- `thai`
-- `vietnamese`
-- `french`
-- `german`
-- `italian`
-- `russian`
-- `arabic`
-
-Content type tags:
-
-- `manga`
-- `manhua`
-- `manhwa`
-- `novel`
-- `webtoon`
-- `comic`
-- `other`
-
-How to publish:
-
-1. Create a public GitHub repository for the plugin.
-2. Initialize Git in the plugin folder, commit every plugin file, connect the public repository as `origin`, and push the main branch.
-3. Paste the public GitHub repository URL in the Plugin Hub.
-4. Confirm the generated GitHub request and accept the current rules.
-5. Automation reviews every file and code line, runs antivirus checks, validates metadata and ownership, and pins the exact approved commit.
-6. A technically valid request is published in the catalog.
-
-```bash
-git init
-git add .
-git commit -m "Add Nyxovira plugin"
-git branch -M main
-git remote add origin https://github.com/USERNAME/PLUGIN.git
-git push -u origin main
-```
-
-Only one visible plugin may cover a host. Responsibility, review, correction, and removal rules are in the [Terms and Plugin Catalog Rules](https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules).
+If you want to share it, [maintain an external store](#external-plugin-store). KapiTomo does not accept third-party plugins: the page, catalog, and files remain under the control of whoever published them.
 
 ## External Plugin Store
 
-Use this option only after the plugins are ready and tested. It is intended for anyone maintaining an independent distribution that may contain their own plugins and plugins from other creators.
+Use this option only after the plugins are ready and tested. It is intended for an independent distribution of plugins you created or have permission to distribute.
 
 A minimal external store can use this structure:
 
@@ -370,7 +307,7 @@ Without a declaration, Nyxovira looks for `catalog.json`, `catalog-store.json`, 
 }
 ```
 
-`hub_url` tells Nyxovira which page to open when the user connects the JSON URL directly. `store_url` and `homepage` are also accepted. Relative URLs such as `manifest_url` are resolved against the catalog URL. An entry may alternatively use `repository_url`, `repository_ref`, and `plugin_path` in the same format as the Plugin Hub.
+`hub_url` tells Nyxovira which page to open when the user connects the JSON URL directly. `store_url` and `homepage` are also accepted. Relative URLs such as `manifest_url` are resolved against the catalog URL. A GitHub-hosted entry may instead use `repository_url`, `repository_ref`, and `plugin_path`.
 
 ### Installation from the external page
 
@@ -431,13 +368,6 @@ For a plugin imported for personal use:
 1. `plugin.json` is valid JSON, its folder name (or `id`) is not empty, it has at least one `match.hosts` value, and `browser.home_url` is valid.
 2. If generic recognition is insufficient, `browser/download_target.js` recognizes the work and creates the chapter list.
 3. Novels use `paragraphs`; comics use `pages`.
-
-For the official Plugin Hub:
-
-1. The plugin is in a public GitHub repository owned by the requester.
-2. The icon is public and `plugin.json.tags` uses only accepted values.
-3. No visible plugin already covers the same host.
-4. The request is sent through the Plugin Hub and accepts the current rules.
 
 For an external store:
 

@@ -3,23 +3,22 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Nyxalira app Privacy Policy.">
+    <meta name="description" content="How Nyxalira handles local library files, reading progress, preferences, and purchases.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://nanquimori.github.io/KapiTomo/nyxalira/privacy/">
-    <script>
-      if (window.location.pathname.endsWith("/index.html")) {
-        window.history.replaceState(null, "", window.location.pathname.slice(0, -"index.html".length) + window.location.search + window.location.hash);
-      }
-    </script>
     <meta property="og:site_name" content="KapiTomo">
     <meta property="og:title" content="Nyxalira Privacy Policy">
-    <meta property="og:description" content="How Nyxalira handles the local library, progress, favorites, reading, and Pro purchases.">
+    <meta property="og:description" content="How Nyxalira handles local library files, reading progress, preferences, and purchases.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://nanquimori.github.io/KapiTomo/nyxalira/privacy/">
     <title>Nyxalira Privacy Policy</title>
-    <link rel="icon" type="image/png" href="../../assets/kapitomo-logo.png?v=20260710-policy-icons">
-    <link rel="apple-touch-icon" href="../../assets/kapitomo-logo.png?v=20260710-policy-icons">
-    <link rel="stylesheet" href="../../styles.css?v=20260705-terms">
+    <link rel="icon" type="image/png" href="../../assets/kapitomo-logo.png">
+    <link rel="stylesheet" href="../../styles.css?v=20260910-official-only">
+    <style>
+      .policy-language { display:flex; justify-content:flex-end; gap:8px; max-width:900px; margin:18px auto 0; padding:0 18px; }
+      .policy-language button { border:1px solid rgba(255,255,255,.18); border-radius:999px; padding:7px 12px; color:inherit; background:transparent; cursor:pointer; }
+      .policy-language button[aria-pressed="true"] { color:#111; border-color:#ff6534; background:#ff6534; }
+    </style>
   </head>
   <body>
     <header class="site-header">
@@ -28,98 +27,118 @@
         <span>KapiTomo</span>
       </a>
     </header>
+    <div class="policy-language" aria-label="Language">
+      <button type="button" data-policy-language-option="en" aria-pressed="true">EN</button>
+      <button type="button" data-policy-language-option="pt" aria-pressed="false">PT</button>
+    </div>
 
     <main class="legal-page">
-      <article class="legal-document">
+      <article class="legal-document" data-policy-language="en" lang="en">
         <p class="eyebrow">Nyxalira</p>
         <h1>Privacy Policy</h1>
-        <p class="legal-updated">Last updated: July 5, 2026</p>
+        <p class="legal-updated">Last updated: September 10, 2026</p>
 
-        <p>
-          This Privacy Policy explains how the Nyxalira app handles user and device data. Nyxalira is a reading and
-          local library organization app, built for reading works in folders chosen by the user and for supporting
-          KapiTomo's ecosystem of free original works.
-        </p>
+        <h2>What Nyxalira does</h2>
+        <p>Nyxalira is a reader and local-library organizer for compatible works stored in folders selected by the user. It also offers an optional Pro purchase through Google Play.</p>
 
-        <h2>Data the app may use</h2>
-        <p>Nyxalira may use the following data to work:</p>
+        <h2>Data used by the app</h2>
         <ul>
-          <li>Reading folders and files chosen by the user on the device.</li>
-          <li>Covers, chapters, pages, and metadata detected inside the local library.</li>
-          <li>Local app preferences such as language, theme, reading mode, and visual settings.</li>
-          <li>Reading progress, favorite chapters, local resume history, and filters used in the reader.</li>
-          <li>Purchase state reported by Google Play Billing to unlock or restore Pro.</li>
-        </ul>
-
-        <h2>How data is used</h2>
-        <p>This data is used to:</p>
-        <ul>
-          <li>Build the reading shelf from folders chosen by the user.</li>
-          <li>Open chapters, images, and text in the app reader.</li>
-          <li>Save progress, favorites, and reading preferences on the device.</li>
-          <li>Activate Pro features such as favorites, automatic scrolling, themes, and FX/filters.</li>
-          <li>Process and restore Pro unlocks through Google Play Billing.</li>
+          <li>Reading folders and files selected by the user.</li>
+          <li>Covers, chapters, pages, text, and metadata found in the local library.</li>
+          <li>Reading progress, favorites, resume history, filters, language, theme, reading mode, and visual preferences.</li>
+          <li>Purchase state supplied by Google Play to unlock or restore Pro.</li>
         </ul>
 
         <h2>Local storage</h2>
-        <p>
-          Nyxalira stores the library, progress, favorites, and preferences mainly on the device. The app does not
-          send the user's local library to a developer-owned server.
-        </p>
+        <p>Library information, progress, favorites, history, and preferences are stored mainly on the device. They remain until the user deletes the files, clears app data, resets the relevant setting, or uninstalls Nyxalira.</p>
 
-        <h2>In-app purchases</h2>
-        <p>
-          The Pro purchase is processed by Google Play. Nyxalira does not receive full payment data such as card
-          numbers. The app receives only the information needed to confirm, unlock, and restore Pro, such as product
-          identifier, purchase state, and purchase token provided by Google Play.
-        </p>
-        <p>
-          Nyxalira Pro unlocks app features and supports app development. It is not payment for third-party books,
-          manga, comics, novels, chapters, translations, pages, or external sites.
-        </p>
+        <h2>User-selected files</h2>
+        <p>Nyxalira reads only files and folders made available to the app through Android storage access or an action selected by the user. Removing a folder permission or deleting a file can make that work unavailable in the reader.</p>
 
-        <h2>Permissions and file access</h2>
-        <p>
-          Nyxalira may ask the user to choose a folder through the Android picker. This access is used to read works
-          from the local library and keep the shelf working after the app is reopened.
-        </p>
+        <h2>Google Play and Pro</h2>
+        <p>Google Play processes the payment. Nyxalira does not receive complete card details. It receives only information needed to confirm and restore the purchase, such as product id, purchase state, and purchase token. Pro unlocks reader features and supports development; it is not payment for books, chapters, or external content.</p>
 
-        <h2>External links and KapiTomo</h2>
-        <p>
-          The app may open external links, including the KapiTomo site where free original works are published. Those
-          external sites may have their own privacy policies and data practices. Nyxalira does not control those
-          external practices.
-        </p>
+        <h2>Network and external links</h2>
+        <p>Nyxalira may access Google Play to process purchases and may open external links selected by the user, including KapiTomo. External services process data under their own policies. Nyxalira does not upload the user's local library to KapiTomo.</p>
 
         <h2>Data sharing</h2>
-        <p>
-          Nyxalira does not sell user personal data. Data may be shared only when required for an action chosen by
-          the user, such as opening an external link or processing a purchase through Google Play.
-        </p>
+        <p>Nyxalira does not sell personal data. Data reaches another service only when required for an action selected by the user, such as completing a Google Play purchase or opening an external link.</p>
 
         <h2>Children</h2>
-        <p>
-          Nyxalira is not directed to children. If you believe a child provided personal data through the app or
-          through external contact, get in touch so the situation can be reviewed.
-        </p>
+        <p>Nyxalira is not directed to children. If you believe personal data was provided through an external contact by a child, contact Nanquimori so the situation can be reviewed.</p>
 
         <h2>Contact</h2>
-        <p>
-          For questions about this Privacy Policy, contact
-          <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a>.
-        </p>
+        <p>For privacy questions, contact <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a>.</p>
+      </article>
+
+      <article class="legal-document" data-policy-language="pt" lang="pt-BR" hidden>
+        <p class="eyebrow">Nyxalira</p>
+        <h1>Política de Privacidade</h1>
+        <p class="legal-updated">Última atualização: 10 de setembro de 2026</p>
+
+        <h2>O que o Nyxalira faz</h2>
+        <p>O Nyxalira é um leitor e organizador de biblioteca local para obras compatíveis guardadas em pastas escolhidas pelo usuário. Ele também oferece uma compra Pro opcional pelo Google Play.</p>
+
+        <h2>Dados usados pelo aplicativo</h2>
+        <ul>
+          <li>Pastas e arquivos de leitura escolhidos pelo usuário.</li>
+          <li>Capas, capítulos, páginas, textos e metadados encontrados na biblioteca local.</li>
+          <li>Progresso de leitura, favoritos, histórico de retomada, filtros, idioma, tema, modo de leitura e preferências visuais.</li>
+          <li>Estado da compra fornecido pelo Google Play para liberar ou restaurar o Pro.</li>
+        </ul>
+
+        <h2>Armazenamento local</h2>
+        <p>Informações da biblioteca, progresso, favoritos, histórico e preferências ficam principalmente no dispositivo. Elas permanecem até o usuário apagar os arquivos, limpar os dados do aplicativo, redefinir a configuração correspondente ou desinstalar o Nyxalira.</p>
+
+        <h2>Arquivos escolhidos pelo usuário</h2>
+        <p>O Nyxalira lê somente arquivos e pastas disponibilizados ao aplicativo pelo acesso de armazenamento do Android ou por uma ação escolhida pelo usuário. Remover a permissão de uma pasta ou apagar um arquivo pode tornar a obra indisponível no leitor.</p>
+
+        <h2>Google Play e Pro</h2>
+        <p>O Google Play processa o pagamento. O Nyxalira não recebe os dados completos do cartão. Ele recebe apenas informações necessárias para confirmar e restaurar a compra, como identificador do produto, estado da compra e token. O Pro libera recursos do leitor e apoia o desenvolvimento; não é pagamento por livros, capítulos ou conteúdo externo.</p>
+
+        <h2>Internet e links externos</h2>
+        <p>O Nyxalira pode acessar o Google Play para processar compras e abrir links externos escolhidos pelo usuário, incluindo o KapiTomo. Serviços externos tratam dados conforme suas próprias políticas. O Nyxalira não envia a biblioteca local do usuário ao KapiTomo.</p>
+
+        <h2>Compartilhamento de dados</h2>
+        <p>O Nyxalira não vende dados pessoais. Dados chegam a outro serviço somente quando isso é necessário para uma ação escolhida pelo usuário, como concluir uma compra no Google Play ou abrir um link externo.</p>
+
+        <h2>Crianças</h2>
+        <p>O Nyxalira não é direcionado a crianças. Se você acreditar que uma criança forneceu dados pessoais por um contato externo, fale com Nanquimori para que a situação seja analisada.</p>
+
+        <h2>Contato</h2>
+        <p>Para dúvidas sobre privacidade, escreva para <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a>.</p>
       </article>
     </main>
 
     <footer class="site-footer">
-      <p>KapiTomo is an official space for publishing and reading free original works.</p>
-      <p class="footer-policy-title">Policies</p>
+      <p>KapiTomo is Nanquimori's official space for original works and official plugins.</p>
       <nav class="footer-policy-links" aria-label="Policies">
-        <a href="https://nanquimori.github.io/KapiTomo/terms/">Terms</a>
-        <a href="https://nanquimori.github.io/KapiTomo/privacy/">KapiTomo Privacy</a>
-        <a href="https://nanquimori.github.io/KapiTomo/nyxovira/privacy/">Nyxovira Privacy</a>
-        <a href="https://nanquimori.github.io/KapiTomo/nyxalira/privacy/">Nyxalira Privacy</a>
+        <a href="../../terms/">Terms</a>
+        <a href="../../privacy/">KapiTomo Privacy</a>
+        <a href="../../nyxovira/privacy/">Nyxovira Privacy</a>
+        <a href="./">Nyxalira Privacy</a>
       </nav>
     </footer>
+    <script>
+      (() => {
+        const key = "kapitomo.policyLanguage.v2";
+        const normalize = value => String(value || "").toLowerCase().startsWith("pt") ? "pt" : "en";
+        const query = new URLSearchParams(location.search).get("lang");
+        let saved = "";
+        try { saved = localStorage.getItem(key) || ""; } catch {}
+        let language = normalize(query || saved || navigator.language);
+        const documents = [...document.querySelectorAll("[data-policy-language]")];
+        const buttons = [...document.querySelectorAll("[data-policy-language-option]")];
+        function apply(next) {
+          language = normalize(next);
+          document.documentElement.lang = language === "pt" ? "pt-BR" : "en";
+          documents.forEach(node => { node.hidden = node.dataset.policyLanguage !== language; });
+          buttons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.policyLanguageOption === language)));
+          try { localStorage.setItem(key, language); } catch {}
+        }
+        buttons.forEach(button => button.addEventListener("click", () => apply(button.dataset.policyLanguageOption)));
+        apply(language);
+      })();
+    </script>
   </body>
 </html>

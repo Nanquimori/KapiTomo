@@ -1,0 +1,6 @@
+* @Nanquimori
+
+# Security-sensitive public paths.
+/.github/ @Nanquimori
+/plugins/ @Nanquimori
+/SECURITY.md @Nanquimori

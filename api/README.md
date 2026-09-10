@@ -4,35 +4,15 @@ The public API lives in `api/works/` and uses JSON for works and chapters.
 
 ## Endpoints
 
-Main work index:
-
 ```text
 api/works/index.json
-```
-
-Work details:
-
-```text
 api/works/{work}/index.json
-```
-
-Chapter details:
-
-```text
 api/works/{work}/chapters/{chapter}.json
 ```
 
-Legacy catalog:
-
-```text
-api/catalog.json
-```
-
-Use `api/works/index.json` for new integrations.
+`api/catalog.json` is a legacy work catalog. New integrations should use `api/works/index.json`.
 
 ## Work Object
-
-Work indexes expose the reading metadata used by the site and apps:
 
 ```json
 {
@@ -52,7 +32,7 @@ Work indexes expose the reading metadata used by the site and apps:
 
 ## Chapter Objects
 
-Novel chapter example:
+Novel:
 
 ```json
 {
@@ -64,24 +44,20 @@ Novel chapter example:
 }
 ```
 
-Comic chapter example:
+Comic:
 
 ```json
 {
   "id": "chapter-001",
   "title": "Chapter 001",
   "contentType": "images",
-  "pages": [
-    "https://example.com/page-001.png"
-  ]
+  "pages": ["https://example.com/page-001.png"]
 }
 ```
 
-Novel chapters should use `paragraphs`. The `text` field is a generated convenience field made from those paragraphs.
+Novel chapters should use `paragraphs`. Image chapters should use `pages`.
 
-Image chapters should use `pages`; each page can include an image URL and page metadata.
-
-## Plugin Catalog
+## Official Plugin Catalog
 
 The plugin catalog is separate from the work API:
 
@@ -90,6 +66,4 @@ plugins/catalog-store.json
 plugins/catalog.json
 ```
 
-The Plugin Hub validates public GitHub repositories, repository ownership, policy acceptance, official tags, source hosts, and health status before a plugin appears in the storefront. Automatic publication confirms technical eligibility, not endorsement of a source or third-party content.
-
-KapiTomo does not host or sell third-party works through the plugin catalog. Community plugins remain in their creators' public repositories. Maintainers may mark a plugin offline, hide it during a credible review, restore it, or remove it after a confirmed violation, authorized owner request, or repeated repository absence. Nyxovira Pro unlocks app features; it is not payment for third-party content.
+It contains only official plugins maintained and published by Nanquimori. Independent catalogs are hosted elsewhere and connected manually by Nyxovira users.
