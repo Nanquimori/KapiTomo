@@ -123,6 +123,8 @@ Declare `encrypted_response_format` and key material only when legitimately obse
 
 The limited laboratory has no library, settings, catalogs, favorites, or permanent downloads. The ZIP and content exist only for the request and are released before the response. Require `temporaryDataReleased: true` and `stored: false`. Without network access, report **“not validated against the real site.”**
 
+If the source returns `401`, `403`, or `429` before `download_target.js` runs, the report returns `AMBIENTE_WEB_BLOQUEADO`, `conclusive: false`, and `pluginInvalid: false`. A hosted-browser access block is not a plugin failure; sources that accept only the app WebView require validation in Nyxovira.
+
 ## Release checklist
 
 - Manifest passes `plugin.schema.json`.

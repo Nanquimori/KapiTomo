@@ -9,6 +9,17 @@ const MAX_ENTRIES = 40;
 const MAX_PAGES = 24;
 const MAX_DOWNLOAD_BYTES = 24 * 1024 * 1024;
 const MAX_BROWSER_REQUESTS = 160;
+const MAX_HTML_BYTES = 2 * 1024 * 1024;
+const WEBVIEW_USER_AGENT = "Mozilla/5.0 (Linux; Android 13; Pixel 7 Build/TQ3A.230805.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile Safari/537.36";
+
+class WebEnvironmentBlockedError extends Error {
+  constructor(status, detail) {
+    super(detail);
+    this.name = "WebEnvironmentBlockedError";
+    this.status = status;
+    this.code = "WEB_ENVIRONMENT_BLOCKED";
+  }
+}
 
 const corsHeaders = (request) => {
   const origin = request.headers.get("origin");
@@ -164,11 +175,33 @@ function imageLooksValid(bytes, contentType) {
   return head[0] === 0xff && head[1] === 0xd8;
 }
 
+async function detectAccessBlock(page) {
+  return page.evaluate(() => {
+    const title = String(document.title || "");
+    const body = String(document.body?.innerText || "").slice(0, 12000);
+    const combined = `${title}\n${body}`;
+    return /Attention Required|Just a moment|Sorry, you have been blocked|Cloudflare Ray ID|Enable JavaScript and cookies to continue|Access denied/i.test(combined)
+      || Boolean(document.querySelector("#cf-error-details, .cf-error-details, [data-translate=block_headline]"));
+  });
+}
+
 async function testPlugin(env, plugin, workUrl, steps) {
   let browser;
+  let usedHttpFallback = false;
+  let blockedHttpStatus = 0;
   try {
     browser = await launch(env.BROWSER);
-    const context = await browser.newContext();
+    const context = await browser.newContext({
+      userAgent: WEBVIEW_USER_AGENT,
+      viewport: { width: 412, height: 915 },
+      deviceScaleFactor: 2.625,
+      isMobile: true,
+      hasTouch: true,
+      locale: "pt-BR",
+      extraHTTPHeaders: {
+        "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8"
+      }
+    });
     let requestCount = 0;
     await context.route("**/*", async (route) => {
       const target = route.request().url();
@@ -183,9 +216,42 @@ async function testPlugin(env, plugin, workUrl, steps) {
       }
     });
     const page = await context.newPage();
-    const response = await page.goto(workUrl.href, { waitUntil: "domcontentloaded", timeout: 45000 });
-    if (!response || !response.ok()) throw new Error(`A página da obra respondeu HTTP ${response?.status() || 0}.`);
+    let response = await page.goto(workUrl.href, { waitUntil: "domcontentloaded", timeout: 45000 });
+    let responseStatus = response?.status() || 0;
+    if (!response || !response.ok()) {
+      blockedHttpStatus = responseStatus;
+      const direct = await fetch(workUrl.href, {
+        redirect: "follow",
+        headers: {
+          "User-Agent": WEBVIEW_USER_AGENT,
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8"
+        }
+      });
+      if (direct.ok && String(direct.headers.get("content-type") || "").toLowerCase().includes("text/html")) {
+        const declaredSize = Number(direct.headers.get("content-length") || 0);
+        if (declaredSize > MAX_HTML_BYTES) throw new Error("A página da obra excede o limite web de 2 MiB.");
+        const html = await direct.text();
+        if (new TextEncoder().encode(html).byteLength > MAX_HTML_BYTES) throw new Error("A página da obra excede o limite web de 2 MiB.");
+        assertPublicHttpUrl(direct.url || workUrl.href, "Redirecionamento");
+        await page.setContent(html, { waitUntil: "networkidle", timeout: 45000 });
+        await page.waitForTimeout(750);
+        responseStatus = direct.status;
+        usedHttpFallback = true;
+      } else if ([401, 403, 429].includes(responseStatus) || [401, 403, 429].includes(direct.status)) {
+        const status = responseStatus || direct.status;
+        throw new WebEnvironmentBlockedError(status, `O site recusou o ambiente web com HTTP ${status} antes da execução do plugin.`);
+      } else {
+        throw new Error(`A página da obra respondeu HTTP ${responseStatus || direct.status || 0}.`);
+      }
+    }
     assertPublicHttpUrl(page.url(), "Redirecionamento");
+    if (await detectAccessBlock(page)) {
+      throw new WebEnvironmentBlockedError(
+        blockedHttpStatus || responseStatus,
+        `A proteção do site recusou o navegador hospedado antes da execução do plugin${(blockedHttpStatus || responseStatus) ? ` (HTTP ${blockedHttpStatus || responseStatus})` : ""}.`
+      );
+    }
     await page.evaluate(plugin.script);
     await page.waitForFunction(() => {
       try {
@@ -196,7 +262,9 @@ async function testPlugin(env, plugin, workUrl, steps) {
         return false;
       }
     }, null, { timeout: 15000 });
-    step(steps, "site", "PASS", `Página real carregada com HTTP ${response.status()}; plano de capítulos detectado.`);
+    step(steps, "site", "PASS", usedHttpFallback
+      ? `Página real carregada pelo fallback HTTPS com HTTP ${responseStatus}; plano de capítulos detectado.`
+      : `Página real carregada com HTTP ${responseStatus}; plano de capítulos detectado.`);
 
     let plan = await page.evaluate(() => {
       const raw = window.__nyxoviraChapterPlan;
@@ -254,6 +322,20 @@ async function testPlugin(env, plugin, workUrl, steps) {
     }
     step(steps, "conteúdo", "PASS", contentSummary);
     return { selectedChapterId, title: plan.title, chapterCount: plan.chapters.length, contentSummary, requestCount };
+  } catch (error) {
+    if (/\b429\b|rate limit exceeded|browser acquisition/i.test(String(error?.message || ""))) {
+      throw new WebEnvironmentBlockedError(
+        429,
+        "O serviço de navegador atingiu o limite temporário de novas sessões. Tente novamente em alguns segundos."
+      );
+    }
+    if (usedHttpFallback && error?.code !== "WEB_ENVIRONMENT_BLOCKED") {
+      throw new WebEnvironmentBlockedError(
+        blockedHttpStatus,
+        `A navegação normal foi recusada com HTTP ${blockedHttpStatus}; o fallback HTTPS não conseguiu reproduzir o conteúdo dinâmico usado pelo Nyxovira.`
+      );
+    }
+    throw error;
   } finally {
     if (browser) await browser.close().catch(() => {});
   }
@@ -261,6 +343,7 @@ async function testPlugin(env, plugin, workUrl, steps) {
 
 async function handleTest(request, env, requestUrl) {
   const steps = [];
+  let plugin;
   try {
     if (request.headers.get("origin") && request.headers.get("origin") !== SITE_ORIGIN) {
       const result = fail("Origem não autorizada.", 403, steps);
@@ -271,7 +354,7 @@ async function handleTest(request, env, requestUrl) {
     if (declaredLength > MAX_ZIP_BYTES) throw new Error("O ZIP excede o limite de 2 MiB.");
     const bytes = await request.arrayBuffer();
     if (!bytes.byteLength || bytes.byteLength > MAX_ZIP_BYTES) throw new Error("Envie um ZIP de até 2 MiB.");
-    const plugin = await readPluginZip(bytes);
+    plugin = await readPluginZip(bytes);
     if (!hostMatches(workUrl.hostname, plugin.hosts)) throw new Error("O domínio da obra não aparece em plugin.json > match.hosts.");
     step(steps, "segurança", "PASS", `${plugin.entryCount} arquivo(s) inspecionados; sem executáveis, caminhos inseguros ou APIs de exfiltração bloqueadas.`);
     step(steps, "manifesto", "PASS", "plugin.json, domínio e download_target.js são válidos para o laboratório web.");
@@ -293,6 +376,24 @@ async function handleTest(request, env, requestUrl) {
       stored: false
     });
   } catch (error) {
+    if (error?.code === "WEB_ENVIRONMENT_BLOCKED") {
+      step(steps, "ambiente", "BLOCKED", `${error.message} Isso aconteceu antes de download_target.js e não invalida o plugin.`);
+      return json(request, {
+        report: {
+          schemaVersion: 2,
+          verdict: "AMBIENTE_WEB_BLOQUEADO",
+          success: false,
+          conclusive: false,
+          pluginInvalid: false,
+          pluginId: plugin?.manifest?.id || plugin?.manifest?.name || "plugin-sem-id",
+          workUrl: requestUrl.searchParams.get("workUrl") || "",
+          error: "O laboratório hospedado não conseguiu concluir a navegação. O plugin não foi considerado inválido; tente novamente e, se a fonte bloquear navegadores web, valide-a no Nyxovira.",
+          steps
+        },
+        temporaryDataReleased: true,
+        stored: false
+      });
+    }
     step(steps, "diagnóstico", "FAIL", error?.message || String(error));
     const result = fail(error?.message || String(error), 422, steps);
     return json(request, result.payload, result.status);
