@@ -124,6 +124,7 @@
       const rawUrl = typeof input === "string" || input instanceof URL ? String(input) : input.url;
       const method = String(init.method || input?.method || "GET").toUpperCase();
       const headers = normalizeHeaders(init.headers || input?.headers);
+      if (!Object.keys(headers).some((name) => name.toLowerCase() === "referer")) headers.Referer = currentUrl;
       let body = init.body;
       if (body instanceof URLSearchParams) body = body.toString();
       if (body == null) body = undefined;

@@ -25,6 +25,7 @@ test("web lab relays null-body XHR and preserves synchronous WebView responses",
   assert.match(lab, /runWithSynchronousPriming/);
   assert.match(lab, /await primeSynchronousResponse\(requestedUrl\)/);
   assert.match(lab, /Promise\.resolve\(prepare/);
+  assert.match(lab, /headers\.Referer = currentUrl/);
   assert.match(lab, /this\.responseURL = cached\.finalUrl/);
   assert.match(lab, /"x-lab-final-url": response\.headers\.get\("x-lab-final-url"\)/);
 });
