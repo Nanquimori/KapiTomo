@@ -47,3 +47,13 @@ test("module relay remains restricted to the signed plugin hosts", () => {
   assert.match(worker, /hostMatches\(loaded\.finalUrl\.hostname, token\.hosts\)/);
   assert.match(worker, /"cache-control": "no-store"/);
 });
+
+test("chapter media validation accepts only public image responses and samples long chapters", () => {
+  assert.match(worker, /async function handleMedia/);
+  assert.match(worker, /assertPublicHttpUrl\(input\.url, "Imagem do capítulo"\)/);
+  assert.match(worker, /contentType\.startsWith\("image\/"\)/);
+  assert.match(worker, /url\.pathname === "\/media"/);
+  assert.match(lab, /const testedPages = pages\.slice\(0, maxPages\)/);
+  assert.match(lab, /await mediaFetch\(prepared\.token/);
+  assert.doesNotMatch(lab, /O capítulo tem .*limite web/);
+});

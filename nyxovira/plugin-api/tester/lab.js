@@ -102,6 +102,21 @@
     return response;
   }
 
+  async function mediaFetch(token, input) {
+    const response = await fetch(`${apiBase}/media`, {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-lab-token": token },
+      body: JSON.stringify(input),
+      cache: "no-store"
+    });
+    const contentType = response.headers.get("content-type") || "application/octet-stream";
+    if (!response.ok && contentType.includes("application/json")) {
+      const body = await response.json();
+      throw new Error(body.error || `HTTP ${response.status}`);
+    }
+    return response;
+  }
+
   function sandboxBootstrap(config) {
     window.addEventListener("error", (event) => parent.postMessage({ channel: config.channel, type: "sandbox-error", error: event.message || "Erro ao iniciar o sandbox." }, "*"));
     window.addEventListener("unhandledrejection", (event) => parent.postMessage({ channel: config.channel, type: "sandbox-error", error: event.reason?.message || String(event.reason) }, "*"));
@@ -735,12 +750,12 @@
       if (reopened.paragraphs.length !== paragraphs.length) throw new Error("O capítulo de texto não pôde ser reaberto em memória.");
       contentSummary = `${paragraphs.length} parágrafo(s) serializados e reabertos em memória.`;
     } else if (pages.length) {
-      if (pages.length > maxPages) throw new Error(`O capítulo tem ${pages.length} páginas; o limite web é ${maxPages}.`);
+      const testedPages = pages.slice(0, maxPages);
       let totalBytes = 0;
-      for (let index = 0; index < pages.length; index += 1) {
-        const descriptor = typeof pages[index] === "string" ? { url: pages[index] } : pages[index];
+      for (let index = 0; index < testedPages.length; index += 1) {
+        const descriptor = typeof testedPages[index] === "string" ? { url: testedPages[index] } : testedPages[index];
         const target = new URL(descriptor?.url || descriptor?.src || descriptor?.image || descriptor?.imageUrl, prepared.page.url).href;
-        const response = await proxyFetch(prepared.token, {
+        const response = await mediaFetch(prepared.token, {
           url: target,
           method: "GET",
           headers: { Referer: chapter.url || prepared.page.url, ...(descriptor.headers || {}) }
@@ -753,7 +768,9 @@
         totalBytes += bytes.byteLength;
         if (totalBytes > maxChapterBytes) throw new Error("O capítulo excedeu o limite web de 24 MiB.");
       }
-      contentSummary = `${pages.length} imagem(ns), ${totalBytes} bytes, baixadas e verificadas em memória.`;
+      contentSummary = pages.length > testedPages.length
+        ? `${pages.length} imagem(ns) resolvidas; as primeiras ${testedPages.length} (${totalBytes} bytes) foram baixadas e verificadas em memória.`
+        : `${pages.length} imagem(ns), ${totalBytes} bytes, baixadas e verificadas em memória.`;
     } else {
       throw new Error("O primeiro capítulo não resolveu páginas nem parágrafos.");
     }
