@@ -118,8 +118,23 @@
   }
 
   function sandboxBootstrap(config) {
-    window.addEventListener("error", (event) => parent.postMessage({ channel: config.channel, type: "sandbox-error", error: event.message || "Erro ao iniciar o sandbox." }, "*"));
-    window.addEventListener("unhandledrejection", (event) => parent.postMessage({ channel: config.channel, type: "sandbox-error", error: event.reason?.message || String(event.reason) }, "*"));
+    const describeError = (value, fallback) => {
+      if (value?.message) return String(value.message);
+      if (value?.reason?.message) return String(value.reason.message);
+      if (value?.type) return String(value.type);
+      const text = String(value || "").trim();
+      return text && text !== "[object Event]" && text !== "[object PromiseRejectionEvent]" ? text : fallback;
+    };
+    window.addEventListener("error", (event) => parent.postMessage({
+      channel: config.channel,
+      type: "source-warning",
+      warning: describeError(event.error || event, "A página da fonte emitiu um erro de script.")
+    }, "*"));
+    window.addEventListener("unhandledrejection", (event) => parent.postMessage({
+      channel: config.channel,
+      type: "source-warning",
+      warning: describeError(event.reason || event, "A página da fonte rejeitou uma operação interna.")
+    }, "*"));
     const pending = new Map();
     const synchronousResponses = new Map();
     let sequence = 0;
@@ -672,6 +687,10 @@
         if (event.source !== frame.contentWindow || event.data?.channel !== channel) return;
         const message = event.data;
         if (message.type === "sandbox-error") return finish(new Error(message.error || "O sandbox não pôde ser iniciado."));
+        if (message.type === "source-warning") {
+          sandboxState = "página carregada com aviso";
+          return;
+        }
         if (message.type === "frame-host-ready") {
           sandboxState = "host pronto";
           frame.contentWindow?.postMessage({

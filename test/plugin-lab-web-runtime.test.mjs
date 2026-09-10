@@ -41,6 +41,14 @@ test("web lab follows the same target-then-plan sequence as Nyxovira", () => {
   assert.doesNotMatch(lab, /O plugin não produziu o plano de capítulos/);
 });
 
+test("source-page JavaScript errors do not invalidate an otherwise working plugin", () => {
+  assert.match(lab, /type: "source-warning"/);
+  assert.match(lab, /message\.type === "source-warning"/);
+  assert.match(lab, /página carregada com aviso/);
+  assert.match(lab, /text !== "\[object Event\]"/);
+  assert.doesNotMatch(lab, /addEventListener\("error",[\s\S]{0,160}type: "sandbox-error"/);
+});
+
 test("module relay remains restricted to the signed plugin hosts", () => {
   assert.match(worker, /verifyToken\(env\.LAB_TOKEN_SECRET/);
   assert.match(worker, /hostMatches\(target\.hostname, token\.hosts\)/);
