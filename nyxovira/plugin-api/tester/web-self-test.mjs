@@ -73,13 +73,21 @@ try {
   const health = await fetch(new URL("api/health", serverUrl)).then((response) => response.json());
   assert.equal(health.ready, true);
   assert.equal(health.chapterLimit, 1);
+  const preflight = await fetch(new URL("api/test", serverUrl), {
+    method: "OPTIONS",
+    headers: { origin: "https://nanquimori.github.io", "access-control-request-method": "POST", "access-control-request-private-network": "true" }
+  });
+  assert.equal(preflight.status, 204);
+  assert.equal(preflight.headers.get("access-control-allow-origin"), "https://nanquimori.github.io");
+  assert.equal(preflight.headers.get("access-control-allow-private-network"), "true");
   const response = await fetch(new URL(`api/test?workUrl=${encodeURIComponent(workUrl)}`, serverUrl), {
     method: "POST",
-    headers: { "content-type": "application/zip" },
+    headers: { "content-type": "application/zip", origin: "https://nanquimori.github.io" },
     body: await createZip()
   });
   const result = await response.json();
   assert.equal(response.status, 200, JSON.stringify(result, null, 2));
+  assert.equal(response.headers.get("access-control-allow-origin"), "https://nanquimori.github.io");
   assert.equal(result.report.verdict, "PLUGIN_VALID");
   assert.equal(result.report.selectedChapterId, "chapter-1");
   assert.equal(result.temporaryFilesDeleted, true);
