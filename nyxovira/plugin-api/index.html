@@ -972,7 +972,6 @@ return "https://source.invalid/manga/work/";</code></pre>
             <h3 class="api-subheading">Conformance gate</h3>
             <p><a class="button primary" href="tester/"><strong>Open the Web Plugin Laboratory</strong></a></p>
             <p>Upload the ZIP and enter the work URL. The hosted service chooses the first chapter automatically and returns <code>PLUGIN_VALID</code> only after resolving and checking real content. No local service, command line, APK, ADB, or emulator is required.</p>
-            <p>If the source blocks the hosted browser before plugin execution, the report returns <code>AMBIENTE_WEB_BLOQUEADO</code>, <code>conclusive: false</code>, and <code>pluginInvalid: false</code>. This result does not reject the plugin.</p>
             <p>The result must contain <code>temporaryDataReleased: true</code> and <code>stored: false</code>. Without real network validation, state: <strong>not validated against the real site</strong>.</p>
             <p><a href="examples/">Complete sanitized examples</a>: simple HTML, JSON API, novel, manga, and encrypted API. All use the reserved <code>source.invalid</code> domain.</p>
             <p class="panel-copy-after-list"><strong>Plugin creation ends after complete validation.</strong> Tags, <code>schema_version</code>, GitHub, a public catalog, and a plugin website are distribution metadata, not requirements for creating or importing the plugin. Use the site's favicon or logo when available; you do not need to host a separate icon.</p>
@@ -1350,7 +1349,6 @@ return "https://source.invalid/manga/work/";</code></pre>
             <h3 class="api-subheading">Barreira de conformidade</h3>
             <p><a class="button primary" href="tester/"><strong>Abrir o Laboratório Web de Plugins</strong></a></p>
             <p>Envie o ZIP e informe a URL da obra. O serviço hospedado escolhe o primeiro capítulo automaticamente e só retorna <code>PLUGIN_VALID</code> depois de resolver e verificar conteúdo real. Não é necessário serviço local, linha de comando, APK, ADB ou emulador.</p>
-            <p>Se a fonte bloquear o navegador hospedado antes da execução do plugin, o relatório retorna <code>AMBIENTE_WEB_BLOQUEADO</code>, <code>conclusive: false</code> e <code>pluginInvalid: false</code>. Esse resultado não reprova o plugin.</p>
             <p>O resultado precisa conter <code>temporaryDataReleased: true</code> e <code>stored: false</code>. Sem validação real de rede, informe: <strong>não validado contra o site real</strong>.</p>
             <p><a href="examples/">Exemplos completos e sanitizados</a>: HTML simples, API JSON, novel, manga e API criptografada. Todos usam o domínio reservado <code>source.invalid</code>.</p>
             <p class="panel-copy-after-list"><strong>A criação termina depois da validação completa.</strong> Tags, <code>schema_version</code>, GitHub, catálogo público e site de plugins são metadados de distribuição, não requisitos para criar ou importar o plugin. Use o favicon ou logo do próprio site quando existir; você não precisa hospedar um ícone separado.</p>

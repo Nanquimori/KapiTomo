@@ -173,8 +173,6 @@ Declare `encrypted_response_format` e material de chave somente quando forem obs
 
 O laboratório limitado não possui biblioteca, configurações, catálogos, favoritos nem downloads permanentes. O ZIP e o conteúdo são mantidos somente durante a requisição e descartados antes da resposta. Exija `temporaryDataReleased: true` e `stored: false`. Sem rede, informe **“não validado contra o site real”**.
 
-Se a fonte responder `401`, `403` ou `429` antes de `download_target.js`, o relatório retorna `AMBIENTE_WEB_BLOQUEADO`, `conclusive: false` e `pluginInvalid: false`. Esse bloqueio do navegador hospedado não é falha do plugin; fontes que aceitam apenas o WebView precisam da validação no Nyxovira.
-
 ## Checklist antes de entregar
 
 - [ ] `plugin.json` passa em `plugin.schema.json`.
