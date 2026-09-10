@@ -119,15 +119,9 @@ Declare `encrypted_response_format` and key material only when legitimately obse
 
 ## Web Plugin Laboratory
 
-```bash
-cd tester
-npm install
-npm run web
-```
+[Open the Web Plugin Laboratory](tester/), upload the ZIP, and enter a real work URL. The hosted service automatically selects the first chapter, runs the collection in a temporary browser, and returns the report on the same page. No program, command line, APK, ADB, or emulator is required.
 
-Open `http://127.0.0.1:4173/`, upload the plugin ZIP, and enter an authorized real work URL. The limited laboratory has no library, settings, catalogs, favorites, or permanent downloads. It tests one complete chapter and emits `PLUGIN_VALID` only after real content is serialized/downloaded, saved, and reopened.
-
-The ZIP, chapter, and report workspace are held in one random temporary session and deleted before the API response. Require `temporaryFilesDeleted: true` and `sessionStored: false`. The Android diagnostic is an optional final compatibility check. Without network access, report **“not validated against the real site.”**
+The limited laboratory has no library, settings, catalogs, favorites, or permanent downloads. The ZIP and content exist only for the request and are released before the response. Require `temporaryDataReleased: true` and `stored: false`. Without network access, report **“not validated against the real site.”**
 
 ## Release checklist
 
@@ -136,7 +130,7 @@ The ZIP, chapter, and report workspace are held in one random temporary session 
 - Chapter IDs are unique and selection preserves the exact ID.
 - One real chapter resolves pages or paragraphs.
 - Headers, cookies, session, restrictions, encryption, order, and relative URLs were tested.
-- The web laboratory returned `PLUGIN_VALID`, `temporaryFilesDeleted: true`, and no `FAIL` step.
+- The web laboratory returned `PLUGIN_VALID`, `temporaryDataReleased: true`, `stored: false`, and no `FAIL` step.
 - Known limitations and restricted content are documented.
 
 ## Complete sanitized examples
@@ -145,7 +139,7 @@ See [examples/](examples/): `simple-html`, `json-api`, `novel`, `manga`, and `en
 
 ## Strict AI prompt
 
-> Create a Nyxovira plugin for the supplied source URL using this documentation. Inspect the real page, scripts, network traffic, and first-party API documentation before coding. Do not invent endpoints, selectors, headers, cookies, tokens, keys, or test results. Record work/reader URLs, endpoints, IDs, order, relative URL bases, authentication, restrictions, and encryption. Use `download_target.js` for discovery and declare `parser` for structured APIs, special headers, encryption, or native downloading. Keep each chapter ID exactly equal to the value in `selectedChapterIds`. Package the plugin as a ZIP and test it in `tester/` against one real work/chapter. Claim success only after the laboratory returns `PLUGIN_VALID`, no `FAIL` step, and `temporaryFilesDeleted: true`. If network access is unavailable, state “not validated against the real site.”
+> Create a Nyxovira plugin for the supplied source URL using this documentation. Inspect the real page, scripts, network traffic, and first-party API documentation before coding. Do not invent endpoints, selectors, headers, cookies, tokens, keys, or test results. Record work/reader URLs, endpoints, IDs, order, relative URL bases, authentication, restrictions, and encryption. Use `download_target.js` for discovery and declare `parser` for structured APIs, special headers, encryption, or native downloading. Keep each chapter ID exactly equal to the value in `selectedChapterIds`. Package the plugin as a ZIP and test it in the [Web Laboratory](tester/) against a real work; the first chapter is selected automatically. Claim success only after the laboratory returns `PLUGIN_VALID`, no `FAIL` step, `temporaryDataReleased: true`, and `stored: false`. If network access is unavailable, state “not validated against the real site.”
 
 ## Independent distribution
 
