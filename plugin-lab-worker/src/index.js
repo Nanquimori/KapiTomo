@@ -293,6 +293,53 @@ async function handleProxy(request, env) {
   }
 }
 
+async function handleSourceModule(request, env, requestUrl) {
+  try {
+    const match = requestUrl.pathname.match(/^\/source\/([^/]+)\/([^/]+)(\/.*)$/);
+    if (!match) throw new Error("Rota de módulo inválida.");
+    const token = await verifyToken(env.LAB_TOKEN_SECRET, decodeURIComponent(match[1]));
+    const sourceOrigin = decoder.decode(fromBase64Url(match[2]));
+    const origin = assertPublicHttpUrl(`${sourceOrigin}/`, "Origem do módulo");
+    const target = assertPublicHttpUrl(new URL(`${match[3]}${requestUrl.search}`, origin).href, "Módulo da fonte");
+    if (!hostMatches(target.hostname, token.hosts)) throw new Error("O módulo tentou acessar um domínio não declarado em match.hosts.");
+    const loaded = await fetchLimited(target.href, {
+      method: "GET",
+      headers: upstreamHeaders({
+        Accept: request.headers.get("accept") || "text/javascript, application/javascript, text/css, */*;q=0.1",
+        Referer: origin.href
+      })
+    }, MAX_PROXY_BYTES);
+    if (!hostMatches(loaded.finalUrl.hostname, token.hosts)) throw new Error("O módulo redirecionou para um domínio não declarado no plugin.");
+    const contentType = loaded.response.headers.get("content-type") || "application/javascript; charset=utf-8";
+    let responseBytes = loaded.bytes;
+    if (/\b(?:javascript|ecmascript)\b/i.test(contentType)) {
+      const routePrefix = `/source/${encodeURIComponent(match[1])}/${match[2]}/`;
+      const code = decoder.decode(loaded.bytes)
+        .replace(/(["'`])\/assets\//g, `$1${routePrefix}assets/`)
+        .replace(/return(["'])\/\1\+([A-Za-z_$][\w$]*)/g, (_whole, quote, variable) => (
+          `return ${variable}.startsWith("assets/")?${JSON.stringify(routePrefix)}+${variable}:${quote}/${quote}+${variable}`
+        ));
+      responseBytes = encoder.encode(code);
+    }
+    const headers = new Headers({
+      "cache-control": "no-store",
+      "content-type": contentType,
+      "cross-origin-resource-policy": "same-origin",
+      "x-content-type-options": "nosniff"
+    });
+    return new Response(responseBytes, { status: loaded.response.status, headers });
+  } catch (error) {
+    return new Response(`throw new Error(${JSON.stringify(error?.message || String(error))});\n`, {
+      status: 422,
+      headers: {
+        "cache-control": "no-store",
+        "content-type": "application/javascript; charset=utf-8",
+        "x-content-type-options": "nosniff"
+      }
+    });
+  }
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -305,12 +352,13 @@ export default {
         headers: {
           "content-type": "text/html; charset=utf-8",
           "cache-control": "public, max-age=300",
-          "content-security-policy": "default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; connect-src 'none'; img-src 'none'; media-src 'none'; style-src 'unsafe-inline'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors *",
+          "content-security-policy": "default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'none'; img-src 'none'; media-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors *",
           "referrer-policy": "no-referrer",
           "x-content-type-options": "nosniff"
         }
       });
     }
+    if (request.method === "GET" && url.pathname.startsWith("/source/")) return handleSourceModule(request, env, url);
     if (request.method === "POST" && url.pathname === "/prepare") return handlePrepare(request, env, url);
     if (request.method === "POST" && url.pathname === "/proxy") return handleProxy(request, env);
     return json(request, { error: "Rota não encontrada." }, 404);
