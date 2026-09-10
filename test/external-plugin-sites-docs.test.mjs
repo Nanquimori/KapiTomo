@@ -8,9 +8,9 @@ const portuguese = read("nyxovira/plugin-api/PLUGIN_API.pt-BR.md");
 const english = read("nyxovira/plugin-api/PLUGIN_API.md");
 const documents = [html, portuguese, english];
 
-test("documents personal plugins and independent catalogs without an official submission path", () => {
+test("documents one plugin creation flow and optional independent distribution", () => {
   for (const document of documents) {
-    assert.match(document, /Minimum for personal use|Mínimo para uso pessoal|real minimum|mínimo real/i);
+    assert.match(document, /Minimum (?:plugin structure|required by Nyxovira)|Estrutura mínima do plugin|Mínimo exigido pelo Nyxovira/i);
     assert.match(document, /match\.hosts/);
     assert.match(document, /browser\.home_url/);
     assert.match(document, /generic page detector|detector genérico/i);
@@ -37,11 +37,11 @@ test("keeps the external catalog contract complete and copyable", () => {
   escapedScripts.forEach(script => assert.doesNotThrow(() => new Function(script)));
 });
 
-test("AI prompt builder has personal and external modes in both languages", () => {
+test("AI prompt builder has one creation flow in both languages", () => {
   assert.equal((html.match(/<section[^>]+data-prompt-builder/g) || []).length, 2);
-  assert.equal((html.match(/data-prompt-mode-option="personal"/g) || []).length, 2);
-  assert.equal((html.match(/data-prompt-mode-option="external"/g) || []).length, 2);
-  assert.equal((html.match(/data-prompt-mode-option="catalog"/g) || []).length, 0);
+  assert.doesNotMatch(html, /data-prompt-mode(?:-option)?=/);
+  assert.doesNotMatch(html, /How will you use this plugin\?|Como você usará este plugin\?/);
+  assert.doesNotMatch(html, /Only the minimum needed to import|Somente o mínimo necessário para importar/);
   assert.match(html, /AI prompt · copy in one click/);
   assert.match(html, /Prompt para IA · copie em um clique/);
   assert.match(html, /official developer documentation/);
@@ -50,8 +50,6 @@ test("AI prompt builder has personal and external modes in both languages", () =
   assert.match(html, /OpenAPI ou Swagger/);
   assert.match(html, /browser network requests/);
   assert.match(html, /requisições de rede do navegador/);
-  assert.match(html, /Do not add catalog tags/);
-  assert.match(html, /Não adicione tags de catálogo/);
   assert.match(html, /navigator\.clipboard\.writeText/);
   assert.match(html, /document\.execCommand\("copy"\)/);
   const scripts = html.split("<script>").slice(1).map(value => value.split("</script>")[0]);
@@ -60,26 +58,26 @@ test("AI prompt builder has personal and external modes in both languages", () =
   const helperStart = scripts[0].indexOf("const documentationUrl");
   const helperEnd = scripts[0].indexOf("function updateBuilder");
   const helpers = new Function(`${scripts[0].slice(helperStart, helperEnd)}; return { buildPluginPrompt };`)();
-  const personalPt = helpers.buildPluginPrompt("pt", "personal", "example.org");
-  const externalPt = helpers.buildPluginPrompt("pt", "external", "example.org");
-  const personalEn = helpers.buildPluginPrompt("en", "personal", "example.org");
-  const externalEn = helpers.buildPluginPrompt("en", "external", "example.org");
-  for (const prompt of [personalPt, externalPt, personalEn, externalEn]) {
+  const promptPt = helpers.buildPluginPrompt("pt", "example.org");
+  const promptEn = helpers.buildPluginPrompt("en", "example.org");
+  for (const prompt of [promptPt, promptEn]) {
     assert.match(prompt, /https:\/\/example\.org\//);
     assert.match(prompt, /https:\/\/nanquimori\.github\.io\/KapiTomo\/nyxovira\/plugin-api\//);
+    assert.doesNotMatch(prompt, /personal use|uso pessoal|independent external catalog|catálogo externo independente/i);
   }
-  assert.match(personalPt, /Não adicione tags de catálogo/);
-  assert.match(personalEn, /Do not add catalog tags/);
-  assert.match(externalPt, /catálogo externo independente/);
-  assert.match(externalPt, /repositório público/);
-  assert.match(externalEn, /independent external catalog/);
-  assert.match(externalEn, /public repository/);
-  assert.notEqual(personalPt, externalPt);
+  assert.match(promptPt, /Crie um plugin Nyxovira para o site/);
+  assert.match(promptEn, /Create a Nyxovira plugin for the site/);
 });
 
-test("documentation keeps personal metadata optional and official languages limited", () => {
+test("published SDK resources are directly linked from both language views", () => {
+  for (const href of ["PLUGIN_API.md", "PLUGIN_API.pt-BR.md", "plugin.schema.json", "examples/", "tester/"]) {
+    assert.match(html, new RegExp(`href="${href.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"`));
+  }
+});
+
+test("documentation keeps runtime metadata optional and official languages limited", () => {
   for (const document of documents) {
-    assert.match(document, /tags[\s\S]{0,180}(?:not required|not needed|não são obrigatóri|desnecessárias)/i);
+    assert.match(document, /tags[\s\S]{0,180}(?:not required|not needed|não são (?:obrigatóri|necessári)|desnecessárias)/i);
     assert.match(document, /favicon or logo|favicon ou logo/i);
     assert.doesNotMatch(document, /spanish|japanese|korean|chinese|indonesian|thai|vietnamese|french|german|italian|russian|arabic/i);
   }

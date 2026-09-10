@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Testador oficial de plugins Nyxovira</title>
+  <meta name="description" content="Arquivos e instruções do testador oficial de plugins Nyxovira.">
+  <style>
+    body{margin:0;background:#09070d;color:#f6f4fb;font:16px/1.6 "Segoe UI",sans-serif}
+    main{max-width:820px;margin:48px auto;padding:28px;border:1px solid #342a45;border-radius:16px;background:#12101a}
+    a{color:#ff7b58}code{color:#f3b347}pre{overflow:auto;padding:16px;border:1px solid #342a45;background:#08070d;color:#dce8ff}
+    .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;padding:0;list-style:none}
+    .links a{display:block;padding:13px;border:1px solid #342a45;border-radius:10px;text-decoration:none;background:#0c0a12}
+  </style>
+</head>
+<body><main>
+  <p><a href="../">← API de Plugins Nyxovira</a></p>
+  <h1>Testador oficial de plugins</h1>
+  <p>O teste só retorna <code>PLUGIN_VALID</code> depois de resolver, salvar e reabrir um capítulo completo. Colocar um download na fila não comprova o funcionamento.</p>
+  <pre><code>npm install
+node test-plugin.js &lt;pasta-do-plugin&gt; &lt;URL-real-autorizada&gt;</code></pre>
+  <ul class="links">
+    <li><a href="README.md">Abrir instruções</a></li>
+    <li><a href="test-plugin.js">Abrir test-plugin.js</a></li>
+    <li><a href="package.json">Abrir package.json</a></li>
+    <li><a href="package-lock.json">Abrir package-lock.json</a></li>
+  </ul>
+  <p>Use uma obra real que você esteja autorizado a acessar. Os exemplos do SDK usam apenas o domínio reservado <code>source.invalid</code>.</p>
+</main></body>
+</html>

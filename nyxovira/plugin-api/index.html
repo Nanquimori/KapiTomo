@@ -4,12 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Nyxovira Plugin API</title>
-    <meta name="description" content="Create personal Nyxovira plugins or host an independent external plugin catalog.">
+    <meta name="description" content="Create and validate Nyxovira plugins with official documentation, examples, schema, and testing tools.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/">
     <meta property="og:site_name" content="KapiTomo">
     <meta property="og:title" content="Nyxovira Plugin API">
-    <meta property="og:description" content="Technical documentation, minimum manifest, AI prompt builder, testing, and external catalog format.">
+    <meta property="og:description" content="Technical documentation, schema, examples, AI prompt builder, and official conformance tester.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/">
     <meta name="kapitomo-doc-revision" content="20260910-original-layout">
@@ -279,7 +279,7 @@
 
       .prompt-grid {
         display: grid;
-        grid-template-columns: minmax(250px, 0.72fr) minmax(0, 1.28fr);
+        grid-template-columns: minmax(0, 1fr);
         gap: 16px;
         margin-top: 18px;
       }
@@ -292,7 +292,6 @@
       }
 
       .prompt-field-label,
-      .prompt-type-label,
       .prompt-output-title {
         display: block;
         color: var(--text);
@@ -317,55 +316,6 @@
         box-shadow: 0 0 0 3px rgba(156, 230, 208, 0.1);
       }
 
-      .prompt-type {
-        margin: 16px 0 0;
-        padding: 0;
-        border: 0;
-      }
-
-      .prompt-modes {
-        display: grid;
-        gap: 8px;
-        margin-top: 8px;
-      }
-
-      .prompt-mode {
-        width: 100%;
-        border: 1px solid var(--line);
-        background: rgba(255, 255, 255, 0.035);
-        color: var(--text);
-        padding: 11px;
-        text-align: left;
-        cursor: pointer;
-      }
-
-      .prompt-mode strong,
-      .prompt-mode span {
-        display: block;
-      }
-
-      .prompt-mode strong {
-        margin-bottom: 4px;
-        font-size: 13px;
-      }
-
-      .prompt-mode span {
-        color: var(--soft);
-        font-size: 11px;
-        line-height: 1.45;
-      }
-
-      .prompt-mode[aria-pressed="true"] {
-        border-color: rgba(255, 178, 71, 0.78);
-        background: linear-gradient(135deg, rgba(182, 32, 56, 0.34), rgba(119, 88, 211, 0.24));
-        box-shadow: inset 4px 0 0 var(--accent-2);
-      }
-
-      .prompt-mode[aria-pressed="true"] span {
-        color: var(--muted);
-      }
-
-      .prompt-mode:focus-visible,
       .prompt-copy:focus-visible {
         outline: 3px solid rgba(255, 178, 71, 0.38);
         outline-offset: 2px;
@@ -766,37 +716,35 @@
 
       <main class="grid">
         <div class="content">
-          <section id="prompt-builder" class="panel prompt-panel" data-prompt-builder data-prompt-language="en" data-prompt-mode="personal">
+          <section id="prompt-builder" class="panel prompt-panel" data-prompt-builder data-prompt-language="en">
             <span class="prompt-kicker">AI prompt · copy in one click</span>
             <h2>Generate an AI prompt to create your plugin</h2>
-            <p class="prompt-intro">Enter the source site and choose how the plugin will be used. Copy the result into the conversation with the AI that will create the plugin. Personal use and an independent external catalog stay clearly separated.</p>
+            <p class="prompt-intro">Enter the source site and copy the complete request into the conversation with the AI that will create and validate the plugin.</p>
             <div class="prompt-grid">
               <div class="prompt-controls">
                 <label class="prompt-field-label">Source site URL
                   <input class="prompt-url" type="url" value="https://source.invalid/" placeholder="https://source.invalid/" autocomplete="off" autocapitalize="off" spellcheck="false" data-prompt-url>
                 </label>
-                <fieldset class="prompt-type">
-                  <legend class="prompt-type-label">How will you use this plugin?</legend>
-                  <div class="prompt-modes">
-                    <button class="prompt-mode" type="button" data-prompt-mode-option="personal" aria-pressed="true">
-                      <strong>Personal use</strong>
-                      <span>Only the minimum needed to import and use it on your device.</span>
-                    </button>
-                    <button class="prompt-mode" type="button" data-prompt-mode-option="external" aria-pressed="false">
-                      <strong>Independent external catalog</strong>
-                      <span>Creates the plugin, a public repository, your own HTTPS catalog page and its installation button.</span>
-                    </button>
-                  </div>
-                </fieldset>
               </div>
               <div class="prompt-output-shell">
                 <div class="prompt-output-head">
                   <span class="prompt-output-title">Prompt ready to send to an AI assistant</span>
                   <button class="prompt-copy" type="button" data-copy-prompt data-copy-default="Copy prompt" data-copy-success="Prompt copied">Copy prompt</button>
                 </div>
-                <textarea class="prompt-output" rows="13" readonly spellcheck="false" aria-label="Generated plugin request" data-prompt-output>Create a Nyxovira plugin for personal use for the site "https://source.invalid/", following the official documentation: "https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/".</textarea>
-                <p class="prompt-status" aria-live="polite" data-copy-status>Change the URL or mode; the prompt updates automatically.</p>
+                <textarea class="prompt-output" rows="13" readonly spellcheck="false" aria-label="Generated plugin request" data-prompt-output>Create a Nyxovira plugin for the site "https://source.invalid/", following the official documentation: "https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/".</textarea>
+                <p class="prompt-status" aria-live="polite" data-copy-status>Change the URL; the prompt updates automatically.</p>
               </div>
+            </div>
+          </section>
+
+          <section class="panel" id="sdk-resources">
+            <h2>Official SDK resources</h2>
+            <p>Open each published resource directly from this documentation.</p>
+            <div class="rule-list">
+              <article><h3><a href="PLUGIN_API.md">Complete Markdown reference</a></h3><p>Readable and downloadable English API reference.</p></article>
+              <article><h3><a href="plugin.schema.json">plugin.schema.json</a></h3><p>Official machine-readable manifest contract.</p></article>
+              <article><h3><a href="examples/">Complete examples</a></h3><p>Sanitized HTML, JSON, novel, manga, and encrypted API examples.</p></article>
+              <article><h3><a href="tester/">Plugin tester</a></h3><p>Commands, files, and validator used before declaring a plugin valid.</p></article>
             </div>
           </section>
 
@@ -805,8 +753,8 @@
             <div class="rule-list">
               <article><h3>1. <a href="#files">Create the plugin</a></h3><p>Prepare <code>plugin.json</code>, map the site, and build chapter downloads.</p></article>
               <article><h3>2. <a href="#testing">Test through Import plugins</a></h3><p>Import the local folder into Nyxovira and repeat the test while developing.</p></article>
-              <article><h3>3. Keep it for yourself</h3><p>If only you will use the plugin, no publication, catalog, or website is required.</p></article>
-              <article><h3>4. <a href="#external-sites">Create an external catalog</a></h3><p>Choose this only when you want to maintain your own independent distribution of ready plugins.</p></article>
+              <article><h3>3. Validate the complete result</h3><p>A plugin is ready only after a real chapter is downloaded, saved, and reopened successfully.</p></article>
+              <article><h3>4. <a href="#external-sites">Distribute later, if needed</a></h3><p>Distribution is a separate optional step and does not change how the plugin itself is created.</p></article>
             </div>
           </section>
 
@@ -843,7 +791,7 @@
               <table>
                 <thead><tr><th>File</th><th>Purpose</th></tr></thead>
                 <tbody>
-                  <tr><td><code>plugin.json</code></td><td>Identifies the supported site. Only a few fields are needed for a personal plugin.</td></tr>
+                  <tr><td><code>plugin.json</code></td><td>Identifies the supported site. Start with the minimum fields required by Nyxovira.</td></tr>
                   <tr><td><code>browser/download_target.js</code></td><td>Required for the new conformance workflow. A legacy manifest may import without it and fall back to generic detection.</td></tr>
                 </tbody>
               </table>
@@ -852,8 +800,8 @@
 
           <section id="manifest" class="panel">
             <h2>plugin.json</h2>
-            <h3 class="api-subheading">Minimum for personal use</h3>
-            <p>This is the smallest practical manifest for a plugin imported directly into Nyxovira:</p>
+            <h3 class="api-subheading">Minimum required by Nyxovira</h3>
+            <p>This is the smallest practical manifest for importing and testing a plugin:</p>
             <pre><code>{
   "id": "my-plugin",
   "match": { "hosts": ["source.invalid"] },
@@ -863,7 +811,7 @@
   }
 }</code></pre>
             <p>To load the source, Nyxovira only needs valid JSON, a non-empty folder name or <code>id</code>, at least one <code>match.hosts</code> entry, and <code>browser.home_url</code>. The example also names the browser script because it is the reliable way to recognize works and chapters. Without it, Nyxovira tries generic page detection, which may not understand every site.</p>
-            <p><strong>Not required for personal use:</strong> <code>schema_version</code>, <code>name</code>, <code>version</code>, <code>tags</code>, <code>browser.icon_mode</code>, <code>browser.short_label</code>, <code>parser</code>, GitHub, a catalog, or a plugin website. If the site provides a stable public favicon or logo, use its URL in <code>browser.icon_url</code>; otherwise the icon may be omitted for personal use.</p>
+            <p><strong>Not required to import the plugin:</strong> <code>schema_version</code>, <code>name</code>, <code>version</code>, <code>tags</code>, <code>browser.icon_mode</code>, <code>browser.short_label</code>, GitHub, a catalog, or a plugin website. Declare <code>parser</code> whenever the source needs a structured API, special headers, encryption, or native downloading. If the site provides a stable public favicon or logo, use its URL in <code>browser.icon_url</code>; otherwise the icon may be omitted.</p>
             <div class="table-wrap">
               <table>
                 <thead><tr><th>Field</th><th>When it is needed</th></tr></thead>
@@ -872,9 +820,9 @@
                   <tr><td><code>match.hosts</code></td><td>Required. Domains recognized by the plugin.</td></tr>
                   <tr><td><code>browser.home_url</code></td><td>Required. Page opened by the app browser.</td></tr>
                   <tr><td><code>browser.download_target_script_file</code></td><td>Required for a newly developed plugin; points to the discovery and chapter-plan script.</td></tr>
-                  <tr><td><code>name</code>, <code>version</code></td><td>Optional for personal use; useful when sharing and updating.</td></tr>
-                  <tr><td><code>tags</code></td><td>Not needed for personal use. Add them only when your own external catalog uses tags for organization or filtering.</td></tr>
-                  <tr><td><code>browser.icon_url</code></td><td>Optional for personal use. Prefer the site's public favicon or logo when one is available.</td></tr>
+                  <tr><td><code>name</code>, <code>version</code></td><td>Optional for importing; useful for identification, sharing, and updates.</td></tr>
+                  <tr><td><code>tags</code></td><td>Not needed by the plugin runtime. Add them only if an external catalog uses tags for organization or filtering.</td></tr>
+                  <tr><td><code>browser.icon_url</code></td><td>Optional. Prefer the site's public favicon or logo when one is available.</td></tr>
                   <tr><td><code>parser</code></td><td>Required for structured APIs, special headers, encryption, or native downloading outside the WebView. It may be omitted only when the browser plan already contains final content.</td></tr>
                 </tbody>
               </table>
@@ -1014,7 +962,7 @@ return "https://source.invalid/manga/work/";</code></pre>
 
           <section id="testing" class="panel">
             <h2>Test in Nyxovira</h2>
-            <p>Manual import is the normal development loop and also supports plugins intended only for personal use. Personal import does not validate catalog tags or require you to host an icon. When the site already provides a public favicon or logo, use it in <code>browser.icon_url</code>.</p>
+            <p>Manual import is the normal development loop. Nyxovira does not require catalog tags or a separately hosted icon to test a plugin. When the site already provides a public favicon or logo, use it in <code>browser.icon_url</code>.</p>
             <div class="steps">
               <div class="step"><p>Keep <code>plugin.json</code> and the <code>browser</code> folder together inside the plugin folder.</p></div>
               <div class="step"><p>In Nyxovira, open <strong>Sites</strong>, tap <strong>Import plugins</strong>, and select the plugin folder. You may also select a parent folder containing several plugin folders.</p></div>
@@ -1028,14 +976,14 @@ node test-plugin.js ../my-plugin https://source.invalid/work/slug</code></pre>
             <p>The tester writes <code>work.json</code>, <code>chapter-plan.json</code>, <code>chapter-001/</code>, and <code>report.json</code>. It returns <code>PLUGIN_VALID</code> only after real content is downloaded or serialized, saved, and reopened. Queueing a task is not validation.</p>
             <p>In the Android app, open <strong>Sites → Test source</strong>, navigate to a work, and tap the diagnostic icon. Without real network validation, state: <strong>not validated against the real site</strong>.</p>
             <p><a href="examples/">Complete sanitized examples</a>: simple HTML, JSON API, novel, manga, and encrypted API. All use the reserved <code>source.invalid</code> domain.</p>
-            <p class="panel-copy-after-list"><strong>If the plugin is only for you, you are done.</strong> You do not need tags, <code>schema_version</code>, GitHub, a public catalog, or a plugin website. Use the site's favicon or logo when available; you do not need to host a separate icon.</p>
-            <h3 class="api-subheading">If you want to distribute it</h3>
-            <p>Host your own independent external catalog. You control its repository, page, plugin files, descriptions, updates, and security; it is not submitted to KapiTomo.</p>
+            <p class="panel-copy-after-list"><strong>Plugin creation ends after complete validation.</strong> Tags, <code>schema_version</code>, GitHub, a public catalog, and a plugin website are distribution metadata, not requirements for creating or importing the plugin. Use the site's favicon or logo when available; you do not need to host a separate icon.</p>
+            <h3 class="api-subheading">Optional distribution after validation</h3>
+            <p>If you later choose to share the finished plugin, host your own independent external catalog. This is a separate process and does not create another type of plugin.</p>
           </section>
 
           <section id="external-sites" class="panel">
             <h2>External plugin store</h2>
-            <p>Use this option only after the plugins are ready and tested. It is intended for anyone maintaining an independent distribution that may contain their own plugins and plugins from other creators.</p>
+            <p>This optional step comes only after plugins are ready and tested. It explains how to maintain an independent distribution; it is not a second plugin-creation mode.</p>
             <p>A minimal external store can use this structure:</p>
             <div class="folder">
               plugin-store/<br>
@@ -1121,14 +1069,11 @@ node test-plugin.js ../my-plugin https://source.invalid/work/slug</code></pre>
             <h2>Final checklist</h2>
             <div class="rule-list">
               <article>
-                <h3>Personal plugin</h3>
-                <p>Valid JSON, a non-empty folder name (or id), at least one supported host, a valid home URL, and a browser script tested against real content; use <code>paragraphs</code> for novels or <code>pages</code> for comics.</p>
-              </article>
-              <article>
-                <h3>Independent external catalog</h3>
-                <p>Public repository, HTTPS page and catalog; correct author and source-site information; stable public site icon when available; Install button tested by opening the catalog from Nyxovira.</p>
+                <h3>Validated plugin</h3>
+                <p>Valid JSON, a non-empty folder name (or id), at least one supported host, a valid home URL, and a browser script tested against real content; use <code>paragraphs</code> for novels or <code>pages</code> for comics. A real chapter must finish, be saved, and reopen successfully.</p>
               </article>
             </div>
+            <p class="panel-copy-after-list">If you later distribute it, follow the separate external-catalog section after this checklist.</p>
           </section>
         </div>
       </main>
@@ -1150,37 +1095,35 @@ node test-plugin.js ../my-plugin https://source.invalid/work/slug</code></pre>
 
       <main class="grid">
         <div class="content">
-          <section id="gerador-de-prompt" class="panel prompt-panel" data-prompt-builder data-prompt-language="pt" data-prompt-mode="personal">
+          <section id="gerador-de-prompt" class="panel prompt-panel" data-prompt-builder data-prompt-language="pt">
             <span class="prompt-kicker">Prompt para IA · copie em um clique</span>
             <h2>Gere um prompt para uma IA criar seu plugin</h2>
-            <p class="prompt-intro">Informe o site da fonte e escolha como o plugin será usado. Copie o resultado na conversa com a IA que criará o plugin. O uso pessoal e um catálogo externo independente ficam claramente separados.</p>
+            <p class="prompt-intro">Informe o site da fonte e copie o pedido completo na conversa com a IA que criará e validará o plugin.</p>
             <div class="prompt-grid">
               <div class="prompt-controls">
                 <label class="prompt-field-label">URL do site da fonte
                   <input class="prompt-url" type="url" value="https://source.invalid/" placeholder="https://source.invalid/" autocomplete="off" autocapitalize="off" spellcheck="false" data-prompt-url>
                 </label>
-                <fieldset class="prompt-type">
-                  <legend class="prompt-type-label">Como você usará este plugin?</legend>
-                  <div class="prompt-modes">
-                    <button class="prompt-mode" type="button" data-prompt-mode-option="personal" aria-pressed="true">
-                      <strong>Uso pessoal</strong>
-                      <span>Somente o mínimo necessário para importar e usar no seu aparelho.</span>
-                    </button>
-                    <button class="prompt-mode" type="button" data-prompt-mode-option="external" aria-pressed="false">
-                      <strong>Catálogo externo independente</strong>
-                      <span>Cria o plugin, um repositório público, sua própria página HTTPS de catálogo e o botão de instalação.</span>
-                    </button>
-                  </div>
-                </fieldset>
               </div>
               <div class="prompt-output-shell">
                 <div class="prompt-output-head">
                   <span class="prompt-output-title">Prompt pronto para enviar a uma IA</span>
                   <button class="prompt-copy" type="button" data-copy-prompt data-copy-default="Copiar prompt" data-copy-success="Prompt copiado">Copiar prompt</button>
                 </div>
-                <textarea class="prompt-output" rows="13" readonly spellcheck="false" aria-label="Pedido de plugin gerado" data-prompt-output>Crie um plugin Nyxovira para uso pessoal para o site "https://source.invalid/", seguindo a documentação oficial: "https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/".</textarea>
-                <p class="prompt-status" aria-live="polite" data-copy-status>Altere a URL ou o tipo; o prompt será atualizado automaticamente.</p>
+                <textarea class="prompt-output" rows="13" readonly spellcheck="false" aria-label="Pedido de plugin gerado" data-prompt-output>Crie um plugin Nyxovira para o site "https://source.invalid/", seguindo a documentação oficial: "https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/".</textarea>
+                <p class="prompt-status" aria-live="polite" data-copy-status>Altere a URL; o prompt será atualizado automaticamente.</p>
               </div>
+            </div>
+          </section>
+
+          <section class="panel" id="recursos-sdk">
+            <h2>Recursos oficiais do SDK</h2>
+            <p>Abra cada recurso publicado diretamente por esta documentação.</p>
+            <div class="rule-list">
+              <article><h3><a href="PLUGIN_API.pt-BR.md">Referência Markdown completa</a></h3><p>Documentação da API em português para ler ou baixar.</p></article>
+              <article><h3><a href="plugin.schema.json">plugin.schema.json</a></h3><p>Contrato oficial do manifesto em formato legível por ferramentas.</p></article>
+              <article><h3><a href="examples/">Exemplos completos</a></h3><p>Exemplos sanitizados de HTML, JSON, novel, manga e API criptografada.</p></article>
+              <article><h3><a href="tester/">Testador de plugins</a></h3><p>Comandos, arquivos e validador usados antes de declarar um plugin válido.</p></article>
             </div>
           </section>
 
@@ -1189,8 +1132,8 @@ node test-plugin.js ../my-plugin https://source.invalid/work/slug</code></pre>
             <div class="rule-list">
               <article><h3>1. <a href="#files-pt">Criar o plugin</a></h3><p>Prepare o <code>plugin.json</code>, mapeie o site e monte os downloads de capítulos.</p></article>
               <article><h3>2. <a href="#testing-pt">Testar por Importar plugins</a></h3><p>Importe a pasta local no Nyxovira e repita o teste enquanto desenvolve.</p></article>
-              <article><h3>3. Usar somente para você</h3><p>Se apenas você usará o plugin, não precisa publicar, criar catálogo nem montar site.</p></article>
-              <article><h3>4. <a href="#external-sites-pt">Criar um catálogo externo</a></h3><p>Escolha isso somente quando quiser manter sua própria distribuição independente de plugins prontos.</p></article>
+              <article><h3>3. Validar o resultado completo</h3><p>O plugin só fica pronto depois que um capítulo real for baixado, salvo e reaberto com sucesso.</p></article>
+              <article><h3>4. <a href="#external-sites-pt">Distribuir depois, se necessário</a></h3><p>A distribuição é uma etapa opcional separada e não muda a forma de criar o plugin.</p></article>
             </div>
           </section>
 
@@ -1227,7 +1170,7 @@ node test-plugin.js ../my-plugin https://source.invalid/work/slug</code></pre>
               <table>
                 <thead><tr><th>Arquivo</th><th>Função</th></tr></thead>
                 <tbody>
-                  <tr><td><code>plugin.json</code></td><td>Identifica o site compatível. Poucos campos são necessários para um plugin pessoal.</td></tr>
+                  <tr><td><code>plugin.json</code></td><td>Identifica o site compatível. Comece pelos campos mínimos exigidos pelo Nyxovira.</td></tr>
                   <tr><td><code>browser/download_target.js</code></td><td>Obrigatório no novo fluxo de conformidade. Um manifesto antigo pode importar sem ele e recorrer ao detector genérico.</td></tr>
                 </tbody>
               </table>
@@ -1236,8 +1179,8 @@ node test-plugin.js ../my-plugin https://source.invalid/work/slug</code></pre>
 
           <section class="panel">
             <h2>plugin.json</h2>
-            <h3 class="api-subheading">Mínimo para uso pessoal</h3>
-            <p>Este é o menor manifesto prático para importar um plugin diretamente no Nyxovira:</p>
+            <h3 class="api-subheading">Mínimo exigido pelo Nyxovira</h3>
+            <p>Este é o menor manifesto prático para importar e testar um plugin:</p>
             <pre><code>{
   "id": "my-plugin",
   "match": { "hosts": ["source.invalid"] },
@@ -1247,7 +1190,7 @@ node test-plugin.js ../my-plugin https://source.invalid/work/slug</code></pre>
   }
 }</code></pre>
             <p>Para carregar a fonte, o Nyxovira precisa somente de JSON válido, nome de pasta ou <code>id</code> não vazio, pelo menos um item em <code>match.hosts</code> e <code>browser.home_url</code>. O exemplo também indica o script do navegador porque ele é a forma confiável de reconhecer obras e capítulos. Sem ele, o Nyxovira tenta usar o detector genérico da página, que pode não compreender todos os sites.</p>
-            <p><strong>Não exigidos no uso pessoal:</strong> <code>schema_version</code>, <code>name</code>, <code>version</code>, <code>tags</code>, <code>browser.icon_mode</code>, <code>browser.short_label</code>, <code>parser</code>, GitHub, catálogo ou site de plugins. Se o site fornecer um favicon ou logo público e estável, use essa URL em <code>browser.icon_url</code>; se não houver, o ícone pode ser omitido no uso pessoal.</p>
+            <p><strong>Não exigidos para importar o plugin:</strong> <code>schema_version</code>, <code>name</code>, <code>version</code>, <code>tags</code>, <code>browser.icon_mode</code>, <code>browser.short_label</code>, GitHub, catálogo ou site de plugins. Declare <code>parser</code> sempre que a fonte exigir API estruturada, headers especiais, criptografia ou download nativo. Se o site fornecer favicon ou logo público e estável, use essa URL em <code>browser.icon_url</code>; se não houver, o ícone pode ser omitido.</p>
             <div class="table-wrap">
               <table>
                 <thead><tr><th>Campo</th><th>Quando é necessário</th></tr></thead>
@@ -1256,9 +1199,9 @@ node test-plugin.js ../my-plugin https://source.invalid/work/slug</code></pre>
                   <tr><td><code>match.hosts</code></td><td>Obrigatório. Domínios reconhecidos pelo plugin.</td></tr>
                   <tr><td><code>browser.home_url</code></td><td>Obrigatório. Página aberta pelo navegador interno.</td></tr>
                   <tr><td><code>browser.download_target_script_file</code></td><td>Obrigatório em plugin novo; aponta para o script de descoberta e plano de capítulos.</td></tr>
-                  <tr><td><code>name</code>, <code>version</code></td><td>Opcionais no uso pessoal; úteis ao compartilhar e atualizar.</td></tr>
-                  <tr><td><code>tags</code></td><td>Desnecessárias no uso pessoal. Adicione somente se o seu catálogo externo usar tags para organização ou filtros.</td></tr>
-                  <tr><td><code>browser.icon_url</code></td><td>Opcional no uso pessoal. Prefira o favicon ou logo público do próprio site quando estiver disponível.</td></tr>
+                  <tr><td><code>name</code>, <code>version</code></td><td>Opcionais para importar; úteis para identificação, compartilhamento e atualizações.</td></tr>
+                  <tr><td><code>tags</code></td><td>Desnecessárias para executar o plugin. Adicione somente se um catálogo externo usar tags para organização ou filtros.</td></tr>
+                  <tr><td><code>browser.icon_url</code></td><td>Opcional. Prefira o favicon ou logo público do próprio site quando estiver disponível.</td></tr>
                   <tr><td><code>parser</code></td><td>Obrigatório para API estruturada, headers especiais, criptografia ou download nativo fora da WebView. Só pode ser omitido quando o plano do navegador já contém o conteúdo final.</td></tr>
                 </tbody>
               </table>
@@ -1398,7 +1341,7 @@ return "https://source.invalid/manga/work/";</code></pre>
 
           <section id="testing-pt" class="panel">
             <h2>Testar no Nyxovira</h2>
-            <p>A importação manual é o caminho normal durante o desenvolvimento e também permite usar um plugin somente para você. A importação pessoal não valida tags de catálogo nem exige que você hospede um ícone. Quando o site já fornecer favicon ou logo público, use-o em <code>browser.icon_url</code>.</p>
+            <p>A importação manual é o caminho normal durante o desenvolvimento. O Nyxovira não exige tags de catálogo nem um ícone hospedado separadamente para testar o plugin. Quando o site já fornecer favicon ou logo público, use-o em <code>browser.icon_url</code>.</p>
             <div class="steps">
               <div class="step"><p>Mantenha <code>plugin.json</code> e a pasta <code>browser</code> juntos dentro da pasta do plugin.</p></div>
               <div class="step"><p>No Nyxovira, abra <strong>Sites</strong>, toque em <strong>Importar plugins</strong> e selecione a pasta do plugin. Você também pode selecionar uma pasta que contenha várias pastas de plugins.</p></div>
@@ -1412,14 +1355,14 @@ node test-plugin.js ../meu-plugin https://source.invalid/work/slug</code></pre>
             <p>O testador gera <code>work.json</code>, <code>chapter-plan.json</code>, <code>chapter-001/</code> e <code>report.json</code>. Ele retorna <code>PLUGIN_VALID</code> somente depois de baixar ou serializar, gravar e reabrir conteúdo real. Colocar uma tarefa na fila não é validação.</p>
             <p>No Android, abra <strong>Sites → Testar fonte</strong>, navegue até uma obra e toque no ícone de diagnóstico. Sem validação real de rede, informe: <strong>não validado contra o site real</strong>.</p>
             <p><a href="examples/">Exemplos completos e sanitizados</a>: HTML simples, API JSON, novel, manga e API criptografada. Todos usam o domínio reservado <code>source.invalid</code>.</p>
-            <p class="panel-copy-after-list"><strong>Se o plugin é somente para você, o processo termina aqui.</strong> Não é necessário ter tags, <code>schema_version</code>, GitHub, catálogo público ou site de plugins. Use o favicon ou logo do próprio site quando existir; você não precisa hospedar um ícone separado.</p>
-            <h3 class="api-subheading">Se quiser distribuir</h3>
-            <p>Hospede seu próprio catálogo externo independente. Você controla o repositório, a página, os arquivos, as descrições, as atualizações e a segurança; nada é enviado ao KapiTomo.</p>
+            <p class="panel-copy-after-list"><strong>A criação termina depois da validação completa.</strong> Tags, <code>schema_version</code>, GitHub, catálogo público e site de plugins são metadados de distribuição, não requisitos para criar ou importar o plugin. Use o favicon ou logo do próprio site quando existir; você não precisa hospedar um ícone separado.</p>
+            <h3 class="api-subheading">Distribuição opcional após validar</h3>
+            <p>Se depois você decidir compartilhar o plugin pronto, hospede seu próprio catálogo externo independente. Esse é um processo separado e não cria outro tipo de plugin.</p>
           </section>
 
           <section id="external-sites-pt" class="panel">
             <h2>Loja externa de plugins</h2>
-            <p>Use esta opção somente depois que os plugins estiverem prontos e testados. Ela é destinada a quem mantém uma distribuição independente com plugins próprios e, se quiser, plugins de outros criadores.</p>
+            <p>Esta etapa opcional vem somente depois que os plugins estiverem prontos e testados. Ela explica como manter uma distribuição independente; não é um segundo modo de criação de plugin.</p>
             <p>Uma loja externa mínima pode usar esta estrutura:</p>
             <div class="folder">
               plugin-store/<br>
@@ -1505,14 +1448,11 @@ node test-plugin.js ../meu-plugin https://source.invalid/work/slug</code></pre>
             <h2>Checklist final</h2>
             <div class="rule-list">
               <article>
-                <h3>Plugin pessoal</h3>
-                <p>JSON válido, nome de pasta (ou id) não vazio, pelo menos um host compatível, URL inicial válida e script do navegador testado com conteúdo real; use <code>paragraphs</code> para novels ou <code>pages</code> para quadrinhos.</p>
-              </article>
-              <article>
-                <h3>Catálogo externo independente</h3>
-                <p>Repositório público, página e catálogo em HTTPS; autor e fonte corretos; ícone público estável do site quando disponível; botão Instalar testado pelo Nyxovira.</p>
+                <h3>Plugin validado</h3>
+                <p>JSON válido, nome de pasta (ou id) não vazio, pelo menos um host compatível, URL inicial válida e script do navegador testado com conteúdo real; use <code>paragraphs</code> para novels ou <code>pages</code> para quadrinhos. Um capítulo real precisa terminar, ser salvo e reabrir com sucesso.</p>
               </article>
             </div>
+            <p class="panel-copy-after-list">Se depois você distribuir o plugin, siga a seção separada de catálogo externo após este checklist.</p>
           </section>
         </div>
       </main>
@@ -1536,12 +1476,11 @@ node test-plugin.js ../meu-plugin https://source.invalid/work/slug</code></pre>
           }
         }
 
-        function buildPluginPrompt(language, mode, rawSite) {
+        function buildPluginPrompt(language, rawSite) {
           var site = normalizePromptSite(rawSite);
           var isPortuguese = language === "pt";
-          var external = mode === "external";
           var lines = isPortuguese ? [
-            "Crie um plugin Nyxovira " + (external ? "para um catálogo externo independente" : "para uso pessoal") + " para o site \"" + site + "\", seguindo integralmente a documentação oficial: \"" + documentationUrl + "\".",
+            "Crie um plugin Nyxovira para o site \"" + site + "\", seguindo integralmente a documentação oficial: \"" + documentationUrl + "\".",
             "",
             "Antes de programar, inspecione a página real, os scripts carregados, as requisições de rede do navegador e qualquer documentação oficial para desenvolvedores, API pública, OpenAPI ou Swagger da própria fonte. Não invente endpoints, seletores, headers, cookies, tokens, chaves ou resultados.",
             "- Registre URL de obra e leitor; endpoints de obra, capítulos e páginas; seletores; ordem; URLs relativas; IDs reais; login e cookies; restrições e criptografia.",
@@ -1549,14 +1488,13 @@ node test-plugin.js ../meu-plugin https://source.invalid/work/slug</code></pre>
             "- Use browser/download_target.js para descoberta e plano. Declare parser para API estruturada, headers especiais, criptografia ou download nativo fora da WebView.",
             "- Garanta que cada chapterPlan.chapters[].id seja exatamente igual ao valor recebido em selectedChapterIds; não acrescente nem remova o prefixo id:.",
             "- Use o favicon ou logo público da própria fonte em browser.icon_url quando existir.",
-            external ? "- Crie um repositório público, faça commit e push, e publique sua própria página HTTPS e catalog.json independente com botão de instalação." : "- Não adicione tags de catálogo, catálogo, site de plugins ou repositório; mantenha apenas o mínimo pessoal.",
             "- Execute node test-plugin.js <pasta> <URL-real> e o diagnóstico do app em uma obra e capítulo reais.",
             "- Só declare sucesso depois de resolver conteúdo, baixar ou serializar, gravar e reabrir o arquivo. Colocar na fila não é validação.",
             "- Se não houver acesso à rede, escreva exatamente: não validado contra o site real.",
             "",
             "Entregue os arquivos completos e informe mapeamento, limitações, artefatos do teste e etapas que falharam."
           ] : [
-            "Create a Nyxovira plugin " + (external ? "for an independent external catalog" : "for personal use") + " for the site \"" + site + "\", following the official documentation completely: \"" + documentationUrl + "\".",
+            "Create a Nyxovira plugin for the site \"" + site + "\", following the official documentation completely: \"" + documentationUrl + "\".",
             "",
             "Before coding, inspect the real page, loaded scripts, browser network requests, and any official developer documentation, public API, OpenAPI or Swagger description. Do not invent endpoints, selectors, headers, cookies, tokens, keys, or results.",
             "- Record work and reader URLs; work, chapter, and page endpoints; selectors; order; relative URLs; real IDs; login and cookies; restrictions; and encryption.",
@@ -1564,7 +1502,6 @@ node test-plugin.js ../meu-plugin https://source.invalid/work/slug</code></pre>
             "- Use browser/download_target.js for discovery and the plan. Declare parser for structured APIs, special headers, encryption, or native downloading outside the WebView.",
             "- Keep each chapterPlan.chapters[].id exactly equal to the value in selectedChapterIds; never add or remove an id: prefix.",
             "- Use the source's own public favicon or logo as browser.icon_url when available.",
-            external ? "- Create a public repository, commit and push it, and publish your own independent HTTPS page and catalog.json with an install button." : "- Do not add catalog tags, a catalog, plugin website, or repository; keep only the personal minimum.",
             "- Run node test-plugin.js <folder> <real-URL> and the in-app diagnostic against one real work and chapter.",
             "- Claim success only after content is resolved, downloaded or serialized, saved, and reopened. Queueing is not validation.",
             "- If network access is unavailable, state exactly: not validated against the real site.",
@@ -1578,8 +1515,7 @@ node test-plugin.js ../meu-plugin https://source.invalid/work/slug</code></pre>
           var input = builder.querySelector("[data-prompt-url]");
           var output = builder.querySelector("[data-prompt-output]");
           var language = builder.getAttribute("data-prompt-language") || "en";
-          var mode = builder.getAttribute("data-prompt-mode") || "personal";
-          if (output) output.value = buildPluginPrompt(language, mode, input ? input.value : "");
+          if (output) output.value = buildPluginPrompt(language, input ? input.value : "");
         }
 
         function setPromptCopyState(builder, copied, message) {
@@ -1629,7 +1565,6 @@ node test-plugin.js ../meu-plugin https://source.invalid/work/slug</code></pre>
 
         function initializePromptBuilder(builder) {
           var input = builder.querySelector("[data-prompt-url]");
-          var modeButtons = builder.querySelectorAll("[data-prompt-mode-option]");
           if (input) {
             input.addEventListener("input", function () { updateBuilder(builder); });
             input.addEventListener("blur", function () {
@@ -1637,16 +1572,6 @@ node test-plugin.js ../meu-plugin https://source.invalid/work/slug</code></pre>
               updateBuilder(builder);
             });
           }
-          modeButtons.forEach(function (button) {
-            button.addEventListener("click", function () {
-              var mode = button.getAttribute("data-prompt-mode-option");
-              builder.setAttribute("data-prompt-mode", mode);
-              modeButtons.forEach(function (candidate) {
-                candidate.setAttribute("aria-pressed", candidate === button ? "true" : "false");
-              });
-              updateBuilder(builder);
-            });
-          });
           var copyButton = builder.querySelector("[data-copy-prompt]");
           if (copyButton) copyButton.addEventListener("click", function () { copyGeneratedPrompt(builder); });
           updateBuilder(builder);

@@ -16,7 +16,7 @@ A plugin is validated only when an authorized real URL resolves a work, lists ch
 
 “Parser optional” only means a manifest may import without one. Declare `parser` for structured APIs, special headers, encryption, or native downloading outside the WebView.
 
-## Personal minimum
+## Minimum plugin structure
 
 ```text
 my-plugin/
@@ -38,7 +38,7 @@ my-plugin/
 }
 ```
 
-For private use, the real minimum is valid JSON, a folder name or `id`, one `match.hosts` value, and `browser.home_url`. `name`, `version`, and `language` are optional; `tags` are not required, nor is a repository or catalog. Use `browser.icon_url` when the source itself provides a stable public favicon or logo.
+The runtime minimum is valid JSON, a folder name or `id`, one `match.hosts` value, and `browser.home_url`. `name`, `version`, `language`, and `tags` are not required for import; a repository or catalog belongs only to optional later distribution. Use `browser.icon_url` when the source itself provides a stable public favicon or logo.
 
 Without `browser/download_target.js`, the generic page detector attempts basic recognition. It is useful for simple HTML but is not a substitute for source-specific mapping.
 
@@ -145,10 +145,10 @@ See [examples/](examples/): `simple-html`, `json-api`, `novel`, `manga`, and `en
 
 ## Strict AI prompt
 
-> Create a Nyxovira plugin for the supplied source URL using this documentation. Inspect the real page, scripts, network traffic, and first-party API documentation before coding. Do not invent endpoints, selectors, headers, cookies, tokens, keys, or test results. Record work/reader URLs, endpoints, IDs, order, relative URL bases, authentication, restrictions, and encryption. Use `download_target.js` for discovery and declare `parser` for structured APIs, special headers, encryption, or native downloading. Keep each chapter ID exactly equal to the value in `selectedChapterIds`. Run `node test-plugin.js <folder> <real-URL>` against one real work/chapter and claim success only after content is downloaded, saved, and reopened. If network access is unavailable, state “not validated against the real site.” Personal plugins do not require tags, a catalog, or a repository.
+> Create a Nyxovira plugin for the supplied source URL using this documentation. Inspect the real page, scripts, network traffic, and first-party API documentation before coding. Do not invent endpoints, selectors, headers, cookies, tokens, keys, or test results. Record work/reader URLs, endpoints, IDs, order, relative URL bases, authentication, restrictions, and encryption. Use `download_target.js` for discovery and declare `parser` for structured APIs, special headers, encryption, or native downloading. Keep each chapter ID exactly equal to the value in `selectedChapterIds`. Run `node test-plugin.js <folder> <real-URL>` against one real work/chapter and claim success only after content is downloaded, saved, and reopened. If network access is unavailable, state “not validated against the real site.”
 
 ## Independent distribution
 
-A personal plugin ends after local import and testing. Anyone sharing plugins maintains an independent external catalog that users connect manually. KapiTomo does not accept third-party plugin submissions. Distribution does not replace authorization, source compliance, or technical validation.
+Plugin creation ends after local import and complete validation. Sharing the same finished plugin through an independent external catalog is a separate optional process, not another plugin type. Users connect that catalog manually. KapiTomo does not accept third-party plugin submissions. Distribution does not replace authorization, source compliance, or technical validation.
 
 An external plugin store publishes an HTTPS page and `catalog.json`. The page declares `<link rel="nyxovira-plugin-catalog" href="catalog.json">`; the catalog uses `hub_url` and an entry `manifest_url`. `repository_url`, `repository_ref`, and `plugin_path` are also supported. Its install button calls `installCommunityPlugin(catalogUrl, JSON.stringify({ id }))` inside Nyxovira. The publisher remains responsible for the repository, catalog, and review.

@@ -16,7 +16,7 @@ Um plugin só está validado quando, em uma URL real autorizada, ele reconhece a
 
 “Parser opcional” significa apenas que o manifesto pode ser importado sem ele. Declare `parser` sempre que houver API estruturada, cabeçalhos especiais, criptografia ou download nativo fora da WebView.
 
-## Estrutura e mínimo pessoal
+## Estrutura mínima do plugin
 
 ```text
 meu-plugin/
@@ -38,7 +38,7 @@ meu-plugin/
 }
 ```
 
-Para uso somente no seu aparelho, o mínimo real é JSON válido, nome de pasta ou `id`, um `match.hosts` e `browser.home_url`. `name`, `version` e `language` são opcionais; `tags` não são obrigatórias, assim como repositório e catálogo. Use `browser.icon_url` quando a própria fonte tiver favicon ou logo público estável.
+O mínimo exigido em execução é JSON válido, nome de pasta ou `id`, um `match.hosts` e `browser.home_url`. `name`, `version`, `language` e `tags` não são necessários para importar; repositório e catálogo pertencem somente a uma distribuição posterior opcional. Use `browser.icon_url` quando a própria fonte tiver favicon ou logo público estável.
 
 Sem `browser/download_target.js`, o detector genérico tenta reconhecer a página. Isso ajuda no HTML básico, mas não substitui o mapeamento de uma fonte específica.
 
@@ -197,10 +197,10 @@ Veja [examples/](examples/): `simple-html`, `json-api`, `novel`, `manga` e `encr
 
 ## Prompt rigoroso para IA
 
-> Crie um plugin Nyxovira para a URL de fonte informada, seguindo esta documentação. Primeiro inspecione a página real, scripts e tráfego de rede e procure API/documentação oficial. Não invente endpoints, seletores, headers, cookies, tokens, chaves nem resultados. Registre URL de obra/leitor, endpoints, IDs, ordem, URLs relativas, autenticação, restrições e criptografia. Use `download_target.js` para descoberta e plano; declare `parser` para API estruturada, headers especiais, criptografia ou download nativo. Garanta que cada `chapter.id` seja exatamente o ID recebido em `selectedChapterIds`. Execute `node test-plugin.js <pasta> <URL-real>`, teste uma obra e um capítulo reais e só declare sucesso se o conteúdo for baixado, gravado e reaberto. Se não houver acesso à rede, escreva “não validado contra o site real”. Para uso pessoal, não exija tags, catálogo ou repositório.
+> Crie um plugin Nyxovira para a URL de fonte informada, seguindo esta documentação. Primeiro inspecione a página real, scripts e tráfego de rede e procure API/documentação oficial. Não invente endpoints, seletores, headers, cookies, tokens, chaves nem resultados. Registre URL de obra/leitor, endpoints, IDs, ordem, URLs relativas, autenticação, restrições e criptografia. Use `download_target.js` para descoberta e plano; declare `parser` para API estruturada, headers especiais, criptografia ou download nativo. Garanta que cada `chapter.id` seja exatamente o ID recebido em `selectedChapterIds`. Execute `node test-plugin.js <pasta> <URL-real>`, teste uma obra e um capítulo reais e só declare sucesso se o conteúdo for baixado, gravado e reaberto. Se não houver acesso à rede, escreva “não validado contra o site real”.
 
 ## Distribuição independente
 
-Um plugin pessoal termina após importação e teste. Quem quiser compartilhar mantém seu próprio catálogo externo e os usuários o conectam manualmente no Nyxovira. O catálogo do KapiTomo não aceita publicações de terceiros. Distribuição não substitui autorização, conformidade com a fonte nem validação técnica.
+A criação do plugin termina após importação e validação completa. Compartilhar o mesmo plugin pronto por um catálogo externo independente é um processo opcional separado, não outro tipo de plugin. Os usuários conectam esse catálogo manualmente no Nyxovira. O catálogo do KapiTomo não aceita publicações de terceiros. Distribuição não substitui autorização, conformidade com a fonte nem validação técnica.
 
 Uma loja externa publica por HTTPS uma página e um `catalog.json`. A página declara `<link rel="nyxovira-plugin-catalog" href="catalog.json">`; o catálogo usa `hub_url` e, em cada entrada, `manifest_url`. Também são aceitos `repository_url`, `repository_ref` e `plugin_path`. O botão da página chama `installCommunityPlugin(catalogUrl, JSON.stringify({ id }))` quando aberto dentro do Nyxovira. O repositório, o catálogo e a revisão continuam sob responsabilidade de quem os publicou.
