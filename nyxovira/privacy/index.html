@@ -3,23 +3,22 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Nyxovira app Privacy Policy.">
+    <meta name="description" content="How Nyxovira handles local files, plugins, downloads, external catalogs, and purchases.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://nanquimori.github.io/KapiTomo/nyxovira/privacy/">
-    <script>
-      if (window.location.pathname.endsWith("/index.html")) {
-        window.history.replaceState(null, "", window.location.pathname.slice(0, -"index.html".length) + window.location.search + window.location.hash);
-      }
-    </script>
     <meta property="og:site_name" content="KapiTomo">
     <meta property="og:title" content="Nyxovira Privacy Policy">
-    <meta property="og:description" content="How Nyxovira handles data, local files, downloads, notifications, and Pro purchases.">
+    <meta property="og:description" content="How Nyxovira handles local files, plugins, downloads, external catalogs, and purchases.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://nanquimori.github.io/KapiTomo/nyxovira/privacy/">
     <title>Nyxovira Privacy Policy</title>
-    <link rel="icon" type="image/png" href="../../assets/kapitomo-logo.png?v=20260710-policy-icons">
-    <link rel="apple-touch-icon" href="../../assets/kapitomo-logo.png?v=20260710-policy-icons">
-    <link rel="stylesheet" href="../../styles.css?v=20260826-catalog-rules">
+    <link rel="icon" type="image/png" href="../../assets/kapitomo-logo.png">
+    <link rel="stylesheet" href="../../styles.css?v=20260910-official-only">
+    <style>
+      .policy-language { display:flex; justify-content:flex-end; gap:8px; max-width:900px; margin:18px auto 0; padding:0 18px; }
+      .policy-language button { border:1px solid rgba(255,255,255,.18); border-radius:999px; padding:7px 12px; color:inherit; background:transparent; cursor:pointer; }
+      .policy-language button[aria-pressed="true"] { color:#111; border-color:#ff6534; background:#ff6534; }
+    </style>
   </head>
   <body>
     <header class="site-header">
@@ -28,129 +27,128 @@
         <span>KapiTomo</span>
       </a>
     </header>
+    <div class="policy-language" aria-label="Language">
+      <button type="button" data-policy-language-option="en" aria-pressed="true">EN</button>
+      <button type="button" data-policy-language-option="pt" aria-pressed="false">PT</button>
+    </div>
 
     <main class="legal-page">
-      <article class="legal-document">
+      <article class="legal-document" data-policy-language="en" lang="en">
         <p class="eyebrow">Nyxovira</p>
         <h1>Privacy Policy</h1>
-        <p class="legal-updated">Last updated: August 26, 2026</p>
+        <p class="legal-updated">Last updated: September 10, 2026</p>
 
-        <p>
-          This Privacy Policy explains how the Nyxovira app handles user and device data. Nyxovira is an app for
-          installing compatible source plugins, downloading and updating selected works, and managing a local
-          library for compatible readers such as Nyxalira. It also offers an optional Pro purchase through Google Play.
-        </p>
+        <h2>What Nyxovira does</h2>
+        <p>Nyxovira installs compatible plugins selected by the user, opens source sites, prepares selected downloads, manages local files, and offers an optional Pro purchase through Google Play.</p>
 
-        <h2>Data the app may use</h2>
-        <p>Nyxovira may use the following data to work:</p>
+        <h2>Data used by the app</h2>
         <ul>
-          <li>Local app preferences such as theme, language, Pro state, download settings, and library settings.</li>
-          <li>Files and folders chosen by the user to import, save, export, or download works.</li>
-          <li>URLs for sites, catalogs, plugins, or works added by the user.</li>
-          <li>Installed plugin metadata such as plugin id, version, source host, icon URL, and repository URL.</li>
-          <li>Technical download information such as progress, downloaded chapters, and task state.</li>
-          <li>Purchase state reported by Google Play Billing to unlock or restore Pro.</li>
-        </ul>
-
-        <h2>How data is used</h2>
-        <p>This data is used to:</p>
-        <ul>
-          <li>Display and organize the user's local library.</li>
-          <li>Download, import, export, and manage work files on the device.</li>
-          <li>Install, update, remove, and open source plugins selected by the user.</li>
-          <li>Keep download, library, and app settings.</li>
-          <li>Show download progress notifications.</li>
-          <li>Process and restore Pro unlocks through Google Play Billing.</li>
+          <li>App preferences, download settings, language, theme, and local library settings.</li>
+          <li>Files and folders selected for importing, saving, exporting, or downloading.</li>
+          <li>URLs for sites, plugins, works, and external catalogs entered or selected by the user.</li>
+          <li>Installed plugin metadata, including id, version, source host, icon, repository, and local files.</li>
+          <li>Download progress, selected chapters, completed tasks, and notification state.</li>
+          <li>Purchase state supplied by Google Play to unlock or restore Pro.</li>
         </ul>
 
         <h2>Local storage</h2>
-        <p>
-          Nyxovira stores data mainly on the device. Downloaded works, imported files, plugins, and local preferences
-          remain on the device until the user deletes that data, removes the files, or uninstalls the app.
-        </p>
+        <p>Downloaded works, imported plugins, connected catalog addresses, history needed by the app, and preferences are stored mainly on the device. They remain there until the user removes them, clears app data, deletes the selected files, or uninstalls Nyxovira.</p>
 
-        <h2>In-app purchases</h2>
-        <p>
-          The Pro purchase is processed by Google Play. Nyxovira does not receive full payment data such as card
-          numbers. The app receives only the information needed to confirm, unlock, and restore Pro, such as product
-          identifier, purchase state, and purchase token provided by Google Play.
-        </p>
+        <h2>Network access</h2>
+        <p>When the user opens a site, connects a catalog, installs a plugin, or downloads a work, Nyxovira contacts the selected address and the hosts used by that plugin. Those services can receive normal network information such as the user's IP address, request headers, requested URLs, and any information the user enters on their pages.</p>
 
-        <h2>Device permissions</h2>
-        <p>The app may request permissions to:</p>
-        <ul>
-          <li>Access the internet to open sites, fetch catalogs, download works, and use Google Play Billing.</li>
-          <li>Access storage or user-selected folders to save and manage work files.</li>
-          <li>Display notifications related to download progress.</li>
-          <li>Keep downloads running through a foreground service when necessary.</li>
-        </ul>
+        <h2>Official and external catalogs</h2>
+        <p>The KapiTomo catalog contains only official plugins published by Nanquimori. Nyxovira also allows a user to connect an independently hosted catalog URL manually. External catalogs and plugins are controlled by their own maintainers and are not submitted to, hosted by, reviewed by, or approved by KapiTomo.</p>
+
+        <h2>Plugin behavior</h2>
+        <p>A plugin can read and organize information from the source page opened inside Nyxovira so the app can identify works, chapters, text, and images. A plugin may contact the domains declared by its implementation. Users should connect only addresses they trust and review the catalog origin before installing an external plugin.</p>
+
+        <h2>Google Play and Pro</h2>
+        <p>Google Play processes the payment. Nyxovira does not receive complete card details. The app receives only information needed to confirm and restore the purchase, such as product id, purchase state, and purchase token. Pro unlocks app features; it is not payment for external works, plugins, or websites.</p>
+
+        <h2>Permissions</h2>
+        <p>Nyxovira may request internet access, access to user-selected folders, notification permission, and foreground-service capability needed to continue downloads. While a download is active, the app can keep the processor awake; after the device restarts, it can resume the download service when work is still pending. The exact permissions available depend on the Android version and the features used.</p>
 
         <h2>Data sharing</h2>
-        <p>
-          Nyxovira does not sell user personal data. Data may be sent to third parties only when required for an
-          action chosen by the user, such as opening an external site, downloading content from an added source,
-          opening links, or processing purchases through Google Play.
-        </p>
-
-        <h2>External sites and sources</h2>
-        <p>
-          The user may open third-party sites, sources, catalogs, or plugins inside the app. These external services
-          may have their own privacy policies and data practices. Nyxovira does not control those external practices.
-        </p>
-
-        <h2>Online plugins</h2>
-        <p>
-          Nyxovira can open the KapiTomo Plugin Hub inside the app. When the user installs an online plugin, the app
-          reads the plugin's public GitHub repository and stores the plugin files locally so it can detect works,
-          show chapter lists, and prepare selected chapters for download. Plugin scripts run in the page opened by
-          the app browser and interact with that source site according to the plugin's code.
-        </p>
-
-        <h2>Content and plugin responsibility</h2>
-        <p>
-          Nyxovira is a plugin, download, update, and local-library management tool. It does not publish, sell, host,
-          or claim ownership over works supplied by third-party sites. Community plugins remain in their creators'
-          public repositories. KapiTomo lists catalog entries and may moderate them under the published
-          <a href="https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules">Plugin Hub catalog rules</a>.
-        </p>
-
-        <h2>Pro purchase and content access</h2>
-        <p>
-          Nyxovira Pro unlocks app features and supports app development. It is not payment for third-party manga,
-          novels, comics, chapters, translations, pages, or plugins, and it does not guarantee that any external
-          site or plugin will remain available.
-        </p>
-
-        <h2>KapiTomo</h2>
-        <p>
-          KapiTomo is the official site used to publish free original works and provide catalogs or plugins related
-          to the apps. The KapiTomo Privacy Policy is available at
-          <a href="https://nanquimori.github.io/KapiTomo/privacy/">https://nanquimori.github.io/KapiTomo/privacy/</a>.
-        </p>
-
-        <h2>Children</h2>
-        <p>
-          Nyxovira is not directed to children. If you believe a child provided personal data through the app or
-          through external contact, get in touch so the situation can be reviewed.
-        </p>
+        <p>Nyxovira does not sell personal data. Data reaches another service only when required by an action selected by the user, such as visiting a source, downloading a file, connecting a catalog, opening a link, or completing a Google Play purchase.</p>
 
         <h2>Contact</h2>
-        <p>
-          For questions about this Privacy Policy, contact
-          <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a>.
-        </p>
+        <p>For privacy questions, contact <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a>.</p>
+      </article>
+
+      <article class="legal-document" data-policy-language="pt" lang="pt-BR" hidden>
+        <p class="eyebrow">Nyxovira</p>
+        <h1>Política de Privacidade</h1>
+        <p class="legal-updated">Última atualização: 10 de setembro de 2026</p>
+
+        <h2>O que o Nyxovira faz</h2>
+        <p>O Nyxovira instala plugins compatíveis escolhidos pelo usuário, abre sites de origem, prepara downloads selecionados, gerencia arquivos locais e oferece uma compra Pro opcional pelo Google Play.</p>
+
+        <h2>Dados usados pelo aplicativo</h2>
+        <ul>
+          <li>Preferências do aplicativo, configurações de download, idioma, tema e biblioteca local.</li>
+          <li>Arquivos e pastas escolhidos para importar, salvar, exportar ou baixar.</li>
+          <li>URLs de sites, plugins, obras e catálogos externos informadas ou escolhidas pelo usuário.</li>
+          <li>Metadados dos plugins instalados, incluindo id, versão, domínio de origem, ícone, repositório e arquivos locais.</li>
+          <li>Progresso dos downloads, capítulos escolhidos, tarefas concluídas e estado das notificações.</li>
+          <li>Estado da compra fornecido pelo Google Play para liberar ou restaurar o Pro.</li>
+        </ul>
+
+        <h2>Armazenamento local</h2>
+        <p>Obras baixadas, plugins importados, endereços de catálogos conectados, histórico necessário ao funcionamento e preferências ficam principalmente no dispositivo. Eles permanecem até o usuário removê-los, limpar os dados do aplicativo, apagar os arquivos escolhidos ou desinstalar o Nyxovira.</p>
+
+        <h2>Acesso à internet</h2>
+        <p>Quando o usuário abre um site, conecta um catálogo, instala um plugin ou baixa uma obra, o Nyxovira acessa o endereço escolhido e os domínios usados por esse plugin. Esses serviços podem receber informações normais de rede, como endereço IP, cabeçalhos, URLs solicitadas e informações que o usuário inserir nas páginas deles.</p>
+
+        <h2>Catálogo oficial e catálogos externos</h2>
+        <p>O catálogo do KapiTomo contém somente plugins oficiais publicados por Nanquimori. O Nyxovira também permite conectar manualmente a URL de um catálogo hospedado de forma independente. Catálogos e plugins externos são controlados por seus próprios responsáveis e não são enviados ao, hospedados pelo, analisados pelo ou aprovados pelo KapiTomo.</p>
+
+        <h2>Funcionamento dos plugins</h2>
+        <p>Um plugin pode ler e organizar informações da página de origem aberta dentro do Nyxovira para o aplicativo identificar obras, capítulos, textos e imagens. O plugin pode acessar os domínios declarados em sua implementação. O usuário deve conectar apenas endereços confiáveis e conferir a origem do catálogo antes de instalar um plugin externo.</p>
+
+        <h2>Google Play e Pro</h2>
+        <p>O Google Play processa o pagamento. O Nyxovira não recebe os dados completos do cartão. O aplicativo recebe apenas as informações necessárias para confirmar e restaurar a compra, como identificador do produto, estado da compra e token. O Pro libera recursos do aplicativo; não é pagamento por obras, plugins ou sites externos.</p>
+
+        <h2>Permissões</h2>
+        <p>O Nyxovira pode solicitar acesso à internet, acesso a pastas escolhidas pelo usuário, permissão para notificações e capacidade de serviço em primeiro plano necessária para continuar downloads. Durante um download ativo, o aplicativo pode manter o processador acordado; após a reinicialização do dispositivo, ele pode retomar o serviço quando ainda houver trabalho pendente. As permissões disponíveis dependem da versão do Android e dos recursos utilizados.</p>
+
+        <h2>Compartilhamento de dados</h2>
+        <p>O Nyxovira não vende dados pessoais. Dados chegam a outro serviço somente quando isso é necessário para uma ação escolhida pelo usuário, como visitar uma fonte, baixar um arquivo, conectar um catálogo, abrir um link ou concluir uma compra pelo Google Play.</p>
+
+        <h2>Contato</h2>
+        <p>Para dúvidas sobre privacidade, escreva para <a href="mailto:nanquimori@gmail.com">nanquimori@gmail.com</a>.</p>
       </article>
     </main>
 
     <footer class="site-footer">
-      <p>KapiTomo is an official space for publishing and reading free original works.</p>
-      <p class="footer-policy-title">Policies</p>
+      <p>KapiTomo is Nanquimori's official space for original works and official plugins.</p>
       <nav class="footer-policy-links" aria-label="Policies">
-        <a href="https://nanquimori.github.io/KapiTomo/terms/">Terms</a>
-        <a href="https://nanquimori.github.io/KapiTomo/privacy/">KapiTomo Privacy</a>
-        <a href="https://nanquimori.github.io/KapiTomo/nyxovira/privacy/">Nyxovira Privacy</a>
-        <a href="https://nanquimori.github.io/KapiTomo/nyxalira/privacy/">Nyxalira Privacy</a>
+        <a href="../../terms/">Terms</a>
+        <a href="../../privacy/">KapiTomo Privacy</a>
+        <a href="./">Nyxovira Privacy</a>
+        <a href="../../nyxalira/privacy/">Nyxalira Privacy</a>
       </nav>
     </footer>
+    <script>
+      (() => {
+        const key = "kapitomo.policyLanguage.v2";
+        const normalize = value => String(value || "").toLowerCase().startsWith("pt") ? "pt" : "en";
+        const query = new URLSearchParams(location.search).get("lang");
+        let saved = "";
+        try { saved = localStorage.getItem(key) || ""; } catch {}
+        let language = normalize(query || saved || navigator.language);
+        const documents = [...document.querySelectorAll("[data-policy-language]")];
+        const buttons = [...document.querySelectorAll("[data-policy-language-option]")];
+        function apply(next) {
+          language = normalize(next);
+          document.documentElement.lang = language === "pt" ? "pt-BR" : "en";
+          documents.forEach(node => { node.hidden = node.dataset.policyLanguage !== language; });
+          buttons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.policyLanguageOption === language)));
+          try { localStorage.setItem(key, language); } catch {}
+        }
+        buttons.forEach(button => button.addEventListener("click", () => apply(button.dataset.policyLanguageOption)));
+        apply(language);
+      })();
+    </script>
   </body>
 </html>

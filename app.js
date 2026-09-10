@@ -27,8 +27,8 @@ const I18N = {
     },
     plugin: {
       title: "KapiTomo Plugin",
-      note: "Online plugins are source connectors. Community or third-party plugins are maintained by their creators and by the source sites they target. Nyxovira Pro unlocks app features; it is not a sale of third-party works, chapters, translations, or plugins.",
-      openPlugins: "Open online plugins",
+      note: "The official catalog contains only KapiTomo plugins published by Nanquimori. Personal plugins and independently hosted catalogs can be connected manually in Nyxovira.",
+      openPlugins: "Open official plugins",
       openDocs: "Open API documentation",
       terms: "Terms and content policy"
     },
@@ -114,8 +114,8 @@ const I18N = {
     },
     plugin: {
       title: "Plugin KapiTomo",
-      note: "Plugins online são conectores de fonte. Plugins da comunidade ou de terceiros são mantidos por seus criadores e pelos sites de origem. O Nyxovira Pro libera recursos do app; não é venda de obras, capítulos, traduções ou plugins de terceiros.",
-      openPlugins: "Abrir plugins online",
+      note: "O catálogo oficial contém somente plugins do KapiTomo publicados por Nanquimori. Plugins pessoais e catálogos hospedados de forma independente podem ser conectados manualmente no Nyxovira.",
+      openPlugins: "Abrir plugins oficiais",
       openDocs: "Abrir documentação da API",
       terms: "Termos e política de conteúdo"
     },

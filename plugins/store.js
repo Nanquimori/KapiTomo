@@ -1,515 +1,161 @@
-const list = document.getElementById("pluginList");
-const repoUrlInput = document.getElementById("repoUrlInput");
-const loadRepoPluginButton = document.getElementById("loadRepoPluginButton");
-const discardDraftPluginsButton = document.getElementById("discardDraftPluginsButton");
-const publishStatus = document.getElementById("publishStatus");
-const removePluginIdInput = document.getElementById("removePluginIdInput");
-const removeRepoUrlInput = document.getElementById("removeRepoUrlInput");
-const requestRemovePluginButton = document.getElementById("requestRemovePluginButton");
-const removeStatus = document.getElementById("removeStatus");
-const reportPluginIdInput = document.getElementById("reportPluginIdInput");
-const reportEmailInput = document.getElementById("reportEmailInput");
-const reportDetailsInput = document.getElementById("reportDetailsInput");
-const reportDetailsCount = document.getElementById("reportDetailsCount");
-const reportConfirmationInput = document.getElementById("reportConfirmationInput");
-const reportWebsiteInput = document.getElementById("reportWebsiteInput");
-const reportChallenge = document.getElementById("reportChallenge");
-const requestReportPluginButton = document.getElementById("requestReportPluginButton");
-const reportStatus = document.getElementById("reportStatus");
-const reportCreatorHelp = document.getElementById("reportCreatorHelp");
-const reportCreatorLink = document.getElementById("reportCreatorLink");
-const tagFilter = document.getElementById("tagFilter");
-const tagFilterStatus = document.getElementById("tagFilterStatus");
+const pluginList = document.getElementById("pluginList");
 const pluginSearchInput = document.getElementById("pluginSearchInput");
-const favoritesOnlyButton = document.getElementById("favoritesOnlyButton");
+const tagFilter = document.getElementById("tagFilter");
+const catalogCount = document.getElementById("catalogCount");
 const catalogPagination = document.getElementById("catalogPagination");
-const officialCatalogSection = document.getElementById("officialCatalogSection");
-const officialPluginList = document.getElementById("officialPluginList");
-const viewButtons = Array.from(document.querySelectorAll("[data-view-target]"));
-const viewPanels = Array.from(document.querySelectorAll("[data-view-panel]"));
 const languageButtons = Array.from(document.querySelectorAll("[data-language-option]"));
-const LOCAL_PLUGIN_KEY = "kapitomo.pluginDrafts.v3";
-const LANGUAGE_STORAGE_KEY = "kapitomo.pluginHubLanguage.v1";
-const FAVORITE_PLUGIN_KEY = "kapitomo.favoritePlugins.v1";
-const REPORT_HISTORY_KEY = "kapitomo.reportHistory.v1";
-const CATALOG_VERSION = "20260908-security-review";
-const REPORT_CONFIG = globalThis.KAPITOMO_REPORT_CONFIG || {};
-const REPORT_ENDPOINT = String(REPORT_CONFIG.endpoint || "").trim();
-const REPORT_TURNSTILE_SITE_KEY = String(REPORT_CONFIG.turnstileSiteKey || "").trim();
-const TURNSTILE_SCRIPT_URL = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-const REPORT_DUPLICATE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
-const MAX_REPORT_HISTORY = 100;
-const MIN_REPORT_DETAILS = 200;
-const MIN_REPORT_WORDS = 20;
-let reportTurnstileWidgetId = null;
-let reportTurnstileToken = "";
-let reportTurnstileScriptPromise = null;
-const MAX_PUBLIC_TAGS = 5;
-const MAX_TYPE_TAGS = 3;
-const MIN_PUBLIC_TAGS = 2;
-const OFFICIAL_LANGUAGE_TAGS = [
-  "english",
-  "portuguese",
-  "spanish",
-  "japanese",
-  "korean",
-  "chinese",
-  "indonesian",
-  "thai",
-  "vietnamese",
-  "french",
-  "german",
-  "italian",
-  "russian",
-  "arabic"
+const LANGUAGE_STORAGE_KEY = "kapitomo.pluginCatalogLanguage.v1";
+const FAVORITES_STORAGE_KEY = "kapitomo.favoritePlugins.v1";
+const LEGACY_STORAGE_KEYS = [
+  "kapitomo.pluginDrafts.v3",
+  "kapitomo.reportHistory.v1",
+  "kapitomo.restrictedAccess.v1",
+  "kapitomo.pluginHubLanguage.v1"
 ];
-const OFFICIAL_TYPE_TAGS = [
-  "manga",
-  "manhua",
-  "manhwa",
-  "novel",
-  "webtoon",
-  "comic",
-  "other"
-];
-const LANGUAGE_TAGS = new Set(OFFICIAL_LANGUAGE_TAGS);
-const TYPE_TAGS = new Set(OFFICIAL_TYPE_TAGS);
-const PUBLIC_TAGS = new Set([
-  ...OFFICIAL_LANGUAGE_TAGS,
-  ...OFFICIAL_TYPE_TAGS
-]);
+const CATALOG_VERSION = "20260910-official-only";
+const ALLOWED_LANGUAGES = ["portuguese", "english"];
+const ALLOWED_TYPES = ["manga", "manhua", "manhwa", "novel", "webtoon", "comic", "other"];
+
 const I18N = {
   en: {
-    title: "KapiTomo | Plugin Hub",
-    nav: {
-      catalog: "Catalog",
-      publish: "Publish",
-      report: "Report",
-      remove: "Remove",
-      api: "Plugin API"
+    title: "KapiTomo | Plugins",
+    nav: { label: "Main navigation", catalog: "Plugins", api: "Plugin API" },
+    hero: {
+      kicker: "Official catalog",
+      title: "Plugins published by Nanquimori",
+      description: "This catalog contains only KapiTomo plugins maintained and published by Nanquimori for Nyxovira.",
+      otherTitle: "Need another source?",
+      otherText: "Create a personal plugin or connect an external catalog manually in Nyxovira. External catalogs remain independent from KapiTomo.",
+      readApi: "Read the Plugin API"
     },
     catalog: {
       kicker: "Catalog",
-      title: "Published plugins",
+      title: "Available plugins",
       search: "Search plugins",
-      categories: "Categories",
-      tagFilters: "Catalog tag filters",
-      tagLegend: "Tag color meanings",
-      tagNeutral: "No filter",
-      tagIncluded: "Include tag",
-      tagExcluded: "Exclude tag",
+      filters: "Plugin filters",
+      pages: "Catalog pages",
       loading: "Loading catalog...",
-      officialPlugin: "Official plugin",
-      officialBadge: "Official",
-      communityPlugins: "Community plugins",
-      paginationLabel: "Catalog pages",
-      previousPage: "Previous",
-      nextPage: "Next",
-      page: "Page",
-      ofPages: "of {total}",
-      choosePage: "Choose a catalog page",
-      goToPage: "Go to page {page}",
-      currentPage: "Page {page}, current page",
-      showing: "Showing community plugins {start}-{end} of {total}.",
-      noTags: "No tags available yet.",
-      noPlugins: "No plugins published yet.",
-      noCommunityPlugins: "No community plugins published yet.",
-      noMatches: "No plugins match the selected tags.",
-      matching: "{count} plugin{plural} matching {filters}.",
-      loadError: "Could not load the catalog: {message}",
-      language: "Language",
-      type: "Type",
-      tagLabels: {
-        other: "other"
-      },
-      favorite: "Favorite",
-      favorites: "Favorites",
-      favoriteOnly: "Favorites only",
-      showAll: "Show all",
-      without: "without {tags}",
-      online: "Online",
-      offline: "Offline",
+      all: "All",
+      count: "{count} plugin{plural} available.",
+      shown: "{count} plugin{plural} found.",
+      empty: "No plugin matches this search.",
+      error: "The catalog could not be loaded. Try again later.",
       install: "Install",
-      publish: "Publish",
-      report: "Report",
-      remove: "Delete",
-      open: "Open",
-      pluginFallback: "Plugin"
+      open: "Open site",
+      favorite: "Favorite",
+      online: "Available",
+      previous: "Previous",
+      next: "Next",
+      page: "Page {page}"
     },
-    report: {
-      kicker: "Report",
-      title: "Report a plugin",
-      description: "Use this form to report a serious problem with a plugin available in the catalog. Every report is reviewed before any decision is made.",
-      notFor: "Do not use this form to complain about works, missing chapters, translations, advertisements, website availability, or account rules. For common plugin errors, contact its developer.",
-      technicalHelp: "Need help using the plugin? Visit the developer's repository:",
-      creatorRepository: "Open developer repository",
-      notice: "The report is sent privately. Your email will be used only if we need to contact you about the review.",
-      privacyLink: "Privacy Policy",
-      pluginId: "Plugin ID",
-      email: "Contact email",
-      reason: "Reason",
-      languageRequirement: "The reason must be written in Portuguese or English. Reports in other languages cannot be reviewed.",
-      duplicatePolicy: "Repeated reports are combined into the same review. A high number of reports does not prove wrongdoing and never removes a plugin automatically.",
-      detailsPlaceholder: "Clearly explain why you are reporting this plugin. Include only the information you consider important for the review.",
-      detailsCount: "{count}/{minimum} minimum characters · {words}/{minimumWords} minimum words",
-      confirmation: "I confirm that I have read the guidance above and that the information I provided is true to the best of my knowledge.",
-      request: "Send report",
-      enterId: "Enter the plugin ID.",
-      invalidId: "Use a valid plugin ID.",
-      enterEmail: "Enter a contact email.",
-      invalidEmail: "Enter a valid contact email.",
-      explain: "Write a complete reason with at least {minimum} characters and {minimumWords} words. Current: {count} characters and {words} words.",
-      confirm: "Confirm that you have read the guidance and provided truthful information before sending the report.",
-      sending: "Sending report...",
-      sent: "Report sent successfully. It will be reviewed by the Plugin Hub team. Thank you for helping us maintain a safe environment for the entire community.",
-      duplicate: "This report has already been sent from this browser and is included in the review. Sending it again will not change the decision.",
-      sendError: "The report could not be sent right now. Check your connection and try again in a few minutes.",
-      securityVerification: "Security verification",
-      serviceUnavailable: "Secure reporting is not configured right now. Please try again later.",
-      captchaRequired: "Complete the security verification before sending the report.",
-      captchaFailed: "The security verification failed or expired. Complete it again and retry.",
-      rateLimited: "Too many reports were sent from this connection. Wait a minute and try again.",
-      confirmationLine: "Reporter confirmed that the guidance was read and the information is true to the best of their knowledge",
-      rulesLine: "Catalog rules: https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules"
-    },
-    publish: {
-      kicker: "Publish",
-      title: "Publish a ready plugin",
-      description: "Paste the GitHub repository that already contains plugin.json. The Hub checks it and prepares the publication request.",
-      repository: "GitHub repository",
-      load: "Load plugin",
-      discard: "Discard drafts",
-      securityTitle: "Security review before publication",
-      securityDescription: "The catalog is updated only after the exact repository snapshot passes every check.",
-      securityFiles: "Every plugin file is inventoried; executables, archives, symbolic links, disguised files, and oversized packages are rejected.",
-      securityCode: "Browser scripts are inspected line by line for malicious or obfuscated behavior and undeclared network hosts.",
-      securityAntivirus: "ClamAV scans the complete plugin snapshot with current official signatures. A detection or incomplete scan blocks publication.",
-      securityPinned: "The approved catalog entry is pinned to the reviewed commit, so later repository changes require a new review.",
-      securityLimits: "Automated checks reduce risk but cannot prove that software is harmless. Reports and manual moderation remain available.",
-      how: "How publishing works",
-      step1: {
-        title: "Prepare the plugin",
-        text: "Keep the manifest and browser script organized in the repository."
-      },
-      step2: {
-        title: "Publish on GitHub",
-        text: "The plugin stays in your repository, and KapiTomo publishes only the catalog entry."
-      },
-      step3: {
-        title: "Add it to the catalog",
-        text: "Use the publication button and confirm on GitHub. Automation updates the catalog when it finishes."
-      },
-      reading: "Reading plugin.json from the repository...",
-      preparing: "Preparing the publication request...",
-      loaded: "Plugin loaded. Confirm the GitHub request; file, code, and antivirus checks run before publication.",
-      failed: "Could not load the plugin.",
-      outdated: "This draft is outdated. Load the GitHub repository again before requesting publication.",
-      draftsRemoved: "Drafts removed from this browser.",
-      requestTitle: "Plugin publication request for the Nyxovira catalog.",
-      requestDescription: "After submission, the catalog automation reviews every plugin file, scans browser code and network hosts, runs antivirus checks, and validates ownership, manifest, icon, tags, hosts, and acceptance of the current catalog rules.",
-      responsibility: "By submitting this plugin, I confirm that I control its repository, accept the current Plugin Hub catalog rules, and am responsible for the plugin code, metadata, icon, permissions requested by the plugin, maintenance, and source mapping. I understand that automatic publication is not approval of third-party content.",
-      acceptanceLine: "Catalog rules accepted: yes",
-      rulesLine: "Catalog rules: https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules",
-      repositoryLine: "Repository: {url}",
-      tagMinimum: "plugin.json must declare at least 2 tags: language first, then type.",
-      firstTag: "The first public tag must be one of: {tags}.",
-      nextTags: "After language, use one to three types from: {types}.",
-      typeLimit: "Use no more than three content types.",
-      validUrl: "Paste a valid GitHub URL.",
-      githubOnly: "Use a github.com repository.",
-      ownerRepo: "The URL must include an owner and repository.",
-      manifestMissing: "plugin.json was not found in the repository. {message}",
-      iconMissing: "The plugin must declare browser.icon_url."
-    },
-    remove: {
-      kicker: "Remove",
-      title: "Remove a publication",
-      description: "Enter the published plugin and confirm the GitHub request. Plugin owners can remove their own entries; maintainer actions require a recorded reason.",
-      pluginId: "Plugin ID",
-      repository: "GitHub repository",
-      request: "Request removal",
-      enterId: "Enter the published plugin ID.",
-      enterRepo: "Enter the plugin GitHub repository.",
-      opening: "Opening the removal request on GitHub...",
-      requestTitle: "Plugin removal request for the Nyxovira catalog.",
-      requestDescription: "After you submit this request, the catalog automation validates ownership and applies authorized removals automatically.",
-      pluginIdLine: "Plugin ID: {id}",
-      repositoryLine: "Repository: {url}",
-      confirm: "I confirm that I want to remove this plugin from the online catalog."
-    },
-    ownership: {
-      kicker: "Ownership",
-      title: "Who can manage a plugin?",
-      explainer: "The Hub compares the GitHub account that opens the request with the repository owner saved in the catalog.",
-      joao: "can publish and remove",
-      maria: "can publish and remove",
-      blocked: "cannot remove Maria's plugin",
-      moderator: "can review both",
-      rule: "The typed link and ID identify the plugin; authorization comes from the GitHub account that creates the issue."
+    tag: {
+      portuguese: "Portuguese",
+      english: "English",
+      manga: "Manga",
+      manhua: "Manhua",
+      manhwa: "Manhwa",
+      novel: "Novel",
+      webtoon: "Webtoon",
+      comic: "Comic",
+      other: "Other"
     },
     install: {
-      iconMissing: "This plugin does not have icon_url and cannot be installed from the online catalog.",
-      repositoryMissing: "This plugin does not have repository_url and cannot be installed from the online catalog.",
-      openInsideApp: "Open this page from the Online plugins button inside Nyxovira to install directly in the app.",
-      success: "Plugin installed.",
-      failed: "Could not install the plugin.",
-      failedWithMessage: "Could not install the plugin: {message}",
-      unknown: "unknown error"
-    }
+      openInsideApp: "Open this catalog inside Nyxovira to install the plugin.",
+      failed: "The plugin could not be installed.",
+      unknown: "Unknown error"
+    },
+    footer: { terms: "Terms", privacy: "KapiTomo Privacy" }
   },
   pt: {
-    title: "KapiTomo | Hub de Plugins",
-    nav: {
-      catalog: "Catálogo",
-      publish: "Publicar",
-      report: "Denunciar",
-      remove: "Remover",
-      api: "API de Plugins"
+    title: "KapiTomo | Plugins",
+    nav: { label: "Navegação principal", catalog: "Plugins", api: "API de Plugins" },
+    hero: {
+      kicker: "Catálogo oficial",
+      title: "Plugins publicados por Nanquimori",
+      description: "Este catálogo contém somente plugins do KapiTomo mantidos e publicados por Nanquimori para o Nyxovira.",
+      otherTitle: "Precisa de outra fonte?",
+      otherText: "Crie um plugin pessoal ou conecte manualmente um catálogo externo no Nyxovira. Catálogos externos continuam independentes do KapiTomo.",
+      readApi: "Ler a API de Plugins"
     },
     catalog: {
       kicker: "Catálogo",
-      title: "Plugins publicados",
+      title: "Plugins disponíveis",
       search: "Pesquisar plugins",
-      categories: "Categorias",
-      tagFilters: "Filtros de tags do catálogo",
-      tagLegend: "Significado das cores das tags",
-      tagNeutral: "Sem filtro",
-      tagIncluded: "Incluir tag",
-      tagExcluded: "Excluir tag",
+      filters: "Filtros de plugins",
+      pages: "Páginas do catálogo",
       loading: "Carregando catálogo...",
-      officialPlugin: "Plugin oficial",
-      officialBadge: "Oficial",
-      communityPlugins: "Plugins da comunidade",
-      paginationLabel: "Páginas do catálogo",
-      previousPage: "Anterior",
-      nextPage: "Próxima",
-      page: "Página",
-      ofPages: "de {total}",
-      choosePage: "Escolha uma página do catálogo",
-      goToPage: "Ir para a página {page}",
-      currentPage: "Página {page}, página atual",
-      showing: "Exibindo plugins da comunidade {start}-{end} de {total}.",
-      noTags: "Nenhuma tag disponível ainda.",
-      noPlugins: "Nenhum plugin publicado ainda.",
-      noCommunityPlugins: "Nenhum plugin da comunidade foi publicado ainda.",
-      noMatches: "Nenhum plugin combina com as tags selecionadas.",
-      matching: "{count} plugin{plural} encontrado{plural} para {filters}.",
-      loadError: "Não foi possível carregar o catálogo: {message}",
-      language: "Idioma",
-      type: "Tipo",
-      tagLabels: {
-        other: "outros"
-      },
-      favorite: "Favoritar",
-      favorites: "Favoritos",
-      favoriteOnly: "So favoritos",
-      showAll: "Mostrar todos",
-      without: "sem {tags}",
-      online: "Online",
-      offline: "Offline",
+      all: "Todos",
+      count: "{count} plugin{plural} disponível{plural}.",
+      shown: "{count} plugin{plural} encontrado{plural}.",
+      empty: "Nenhum plugin corresponde a esta pesquisa.",
+      error: "Não foi possível carregar o catálogo. Tente novamente mais tarde.",
       install: "Instalar",
-      publish: "Publicar",
-      report: "Denunciar",
-      remove: "Excluir",
-      open: "Abrir",
-      pluginFallback: "Plugin"
+      open: "Abrir site",
+      favorite: "Favorito",
+      online: "Disponível",
+      previous: "Anterior",
+      next: "Próxima",
+      page: "Página {page}"
     },
-    report: {
-      kicker: "Denúncia",
-      title: "Denunciar um plugin",
-      description: "Use este formulário para informar um problema sério com um plugin disponível no catálogo. Toda denúncia é analisada antes de qualquer decisão.",
-      notFor: "Não use este formulário para reclamar de obras, capítulos ausentes, traduções, anúncios, indisponibilidade do site ou regras de conta. Para erros comuns do plugin, procure o desenvolvedor.",
-      technicalHelp: "Precisa de ajuda para usar o plugin? Acesse o repositório do desenvolvedor:",
-      creatorRepository: "Abrir repositório do desenvolvedor",
-      notice: "A denúncia é enviada de forma privada. Seu e-mail será usado apenas se precisarmos falar com você sobre a análise.",
-      privacyLink: "Política de Privacidade",
-      pluginId: "ID do plugin",
-      email: "E-mail para contato",
-      reason: "Motivo",
-      languageRequirement: "O motivo deve ser escrito em português ou inglês. Denúncias em outros idiomas não poderão ser analisadas.",
-      duplicatePolicy: "Denúncias repetidas são reunidas na mesma análise. Ter muitas denúncias não prova que o plugin fez algo errado e nunca causa remoção automática.",
-      detailsPlaceholder: "Explique claramente por que você está denunciando este plugin. Inclua apenas as informações que considera importantes para a análise.",
-      detailsCount: "{count}/{minimum} caracteres mínimos · {words}/{minimumWords} palavras mínimas",
-      confirmation: "Confirmo que li as orientações acima e que as informações que forneci são verdadeiras conforme meu conhecimento.",
-      request: "Enviar denúncia",
-      enterId: "Informe o ID do plugin.",
-      invalidId: "Use um ID de plugin válido.",
-      enterEmail: "Informe um e-mail para contato.",
-      invalidEmail: "Informe um e-mail válido para contato.",
-      explain: "Escreva um motivo completo com pelo menos {minimum} caracteres e {minimumWords} palavras. Atual: {count} caracteres e {words} palavras.",
-      confirm: "Confirme que leu as orientações e forneceu informações verdadeiras antes de enviar a denúncia.",
-      sending: "Enviando denúncia...",
-      sent: "Denúncia enviada com sucesso. Ela será analisada pela equipe do Plugin Hub. Agradecemos por nos ajudar a manter um ambiente seguro para toda a comunidade.",
-      duplicate: "Esta denúncia já foi enviada neste navegador e está incluída na análise. Enviá-la novamente não muda a decisão.",
-      sendError: "Não foi possível enviar a denúncia agora. Verifique sua conexão e tente novamente em alguns minutos.",
-      securityVerification: "Verificação de segurança",
-      serviceUnavailable: "O canal seguro de denúncias não está configurado no momento. Tente novamente mais tarde.",
-      captchaRequired: "Conclua a verificação de segurança antes de enviar a denúncia.",
-      captchaFailed: "A verificação de segurança falhou ou expirou. Faça-a novamente e tente outra vez.",
-      rateLimited: "Muitas denúncias foram enviadas por esta conexão. Aguarde um minuto e tente novamente.",
-      confirmationLine: "O denunciante confirmou que leu as orientações e que as informações são verdadeiras conforme seu conhecimento",
-      rulesLine: "Regras do catálogo: https://nanquimori.github.io/KapiTomo/terms/#regras-do-catalogo"
-    },
-    publish: {
-      kicker: "Publicar",
-      title: "Publique um plugin pronto",
-      description: "Cole o repositório GitHub que já contém plugin.json. O Hub verifica o conteúdo e prepara a solicitação de publicação.",
-      repository: "Repositório GitHub",
-      load: "Carregar plugin",
-      discard: "Descartar rascunhos",
-      securityTitle: "Análise de segurança antes da publicação",
-      securityDescription: "O catálogo só é atualizado depois que a versão exata dos arquivos do repositório passa por todas as verificações.",
-      securityFiles: "Todos os arquivos do plugin são inventariados; executáveis, compactados, links simbólicos, arquivos disfarçados e pacotes grandes demais são recusados.",
-      securityCode: "Os scripts do navegador são examinados linha por linha contra comportamento malicioso ou ofuscado e domínios de rede não declarados.",
-      securityAntivirus: "O ClamAV verifica todo o plugin com assinaturas oficiais atuais. Uma detecção ou análise incompleta bloqueia a publicação.",
-      securityPinned: "A entrada aprovada fica presa ao commit analisado; mudanças posteriores no repositório exigem nova análise.",
-      securityLimits: "As verificações automáticas reduzem o risco, mas não provam que um software seja inofensivo. Denúncias e moderação manual continuam disponíveis.",
-      how: "Como a publicação funciona",
-      step1: {
-        title: "Prepare o plugin",
-        text: "Mantenha o manifesto e o script do navegador organizados no repositório."
-      },
-      step2: {
-        title: "Publique no GitHub",
-        text: "O plugin fica no seu repositório, e o KapiTomo publica apenas a entrada do catálogo."
-      },
-      step3: {
-        title: "Adicione ao catálogo",
-        text: "Use o botão de publicação e confirme no GitHub. A automação atualiza o catálogo quando terminar."
-      },
-      reading: "Lendo plugin.json do repositório...",
-      preparing: "Preparando a solicitação de publicação...",
-      loaded: "Plugin carregado. Confirme a solicitação no GitHub; as verificações de arquivos, código e antivírus acontecem antes da publicação.",
-      failed: "Não foi possível carregar o plugin.",
-      outdated: "Este rascunho está desatualizado. Carregue o repositório GitHub novamente antes de solicitar publicação.",
-      draftsRemoved: "Rascunhos removidos deste navegador.",
-      requestTitle: "Solicitação de publicação de plugin para o catálogo do Nyxovira.",
-      requestDescription: "Depois do envio, a automação analisa todos os arquivos do plugin, examina o código do navegador e os domínios de rede, executa o antivírus e valida propriedade, manifesto, ícone, tags, hosts e aceitação das regras atuais do catálogo.",
-      responsibility: "Ao enviar este plugin, confirmo que controlo seu repositório, aceito as regras atuais do catálogo do Plugin Hub e sou responsável pelo código, metadados, ícone, permissões solicitadas pelo plugin, manutenção e mapeamento da fonte. Entendo que a publicação automática não representa aprovação de conteúdos de terceiros.",
-      acceptanceLine: "Regras do catálogo aceitas: sim",
-      rulesLine: "Regras do catálogo: https://nanquimori.github.io/KapiTomo/terms/#regras-do-catalogo",
-      repositoryLine: "Repositório: {url}",
-      tagMinimum: "plugin.json precisa declarar pelo menos 2 tags: idioma primeiro, depois tipo.",
-      firstTag: "A primeira tag pública precisa ser uma destas: {tags}.",
-      nextTags: "Depois do idioma, use de um a três tipos entre: {types}.",
-      typeLimit: "Use no máximo três tipos de conteúdo.",
-      validUrl: "Cole uma URL válida do GitHub.",
-      githubOnly: "Use um repositório github.com.",
-      ownerRepo: "A URL precisa incluir usuário e repositório.",
-      manifestMissing: "plugin.json não foi encontrado no repositório. {message}",
-      iconMissing: "O plugin precisa declarar browser.icon_url."
-    },
-    remove: {
-      kicker: "Remover",
-      title: "Remova uma publicação",
-      description: "Informe o plugin publicado e confirme a solicitação no GitHub. Donos podem remover as próprias entradas; ações de mantenedores exigem motivo registrado.",
-      pluginId: "ID do plugin",
-      repository: "Repositório GitHub",
-      request: "Solicitar remoção",
-      enterId: "Informe o ID do plugin publicado.",
-      enterRepo: "Informe o repositório GitHub do plugin.",
-      opening: "Abrindo a solicitação de remoção no GitHub...",
-      requestTitle: "Solicitação de remoção de plugin do catálogo do Nyxovira.",
-      requestDescription: "Depois de enviar esta solicitação, a automação valida a propriedade e aplica automaticamente as remoções autorizadas.",
-      pluginIdLine: "ID do plugin: {id}",
-      repositoryLine: "Repositório: {url}",
-      confirm: "Confirmo que quero remover este plugin do catálogo online."
-    },
-    ownership: {
-      kicker: "Propriedade",
-      title: "Quem pode gerenciar um plugin?",
-      explainer: "O Hub compara a conta GitHub que abre a solicitação com o dono do repositório salvo no catálogo.",
-      joao: "pode publicar e remover",
-      maria: "pode publicar e remover",
-      blocked: "não pode remover o plugin de Maria",
-      moderator: "pode analisar ambos",
-      rule: "O link e o ID informados identificam o plugin; a autorização vem da conta GitHub que cria a issue."
+    tag: {
+      portuguese: "Português",
+      english: "Inglês",
+      manga: "Mangá",
+      manhua: "Manhua",
+      manhwa: "Manhwa",
+      novel: "Novel",
+      webtoon: "Webtoon",
+      comic: "Quadrinho",
+      other: "Outro"
     },
     install: {
-      iconMissing: "Este plugin não tem icon_url e não pode ser instalado pelo catálogo online.",
-      repositoryMissing: "Este plugin não tem repository_url e não pode ser instalado pelo catálogo online.",
-      openInsideApp: "Abra esta página pelo botão Plugins online dentro do Nyxovira para instalar direto no app.",
-      success: "Plugin instalado.",
+      openInsideApp: "Abra este catálogo dentro do Nyxovira para instalar o plugin.",
       failed: "Não foi possível instalar o plugin.",
-      failedWithMessage: "Não foi possível instalar o plugin: {message}",
-      unknown: "erro desconhecido"
-    }
+      unknown: "Erro desconhecido"
+    },
+    footer: { terms: "Termos", privacy: "Privacidade KapiTomo" }
   }
 };
-let renderedPlugins = [];
-let pinnedOfficialPlugins = [];
-let allPlugins = [];
-let availableTags = [];
-let selectedTags = [];
-let excludedTags = [];
-let favoritePluginKeys = loadFavoritePluginKeys();
-let favoritesOnly = false;
-let searchQuery = "";
-let filteredCatalogPlugins = [];
-let currentCatalogPage = 1;
-let currentLanguage = initialLanguage();
 
-function normalizeLanguage(value) {
-  const language = String(value ? value : "").toLowerCase();
-  return language.startsWith("pt") ? "pt" : "en";
-}
+let currentLanguage = detectLanguage();
+let allPlugins = [];
+let filteredPlugins = [];
+let selectedTag = "";
+let currentPage = 1;
 
 function detectLanguage() {
-  const candidates = [];
-  if (navigator.languages && navigator.languages.length) {
-    candidates.push(...navigator.languages);
-  }
-  if (navigator.language) {
-    candidates.push(navigator.language);
-  }
-  try {
-    const locale = Intl.DateTimeFormat().resolvedOptions().locale;
-    if (locale) {
-      candidates.push(locale);
-    }
-  } catch (error) {}
-  if (candidates.some((candidate) => normalizeLanguage(candidate) === "pt")) {
-    return "pt";
-  }
-  try {
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    if (/Sao_Paulo|Lisbon|Madeira|Azores|Luanda|Maputo|Bissau|Cape_Verde/i.test(String(timeZone))) {
-      return "pt";
-    }
-  } catch (error) {}
-  return "en";
-}
-
-function initialLanguage() {
-  const urlLanguage = new URLSearchParams(window.location.search).get("lang");
-  if (urlLanguage) {
-    return normalizeLanguage(urlLanguage);
-  }
+  const params = new URLSearchParams(globalThis.location && globalThis.location.search || "");
+  const requested = String(params.get("lang") || "").toLowerCase();
+  if (requested === "pt" || requested === "en") return requested;
   try {
     const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY);
-    if (stored) {
-      return normalizeLanguage(stored);
-    }
-  } catch (error) {}
-  return detectLanguage();
+    if (stored === "pt" || stored === "en") return stored;
+  } catch {}
+  return String(navigator.language || "").toLowerCase().startsWith("pt") ? "pt" : "en";
 }
 
-function t(key, values = {}) {
-  const parts = key.split(".");
-  let output = I18N[currentLanguage];
-  parts.forEach((part) => {
-    output = output && output[part];
-  });
-  if (typeof output !== "string") {
-    output = key;
-  }
+function removeLegacyData() {
+  try {
+    LEGACY_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
+  } catch {}
+}
+
+function t(path, values = {}) {
+  let output = path.split(".").reduce((value, part) => value && value[part], I18N[currentLanguage]);
+  if (typeof output !== "string") output = path;
   Object.entries(values).forEach(([name, value]) => {
-    output = output.split(`{${name}}`).join(value);
+    output = output.replaceAll(`{${name}}`, String(value));
   });
   return output;
 }
 
-function applyStaticTranslations() {
+function escapeHtml(value) {
+  return String(value == null ? "" : value).replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[character]));
+}
+
+function applyTranslations() {
   document.documentElement.lang = currentLanguage === "pt" ? "pt-BR" : "en";
   document.title = t("title");
   document.querySelectorAll("[data-i18n]").forEach((node) => {
@@ -522,1209 +168,180 @@ function applyStaticTranslations() {
     node.setAttribute("aria-label", t(node.dataset.i18nAria));
   });
   languageButtons.forEach((button) => {
-    button.setAttribute("aria-pressed", button.dataset.languageOption === currentLanguage ? "true" : "false");
+    button.setAttribute("aria-pressed", String(button.dataset.languageOption === currentLanguage));
   });
 }
 
-function setLanguage(language, persist = true) {
-  currentLanguage = normalizeLanguage(language);
-  if (persist) {
-    try {
-      localStorage.setItem(LANGUAGE_STORAGE_KEY, currentLanguage);
-    } catch (error) {}
-  }
-  applyStaticTranslations();
-  renderTagFilters(availableTags);
-  updateFavoritesOnlyButton();
-  updateReportDetailsCount();
-  applyTagFilters();
+function setLanguage(language) {
+  currentLanguage = language === "pt" ? "pt" : "en";
+  try { localStorage.setItem(LANGUAGE_STORAGE_KEY, currentLanguage); } catch {}
+  applyTranslations();
+  renderFilters();
+  applyFilters(false);
 }
 
-function escapeHtml(value) {
-  return String(value || "").replace(/[&<>"']/g, (char) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  }[char]));
-}
-
-function hasRequiredPluginIcon(plugin) {
-  return Boolean(plugin && String(plugin.icon_url || "").trim());
-}
-
-function hasRepository(plugin) {
-  return Boolean(plugin && String(plugin.repository_url || "").trim());
-}
-
-function pluginStatus(plugin) {
-  const status = String(plugin?.status || "active").trim().toLowerCase();
-  return ["active", "broken", "hidden", "removed", "missing"].includes(status) ? status : "active";
-}
-
-function isVisiblePlugin(plugin) {
-  return !["hidden", "removed", "missing"].includes(pluginStatus(plugin));
-}
-
-function siteStatusLabel(plugin) {
-  return pluginStatus(plugin) === "broken" ? t("catalog.offline") : t("catalog.online");
-}
-
-function siteStatusClass(plugin) {
-  return pluginStatus(plugin) === "broken" ? "is-offline" : "is-online";
-}
-
-function setPublishStatus(message) {
-  if (publishStatus) {
-    publishStatus.textContent = message || "";
-  }
-}
-
-function setReportStatus(message, state = "") {
-  if (reportStatus) {
-    reportStatus.textContent = message || "";
-    reportStatus.classList.toggle("is-success", state === "success");
-    reportStatus.classList.toggle("is-error", state === "error");
-  }
-}
-
-function reportSecurityConfigured() {
-  try {
-    const endpoint = new URL(REPORT_ENDPOINT);
-    return endpoint.protocol === "https:"
-      && endpoint.hostname !== "formsubmit.co"
-      && Boolean(REPORT_TURNSTILE_SITE_KEY);
-  } catch {
-    return false;
-  }
-}
-
-function loadReportTurnstileScript() {
-  if (globalThis.turnstile?.render) {
-    return Promise.resolve();
-  }
-  if (reportTurnstileScriptPromise) {
-    return reportTurnstileScriptPromise;
-  }
-  reportTurnstileScriptPromise = new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = TURNSTILE_SCRIPT_URL;
-    script.async = true;
-    script.defer = true;
-    script.addEventListener("load", resolve, { once: true });
-    script.addEventListener("error", () => reject(new Error("turnstile_load_failed")), { once: true });
-    document.head.appendChild(script);
-  });
-  return reportTurnstileScriptPromise;
-}
-
-async function initializeReportChallenge() {
-  if (!reportChallenge || reportTurnstileWidgetId !== null) {
-    return;
-  }
-  if (!reportSecurityConfigured()) {
-    setReportStatus(t("report.serviceUnavailable"), "error");
-    return;
-  }
-  try {
-    await loadReportTurnstileScript();
-    reportTurnstileWidgetId = globalThis.turnstile.render(reportChallenge, {
-      sitekey: REPORT_TURNSTILE_SITE_KEY,
-      action: "plugin-report",
-      theme: "auto",
-      callback(token) {
-        reportTurnstileToken = String(token || "");
-        if (reportStatus?.classList.contains("is-error")) {
-          setReportStatus("");
-        }
-      },
-      "expired-callback"() {
-        reportTurnstileToken = "";
-      },
-      "error-callback"() {
-        reportTurnstileToken = "";
-        setReportStatus(t("report.captchaFailed"), "error");
-      }
-    });
-  } catch {
-    setReportStatus(t("report.serviceUnavailable"), "error");
-  }
-}
-
-function resetReportChallenge() {
-  reportTurnstileToken = "";
-  if (reportTurnstileWidgetId !== null && globalThis.turnstile?.reset) {
-    globalThis.turnstile.reset(reportTurnstileWidgetId);
-  }
-}
-
-function setRemoveStatus(message) {
-  if (removeStatus) {
-    removeStatus.textContent = message || "";
-  }
-}
-
-function catalogFreshness(catalog) {
-  const plugins = Array.isArray(catalog?.plugins) ? catalog.plugins : [];
-  return plugins.reduce((latest, plugin) => {
-    const checkedAt = Date.parse(String(plugin?.last_checked_at || ""));
-    return Number.isFinite(checkedAt) ? Math.max(latest, checkedAt) : latest;
-  }, 0);
-}
-
-async function fetchCatalog() {
-  const cacheKey = `${CATALOG_VERSION}-${Date.now()}`;
-  const urls = [
-    `catalog-store.json?v=${cacheKey}`,
-    `https://raw.githubusercontent.com/Nanquimori/KapiTomo/main/plugins/catalog-store.json?v=${cacheKey}`,
-    `https://raw.githubusercontent.com/Nanquimori/KapiTomo/gh-pages/plugins/catalog-store.json?v=${cacheKey}`
-  ];
-  const results = await Promise.allSettled(urls.map((url) => fetch(url, { cache: "no-store" })
-    .then((response) => response.ok ? response.json() : Promise.reject(new Error("HTTP " + response.status)))));
-  const catalogs = results
-    .filter((result) => result.status === "fulfilled")
-    .map((result) => result.value)
-    .filter((catalog) => catalog && Array.isArray(catalog.plugins));
-  if (!catalogs.length) {
-    const failed = results.find((result) => result.status === "rejected");
-    throw failed?.reason || new Error("No plugin catalog is available.");
-  }
-  return catalogs.sort((first, second) => catalogFreshness(second) - catalogFreshness(first))[0];
-}
-
-function publicPlugin(plugin) {
-  const clean = { ...plugin };
-  Object.keys(clean).forEach((key) => {
-    if (key.startsWith("__") || clean[key] === "" || clean[key] == null) {
-      delete clean[key];
-    }
-  });
-  return clean;
-}
-
-function pluginKey(plugin) {
-  return [
-    String(plugin?.id || ""),
-    String(plugin?.repository_url || ""),
-    String(plugin?.repository_ref || ""),
-    String(plugin?.plugin_path || "")
-  ].join("|");
-}
-
-function normalizedPluginId(plugin) {
-  return String(plugin?.id || "").trim().toLowerCase();
-}
-
-function normalizedRepositoryUrl(plugin) {
-  const rawUrl = String(plugin?.repository_url || "").trim();
-  try {
-    const url = new URL(rawUrl);
-    const parts = url.pathname.split("/").filter(Boolean);
-    if (/^(www\.)?github\.com$/i.test(url.hostname) && parts.length >= 2) {
-      return `github.com/${parts[0]}/${parts[1].replace(/\.git$/i, "")}`.toLowerCase();
-    }
-  } catch (error) {}
-  return rawUrl.replace(/\.git\/?$/i, "").replace(/\/+$/, "").toLowerCase();
-}
-
-function isSamePluginPublication(first, second) {
-  const firstId = normalizedPluginId(first);
-  const secondId = normalizedPluginId(second);
-  if (firstId && secondId && firstId === secondId) {
-    return true;
-  }
-  const firstRepository = normalizedRepositoryUrl(first);
-  const secondRepository = normalizedRepositoryUrl(second);
-  return Boolean(firstRepository
-    && firstRepository === secondRepository
-    && normalizePluginPath(first?.plugin_path).toLowerCase() === normalizePluginPath(second?.plugin_path).toLowerCase());
-}
-
-function loadFavoritePluginKeys() {
-  try {
-    const values = JSON.parse(localStorage.getItem(FAVORITE_PLUGIN_KEY) || "[]");
-    return new Set(Array.isArray(values) ? values.map((value) => String(value || "")).filter(Boolean) : []);
-  } catch {
-    return new Set();
-  }
-}
-
-function saveFavoritePluginKeys() {
-  try {
-    localStorage.setItem(FAVORITE_PLUGIN_KEY, JSON.stringify([...favoritePluginKeys].filter(Boolean)));
-  } catch (error) {}
-}
-
-function isFavoritePlugin(plugin) {
-  return favoritePluginKeys.has(pluginKey(plugin));
-}
-
-function toggleFavoritePlugin(plugin) {
-  const key = pluginKey(plugin);
-  if (!key.trim()) {
-    return;
-  }
-  if (favoritePluginKeys.has(key)) {
-    favoritePluginKeys.delete(key);
-  } else {
-    favoritePluginKeys.add(key);
-  }
-  saveFavoritePluginKeys();
-  applyTagFilters();
-}
-
-function displayTags(tags) {
-  return (Array.isArray(tags) ? tags : [])
+function cleanTags(plugin) {
+  return (Array.isArray(plugin && plugin.tags) ? plugin.tags : [])
     .map((tag) => String(tag || "").trim().toLowerCase())
-    .filter((tag) => PUBLIC_TAGS.has(tag))
-    .slice(0, MAX_PUBLIC_TAGS);
+    .filter((tag) => ALLOWED_LANGUAGES.includes(tag) || ALLOWED_TYPES.includes(tag));
 }
 
-function filterTags(tags) {
-  return (Array.isArray(tags) ? tags : [])
-    .map((tag) => String(tag || "").trim().toLowerCase())
-    .filter((tag) => PUBLIC_TAGS.has(tag));
-}
-
-function normalizePublicationTags(tags) {
-  const rawTags = Array.isArray(tags) ? tags : ["community"];
-  const output = [];
-  const seen = new Set();
-  rawTags.forEach((tag) => {
-    const clean = String(tag || "").trim().toLowerCase();
-    if (!clean || seen.has(clean)) {
-      return;
-    }
-    if (clean !== "official" && clean !== "community") {
-      if (!PUBLIC_TAGS.has(clean)) {
-        return;
-      }
-      const publicCount = output.filter((item) => item !== "official" && item !== "community").length;
-      if (publicCount >= MAX_PUBLIC_TAGS) {
-        return;
-      }
-    }
-    seen.add(clean);
-    output.push(clean);
-  });
-  const publicTags = output.filter((tag) => tag !== "official" && tag !== "community");
-  if (publicTags.length < MIN_PUBLIC_TAGS) {
-    throw new Error(t("publish.tagMinimum"));
-  }
-  if (!isLanguageTag(publicTags[0])) {
-    throw new Error(t("publish.firstTag", { tags: OFFICIAL_LANGUAGE_TAGS.join(", ") }));
-  }
-  const contentTags = publicTags.slice(1);
-  const invalidTag = contentTags.find((tag) => !TYPE_TAGS.has(tag));
-  if (invalidTag) {
-    throw new Error(t("publish.nextTags", {
-      types: OFFICIAL_TYPE_TAGS.join(", ")
-    }));
-  }
-  if (!contentTags.length) {
-    throw new Error(t("publish.tagMinimum"));
-  }
-  if (contentTags.length > MAX_TYPE_TAGS) {
-    throw new Error(t("publish.typeLimit"));
-  }
-  return output;
-}
-
-function uniqueTags(groups) {
-  const seen = new Set();
-  const output = [];
-  groups.flat().forEach((tag) => {
-    const clean = String(tag || "").trim().toLowerCase();
-    if (!clean || clean === "official" || clean === "community" || seen.has(clean)) {
-      return;
-    }
-    seen.add(clean);
-    output.push(clean);
-  });
-  return output;
-}
-
-function setActiveView(view) {
-  const activeView = viewPanels.some((panel) => panel.dataset.viewPanel === view) ? view : "catalog";
-  viewPanels.forEach((panel) => {
-    panel.hidden = panel.dataset.viewPanel !== activeView;
-  });
-  viewButtons.forEach((button) => {
-    button.classList.toggle("is-active", button.dataset.viewTarget === activeView);
-  });
-  if (activeView === "report") {
-    initializeReportChallenge();
+function favoriteKeys() {
+  try {
+    const value = JSON.parse(localStorage.getItem(FAVORITES_STORAGE_KEY) || "[]");
+    return Array.isArray(value) ? value.map(String) : [];
+  } catch {
+    return [];
   }
 }
 
-function pluginMatchesSelectedTags(plugin) {
-  if (!selectedTags.length) {
-    return true;
-  }
-  const tags = new Set(filterTags(plugin.tags));
-  return selectedTags.every((tag) => tags.has(tag));
+function isFavorite(plugin) {
+  return favoriteKeys().includes(String(plugin.id || ""));
 }
 
-function pluginMatchesExcludedTags(plugin) {
-  if (!excludedTags.length) {
-    return true;
-  }
-  const tags = new Set(filterTags(plugin.tags));
-  return excludedTags.every((tag) => !tags.has(tag));
+function toggleFavorite(plugin) {
+  const id = String(plugin.id || "");
+  const keys = favoriteKeys();
+  const next = keys.includes(id) ? keys.filter((key) => key !== id) : [...keys, id];
+  try { localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(next)); } catch {}
+  renderPage();
 }
 
-function pluginMatchesFavoriteMode(plugin) {
-  return !favoritesOnly || isFavoritePlugin(plugin);
-}
-
-function pluginMatchesSearch(plugin) {
-  const query = searchQuery.trim().toLowerCase();
-  if (!query) {
-    return true;
-  }
-  return [
-    plugin.name,
-    plugin.id,
-    plugin.author,
-    plugin.site_url,
-    plugin.homepage,
-    plugin.repository_url,
-    ...(Array.isArray(plugin.hosts) ? plugin.hosts : []),
-    ...(Array.isArray(plugin.tags) ? plugin.tags : [])
-  ].some((value) => String(value || "").toLowerCase().includes(query));
-}
-
-function isLanguageTag(tag) {
-  return LANGUAGE_TAGS.has(String(tag || "").trim().toLowerCase());
-}
-
-function renderTagButton(tag) {
-  const active = selectedTags.includes(tag);
-  const excluded = excludedTags.includes(tag);
-  const className = [
-    "filter-chip",
-    active ? "is-active" : "",
-    excluded ? "is-excluded" : ""
-  ].filter(Boolean).join(" ");
-  return `<button class="${className}" type="button" data-filter-tag="${escapeHtml(tag)}">${escapeHtml(tagLabel(tag))}</button>`;
-}
-
-function tagLabel(tag) {
-  const key = `catalog.tagLabels.${tag}`;
-  const localized = t(key);
-  return localized === key ? tag : localized;
-}
-
-function renderTagGroup(title, tags) {
+function renderFilters() {
+  const tags = [...new Set(allPlugins.flatMap(cleanTags))];
   if (!tags.length) {
-    return "";
+    tagFilter.innerHTML = "";
+    return;
   }
+  const options = ["", ...ALLOWED_LANGUAGES.filter((tag) => tags.includes(tag)), ...ALLOWED_TYPES.filter((tag) => tags.includes(tag))];
+  tagFilter.innerHTML = options.map((tag) => `
+    <button class="filter" type="button" data-filter-tag="${escapeHtml(tag)}" aria-pressed="${String(tag === selectedTag)}">
+      ${escapeHtml(tag ? t("tag." + tag) : t("catalog.all"))}
+    </button>
+  `).join("");
+  tagFilter.querySelectorAll("[data-filter-tag]").forEach((button) => {
+    button.addEventListener("click", () => {
+      selectedTag = button.dataset.filterTag || "";
+      renderFilters();
+      applyFilters();
+    });
+  });
+}
+
+function applyFilters(resetPage = true) {
+  const query = String(pluginSearchInput && pluginSearchInput.value || "").trim().toLocaleLowerCase(currentLanguage === "pt" ? "pt-BR" : "en");
+  filteredPlugins = allPlugins.filter((plugin) => {
+    const searchable = [plugin.name, plugin.id, plugin.description, plugin.author, ...cleanTags(plugin)]
+      .join(" ").toLocaleLowerCase(currentLanguage === "pt" ? "pt-BR" : "en");
+    return (!query || searchable.includes(query)) && (!selectedTag || cleanTags(plugin).includes(selectedTag));
+  });
+  if (resetPage) currentPage = 1;
+  renderPage();
+}
+
+function pluginCard(plugin, index) {
+  const tags = cleanTags(plugin);
   return `
-    <div class="tag-group">
-      <p class="tag-group-title">${escapeHtml(title)}</p>
-      <div class="tag-row">${tags.map(renderTagButton).join("")}</div>
-    </div>
+    <article class="plugin-card">
+      <div class="plugin-head">
+        <img class="plugin-icon" src="${escapeHtml(plugin.icon_url)}" alt="" loading="lazy">
+        <div class="plugin-title">
+          <h3>${escapeHtml(plugin.name || plugin.id)}</h3>
+          <p>${escapeHtml(plugin.author || "Nanquimori")} · v${escapeHtml(plugin.version || "1.0.0")}</p>
+        </div>
+        <span class="status">${escapeHtml(t("catalog.online"))}</span>
+      </div>
+      <p class="plugin-description">${escapeHtml(plugin.description || "")}</p>
+      <div class="tags">${tags.map((tag) => `<span class="tag">${escapeHtml(t("tag." + tag))}</span>`).join("")}</div>
+      <div class="actions">
+        <button class="button primary" type="button" data-install-index="${index}">${escapeHtml(t("catalog.install"))}</button>
+        <a class="button" href="${escapeHtml(plugin.homepage || plugin.site_url || "#")}" target="_blank" rel="noopener">${escapeHtml(t("catalog.open"))}</a>
+        <button class="button" type="button" data-favorite-index="${index}" aria-pressed="${String(isFavorite(plugin))}">★ ${escapeHtml(t("catalog.favorite"))}</button>
+      </div>
+    </article>
   `;
 }
 
-function renderTagFilters(tags) {
-  availableTags = uniqueTags([
-    OFFICIAL_LANGUAGE_TAGS,
-    OFFICIAL_TYPE_TAGS,
-    tags.filter((tag) => LANGUAGE_TAGS.has(tag) || TYPE_TAGS.has(tag))
-  ]);
-  selectedTags = selectedTags.filter((tag) => availableTags.includes(tag));
-  excludedTags = excludedTags.filter((tag) => availableTags.includes(tag) && !selectedTags.includes(tag));
-  if (!tagFilter) {
-    return;
-  }
-  const languageTags = OFFICIAL_LANGUAGE_TAGS;
-  const contentTags = OFFICIAL_TYPE_TAGS;
-  tagFilter.innerHTML = availableTags.length
-    ? [
-      renderTagGroup(t("catalog.language"), languageTags),
-      renderTagGroup(t("catalog.type"), contentTags)
-    ].join("")
-    : `<p class="filter-status">${escapeHtml(t("catalog.noTags"))}</p>`;
-  tagFilter.querySelectorAll("[data-filter-tag]").forEach((button) => {
-    button.addEventListener("click", () => toggleTagFilter(button.dataset.filterTag));
-  });
-}
-
-function setTagStatus(filteredCount) {
-  if (!tagFilterStatus) {
-    return;
-  }
-  if (!allPlugins.length) {
-    tagFilterStatus.textContent = "";
-    return;
-  }
-  if (!selectedTags.length && !excludedTags.length && !favoritesOnly && !searchQuery.trim()) {
-    tagFilterStatus.textContent = "";
-    return;
-  }
-  const pieces = [];
-  if (selectedTags.length) {
-    pieces.push(selectedTags.join(", "));
-  }
-  if (excludedTags.length) {
-    pieces.push(t("catalog.without", { tags: excludedTags.join(", ") }));
-  }
-  if (favoritesOnly) {
-    pieces.push(t("catalog.favoriteOnly"));
-  }
-  if (searchQuery.trim()) {
-    pieces.push(`"${searchQuery.trim()}"`);
-  }
-  tagFilterStatus.textContent = t("catalog.matching", {
-    count: filteredCount,
-    plural: filteredCount === 1 ? "" : "s",
-    filters: pieces.join(" + ")
-  });
-}
-
-function renderCatalogPagination(model) {
-  if (!catalogPagination) {
-    return;
-  }
+function renderPagination(model) {
   if (model.totalPages <= 1) {
     catalogPagination.hidden = true;
     catalogPagination.innerHTML = "";
     return;
   }
-
-  const pageButtons = globalThis.KapiTomoPagination.visiblePageItems(model.totalPages, model.page)
-    .map((item) => {
-      if (item === "ellipsis") {
-        return `<span class="pagination-ellipsis" aria-hidden="true">…</span>`;
-      }
-      const current = item === model.page;
-      return `<button class="pagination-number${current ? " is-current" : ""}" type="button" data-catalog-page="${item}"${current ? " aria-current=\"page\" disabled" : ""} aria-label="${escapeHtml(t(current ? "catalog.currentPage" : "catalog.goToPage", { page: item }))}">${item}</button>`;
-    })
-    .join("");
-  const pageOptions = Array.from({ length: model.totalPages }, (_, index) => index + 1)
-    .map((page) => `<option value="${page}"${page === model.page ? " selected" : ""}>${page}</option>`)
-    .join("");
-
+  const items = globalThis.KapiTomoPagination.visiblePageItems(model.totalPages, model.page);
   catalogPagination.hidden = false;
-  catalogPagination.innerHTML = `
-    <p class="pagination-summary">${escapeHtml(t("catalog.showing", {
-      start: model.start,
-      end: model.end,
-      total: model.totalItems
-    }))}</p>
-    <div class="pagination-controls">
-      <button class="pagination-direction" type="button" data-catalog-page="${model.page - 1}"${model.page === 1 ? " disabled" : ""}>‹ ${escapeHtml(t("catalog.previousPage"))}</button>
-      <div class="pagination-numbers">${pageButtons}</div>
-      <label class="pagination-picker">
-        <span>${escapeHtml(t("catalog.page"))}</span>
-        <select data-catalog-page-select aria-label="${escapeHtml(t("catalog.choosePage"))}">${pageOptions}</select>
-        <span>${escapeHtml(t("catalog.ofPages", { total: model.totalPages }))}</span>
-      </label>
-      <button class="pagination-direction" type="button" data-catalog-page="${model.page + 1}"${model.page === model.totalPages ? " disabled" : ""}>${escapeHtml(t("catalog.nextPage"))} ›</button>
-    </div>
-  `;
-  catalogPagination.querySelectorAll("[data-catalog-page]").forEach((button) => {
-    button.addEventListener("click", () => goToCatalogPage(Number(button.dataset.catalogPage)));
-  });
-  catalogPagination.querySelector("[data-catalog-page-select]")?.addEventListener("change", (event) => {
-    goToCatalogPage(Number(event.currentTarget.value));
-  });
-}
-
-function renderCatalogPage(scrollToCatalog = false) {
-  const model = globalThis.KapiTomoPagination.paginate(filteredCatalogPlugins, currentCatalogPage);
-  currentCatalogPage = model.page;
-  renderPlugins(model.items);
-  renderCatalogPagination(model);
-  if (scrollToCatalog && list) {
-    const reducedMotion = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    list.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
-  }
-}
-
-function goToCatalogPage(page) {
-  const requestedPage = Number.parseInt(page, 10);
-  if (!Number.isFinite(requestedPage) || requestedPage === currentCatalogPage) {
-    return;
-  }
-  currentCatalogPage = requestedPage;
-  renderCatalogPage(true);
-}
-
-function applyTagFilters(resetPage = false) {
-  filteredCatalogPlugins = allPlugins.filter((plugin) => pluginMatchesSelectedTags(plugin)
-    && pluginMatchesExcludedTags(plugin)
-    && pluginMatchesFavoriteMode(plugin)
-    && pluginMatchesSearch(plugin));
-  if (resetPage) {
-    currentCatalogPage = 1;
-  }
-  renderTagFilters(availableTags);
-  updateFavoritesOnlyButton();
-  renderCatalogPage();
-  setTagStatus(filteredCatalogPlugins.length);
-}
-
-function toggleTagFilter(tag) {
-  const clean = String(tag || "").trim().toLowerCase();
-  if (!clean) {
-    return;
-  }
-  if (selectedTags.includes(clean)) {
-    selectedTags = selectedTags.filter((selected) => selected !== clean);
-    excludedTags = [...excludedTags, clean];
-  } else if (excludedTags.includes(clean)) {
-    excludedTags = excludedTags.filter((selected) => selected !== clean);
-  } else {
-    selectedTags = [...selectedTags, clean];
-  }
-  applyTagFilters(true);
-}
-
-function pluginManifestUrl(plugin) {
-  try {
-    const url = new URL(plugin.repository_url);
-    if (!/^(www\.)?github\.com$/i.test(url.hostname)) {
-      return "";
-    }
-    const [owner, repo] = url.pathname.split("/").filter(Boolean);
-    if (!owner || !repo) {
-      return "";
-    }
-    const pluginPath = normalizePluginPath(plugin.plugin_path);
-    const manifestPath = [pluginPath, "plugin.json"].filter(Boolean).join("/");
-    return `https://raw.githubusercontent.com/${owner}/${repo.replace(/\.git$/i, "")}/${encodeURIComponent(plugin.repository_ref || "main")}/${manifestPath}`;
-  } catch {
-    return "";
-  }
-}
-
-async function hasAvailableRepository(plugin) {
-  const url = pluginManifestUrl(plugin);
-  if (!url) {
-    return false;
-  }
-  try {
-    const response = await fetch(url, { cache: "no-store" });
-    return response.status !== 404;
-  } catch {
-    return true;
-  }
-}
-
-async function filterAvailablePlugins(plugins) {
-  const checked = await Promise.all(plugins.map(async (plugin) => (
-    await hasAvailableRepository(plugin) ? plugin : null
-  )));
-  return checked.filter(Boolean);
-}
-
-function uniquePlugins(groups) {
-  const output = [];
-  groups.flat().forEach((plugin) => {
-    const key = pluginKey(plugin);
-    if (!key.trim() || output.some((existing) => isSamePluginPublication(existing, plugin))) {
-      return;
-    }
-    output.push(plugin);
-  });
-  return output;
-}
-
-function loadDraftPlugins() {
-  try {
-    return JSON.parse(localStorage.getItem(LOCAL_PLUGIN_KEY) || "[]")
-      .filter((plugin) => hasRequiredPluginIcon(plugin) && hasRepository(plugin));
-  } catch {
-    return [];
-  }
-}
-
-function saveDraftPlugins(drafts) {
-  if (drafts.length) {
-    localStorage.setItem(LOCAL_PLUGIN_KEY, JSON.stringify(drafts.map(publicPlugin)));
-  } else {
-    localStorage.removeItem(LOCAL_PLUGIN_KEY);
-  }
-}
-
-function saveDraftPlugin(plugin) {
-  const drafts = uniquePlugins([[{ ...plugin, __source: "draft" }], loadDraftPlugins()]);
-  saveDraftPlugins(drafts);
-}
-
-function updateFavoritesOnlyButton() {
-  if (!favoritesOnlyButton) {
-    return;
-  }
-  favoritesOnlyButton.classList.toggle("is-active", favoritesOnly);
-  favoritesOnlyButton.setAttribute("aria-pressed", favoritesOnly ? "true" : "false");
-  favoritesOnlyButton.textContent = favoritesOnly ? t("catalog.showAll") : t("catalog.favoriteOnly");
-}
-
-function pluginCardsHtml(plugins, indexOffset = 0) {
-  return plugins.map((plugin, localIndex) => {
-    const index = indexOffset + localIndex;
-    const tags = displayTags(plugin.tags);
-    const favorite = isFavoritePlugin(plugin);
-    const actions = [
-      `<button class="button primary" type="button" data-install-plugin="${index}">${escapeHtml(t("catalog.install"))}</button>`
-    ];
-    if (plugin.__source === "draft") {
-      actions.push(`<button class="button" type="button" data-publish-plugin="${index}">${escapeHtml(t("catalog.publish"))}</button>`);
-      actions.push(`<button class="button" type="button" data-delete-draft="${index}">${escapeHtml(t("catalog.remove"))}</button>`);
-    } else {
-      if (plugin.homepage || plugin.site_url) {
-        actions.push(`<a class="button" href="${escapeHtml(plugin.homepage || plugin.site_url)}">${escapeHtml(t("catalog.open"))}</a>`);
-      }
-      actions.push(`<button class="button" type="button" data-report-plugin="${index}">${escapeHtml(t("catalog.report"))}</button>`);
-    }
-    return `
-      <article class="plugin-card${globalThis.KapiTomoPagination.isOfficialPlugin(plugin) ? " is-official" : ""}">
-        <button class="favorite-button${favorite ? " is-active" : ""}" type="button" data-favorite-plugin="${index}" aria-pressed="${favorite ? "true" : "false"}" aria-label="${escapeHtml(t("catalog.favorite"))}"></button>
-        <img class="plugin-icon" src="${escapeHtml(plugin.icon_url)}" alt="">
-        <div class="plugin-copy">
-          <h3>${escapeHtml(plugin.name || plugin.id || t("catalog.pluginFallback"))}</h3>
-          <div class="meta">
-            ${plugin.author ? `<span>${escapeHtml(plugin.author)}</span>` : ""}
-            ${plugin.version ? `<span>v${escapeHtml(plugin.version)}</span>` : ""}
-          </div>
-        </div>
-        ${globalThis.KapiTomoPagination.isOfficialPlugin(plugin) ? `<span class="official-badge">${escapeHtml(t("catalog.officialBadge"))}</span>` : ""}
-        <span class="site-status ${escapeHtml(siteStatusClass(plugin))}">${escapeHtml(siteStatusLabel(plugin))}</span>
-        ${tags.length ? `<div class="tag-list">${tags.map((tag) => `<span>${escapeHtml(tagLabel(tag))}</span>`).join("")}</div>` : ""}
-        <div class="plugin-actions">
-          ${actions.join("")}
-        </div>
-      </article>
-    `;
-  }).join("");
-}
-
-function renderPlugins(plugins) {
-  renderedPlugins = [...pinnedOfficialPlugins, ...plugins];
-  if (officialCatalogSection && officialPluginList) {
-    officialCatalogSection.hidden = !pinnedOfficialPlugins.length;
-    officialPluginList.innerHTML = pluginCardsHtml(pinnedOfficialPlugins);
-  }
-  list.innerHTML = plugins.length
-    ? pluginCardsHtml(plugins, pinnedOfficialPlugins.length)
-    : `<p>${selectedTags.length || excludedTags.length || favoritesOnly || searchQuery.trim() ? escapeHtml(t("catalog.noMatches")) : escapeHtml(t("catalog.noCommunityPlugins"))}</p>`;
-  document.querySelectorAll("[data-install-plugin]").forEach((button) => {
-    button.addEventListener("click", () => installPlugin(renderedPlugins[Number(button.dataset.installPlugin)]));
-  });
-  document.querySelectorAll("[data-publish-plugin]").forEach((button) => {
-    button.addEventListener("click", () => openPublishRequest(renderedPlugins[Number(button.dataset.publishPlugin)]));
-  });
-  document.querySelectorAll("[data-delete-draft]").forEach((button) => {
-    button.addEventListener("click", () => removeDraftPlugin(renderedPlugins[Number(button.dataset.deleteDraft)]));
-  });
-  document.querySelectorAll("[data-favorite-plugin]").forEach((button) => {
-    button.addEventListener("click", () => toggleFavoritePlugin(renderedPlugins[Number(button.dataset.favoritePlugin)]));
-  });
-  document.querySelectorAll("[data-report-plugin]").forEach((button) => {
-    button.addEventListener("click", () => preparePluginReport(renderedPlugins[Number(button.dataset.reportPlugin)]));
-  });
-}
-
-function loadAllPlugins() {
-  fetchCatalog()
-    .then((catalog) => {
-      const catalogCandidates = (Array.isArray(catalog.plugins) ? catalog.plugins : [])
-        .filter((plugin) => hasRequiredPluginIcon(plugin) && hasRepository(plugin) && isVisiblePlugin(plugin));
-      const savedDrafts = loadDraftPlugins();
-      return Promise.all([
-        filterAvailablePlugins(catalogCandidates),
-        filterAvailablePlugins(savedDrafts)
-      ]).then(([availableCatalogPlugins, availableDrafts]) => {
-        const drafts = availableDrafts.filter((draft) => (
-          !availableCatalogPlugins.some((published) => isSamePluginPublication(published, draft))
-        ));
-        const removedDrafts = savedDrafts.filter((draft) => (
-          !drafts.some((retained) => isSamePluginPublication(retained, draft))
-        ));
-        if (removedDrafts.length) {
-          saveDraftPlugins(savedDrafts.filter((draft) => (
-            !removedDrafts.some((removed) => isSamePluginPublication(removed, draft))
-          )));
-        }
-        const partitionedCatalog = globalThis.KapiTomoPagination.partitionCatalogPlugins(availableCatalogPlugins);
-        pinnedOfficialPlugins = partitionedCatalog.official;
-        allPlugins = uniquePlugins([
-          drafts.map((plugin) => ({ ...plugin, __source: "draft" })),
-          partitionedCatalog.community
-        ]);
-        const catalogTags = uniqueTags([
-          allPlugins.flatMap((plugin) => filterTags(plugin.tags))
-        ]);
-        renderTagFilters(catalogTags);
-        applyTagFilters(true);
-      });
-    })
-    .catch((error) => {
-      pinnedOfficialPlugins = [];
-      filteredCatalogPlugins = [];
-      currentCatalogPage = 1;
-      if (catalogPagination) {
-        catalogPagination.hidden = true;
-        catalogPagination.innerHTML = "";
-      }
-      if (officialCatalogSection) {
-        officialCatalogSection.hidden = true;
-      }
-      list.innerHTML = `<p>${escapeHtml(t("catalog.loadError", { message: error.message }))}</p>`;
+  catalogPagination.innerHTML = [
+    `<button type="button" data-page="${model.page - 1}"${model.page === 1 ? " disabled" : ""}>${escapeHtml(t("catalog.previous"))}</button>`,
+    ...items.map((item) => item === "ellipsis"
+      ? "<span aria-hidden=\"true\">…</span>"
+      : `<button type="button" data-page="${item}"${item === model.page ? ' aria-current="page"' : ""} aria-label="${escapeHtml(t("catalog.page", { page: item }))}">${item}</button>`),
+    `<button type="button" data-page="${model.page + 1}"${model.page === model.totalPages ? " disabled" : ""}>${escapeHtml(t("catalog.next"))}</button>`
+  ].join("");
+  catalogPagination.querySelectorAll("[data-page]").forEach((button) => {
+    button.addEventListener("click", () => {
+      currentPage = Number(button.dataset.page) || 1;
+      renderPage();
     });
-}
-
-function parseGitHubRepo(rawUrl) {
-  let url;
-  try {
-    url = new URL(String(rawUrl || "").trim());
-  } catch {
-    throw new Error(t("publish.validUrl"));
-  }
-  if (!/^(www\.)?github\.com$/i.test(url.hostname)) {
-    throw new Error(t("publish.githubOnly"));
-  }
-  const parts = url.pathname.split("/").filter(Boolean);
-  if (parts.length < 2) {
-    throw new Error(t("publish.ownerRepo"));
-  }
-  const treeIndex = parts.indexOf("tree");
-  return {
-    owner: parts[0],
-    repo: parts[1].replace(/\.git$/i, ""),
-    branch: treeIndex >= 0 && parts[treeIndex + 1] ? parts[treeIndex + 1] : "",
-    pluginPath: treeIndex >= 0 && parts.length > treeIndex + 2 ? parts.slice(treeIndex + 2).join("/") : ""
-  };
-}
-
-function normalizePluginPath(rawPath) {
-  const clean = String(rawPath || "")
-    .replace(/\\/g, "/")
-    .replace(/^\/+|\/+$/g, "")
-    .replace(/\/plugin\.json$/i, "");
-  return clean === "." ? "" : clean;
-}
-
-function resolveUrl(baseUrl, maybeUrl) {
-  try {
-    return new URL(String(maybeUrl || ""), baseUrl || location.href).toString();
-  } catch {
-    return "";
-  }
-}
-
-async function fetchRepoManifest(repo) {
-  const branches = repo.branch ? [repo.branch] : ["main", "master"];
-  const pluginPath = normalizePluginPath(repo.pluginPath);
-  let lastError;
-  for (const branch of branches) {
-    const path = [pluginPath, "plugin.json"].filter(Boolean).join("/");
-    const url = `https://raw.githubusercontent.com/${repo.owner}/${repo.repo}/${branch}/${path}`;
-    try {
-      const response = await fetch(url, { cache: "no-store" });
-      if (!response.ok) {
-        throw new Error("HTTP " + response.status);
-      }
-      return {
-        branch,
-        pluginPath,
-        manifest: await response.json()
-      };
-    } catch (error) {
-      lastError = error;
-    }
-  }
-  throw new Error(t("publish.manifestMissing", { message: lastError?.message || "" }));
-}
-
-async function loadRepoPlugin() {
-  try {
-    const repo = parseGitHubRepo(repoUrlInput?.value || "");
-    setPublishStatus(t("publish.reading"));
-    const { branch, pluginPath, manifest } = await fetchRepoManifest(repo);
-    const browser = manifest.browser || {};
-    const repositoryUrl = `https://github.com/${repo.owner}/${repo.repo}`;
-    const iconUrl = resolveUrl(browser.home_url || repositoryUrl + "/", browser.icon_url || "");
-    if (!iconUrl) {
-      throw new Error(t("publish.iconMissing"));
-    }
-    setPublishStatus(t("publish.preparing"));
-    const plugin = {
-      id: manifest.id || repo.repo,
-      name: manifest.name || manifest.id || repo.repo,
-      description: manifest.description || `Site plugin for downloading works from ${manifest.name || repo.repo} in Nyxovira.`,
-      author: manifest.author || repo.owner,
-      version: manifest.version || "1.0.0",
-      site_url: browser.home_url || repositoryUrl + "/",
-      homepage: browser.home_url || repositoryUrl + "/",
-      icon_url: iconUrl,
-      repository_url: repositoryUrl,
-      repository_ref: branch,
-      plugin_path: pluginPath,
-      tags: normalizePublicationTags(manifest.tags),
-      __source: "draft"
-    };
-    saveDraftPlugin(plugin);
-    setPublishStatus(t("publish.loaded"));
-    loadAllPlugins();
-    setActiveView("catalog");
-  } catch (error) {
-    setPublishStatus(error?.message || t("publish.failed"));
-  }
-}
-
-function openPublishRequest(plugin) {
-  const clean = publicPlugin(plugin);
-  clean.tags = normalizePublicationTags(clean.tags);
-  if (!clean.repository_url) {
-    setPublishStatus(t("publish.outdated"));
-    return;
-  }
-  const body = [
-    `<!-- plugin-hub-language: ${currentLanguage} -->`,
-    "<!-- plugin-hub-policy: accepted-v1 -->",
-    t("publish.requestTitle"),
-    t("publish.requestDescription"),
-    "",
-    t("publish.responsibility"),
-    t("publish.acceptanceLine"),
-    t("publish.rulesLine"),
-    "",
-    t("publish.repositoryLine", { url: clean.repository_url }),
-    "",
-    "```json",
-    JSON.stringify(clean, null, 2),
-    "```"
-  ].join("\n");
-  const url = "https://github.com/Nanquimori/KapiTomo/issues/new"
-    + "?title=" + encodeURIComponent("[plugin] " + (clean.name || clean.id || "new-plugin"))
-    + "&body=" + encodeURIComponent(body);
-  window.open(url, "_blank", "noopener");
-}
-
-function preparePluginReport(plugin) {
-  if (reportPluginIdInput) {
-    reportPluginIdInput.value = String(plugin?.id || "").trim();
-  }
-  if (reportEmailInput) {
-    reportEmailInput.value = "";
-  }
-  if (reportDetailsInput) {
-    reportDetailsInput.value = "";
-  }
-  if (reportConfirmationInput) {
-    reportConfirmationInput.checked = false;
-  }
-  updateReportDetailsCount();
-  updateReportCreatorLink(plugin);
-  setReportStatus("");
-  setActiveView("report");
-  reportEmailInput?.focus();
-}
-
-function updateReportCreatorLink(preferredPlugin = null) {
-  const pluginId = String(reportPluginIdInput?.value || "").trim().toLowerCase();
-  const plugin = preferredPlugin && String(preferredPlugin.id || "").trim().toLowerCase() === pluginId
-    ? preferredPlugin
-    : allPlugins.find((item) => !item.__source && String(item.id || "").trim().toLowerCase() === pluginId);
-  const repositoryUrl = String(plugin?.repository_url || "").trim();
-  if (!reportCreatorHelp || !reportCreatorLink) {
-    return;
-  }
-  reportCreatorHelp.hidden = !repositoryUrl;
-  if (repositoryUrl) {
-    reportCreatorLink.href = repositoryUrl;
-  } else {
-    reportCreatorLink.removeAttribute("href");
-  }
-}
-
-function reportDetailsLength() {
-  return Array.from(String(reportDetailsInput?.value || "").trim()).length;
-}
-
-function reportDetailsWords() {
-  return String(reportDetailsInput?.value || "").toLocaleLowerCase().match(/[\p{L}\p{N}]+/gu) || [];
-}
-
-function updateReportDetailsCount() {
-  if (!reportDetailsCount) {
-    return;
-  }
-  const count = reportDetailsLength();
-  const words = reportDetailsWords();
-  reportDetailsCount.textContent = t("report.detailsCount", {
-    count,
-    minimum: MIN_REPORT_DETAILS,
-    words: words.length,
-    minimumWords: MIN_REPORT_WORDS
   });
-  reportDetailsCount.classList.toggle("is-valid", count >= MIN_REPORT_DETAILS
-    && words.length >= MIN_REPORT_WORDS);
 }
 
-function isValidReportEmail(value) {
-  const email = String(value || "").trim();
-  return email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
-}
-
-function normalizeReportForFingerprint(pluginId, details) {
-  const normalizedDetails = String(details || "")
-    .normalize("NFKD")
-    .replace(/\p{M}/gu, "")
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}]+/gu, " ")
-    .trim();
-  return `${String(pluginId || "").trim().toLowerCase()}|${normalizedDetails}`;
-}
-
-async function reportFingerprint(pluginId, details) {
-  const normalized = normalizeReportForFingerprint(pluginId, details);
-  if (!globalThis.crypto?.subtle || typeof TextEncoder === "undefined") {
-    throw new Error("secure_hash_unavailable");
-  }
-  const digest = await globalThis.crypto.subtle.digest("SHA-256", new TextEncoder().encode(normalized));
-  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
-function loadRecentReportHistory() {
-  const cutoff = Date.now() - REPORT_DUPLICATE_WINDOW_MS;
-  try {
-    const stored = JSON.parse(localStorage.getItem(REPORT_HISTORY_KEY) || "[]");
-    if (!Array.isArray(stored)) {
-      return [];
-    }
-    return stored.filter((entry) => entry
-      && typeof entry.fingerprint === "string"
-      && Number(entry.sentAt) >= cutoff);
-  } catch {
-    return [];
-  }
-}
-
-function wasReportRecentlySent(fingerprint) {
-  return loadRecentReportHistory().some((entry) => entry.fingerprint === fingerprint);
-}
-
-function rememberSubmittedReport(pluginId, fingerprint) {
-  const history = loadRecentReportHistory();
-  history.push({
-    pluginId: String(pluginId || "").trim().toLocaleLowerCase(),
-    fingerprint,
-    sentAt: Date.now()
+function renderPage() {
+  const model = globalThis.KapiTomoPagination.paginate(filteredPlugins, currentPage);
+  currentPage = model.page;
+  catalogCount.textContent = t(filteredPlugins.length === allPlugins.length ? "catalog.count" : "catalog.shown", {
+    count: filteredPlugins.length,
+    plural: filteredPlugins.length === 1 ? "" : currentLanguage === "pt" ? "s" : "s"
   });
-  try {
-    localStorage.setItem(REPORT_HISTORY_KEY, JSON.stringify(history.slice(-MAX_REPORT_HISTORY)));
-  } catch {}
-}
-
-async function openReportRequest() {
-  const pluginId = String(reportPluginIdInput?.value || "").trim().toLowerCase();
-  const email = String(reportEmailInput?.value || "").trim();
-  const details = String(reportDetailsInput?.value || "").trim();
-  if (!pluginId) {
-    setReportStatus(t("report.enterId"));
-    return;
-  }
-  if (!/^[a-z0-9][a-z0-9._-]{1,63}$/.test(pluginId)) {
-    setReportStatus(t("report.invalidId"));
-    return;
-  }
-  if (!email) {
-    setReportStatus(t("report.enterEmail"));
-    return;
-  }
-  if (!isValidReportEmail(email)) {
-    setReportStatus(t("report.invalidEmail"));
-    return;
-  }
-  const detailsLength = reportDetailsLength();
-  const detailsWords = reportDetailsWords();
-  if (detailsLength < MIN_REPORT_DETAILS
-      || detailsWords.length < MIN_REPORT_WORDS) {
-    setReportStatus(t("report.explain", {
-      minimum: MIN_REPORT_DETAILS,
-      count: detailsLength,
-      minimumWords: MIN_REPORT_WORDS,
-      words: detailsWords.length
-    }));
-    return;
-  }
-  if (!reportConfirmationInput?.checked) {
-    setReportStatus(t("report.confirm"));
-    return;
-  }
-  if (!reportSecurityConfigured()) {
-    setReportStatus(t("report.serviceUnavailable"), "error");
-    return;
-  }
-  if (!reportTurnstileToken) {
-    setReportStatus(t("report.captchaRequired"), "error");
-    initializeReportChallenge();
-    return;
-  }
-  let fingerprint;
-  try {
-    fingerprint = await reportFingerprint(pluginId, details);
-  } catch {
-    setReportStatus(t("report.serviceUnavailable"), "error");
-    return;
-  }
-  if (wasReportRecentlySent(fingerprint)) {
-    setReportStatus(t("report.duplicate"));
-    return;
-  }
-  setReportStatus(t("report.sending"));
-  if (requestReportPluginButton) {
-    requestReportPluginButton.disabled = true;
-  }
-  try {
-    const response = await fetch(REPORT_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json"
-      },
-      body: JSON.stringify({
-        email,
-        plugin_id: pluginId,
-        duplicate_fingerprint: fingerprint,
-        reason: details,
-        truthfulness_confirmation: true,
-        turnstile_token: reportTurnstileToken,
-        website: String(reportWebsiteInput?.value || "").trim()
-      })
-    });
-    let result = null;
-    try {
-      result = await response.json();
-    } catch {
-      result = null;
-    }
-    const accepted = response.ok && (result?.success === true || result?.success === "true");
-    if (!accepted) {
-      const errorMessage = result?.code === "rate_limited"
-        ? t("report.rateLimited")
-        : ["captcha_required", "captcha_failed"].includes(result?.code)
-          ? t("report.captchaFailed")
-          : t("report.sendError");
-      setReportStatus(errorMessage, "error");
-      return;
-    }
-    rememberSubmittedReport(pluginId, fingerprint);
-    reportDetailsInput.value = "";
-    reportConfirmationInput.checked = false;
-    updateReportDetailsCount();
-    setReportStatus(t("report.sent"), "success");
-  } catch {
-    setReportStatus(t("report.sendError"), "error");
-  } finally {
-    resetReportChallenge();
-    if (requestReportPluginButton) {
-      requestReportPluginButton.disabled = false;
-    }
-  }
-}
-
-function openRemovalRequest() {
-  const pluginId = String(removePluginIdInput?.value || "").trim();
-  const repoUrl = String(removeRepoUrlInput?.value || "").trim();
-  if (!pluginId) {
-    setRemoveStatus(t("remove.enterId"));
-    return;
-  }
-  if (!repoUrl) {
-    setRemoveStatus(t("remove.enterRepo"));
-    return;
-  }
-  const body = [
-    `<!-- plugin-hub-language: ${currentLanguage} -->`,
-    t("remove.requestTitle"),
-    t("remove.requestDescription"),
-    "",
-    t("remove.pluginIdLine", { id: pluginId }),
-    t("remove.repositoryLine", { url: repoUrl }),
-    "",
-    t("remove.confirm")
-  ].join("\n");
-  const url = "https://github.com/Nanquimori/KapiTomo/issues/new"
-    + "?title=" + encodeURIComponent("[plugin-remove] " + pluginId)
-    + "&body=" + encodeURIComponent(body);
-  setRemoveStatus(t("remove.opening"));
-  window.open(url, "_blank", "noopener");
-}
-
-function removeDraftPlugin(plugin) {
-  if (!plugin || plugin.__source !== "draft") {
-    return;
-  }
-  saveDraftPlugins(loadDraftPlugins().filter((draft) => !isSamePluginPublication(draft, plugin)));
-  loadAllPlugins();
+  pluginList.innerHTML = model.items.length
+    ? model.items.map((plugin, index) => pluginCard(plugin, index)).join("")
+    : `<p class="empty">${escapeHtml(t("catalog.empty"))}</p>`;
+  pluginList.querySelectorAll("[data-install-index]").forEach((button) => {
+    button.addEventListener("click", () => installPlugin(model.items[Number(button.dataset.installIndex)]));
+  });
+  pluginList.querySelectorAll("[data-favorite-index]").forEach((button) => {
+    button.addEventListener("click", () => toggleFavorite(model.items[Number(button.dataset.favoriteIndex)]));
+  });
+  renderPagination(model);
 }
 
 function installPlugin(plugin) {
-  const bridge = window.NyxoviraAndroidBridge || window.ArchiveInkAndroidBridge;
-  if (!hasRequiredPluginIcon(plugin)) {
-    alert(t("install.iconMissing"));
-    return;
-  }
-  if (!hasRepository(plugin)) {
-    alert(t("install.repositoryMissing"));
-    return;
-  }
-  if (!plugin || !bridge || typeof bridge.installOnlinePlugin !== "function") {
+  const bridge = globalThis.NyxoviraAndroidBridge || globalThis.ArchiveInkAndroidBridge;
+  if (!bridge || typeof bridge.installOnlinePlugin !== "function") {
     alert(t("install.openInsideApp"));
     return;
   }
   try {
-    const result = JSON.parse(bridge.installOnlinePlugin(JSON.stringify(publicPlugin(plugin))) || "{}");
-    alert(result.message || (result.success ? t("install.success") : t("install.failed")));
+    const result = JSON.parse(bridge.installOnlinePlugin(JSON.stringify(plugin)) || "{}");
+    alert(result.message || (result.success ? "" : t("install.failed")));
   } catch (error) {
-    alert(t("install.failedWithMessage", { message: error && error.message ? error.message : t("install.unknown") }));
+    alert(t("install.failed") + " " + (error && error.message ? error.message : t("install.unknown")));
   }
 }
 
-loadRepoPluginButton?.addEventListener("click", loadRepoPlugin);
-requestReportPluginButton?.addEventListener("click", openReportRequest);
-requestRemovePluginButton?.addEventListener("click", openRemovalRequest);
-viewButtons.forEach((button) => {
-  button.addEventListener("click", () => setActiveView(button.dataset.viewTarget));
-});
-languageButtons.forEach((button) => {
-  button.addEventListener("click", () => setLanguage(button.dataset.languageOption));
-});
-repoUrlInput?.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    loadRepoPlugin();
+async function loadCatalog() {
+  try {
+    const response = await fetch(`catalog-store.json?v=${CATALOG_VERSION}`, { cache: "no-store" });
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    const catalog = await response.json();
+    allPlugins = globalThis.KapiTomoPagination.sortCatalogPlugins(
+      (Array.isArray(catalog.plugins) ? catalog.plugins : []).filter((plugin) =>
+        plugin && plugin.status !== "removed" && plugin.status !== "hidden" && plugin.repository_url && plugin.icon_url
+      )
+    );
+    renderFilters();
+    applyFilters();
+  } catch (error) {
+    allPlugins = [];
+    filteredPlugins = [];
+    catalogCount.textContent = "";
+    tagFilter.innerHTML = "";
+    catalogPagination.hidden = true;
+    pluginList.innerHTML = `<p class="error">${escapeHtml(t("catalog.error"))}</p>`;
   }
-});
-reportPluginIdInput?.addEventListener("input", () => updateReportCreatorLink());
-reportDetailsInput?.addEventListener("input", updateReportDetailsCount);
-pluginSearchInput?.addEventListener("input", () => {
-  searchQuery = String(pluginSearchInput.value || "");
-  applyTagFilters(true);
-});
-favoritesOnlyButton?.addEventListener("click", () => {
-  favoritesOnly = !favoritesOnly;
-  applyTagFilters(true);
-});
-discardDraftPluginsButton?.addEventListener("click", () => {
-  localStorage.removeItem(LOCAL_PLUGIN_KEY);
-  setPublishStatus(t("publish.draftsRemoved"));
-  loadAllPlugins();
-});
-// Remove the preference left by the retired age filter.
-try {
-  localStorage.removeItem("kapitomo.restrictedAccess.v1");
-} catch {}
-applyStaticTranslations();
-updateFavoritesOnlyButton();
-updateReportDetailsCount();
-const requestedView = new URLSearchParams(window.location.search).get("view");
-setActiveView(["catalog", "publish", "report", "remove"].includes(requestedView) ? requestedView : "catalog");
-loadAllPlugins();
+}
+
+removeLegacyData();
+applyTranslations();
+languageButtons.forEach((button) => button.addEventListener("click", () => setLanguage(button.dataset.languageOption)));
+pluginSearchInput.addEventListener("input", () => applyFilters());
+loadCatalog();

@@ -1,73 +1,11 @@
 {
   "schema_version": 3,
-  "name": "KapiTomo Plugin Hub",
-  "description": "Public plugin catalog for Nyxovira.",
-  "catalog_revision": "20260908-security-review",
-  "publish_model": "github-repository",
-  "rules_url": "https://nanquimori.github.io/KapiTomo/terms/#plugin-catalog-rules",
-  "suggested_tags": [
-    "english",
-    "portuguese",
-    "spanish",
-    "japanese",
-    "korean",
-    "chinese",
-    "indonesian",
-    "thai",
-    "vietnamese",
-    "french",
-    "german",
-    "italian",
-    "russian",
-    "arabic",
-    "manga",
-    "manhua",
-    "manhwa",
-    "novel",
-    "webtoon",
-    "comic",
-    "other"
-  ],
-  "requirements": {
-    "icon_url": "Required. Every online plugin must point to a public icon image.",
-    "repository_url": "Required. Every online plugin must be hosted in a public GitHub repository.",
-    "tags": "Required for catalog publication only. Use one language first, followed by one to three types. Unsupported and extra tags are ignored.",
-    "policy_acceptance": "Required. Publication requests must accept the current Plugin Hub catalog rules.",
-    "security_review": "Required. Every file and browser-code line must pass static review and a complete ClamAV scan.",
-    "immutable_ref": "Required. Published repository_ref values are pinned to the exact reviewed commit."
-  },
-  "moderation": {
-    "active": "Visible and technically available.",
-    "broken": "Visible as Offline after repeated technical failures.",
-    "hidden": "Temporarily unavailable during a credible review.",
-    "removed": "Unavailable after an authorized request, confirmed violation, or repeated repository absence."
-  },
+  "name": "KapiTomo Plugins",
+  "description": "Official plugins published by Nanquimori for Nyxovira.",
+  "catalog_revision": "20260910-official-only",
   "official_tags": {
-    "languages": [
-      "english",
-      "portuguese",
-      "spanish",
-      "japanese",
-      "korean",
-      "chinese",
-      "indonesian",
-      "thai",
-      "vietnamese",
-      "french",
-      "german",
-      "italian",
-      "russian",
-      "arabic"
-    ],
-    "types": [
-      "manga",
-      "manhua",
-      "manhwa",
-      "novel",
-      "webtoon",
-      "comic",
-      "other"
-    ]
+    "languages": ["portuguese", "english"],
+    "types": ["manga", "manhua", "manhwa", "novel", "webtoon", "comic", "other"]
   },
   "plugins": [
     {
@@ -82,51 +20,9 @@
       "repository_url": "https://github.com/Nanquimori/KapiTomo",
       "repository_ref": "cdcc21ecb038587ab4cb669f3622554dd1873940",
       "plugin_path": "nyxovira/plugin-api/kapitomo",
-      "tags": [
-        "official",
-        "portuguese",
-        "manhwa",
-        "novel"
-      ],
-      "hosts": [
-        "nanquimori.github.io"
-      ],
-      "status": "active",
-      "consecutive_failures": 0,
-      "last_error": "",
-      "published_at": "2026-09-08T13:07:54.320Z",
-      "last_checked_at": "2026-09-08T13:07:54.320Z"
-    },
-    {
-      "id": "nexustoons",
-      "name": "NexusToons",
-      "description": "Site plugin for downloading works from NexusToons in Nyxovira.",
-      "author": "yxz0w0zxy",
-      "version": "1.0.7",
-      "site_url": "https://nexustoons.com/",
-      "homepage": "https://nexustoons.com/",
-      "icon_url": "https://nexustoons.com/icon.png",
-      "repository_url": "https://github.com/yxz0w0zxy/NexusToons",
-      "repository_ref": "main",
-      "plugin_path": "",
-      "tags": [
-        "portuguese",
-        "manga",
-        "manhwa",
-        "manhua"
-      ],
-      "hosts": [
-        "nexustoons.com"
-      ],
-      "status": "removed",
-      "consecutive_failures": 0,
-      "last_error": "",
-      "last_checked_at": "2026-08-26T19:13:54.305Z",
-      "removed_at": "2026-08-30T19:02:20.453Z",
-      "moderation_action": "remove",
-      "moderation_reason": "creator-or-maintainer-request",
-      "moderated_by": "yxz0w0zxy",
-      "moderated_at": "2026-08-30T19:02:20.453Z"
+      "tags": ["official", "portuguese", "manhwa", "novel"],
+      "hosts": ["nanquimori.github.io"],
+      "status": "active"
     }
   ]
 }
