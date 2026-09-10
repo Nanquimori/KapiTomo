@@ -106,6 +106,7 @@
     window.addEventListener("error", (event) => parent.postMessage({ channel: config.channel, type: "sandbox-error", error: event.message || "Erro ao iniciar o sandbox." }, "*"));
     window.addEventListener("unhandledrejection", (event) => parent.postMessage({ channel: config.channel, type: "sandbox-error", error: event.reason?.message || String(event.reason) }, "*"));
     const pending = new Map();
+    const synchronousResponses = new Map();
     let sequence = 0;
     let currentUrl = config.sourceUrl;
 
@@ -123,6 +124,7 @@
       const headers = normalizeHeaders(init.headers || input?.headers);
       let body = init.body;
       if (body instanceof URLSearchParams) body = body.toString();
+      if (body == null) body = undefined;
       if (body !== undefined && typeof body !== "string") return reject(new Error("Este corpo de requisição não é compatível com o teste web."));
       pending.set(id, { resolve, reject });
       parent.postMessage({ channel: config.channel, type: "proxy-request", id, request: { url: new URL(rawUrl, currentUrl).href, method, headers, body } }, "*");
@@ -148,29 +150,50 @@
         this.status = 0;
         this.responseText = "";
         this.response = "";
+        this.responseURL = "";
         this.responseType = "";
         this.onreadystatechange = null;
         this.onload = null;
         this.onerror = null;
         this.headers = {};
+        this.responseHeaders = {};
+        this.async = true;
       }
-      open(method, url) {
+      open(method, url, async = true) {
         this.method = method;
         this.url = url;
+        this.responseURL = "";
+        this.async = async !== false;
         this.readyState = 1;
         this.onreadystatechange?.();
       }
       setRequestHeader(name, value) { this.headers[name] = value; }
-      async send(body) {
+      complete(cached) {
+        this.status = cached.status;
+        this.responseText = cached.text;
+        this.responseHeaders = cached.headers || {};
+        this.responseURL = cached.finalUrl || new URL(this.url, currentUrl).href;
+        this.response = this.responseType === "json" ? JSON.parse(this.responseText) : this.responseText;
+        this.readyState = 4;
+        this.onreadystatechange?.();
+        this.onload?.();
+        this.dispatchEvent(new Event("load"));
+      }
+      send(body) {
+        const absoluteUrl = new URL(this.url, currentUrl).href;
+        if (!this.async) {
+          const cached = synchronousResponses.get(absoluteUrl);
+          if (!cached) throw new Error(`A resposta síncrona ainda não foi preparada: ${absoluteUrl}`);
+          this.complete(cached);
+          return;
+        }
+        this.sendAsync(body);
+      }
+      async sendAsync(body) {
         try {
           const response = await labFetch(this.url, { method: this.method, headers: this.headers, body });
-          this.status = response.status;
-          this.responseText = await response.text();
-          this.response = this.responseType === "json" ? JSON.parse(this.responseText) : this.responseText;
-          this.readyState = 4;
-          this.onreadystatechange?.();
-          this.onload?.();
-          this.dispatchEvent(new Event("load"));
+          const headers = Object.fromEntries(response.headers.entries());
+          this.complete({ status: response.status, text: await response.text(), headers, finalUrl: response.headers.get("x-lab-final-url") || "" });
         } catch (error) {
           this.readyState = 4;
           this.onreadystatechange?.();
@@ -179,8 +202,8 @@
         }
       }
       abort() {}
-      getAllResponseHeaders() { return ""; }
-      getResponseHeader() { return null; }
+      getAllResponseHeaders() { return Object.entries(this.responseHeaders).map(([name, value]) => `${name}: ${value}`).join("\r\n"); }
+      getResponseHeader(name) { return this.responseHeaders[String(name).toLowerCase()] || null; }
     }
 
     window.fetch = labFetch;
@@ -208,6 +231,44 @@
       back() {}, forward() {}, go() {}, length: 1, state: null
     };
 
+    const toBase64Url = (value) => btoa(value).replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/g, "");
+    const sourceModuleUrl = (rawUrl) => {
+      const target = new URL(rawUrl, currentUrl);
+      return `${config.apiBase}/source/${encodeURIComponent(config.token)}/${toBase64Url(target.origin)}${target.pathname}${target.search}`;
+    };
+
+    async function loadModule(source) {
+      if (!source.src && !source.text.trim()) return;
+      await new Promise((resolve, reject) => {
+        const module = document.createElement("script");
+        module.type = "module";
+        if (source.src) module.src = sourceModuleUrl(source.src);
+        else module.textContent = source.text;
+        module.addEventListener("load", resolve, { once: true });
+        module.addEventListener("error", () => reject(new Error(`Não foi possível executar o módulo da fonte: ${source.src || "inline"}`)), { once: true });
+        document.body.append(module);
+        if (!source.src) setTimeout(resolve, 0);
+      });
+    }
+
+    async function waitForDynamicRender(initialMarkup) {
+      const started = Date.now();
+      let lastMutation = started;
+      const observer = new MutationObserver(() => { lastMutation = Date.now(); });
+      observer.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true });
+      try {
+        while (Date.now() - started < 12000) {
+          const changed = document.body.innerHTML !== initialMarkup;
+          const minimumElapsed = Date.now() - started >= 2500;
+          const settled = Date.now() - lastMutation >= 800;
+          if (changed && minimumElapsed && settled) return;
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+      } finally {
+        observer.disconnect();
+      }
+    }
+
     async function installSourceDocument() {
       const parsed = new DOMParser().parseFromString(config.html, "text/html");
       parsed.querySelectorAll("base, meta[http-equiv='Content-Security-Policy' i], meta[http-equiv='refresh' i], iframe, frame, object, embed").forEach((node) => node.remove());
@@ -221,6 +282,10 @@
       document.documentElement.lang = parsed.documentElement.lang || "pt-BR";
       document.title = parsed.title || "Nyxovira Plugin Lab";
       document.body.innerHTML = parsed.body.innerHTML;
+      const initialMarkup = document.body.innerHTML;
+      const sourcePage = new URL(currentUrl);
+      history.replaceState(null, "", `${sourcePage.pathname}${sourcePage.search}`);
+      let loadedModule = false;
 
       for (const source of scripts) {
         if (source.type && !new Set(["text/javascript", "application/javascript", "module"]).has(source.type)) {
@@ -230,7 +295,11 @@
           document.body.append(dataScript);
           continue;
         }
-        if (source.type === "module") continue;
+        if (source.type === "module") {
+          await loadModule(source);
+          loadedModule = true;
+          continue;
+        }
         try {
           let code = source.text;
           if (source.src) {
@@ -244,6 +313,7 @@
           }
         } catch {}
       }
+      if (loadedModule) await waitForDynamicRender(initialMarkup);
     }
 
     async function waitForPlan() {
@@ -256,7 +326,28 @@
         } catch {}
         await new Promise((resolve) => setTimeout(resolve, 100));
       }
-      throw new Error("O plugin não produziu o plano de capítulos em 15 segundos.");
+      const diagnostic = Object.getOwnPropertyNames(window)
+        .filter((name) => /(?:last|plugin).*error$/i.test(name))
+        .map((name) => {
+          try { return String(window[name] || "").trim(); } catch { return ""; }
+        })
+        .find(Boolean);
+      const rendered = String(document.body?.innerText || "").replace(/\s+/g, " ").trim().slice(0, 180);
+      const detail = diagnostic || (rendered ? `A fonte renderizou "${rendered}".` : "A página dinâmica permaneceu sem conteúdo.");
+      throw new Error(`O plugin não produziu o plano de capítulos em 15 segundos. ${detail}`);
+    }
+
+    async function primeSynchronousResponse(rawUrl) {
+      if (!rawUrl) return;
+      const absoluteUrl = new URL(rawUrl, currentUrl).href;
+      if (synchronousResponses.has(absoluteUrl)) return;
+      const response = await labFetch(absoluteUrl, { headers: { Accept: "text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8" } });
+      synchronousResponses.set(absoluteUrl, {
+        status: response.status,
+        text: await response.text(),
+        headers: Object.fromEntries(response.headers.entries()),
+        finalUrl: response.headers.get("x-lab-final-url") || absoluteUrl
+      });
     }
 
     async function runPlugin(script) {
@@ -265,8 +356,10 @@
         execute(window, document, sourceLocation, labHistory, labFetch, LabXMLHttpRequest);
         let plan = await waitForPlan();
         const selectedChapterId = String(plan.chapters[0]?.id ?? "");
+        const selectedChapter = plan.chapters.find((chapter) => String(chapter?.id ?? "") === selectedChapterId);
         const prepare = window.__nyxoviraPrepareDownloadPlan || window.Nyxovira?.prepareDownloadPlan;
         if (typeof prepare === "function") {
+          await primeSynchronousResponse(selectedChapter?.url || selectedChapter?.href);
           const prepared = await prepare({ selectedChapterIds: [selectedChapterId], chapterPlan: plan });
           if (prepared) plan = typeof prepared === "string" ? JSON.parse(prepared) : prepared;
         }
@@ -291,7 +384,7 @@
       frame.style.cssText = "position:fixed;width:1px;height:1px;left:-10000px;top:0;opacity:0;pointer-events:none;border:0";
       frame.setAttribute("aria-hidden", "true");
       let sandboxState = "criado";
-      const timeout = setTimeout(() => finish(new Error(`O teste no navegador excedeu 30 segundos (estado: ${sandboxState}).`)), 30000);
+      const timeout = setTimeout(() => finish(new Error(`O teste no navegador excedeu 60 segundos (estado: ${sandboxState}).`)), 60000);
       let started = false;
 
       function startPlugin() {
@@ -319,7 +412,7 @@
             channel,
             type: "bootstrap",
             source: `return (${sandboxBootstrap.toString()})(config);`,
-            config: { channel, sourceUrl: prepared.page.url, html: prepared.page.html }
+            config: { channel, sourceUrl: prepared.page.url, html: prepared.page.html, apiBase, token: prepared.token }
           }, new URL(apiBase).origin);
           return;
         }
@@ -338,7 +431,10 @@
               id: message.id,
               ok: true,
               status: response.status,
-              headers: { "content-type": response.headers.get("content-type") || "application/octet-stream" },
+              headers: {
+                "content-type": response.headers.get("content-type") || "application/octet-stream",
+                "x-lab-final-url": response.headers.get("x-lab-final-url") || message.request.url
+              },
               buffer
             }, "*", [buffer]);
           } catch (error) {
