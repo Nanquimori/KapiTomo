@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/plugin.schema.json",
+  "title": "Nyxovira source plugin",
+  "type": "object",
+  "required": ["match", "browser"],
+  "properties": {
+    "schema_version": { "type": "integer", "minimum": 1 },
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+    "name": { "type": "string", "minLength": 1 },
+    "version": { "type": "string", "minLength": 1 },
+    "language": { "type": "string", "minLength": 2 },
+    "tags": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "match": {
+      "type": "object",
+      "required": ["hosts"],
+      "properties": {
+        "hosts": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[A-Za-z0-9.-]+$" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "browser": {
+      "type": "object",
+      "required": ["home_url"],
+      "properties": {
+        "home_url": { "type": "string", "format": "uri", "pattern": "^https?://" },
+        "short_label": { "type": "string", "minLength": 1 },
+        "icon_url": { "type": "string", "format": "uri", "pattern": "^https?://" },
+        "icon_mode": { "type": "string" },
+        "download_target_script_file": { "$ref": "#/$defs/relativeFile" }
+      },
+      "additionalProperties": true
+    },
+    "parser": {
+      "type": "object",
+      "required": ["adapter"],
+      "properties": {
+        "adapter": { "enum": ["next_payload", "html_series", "aes_json_api"] },
+        "base_url": { "type": "string", "format": "uri", "pattern": "^https?://" },
+        "api_base": { "type": "string", "format": "uri", "pattern": "^https?://" },
+        "cdn_base": { "type": "string", "format": "uri", "pattern": "^https?://" },
+        "request_headers": { "type": "object", "additionalProperties": { "type": "string" } },
+        "encrypted_response_format": { "type": "string", "minLength": 1 },
+        "api_secret": { "type": "string", "minLength": 1 },
+        "work_api_path_template": { "type": "string", "minLength": 1 },
+        "work_api_id_path_template": { "type": "string", "minLength": 1 },
+        "chapter_api_path_template": { "type": "string", "minLength": 1 },
+        "page_api_path_template": { "type": "string", "minLength": 1 },
+        "page_cdn_path_template": { "type": "string", "minLength": 1 },
+        "series_path_template": { "type": "string", "minLength": 1 },
+        "read_path_template": { "type": "string", "minLength": 1 },
+        "work_search_api_path_template": { "type": "string", "minLength": 1 },
+        "cover_search_api_path_template": { "type": "string", "minLength": 1 },
+        "public_work_path_template": { "type": "string", "minLength": 1 },
+        "public_chapter_path_template": { "type": "string", "minLength": 1 },
+        "viewer_bootstrap_path_template": { "type": "string", "minLength": 1 },
+        "static_works_script": { "type": "string", "minLength": 1 },
+        "page_token_header": { "type": "string", "minLength": 1 },
+        "rotating_sbox_key_prefix": { "type": "string", "minLength": 1 },
+        "default_workers": { "type": "integer", "minimum": 1 },
+        "default_retries": { "type": "integer", "minimum": 0 },
+        "base_path_prefix": { "type": "string" },
+        "series_path_prefix": { "type": "string" },
+        "chapter_path_prefix": { "type": "string" },
+        "chapter_slug_pattern": { "type": "string", "minLength": 1 },
+        "work_object_keys": { "$ref": "#/$defs/stringArray" },
+        "work_title_keys": { "$ref": "#/$defs/stringArray" },
+        "work_summary_keys": { "$ref": "#/$defs/stringArray" },
+        "work_cover_keys": { "$ref": "#/$defs/stringArray" },
+        "chapter_object_keys": { "$ref": "#/$defs/stringArray" },
+        "chapter_array_keys": { "$ref": "#/$defs/stringArray" },
+        "chapter_id_keys": { "$ref": "#/$defs/stringArray" },
+        "chapter_number_keys": { "$ref": "#/$defs/stringArray" },
+        "chapter_title_keys": { "$ref": "#/$defs/stringArray" },
+        "chapter_text_keys": { "$ref": "#/$defs/stringArray" },
+        "paragraph_array_keys": { "$ref": "#/$defs/stringArray" },
+        "page_array_keys": { "$ref": "#/$defs/stringArray" },
+        "page_number_keys": { "$ref": "#/$defs/stringArray" },
+        "page_image_keys": { "$ref": "#/$defs/stringArray" },
+        "page_cdn_id_keys": { "$ref": "#/$defs/stringArray" },
+        "search_array_keys": { "$ref": "#/$defs/stringArray" },
+        "cover_search_array_keys": { "$ref": "#/$defs/stringArray" },
+        "series_path_prefixes": { "$ref": "#/$defs/stringArray" },
+        "hash_series_path_prefixes": { "$ref": "#/$defs/stringArray" },
+        "chapter_path_prefixes": { "$ref": "#/$defs/stringArray" },
+        "chapter_slug_strip_prefixes": { "$ref": "#/$defs/stringArray" },
+        "ignored_root_paths": { "$ref": "#/$defs/stringArray" },
+        "chapter_label_patterns": { "$ref": "#/$defs/stringArray" },
+        "chapter_image_path_hints": { "$ref": "#/$defs/stringArray" },
+        "chapter_image_class_hints": { "$ref": "#/$defs/stringArray" },
+        "cdn_direct_path_prefixes": { "$ref": "#/$defs/stringArray" },
+        "rotating_sbox_keys": { "$ref": "#/$defs/stringArray" },
+        "map": { "type": "object", "additionalProperties": { "type": "string" } }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "relativeFile": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z]:)(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+    },
+    "stringArray": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    }
+  }
+}

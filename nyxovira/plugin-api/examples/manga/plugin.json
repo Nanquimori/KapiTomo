@@ -1,0 +1,9 @@
+{
+  "$schema": "../../plugin.schema.json",
+  "schema_version": 1,
+  "id": "sample-manga",
+  "name": "Sanitized manga source",
+  "version": "1.0.0",
+  "match": { "hosts": ["source.invalid"] },
+  "browser": { "home_url": "https://source.invalid/", "download_target_script_file": "browser/download_target.js" }
+}

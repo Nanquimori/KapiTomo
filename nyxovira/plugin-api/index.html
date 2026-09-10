@@ -773,7 +773,7 @@
             <div class="prompt-grid">
               <div class="prompt-controls">
                 <label class="prompt-field-label">Source site URL
-                  <input class="prompt-url" type="url" value="https://example.com/" placeholder="https://example.com/" autocomplete="off" autocapitalize="off" spellcheck="false" data-prompt-url>
+                  <input class="prompt-url" type="url" value="https://source.invalid/" placeholder="https://source.invalid/" autocomplete="off" autocapitalize="off" spellcheck="false" data-prompt-url>
                 </label>
                 <fieldset class="prompt-type">
                   <legend class="prompt-type-label">How will you use this plugin?</legend>
@@ -794,7 +794,7 @@
                   <span class="prompt-output-title">Prompt ready to send to an AI assistant</span>
                   <button class="prompt-copy" type="button" data-copy-prompt data-copy-default="Copy prompt" data-copy-success="Prompt copied">Copy prompt</button>
                 </div>
-                <textarea class="prompt-output" rows="13" readonly spellcheck="false" aria-label="Generated plugin request" data-prompt-output>Create a Nyxovira plugin for personal use for the site "https://example.com/", following the official documentation: "https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/".</textarea>
+                <textarea class="prompt-output" rows="13" readonly spellcheck="false" aria-label="Generated plugin request" data-prompt-output>Create a Nyxovira plugin for personal use for the site "https://source.invalid/", following the official documentation: "https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/".</textarea>
                 <p class="prompt-status" aria-live="polite" data-copy-status>Change the URL or mode; the prompt updates automatically.</p>
               </div>
             </div>
@@ -813,11 +813,21 @@
           <section id="overview" class="panel">
             <h2>How a plugin works</h2>
             <div class="steps">
-              <div class="step"><p>The creator starts with the small <code>plugin.json</code> that Nyxovira needs. A site-specific script is added when generic page recognition is not enough.</p></div>
+              <div class="step"><p>The creator starts with <code>plugin.json</code> and <code>browser/download_target.js</code>. The script performs source-specific discovery and builds the chapter plan.</p></div>
               <div class="step"><p>During development, the creator imports the local plugin folder into Nyxovira and tests it on the supported site.</p></div>
               <div class="step"><p>The plugin may remain private. Publication is optional and happens only after testing.</p></div>
-              <div class="step"><p>When present, the browser script handles site-specific work and chapter recognition. Without it, Nyxovira tries its generic page detector.</p></div>
+              <div class="step"><p>Legacy manifests may omit the script and use the generic page detector, but new plugins need the script to pass the documented conformance workflow.</p></div>
             </div>
+          </section>
+
+          <section id="implementation-levels" class="panel">
+            <h2>Choose the implementation level</h2>
+            <div class="rule-list">
+              <article><h3>1. Simple HTML</h3><p>Use <code>browser/download_target.js</code> to read rendered HTML and produce the complete chapter plan.</p></article>
+              <article><h3>2. Simple JSON API</h3><p>Use the browser script for discovery and declare <code>parser</code> when the native downloader must repeat structured API requests outside the WebView.</p></article>
+              <article><h3>3. Dynamic, protected, or encrypted API</h3><p><code>parser</code> is mandatory for endpoints, special headers, and decoding; the browser script still handles discovery and the browser session.</p></article>
+            </div>
+            <p class="panel-copy-after-list"><strong>Parser optional</strong> only means that a manifest can be imported without one. It should be declared for a structured API, special headers, encryption, or native downloading outside the WebView.</p>
           </section>
 
           <section id="files" class="panel">
@@ -834,7 +844,7 @@
                 <thead><tr><th>File</th><th>Purpose</th></tr></thead>
                 <tbody>
                   <tr><td><code>plugin.json</code></td><td>Identifies the supported site. Only a few fields are needed for a personal plugin.</td></tr>
-                  <tr><td><code>browser/download_target.js</code></td><td>Optional for import, but recommended when generic detection cannot build the correct chapter plan.</td></tr>
+                  <tr><td><code>browser/download_target.js</code></td><td>Required for the new conformance workflow. A legacy manifest may import without it and fall back to generic detection.</td></tr>
                 </tbody>
               </table>
             </div>
@@ -846,9 +856,9 @@
             <p>This is the smallest practical manifest for a plugin imported directly into Nyxovira:</p>
             <pre><code>{
   "id": "my-plugin",
-  "match": { "hosts": ["example.com"] },
+  "match": { "hosts": ["source.invalid"] },
   "browser": {
-    "home_url": "https://example.com/",
+    "home_url": "https://source.invalid/",
     "download_target_script_file": "browser/download_target.js"
   }
 }</code></pre>
@@ -861,11 +871,11 @@
                   <tr><td><code>id</code></td><td>Strongly recommended; otherwise Nyxovira uses the folder name.</td></tr>
                   <tr><td><code>match.hosts</code></td><td>Required. Domains recognized by the plugin.</td></tr>
                   <tr><td><code>browser.home_url</code></td><td>Required. Page opened by the app browser.</td></tr>
-                  <tr><td><code>browser.download_target_script_file</code></td><td>Optional, but recommended for reliable site-specific detection.</td></tr>
+                  <tr><td><code>browser.download_target_script_file</code></td><td>Required for a newly developed plugin; points to the discovery and chapter-plan script.</td></tr>
                   <tr><td><code>name</code>, <code>version</code></td><td>Optional for personal use; useful when sharing and updating.</td></tr>
                   <tr><td><code>tags</code></td><td>Not needed for personal use. Add them only when your own external catalog uses tags for organization or filtering.</td></tr>
                   <tr><td><code>browser.icon_url</code></td><td>Optional for personal use. Prefer the site's public favicon or logo when one is available.</td></tr>
-                  <tr><td><code>parser</code></td><td>Optional advanced native-parser configuration.</td></tr>
+                  <tr><td><code>parser</code></td><td>Required for structured APIs, special headers, encryption, or native downloading outside the WebView. It may be omitted only when the browser plan already contains final content.</td></tr>
                 </tbody>
               </table>
             </div>
@@ -880,9 +890,16 @@
               <li>If the API is not linked or documented, inspect the page source, loaded scripts, and the browser's network requests to identify the endpoints used by the site's own interface.</li>
               <li>Compare the API data with the rendered HTML and use the most complete and stable source for works, chapters, text, and images.</li>
             </ul>
+            <h3 class="api-subheading">Mandatory pre-ZIP map</h3>
+            <ul>
+              <li>Record a real work URL, reader URL, and the work, chapter, and page endpoints.</li>
+              <li>Record selectors, load completion, required headers, referer, cookies, login/tokens, and encryption.</li>
+              <li>Record paid or restricted chapters, source/display order, relative URL bases, and real ID formats.</li>
+              <li>Resolve at least one actual chapter into nonempty pages or paragraphs. Never invent endpoints, selectors, headers, keys, or results.</li>
+            </ul>
             <pre><code>var plugin = {
-  siteBaseUrl: "https://example.com",
-  siteVariable: "EXAMPLE_WORK_INDEX",
+  siteBaseUrl: "https://source.invalid",
+  siteVariable: "SANITIZED_WORK_INDEX",
   siteRoutes: {
     detailsHash: "series",
     readerHash: "reader"
@@ -910,8 +927,8 @@
             <pre><code>window.__nyxoviraChapterPlan = JSON.stringify({
   title: "Work title",
   summary: "Short summary",
-  canonicalUrl: "https://example.com/manga/work/",
-  coverUrl: "https://example.com/cover.png",
+  canonicalUrl: "https://source.invalid/manga/work/",
+  coverUrl: "https://source.invalid/cover.png",
   chapters: [
     {
       id: "chapter-forest-hunt",
@@ -923,7 +940,7 @@
   ]
 });
 
-return "https://example.com/manga/work/";</code></pre>
+return "https://source.invalid/manga/work/";</code></pre>
           </section>
 
           <section id="prepare" class="panel">
@@ -951,6 +968,13 @@ return "https://example.com/manga/work/";</code></pre>
   return plan;
 };</code></pre>
             <p>Nyxovira passes <code>{ selectedChapterIds, chapterPlan }</code>. The function may return the final plan object or a JSON string. If it returns nothing, the app keeps the original plan.</p>
+            <p><strong>ID invariant:</strong> every <code>chapterPlan.chapters[].id</code> must exactly equal the corresponding value received in <code>selectedChapterIds</code>. Never add or remove an <code>id:</code> prefix, convert it to a slug, or replace it with the visible index.</p>
+          </section>
+
+          <section id="parser-fields" class="panel">
+            <h2>Native parser contract</h2>
+            <p>Supported adapters are <code>next_payload</code>, <code>html_series</code>, and <code>aes_json_api</code>. Route fields build work, chapter, reader, bootstrap, page, and CDN requests; <code>request_headers</code> supplies static API headers; <code>map</code> and <code>*_keys</code> map actual JSON paths; route prefixes and image hints control recognition; and encryption fields activate decoding with mapped key material. See the Markdown reference for the operational meaning of every field.</p>
+            <p><a href="PLUGIN_API.md">Open the complete parser field reference</a> · <a href="plugin.schema.json">Open plugin.schema.json</a></p>
           </section>
 
           <section id="formats" class="panel">
@@ -970,8 +994,8 @@ return "https://example.com/manga/work/";</code></pre>
   "title": "Arrival at the Ruins",
   "contentType": "images",
   "pages": [
-    "https://example.com/page-001.png",
-    "https://example.com/page-002.png"
+    "https://source.invalid/page-001.png",
+    "https://source.invalid/page-002.png"
   ]
 }</code></pre>
           </section>
@@ -985,6 +1009,13 @@ return "https://example.com/manga/work/";</code></pre>
               <div class="step"><p>Open the supported site and verify work recognition, the chapter list, and the download.</p></div>
               <div class="step"><p>After changing the files, import the folder again and repeat the test.</p></div>
             </div>
+            <h3 class="api-subheading">Conformance gate</h3>
+            <pre><code>cd tester
+npm install
+node test-plugin.js ../my-plugin https://source.invalid/work/slug</code></pre>
+            <p>The tester writes <code>work.json</code>, <code>chapter-plan.json</code>, <code>chapter-001/</code>, and <code>report.json</code>. It returns <code>PLUGIN_VALID</code> only after real content is downloaded or serialized, saved, and reopened. Queueing a task is not validation.</p>
+            <p>In the Android app, open <strong>Sites → Test source</strong>, navigate to a work, and tap the diagnostic icon. Without real network validation, state: <strong>not validated against the real site</strong>.</p>
+            <p><a href="examples/">Complete sanitized examples</a>: simple HTML, JSON API, novel, manga, and encrypted API. All use the reserved <code>source.invalid</code> domain.</p>
             <p class="panel-copy-after-list"><strong>If the plugin is only for you, you are done.</strong> You do not need tags, <code>schema_version</code>, GitHub, a public catalog, or a plugin website. Use the site's favicon or logo when available; you do not need to host a separate icon.</p>
             <h3 class="api-subheading">If you want to distribute it</h3>
             <p>Host your own independent external catalog. You control its repository, page, plugin files, descriptions, updates, and security; it is not submitted to KapiTomo.</p>
@@ -1013,15 +1044,15 @@ return "https://example.com/manga/work/";</code></pre>
             <pre><code>{
   "schema_version": 1,
   "name": "My plugin store",
-  "hub_url": "https://plugins.example.com/",
+  "hub_url": "https://plugins.source.invalid/",
   "plugins": [{
     "id": "my-plugin",
     "name": "My Plugin",
     "author": "Author",
     "version": "1.0.0",
     "manifest_url": "plugins/my-plugin/plugin.json",
-    "icon_url": "https://example.com/icon.png",
-      "site_url": "https://example.com/",
+    "icon_url": "https://source.invalid/icon.png",
+      "site_url": "https://source.invalid/",
       "status": "active"
   }]
 }</code></pre>
@@ -1079,7 +1110,7 @@ return "https://example.com/manga/work/";</code></pre>
             <div class="rule-list">
               <article>
                 <h3>Personal plugin</h3>
-                <p>Valid JSON, a non-empty folder name (or id), at least one supported host, and a valid home URL. Add a browser script only when generic recognition is insufficient; use <code>paragraphs</code> for novels or <code>pages</code> for comics.</p>
+                <p>Valid JSON, a non-empty folder name (or id), at least one supported host, a valid home URL, and a browser script tested against real content; use <code>paragraphs</code> for novels or <code>pages</code> for comics.</p>
               </article>
               <article>
                 <h3>Independent external catalog</h3>
@@ -1114,7 +1145,7 @@ return "https://example.com/manga/work/";</code></pre>
             <div class="prompt-grid">
               <div class="prompt-controls">
                 <label class="prompt-field-label">URL do site da fonte
-                  <input class="prompt-url" type="url" value="https://example.com/" placeholder="https://example.com/" autocomplete="off" autocapitalize="off" spellcheck="false" data-prompt-url>
+                  <input class="prompt-url" type="url" value="https://source.invalid/" placeholder="https://source.invalid/" autocomplete="off" autocapitalize="off" spellcheck="false" data-prompt-url>
                 </label>
                 <fieldset class="prompt-type">
                   <legend class="prompt-type-label">Como você usará este plugin?</legend>
@@ -1135,7 +1166,7 @@ return "https://example.com/manga/work/";</code></pre>
                   <span class="prompt-output-title">Prompt pronto para enviar a uma IA</span>
                   <button class="prompt-copy" type="button" data-copy-prompt data-copy-default="Copiar prompt" data-copy-success="Prompt copiado">Copiar prompt</button>
                 </div>
-                <textarea class="prompt-output" rows="13" readonly spellcheck="false" aria-label="Pedido de plugin gerado" data-prompt-output>Crie um plugin Nyxovira para uso pessoal para o site "https://example.com/", seguindo a documentação oficial: "https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/".</textarea>
+                <textarea class="prompt-output" rows="13" readonly spellcheck="false" aria-label="Pedido de plugin gerado" data-prompt-output>Crie um plugin Nyxovira para uso pessoal para o site "https://source.invalid/", seguindo a documentação oficial: "https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/".</textarea>
                 <p class="prompt-status" aria-live="polite" data-copy-status>Altere a URL ou o tipo; o prompt será atualizado automaticamente.</p>
               </div>
             </div>
@@ -1154,11 +1185,21 @@ return "https://example.com/manga/work/";</code></pre>
           <section class="panel">
             <h2>Como um plugin funciona</h2>
             <div class="steps">
-              <div class="step"><p>O criador começa pelo pequeno <code>plugin.json</code> de que o Nyxovira precisa. Um script específico do site é adicionado quando o reconhecimento genérico da página não é suficiente.</p></div>
+              <div class="step"><p>O criador começa com <code>plugin.json</code> e <code>browser/download_target.js</code>. O script descobre a fonte específica e monta o plano de capítulos.</p></div>
               <div class="step"><p>Durante o desenvolvimento, o criador importa a pasta local do plugin no Nyxovira e testa no site compatível.</p></div>
               <div class="step"><p>O plugin pode continuar particular. A publicação é opcional e acontece somente depois dos testes.</p></div>
-              <div class="step"><p>Quando existe, o script cuida do reconhecimento específico da obra e dos capítulos. Sem ele, o Nyxovira tenta usar o detector genérico da página.</p></div>
+              <div class="step"><p>Manifestos antigos podem omitir o script e usar o detector genérico, mas plugins novos precisam do script para passar pelo fluxo de conformidade documentado.</p></div>
             </div>
+          </section>
+
+          <section id="implementation-levels-pt" class="panel">
+            <h2>Escolha o nível de implementação</h2>
+            <div class="rule-list">
+              <article><h3>1. HTML simples</h3><p>Use <code>browser/download_target.js</code> para ler o HTML renderizado e produzir o plano completo.</p></article>
+              <article><h3>2. API JSON simples</h3><p>Use o script para descoberta e declare <code>parser</code> quando o downloader nativo precisar repetir requisições estruturadas fora da WebView.</p></article>
+              <article><h3>3. API dinâmica, protegida ou criptografada</h3><p><code>parser</code> é obrigatório para endpoints, cabeçalhos especiais e decodificação; o script continua cuidando da descoberta e da sessão do navegador.</p></article>
+            </div>
+            <p class="panel-copy-after-list"><strong>Parser opcional</strong> significa apenas que o manifesto pode ser importado sem ele. Declare-o para API estruturada, headers especiais, criptografia ou download nativo fora da WebView.</p>
           </section>
 
           <section id="files-pt" class="panel">
@@ -1175,7 +1216,7 @@ return "https://example.com/manga/work/";</code></pre>
                 <thead><tr><th>Arquivo</th><th>Função</th></tr></thead>
                 <tbody>
                   <tr><td><code>plugin.json</code></td><td>Identifica o site compatível. Poucos campos são necessários para um plugin pessoal.</td></tr>
-                  <tr><td><code>browser/download_target.js</code></td><td>Opcional para importar, mas recomendado quando o detector genérico não monta o plano correto de capítulos.</td></tr>
+                  <tr><td><code>browser/download_target.js</code></td><td>Obrigatório no novo fluxo de conformidade. Um manifesto antigo pode importar sem ele e recorrer ao detector genérico.</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1187,9 +1228,9 @@ return "https://example.com/manga/work/";</code></pre>
             <p>Este é o menor manifesto prático para importar um plugin diretamente no Nyxovira:</p>
             <pre><code>{
   "id": "my-plugin",
-  "match": { "hosts": ["example.com"] },
+  "match": { "hosts": ["source.invalid"] },
   "browser": {
-    "home_url": "https://example.com/",
+    "home_url": "https://source.invalid/",
     "download_target_script_file": "browser/download_target.js"
   }
 }</code></pre>
@@ -1202,11 +1243,11 @@ return "https://example.com/manga/work/";</code></pre>
                   <tr><td><code>id</code></td><td>Fortemente recomendado; se faltar, o Nyxovira usa o nome da pasta.</td></tr>
                   <tr><td><code>match.hosts</code></td><td>Obrigatório. Domínios reconhecidos pelo plugin.</td></tr>
                   <tr><td><code>browser.home_url</code></td><td>Obrigatório. Página aberta pelo navegador interno.</td></tr>
-                  <tr><td><code>browser.download_target_script_file</code></td><td>Opcional, mas recomendado para reconhecer corretamente aquele site.</td></tr>
+                  <tr><td><code>browser.download_target_script_file</code></td><td>Obrigatório em plugin novo; aponta para o script de descoberta e plano de capítulos.</td></tr>
                   <tr><td><code>name</code>, <code>version</code></td><td>Opcionais no uso pessoal; úteis ao compartilhar e atualizar.</td></tr>
                   <tr><td><code>tags</code></td><td>Desnecessárias no uso pessoal. Adicione somente se o seu catálogo externo usar tags para organização ou filtros.</td></tr>
                   <tr><td><code>browser.icon_url</code></td><td>Opcional no uso pessoal. Prefira o favicon ou logo público do próprio site quando estiver disponível.</td></tr>
-                  <tr><td><code>parser</code></td><td>Configuração avançada e opcional do parser nativo.</td></tr>
+                  <tr><td><code>parser</code></td><td>Obrigatório para API estruturada, headers especiais, criptografia ou download nativo fora da WebView. Só pode ser omitido quando o plano do navegador já contém o conteúdo final.</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1221,9 +1262,16 @@ return "https://example.com/manga/work/";</code></pre>
               <li>Se a API não estiver visível ou documentada, examine o código da página, os scripts carregados e as requisições de rede do navegador para identificar os endpoints usados pela própria interface do site.</li>
               <li>Compare os dados da API com o HTML renderizado e use a fonte mais completa e estável para obras, capítulos, textos e imagens.</li>
             </ul>
+            <h3 class="api-subheading">Mapa obrigatório antes do ZIP</h3>
+            <ul>
+              <li>Registre URL real de obra e leitor e os endpoints de obra, capítulo e páginas.</li>
+              <li>Registre seletores, fim do carregamento, headers, referer, cookies, login/tokens e criptografia.</li>
+              <li>Registre capítulos pagos/restritos, ordem da fonte e da tela, base das URLs relativas e formatos reais de ID.</li>
+              <li>Resolva pelo menos um capítulo real em páginas ou parágrafos não vazios. Nunca invente endpoints, seletores, headers, chaves ou resultados.</li>
+            </ul>
             <pre><code>var plugin = {
-  siteBaseUrl: "https://example.com",
-  siteVariable: "EXAMPLE_WORK_INDEX",
+  siteBaseUrl: "https://source.invalid",
+  siteVariable: "SANITIZED_WORK_INDEX",
   siteRoutes: {
     detailsHash: "series",
     readerHash: "reader"
@@ -1251,8 +1299,8 @@ return "https://example.com/manga/work/";</code></pre>
             <pre><code>window.__nyxoviraChapterPlan = JSON.stringify({
   title: "Work title",
   summary: "Short summary",
-  canonicalUrl: "https://example.com/manga/work/",
-  coverUrl: "https://example.com/cover.png",
+  canonicalUrl: "https://source.invalid/manga/work/",
+  coverUrl: "https://source.invalid/cover.png",
   chapters: [
     {
       id: "chapter-forest-hunt",
@@ -1264,7 +1312,7 @@ return "https://example.com/manga/work/";</code></pre>
   ]
 });
 
-return "https://example.com/manga/work/";</code></pre>
+return "https://source.invalid/manga/work/";</code></pre>
           </section>
 
           <section class="panel">
@@ -1292,6 +1340,13 @@ return "https://example.com/manga/work/";</code></pre>
   return plan;
 };</code></pre>
             <p>O Nyxovira passa <code>{ selectedChapterIds, chapterPlan }</code>. A função pode retornar o plano final como objeto ou JSON. Se não retornar nada, o app mantém o plano original.</p>
+            <p><strong>Invariante de ID:</strong> cada <code>chapterPlan.chapters[].id</code> deve ser exatamente igual ao valor correspondente recebido em <code>selectedChapterIds</code>. Nunca acrescente ou remova o prefixo <code>id:</code>, converta para slug ou troque pelo índice visual.</p>
+          </section>
+
+          <section id="parser-fields-pt" class="panel">
+            <h2>Contrato do parser nativo</h2>
+            <p>Os adaptadores aceitos são <code>next_payload</code>, <code>html_series</code> e <code>aes_json_api</code>. Campos de rota montam requisições de obra, capítulo, leitor, bootstrap, página e CDN; <code>request_headers</code> fornece headers estáticos; <code>map</code> e <code>*_keys</code> ligam os caminhos reais do JSON; prefixos e dicas de imagem controlam o reconhecimento; campos de criptografia ativam a decodificação com material de chave mapeado. O Markdown descreve o efeito operacional de cada campo.</p>
+            <p><a href="PLUGIN_API.pt-BR.md">Abrir referência completa do parser</a> · <a href="plugin.schema.json">Abrir plugin.schema.json</a></p>
           </section>
 
           <section class="panel">
@@ -1311,8 +1366,8 @@ return "https://example.com/manga/work/";</code></pre>
   "title": "Arrival at the Ruins",
   "contentType": "images",
   "pages": [
-    "https://example.com/page-001.png",
-    "https://example.com/page-002.png"
+    "https://source.invalid/page-001.png",
+    "https://source.invalid/page-002.png"
   ]
 }</code></pre>
           </section>
@@ -1326,6 +1381,13 @@ return "https://example.com/manga/work/";</code></pre>
               <div class="step"><p>Abra o site compatível e confira o reconhecimento da obra, a lista de capítulos e o download.</p></div>
               <div class="step"><p>Depois de alterar os arquivos, importe a pasta novamente e repita o teste.</p></div>
             </div>
+            <h3 class="api-subheading">Barreira de conformidade</h3>
+            <pre><code>cd tester
+npm install
+node test-plugin.js ../meu-plugin https://source.invalid/work/slug</code></pre>
+            <p>O testador gera <code>work.json</code>, <code>chapter-plan.json</code>, <code>chapter-001/</code> e <code>report.json</code>. Ele retorna <code>PLUGIN_VALID</code> somente depois de baixar ou serializar, gravar e reabrir conteúdo real. Colocar uma tarefa na fila não é validação.</p>
+            <p>No Android, abra <strong>Sites → Testar fonte</strong>, navegue até uma obra e toque no ícone de diagnóstico. Sem validação real de rede, informe: <strong>não validado contra o site real</strong>.</p>
+            <p><a href="examples/">Exemplos completos e sanitizados</a>: HTML simples, API JSON, novel, manga e API criptografada. Todos usam o domínio reservado <code>source.invalid</code>.</p>
             <p class="panel-copy-after-list"><strong>Se o plugin é somente para você, o processo termina aqui.</strong> Não é necessário ter tags, <code>schema_version</code>, GitHub, catálogo público ou site de plugins. Use o favicon ou logo do próprio site quando existir; você não precisa hospedar um ícone separado.</p>
             <h3 class="api-subheading">Se quiser distribuir</h3>
             <p>Hospede seu próprio catálogo externo independente. Você controla o repositório, a página, os arquivos, as descrições, as atualizações e a segurança; nada é enviado ao KapiTomo.</p>
@@ -1354,15 +1416,15 @@ return "https://example.com/manga/work/";</code></pre>
             <pre><code>{
   "schema_version": 1,
   "name": "Minha loja de plugins",
-  "hub_url": "https://plugins.example.com/",
+  "hub_url": "https://plugins.source.invalid/",
   "plugins": [{
     "id": "my-plugin",
     "name": "My Plugin",
     "author": "Author",
     "version": "1.0.0",
     "manifest_url": "plugins/my-plugin/plugin.json",
-    "icon_url": "https://example.com/icon.png",
-      "site_url": "https://example.com/",
+    "icon_url": "https://source.invalid/icon.png",
+      "site_url": "https://source.invalid/",
       "status": "active"
   }]
 }</code></pre>
@@ -1420,7 +1482,7 @@ return "https://example.com/manga/work/";</code></pre>
             <div class="rule-list">
               <article>
                 <h3>Plugin pessoal</h3>
-                <p>JSON válido, nome de pasta (ou id) não vazio, pelo menos um host compatível e URL inicial válida. Adicione script do navegador somente quando o reconhecimento genérico não bastar; use <code>paragraphs</code> para novels ou <code>pages</code> para quadrinhos.</p>
+                <p>JSON válido, nome de pasta (ou id) não vazio, pelo menos um host compatível, URL inicial válida e script do navegador testado com conteúdo real; use <code>paragraphs</code> para novels ou <code>pages</code> para quadrinhos.</p>
               </article>
               <article>
                 <h3>Catálogo externo independente</h3>
@@ -1440,11 +1502,11 @@ return "https://example.com/manga/work/";</code></pre>
 
         function normalizePromptSite(value) {
           var site = String(value || "").trim();
-          if (!site) return "https://example.com/";
+          if (!site) return "https://source.invalid/";
           if (!/^https?:\/\//i.test(site)) site = "https://" + site;
           try {
             var parsed = new URL(site);
-            return /^https?:$/.test(parsed.protocol) ? parsed.href : "https://example.com/";
+            return /^https?:$/.test(parsed.protocol) ? parsed.href : "https://source.invalid/";
           } catch (error) {
             return site;
           }
@@ -1452,93 +1514,40 @@ return "https://example.com/manga/work/";</code></pre>
 
         function buildPluginPrompt(language, mode, rawSite) {
           var site = normalizePromptSite(rawSite);
-          if (language === "pt" && mode === "external") {
-            return [
-              "Crie um plugin Nyxovira para distribuir em um catálogo externo independente para o site \"" + site + "\", seguindo integralmente a documentação oficial: \"" + documentationUrl + "\".",
-              "",
-              "Antes de implementar, mapeie e analise o site: rotas, domínio e subdomínios, página da obra, lista e ordem dos capítulos, conteúdo de texto ou imagens, paginação, carregamento dinâmico, seletores, dados embutidos e limitações.",
-              "- Procure documentação oficial para desenvolvedores, API pública, OpenAPI ou Swagger, GraphQL, feeds JSON e endpoints documentados.",
-              "- Se a API não estiver visível ou documentada, examine o código da página, os scripts carregados e as requisições de rede do navegador para descobrir os endpoints usados pela própria interface do site.",
-              "- Compare a API com o HTML renderizado e escolha a fonte de dados mais completa e estável para o plugin.",
-              "",
-              "Requisitos deste modo:",
-              "- Crie e entregue todos os arquivos completos do plugin; não responda apenas com explicações.",
-              "- Use id estável, nome, versão, match.hosts e browser.home_url corretos.",
-              "- Adicione browser/download_target.js quando necessário para reconhecer a obra e baixar capítulos de forma confiável.",
-              "- Se o site fornecer favicon ou logo público e estável, use essa URL como browser.icon_url.",
-              "- Adicione tags somente quando forem úteis para organizar ou filtrar o seu próprio catálogo.",
-              "- Crie um repositório público no GitHub para o plugin, inicialize o Git, faça commit de todos os arquivos e envie a branch principal com push.",
-              "- Crie uma página HTTPS independente, catalog.json com meta nyxovira-plugin-catalog e botão de instalação usando installCommunityPlugin. Identifique claramente que o catálogo é externo e independente do KapiTomo.",
-              "- Valide a importação no Nyxovira, a lista de capítulos e um download completo, incluindo o formato final de textos ou imagens.",
-              "",
-              "Ao final, informe os arquivos criados, as decisões de mapeamento, as limitações encontradas, os testes executados e o que ainda exige validação no aplicativo."
-            ].join("\n");
-          }
-
-          if (language === "pt") {
-            return [
-              "Crie um plugin Nyxovira para uso pessoal para o site \"" + site + "\", seguindo integralmente a documentação oficial: \"" + documentationUrl + "\".",
-              "",
-              "Antes de implementar, mapeie e analise o site: rotas, domínio e subdomínios, página da obra, lista e ordem dos capítulos, conteúdo de texto ou imagens, paginação, carregamento dinâmico, seletores, dados embutidos e limitações.",
-              "- Procure documentação oficial para desenvolvedores, API pública, OpenAPI ou Swagger, GraphQL, feeds JSON e endpoints documentados.",
-              "- Se a API não estiver visível ou documentada, examine o código da página, os scripts carregados e as requisições de rede do navegador para descobrir os endpoints usados pela própria interface do site.",
-              "- Compare a API com o HTML renderizado e escolha a fonte de dados mais completa e estável para o plugin.",
-              "",
-              "Requisitos deste modo:",
-              "- Faça somente o necessário para importar e usar o plugin no meu aparelho.",
-              "- O plugin.json precisa ser um JSON válido, com pasta ou id não vazio, pelo menos um match.hosts e browser.home_url.",
-              "- Não adicione tags de catálogo, GitHub, site de plugins ou outros metadados de publicação sem necessidade técnica.",
-              "- Se o site disponibilizar um favicon ou logo público, use essa URL como browser.icon_url. Se não houver, o ícone pode ser omitido no uso pessoal.",
-              "- Adicione browser/download_target.js somente se a detecção genérica do Nyxovira não reconhecer corretamente a obra e os capítulos.",
-              "- Crie e entregue todos os arquivos completos do plugin; não responda apenas com explicações.",
-              "- Teste a importação, a lista de capítulos e um download completo.",
-              "",
-              "Ao final, informe os arquivos criados, as decisões de mapeamento, as limitações encontradas, os testes executados e o que ainda exige validação no aplicativo."
-            ].join("\n");
-          }
-
-          if (mode === "external") {
-            return [
-              "Create a Nyxovira plugin for distribution through an independent external catalog for the site \"" + site + "\", following the official documentation completely: \"" + documentationUrl + "\".",
-              "",
-              "Before implementing it, map and analyze the site: routes, domains and subdomains, work page, chapter list and order, text or image content, pagination, dynamic loading, selectors, embedded data, and limitations.",
-              "- Look for official developer documentation, a public API, OpenAPI or Swagger files, GraphQL, JSON feeds, and documented endpoints.",
-              "- If the API is not visible or documented, inspect the page source, loaded scripts, and browser network requests to discover the endpoints used by the site's own interface.",
-              "- Compare the API with the rendered HTML and choose the most complete and stable data source for the plugin.",
-              "",
-              "Requirements for this mode:",
-              "- Create and deliver all complete plugin files; do not respond with explanations only.",
-              "- Use a stable id, name, version, correct match.hosts, and browser.home_url.",
-              "- Add browser/download_target.js when needed for reliable work recognition and chapter downloads.",
-              "- If the site provides a stable public favicon or logo, use that URL as browser.icon_url.",
-              "- Add tags only when they are useful for organizing or filtering your own catalog.",
-              "- Create a public repository on GitHub for the plugin, initialize Git, commit every file, and push the main branch.",
-              "- Create an independent HTTPS page, catalog.json with a nyxovira-plugin-catalog meta tag, and an installation button using installCommunityPlugin. Clearly identify the catalog as external and independent from KapiTomo.",
-              "- Validate Nyxovira import, the chapter list, and one complete download, including final text or image formats.",
-              "",
-              "Finish by reporting the created files, mapping decisions, discovered limitations, tests performed, and anything that still requires in-app validation."
-            ].join("\n");
-          }
-
-          return [
-            "Create a Nyxovira plugin for personal use for the site \"" + site + "\", following the official documentation completely: \"" + documentationUrl + "\".",
+          var isPortuguese = language === "pt";
+          var external = mode === "external";
+          var lines = isPortuguese ? [
+            "Crie um plugin Nyxovira " + (external ? "para um catálogo externo independente" : "para uso pessoal") + " para o site \"" + site + "\", seguindo integralmente a documentação oficial: \"" + documentationUrl + "\".",
             "",
-            "Before implementing it, map and analyze the site: routes, domains and subdomains, work page, chapter list and order, text or image content, pagination, dynamic loading, selectors, embedded data, and limitations.",
-            "- Look for official developer documentation, a public API, OpenAPI or Swagger files, GraphQL, JSON feeds, and documented endpoints.",
-            "- If the API is not visible or documented, inspect the page source, loaded scripts, and browser network requests to discover the endpoints used by the site's own interface.",
-            "- Compare the API with the rendered HTML and choose the most complete and stable data source for the plugin.",
+            "Antes de programar, inspecione a página real, os scripts carregados, as requisições de rede do navegador e qualquer documentação oficial para desenvolvedores, API pública, OpenAPI ou Swagger da própria fonte. Não invente endpoints, seletores, headers, cookies, tokens, chaves ou resultados.",
+            "- Registre URL de obra e leitor; endpoints de obra, capítulos e páginas; seletores; ordem; URLs relativas; IDs reais; login e cookies; restrições e criptografia.",
+            "- Escolha o nível correto: HTML simples; API JSON; ou API dinâmica, protegida ou criptografada.",
+            "- Use browser/download_target.js para descoberta e plano. Declare parser para API estruturada, headers especiais, criptografia ou download nativo fora da WebView.",
+            "- Garanta que cada chapterPlan.chapters[].id seja exatamente igual ao valor recebido em selectedChapterIds; não acrescente nem remova o prefixo id:.",
+            "- Use o favicon ou logo público da própria fonte em browser.icon_url quando existir.",
+            external ? "- Crie um repositório público, faça commit e push, e publique sua própria página HTTPS e catalog.json independente com botão de instalação." : "- Não adicione tags de catálogo, catálogo, site de plugins ou repositório; mantenha apenas o mínimo pessoal.",
+            "- Execute node test-plugin.js <pasta> <URL-real> e o diagnóstico do app em uma obra e capítulo reais.",
+            "- Só declare sucesso depois de resolver conteúdo, baixar ou serializar, gravar e reabrir o arquivo. Colocar na fila não é validação.",
+            "- Se não houver acesso à rede, escreva exatamente: não validado contra o site real.",
             "",
-            "Requirements for this mode:",
-            "- Include only what is needed to import and use the plugin on my device.",
-            "- plugin.json must be valid JSON with a non-empty folder or id, at least one match.hosts entry, and browser.home_url.",
-            "- Do not add catalog tags, GitHub, a plugin website, or other publication metadata without a technical need.",
-            "- If the site provides a public favicon or logo, use that URL as browser.icon_url. If none exists, the icon may be omitted for personal use.",
-            "- Add browser/download_target.js only if Nyxovira's generic detection cannot recognize the work and chapters correctly.",
-            "- Create and deliver all complete plugin files; do not respond with explanations only.",
-            "- Test import, the chapter list, and one complete download.",
+            "Entregue os arquivos completos e informe mapeamento, limitações, artefatos do teste e etapas que falharam."
+          ] : [
+            "Create a Nyxovira plugin " + (external ? "for an independent external catalog" : "for personal use") + " for the site \"" + site + "\", following the official documentation completely: \"" + documentationUrl + "\".",
             "",
-            "Finish by reporting the created files, mapping decisions, discovered limitations, tests performed, and anything that still requires in-app validation."
-          ].join("\n");
+            "Before coding, inspect the real page, loaded scripts, browser network requests, and any official developer documentation, public API, OpenAPI or Swagger description. Do not invent endpoints, selectors, headers, cookies, tokens, keys, or results.",
+            "- Record work and reader URLs; work, chapter, and page endpoints; selectors; order; relative URLs; real IDs; login and cookies; restrictions; and encryption.",
+            "- Choose the correct level: simple HTML; JSON API; or dynamic, protected, or encrypted API.",
+            "- Use browser/download_target.js for discovery and the plan. Declare parser for structured APIs, special headers, encryption, or native downloading outside the WebView.",
+            "- Keep each chapterPlan.chapters[].id exactly equal to the value in selectedChapterIds; never add or remove an id: prefix.",
+            "- Use the source's own public favicon or logo as browser.icon_url when available.",
+            external ? "- Create a public repository, commit and push it, and publish your own independent HTTPS page and catalog.json with an install button." : "- Do not add catalog tags, a catalog, plugin website, or repository; keep only the personal minimum.",
+            "- Run node test-plugin.js <folder> <real-URL> and the in-app diagnostic against one real work and chapter.",
+            "- Claim success only after content is resolved, downloaded or serialized, saved, and reopened. Queueing is not validation.",
+            "- If network access is unavailable, state exactly: not validated against the real site.",
+            "",
+            "Deliver complete files and report mapping, limitations, test artifacts, and failed stages."
+          ];
+          return lines.join("\n");
         }
 
         function updateBuilder(builder) {

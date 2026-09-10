@@ -1,0 +1,17 @@
+{
+  "$schema": "../../plugin.schema.json",
+  "schema_version": 1,
+  "id": "sample-json-api",
+  "name": "Sanitized JSON API source",
+  "version": "1.0.0",
+  "match": { "hosts": ["source.invalid"] },
+  "browser": { "home_url": "https://source.invalid/", "download_target_script_file": "browser/download_target.js" },
+  "parser": {
+    "adapter": "aes_json_api",
+    "base_url": "https://source.invalid/",
+    "api_base": "https://source.invalid/api/",
+    "work_api_path_template": "works/{slug}",
+    "chapter_api_path_template": "chapters/{chapter_id}",
+    "map": { "work_title": "title", "work_chapters": "chapters", "chapter_id": "id", "chapter_title": "title", "chapter_pages": "pages" }
+  }
+}

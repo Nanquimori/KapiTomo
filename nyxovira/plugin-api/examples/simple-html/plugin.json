@@ -1,0 +1,13 @@
+{
+  "$schema": "../../plugin.schema.json",
+  "schema_version": 1,
+  "id": "sample-simple-html",
+  "name": "Sanitized simple HTML source",
+  "version": "1.0.0",
+  "match": { "hosts": ["source.invalid"] },
+  "browser": {
+    "home_url": "https://source.invalid/",
+    "icon_url": "https://source.invalid/favicon.ico",
+    "download_target_script_file": "browser/download_target.js"
+  }
+}
