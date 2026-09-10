@@ -14,11 +14,6 @@
     <title>Nyxovira Privacy Policy</title>
     <link rel="icon" type="image/png" href="../../assets/kapitomo-logo.png">
     <link rel="stylesheet" href="../../styles.css?v=20260910-official-only">
-    <style>
-      .policy-language { display:flex; justify-content:flex-end; gap:8px; max-width:900px; margin:18px auto 0; padding:0 18px; }
-      .policy-language button { border:1px solid rgba(255,255,255,.18); border-radius:999px; padding:7px 12px; color:inherit; background:transparent; cursor:pointer; }
-      .policy-language button[aria-pressed="true"] { color:#111; border-color:#ff6534; background:#ff6534; }
-    </style>
   </head>
   <body>
     <header class="site-header">
@@ -27,10 +22,6 @@
         <span>KapiTomo</span>
       </a>
     </header>
-    <div class="policy-language" aria-label="Language">
-      <button type="button" data-policy-language-option="en" aria-pressed="true">EN</button>
-      <button type="button" data-policy-language-option="pt" aria-pressed="false">PT</button>
-    </div>
 
     <main class="legal-page">
       <article class="legal-document" data-policy-language="en" lang="en">
@@ -138,15 +129,12 @@
         try { saved = localStorage.getItem(key) || ""; } catch {}
         let language = normalize(query || saved || navigator.language);
         const documents = [...document.querySelectorAll("[data-policy-language]")];
-        const buttons = [...document.querySelectorAll("[data-policy-language-option]")];
         function apply(next) {
           language = normalize(next);
           document.documentElement.lang = language === "pt" ? "pt-BR" : "en";
           documents.forEach(node => { node.hidden = node.dataset.policyLanguage !== language; });
-          buttons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.policyLanguageOption === language)));
           try { localStorage.setItem(key, language); } catch {}
         }
-        buttons.forEach(button => button.addEventListener("click", () => apply(button.dataset.policyLanguageOption)));
         apply(language);
       })();
     </script>
