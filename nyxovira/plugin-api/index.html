@@ -752,7 +752,7 @@
             <h2>Developer path</h2>
             <div class="rule-list">
               <article><h3>1. <a href="#files">Create the plugin</a></h3><p>Prepare <code>plugin.json</code>, map the site, and build chapter downloads.</p></article>
-              <article><h3>2. <a href="#testing">Test the ZIP in the web laboratory</a></h3><p>Run the temporary Playwright executor without installing the Android app or opening an emulator.</p></article>
+              <article><h3>2. <a href="#testing">Test the ZIP in the web laboratory</a></h3><p>Use the hosted browser test without installing the Android app or opening an emulator.</p></article>
               <article><h3>3. Validate the complete result</h3><p>A plugin is ready only after a real chapter is downloaded, saved, and reopened successfully.</p></article>
               <article><h3>4. <a href="#external-sites">Distribute later, if needed</a></h3><p>Distribution is a separate optional step and does not change how the plugin itself is created.</p></article>
             </div>
@@ -966,15 +966,13 @@ return "https://source.invalid/manga/work/";</code></pre>
             <div class="steps">
               <div class="step"><p>Keep <code>plugin.json</code> and the <code>browser</code> folder together, then create one ZIP.</p></div>
               <div class="step"><p><a href="tester/"><strong>Open the Plugin Laboratory</strong></a>, upload the ZIP, and enter the URL of a real work.</p></div>
-              <div class="step"><p>The executor validates the manifest, mapping, exact chapter ID, complete content, saved output, and reopened files.</p></div>
-              <div class="step"><p>Copy the JSON report. The ZIP, chapter, and output are deleted before the response is returned.</p></div>
+              <div class="step"><p>The hosted test validates the manifest, mapping, chapter IDs, and the complete content of the first chapter.</p></div>
+              <div class="step"><p>Copy the JSON report. The ZIP, navigation, and collected content are released before the response is returned.</p></div>
             </div>
             <h3 class="api-subheading">Conformance gate</h3>
-            <pre><code>cd tester
-npm install
-npm run web</code></pre>
-            <p>The local web executor listens only on <code>127.0.0.1</code>. It tests one complete chapter, returns <code>PLUGIN_VALID</code> only after saving and reopening real content, and removes the random temporary session before returning the report. The public GitHub Pages interface never receives the ZIP.</p>
-            <p>The Android diagnostic is now an optional final compatibility check, not the required development loop. Without real network validation, state: <strong>not validated against the real site</strong>.</p>
+            <p><a class="button primary" href="tester/"><strong>Open the Web Plugin Laboratory</strong></a></p>
+            <p>Upload the ZIP and enter the work URL. The hosted service chooses the first chapter automatically and returns <code>PLUGIN_VALID</code> only after resolving and checking real content. No local service, command line, APK, ADB, or emulator is required.</p>
+            <p>The result must contain <code>temporaryDataReleased: true</code> and <code>stored: false</code>. Without real network validation, state: <strong>not validated against the real site</strong>.</p>
             <p><a href="examples/">Complete sanitized examples</a>: simple HTML, JSON API, novel, manga, and encrypted API. All use the reserved <code>source.invalid</code> domain.</p>
             <p class="panel-copy-after-list"><strong>Plugin creation ends after complete validation.</strong> Tags, <code>schema_version</code>, GitHub, a public catalog, and a plugin website are distribution metadata, not requirements for creating or importing the plugin. Use the site's favicon or logo when available; you do not need to host a separate icon.</p>
             <h3 class="api-subheading">Optional distribution after validation</h3>
@@ -1131,7 +1129,7 @@ npm run web</code></pre>
             <h2>Caminho do desenvolvedor</h2>
             <div class="rule-list">
               <article><h3>1. <a href="#files-pt">Criar o plugin</a></h3><p>Prepare o <code>plugin.json</code>, mapeie o site e monte os downloads de capítulos.</p></article>
-              <article><h3>2. <a href="#testing-pt">Testar o ZIP no laboratório web</a></h3><p>Use o executor temporário Playwright sem instalar o aplicativo Android nem abrir emulador.</p></article>
+              <article><h3>2. <a href="#testing-pt">Testar o ZIP no laboratório web</a></h3><p>Use o teste hospedado no navegador sem instalar o aplicativo Android nem abrir emulador.</p></article>
               <article><h3>3. Validar o resultado completo</h3><p>O plugin só fica pronto depois que um capítulo real for baixado, salvo e reaberto com sucesso.</p></article>
               <article><h3>4. <a href="#external-sites-pt">Distribuir depois, se necessário</a></h3><p>A distribuição é uma etapa opcional separada e não muda a forma de criar o plugin.</p></article>
             </div>
@@ -1345,15 +1343,13 @@ return "https://source.invalid/manga/work/";</code></pre>
             <div class="steps">
               <div class="step"><p>Mantenha <code>plugin.json</code> e a pasta <code>browser</code> juntos e crie um único ZIP.</p></div>
               <div class="step"><p><a href="tester/"><strong>Abra o Laboratório de Plugins</strong></a>, envie o ZIP e informe a URL de uma obra real.</p></div>
-              <div class="step"><p>O executor valida manifesto, mapeamento, ID exato, conteúdo completo, arquivo salvo e reabertura.</p></div>
-              <div class="step"><p>Copie o relatório JSON. O ZIP, o capítulo e a saída são apagados antes da resposta.</p></div>
+              <div class="step"><p>O teste hospedado valida manifesto, mapeamento, IDs e o conteúdo completo do primeiro capítulo.</p></div>
+              <div class="step"><p>Copie o relatório JSON. O ZIP, a navegação e o conteúdo coletado são descartados antes da resposta.</p></div>
             </div>
             <h3 class="api-subheading">Barreira de conformidade</h3>
-            <pre><code>cd tester
-npm install
-npm run web</code></pre>
-            <p>O executor web local aceita somente conexões em <code>127.0.0.1</code>. Ele testa um capítulo completo, retorna <code>PLUGIN_VALID</code> somente depois de salvar e reabrir conteúdo real e elimina a sessão temporária aleatória antes de devolver o relatório. A interface pública do GitHub Pages nunca recebe o ZIP.</p>
-            <p>O diagnóstico Android passa a ser apenas uma verificação final opcional de compatibilidade, não o caminho obrigatório de desenvolvimento. Sem validação real de rede, informe: <strong>não validado contra o site real</strong>.</p>
+            <p><a class="button primary" href="tester/"><strong>Abrir o Laboratório Web de Plugins</strong></a></p>
+            <p>Envie o ZIP e informe a URL da obra. O serviço hospedado escolhe o primeiro capítulo automaticamente e só retorna <code>PLUGIN_VALID</code> depois de resolver e verificar conteúdo real. Não é necessário serviço local, linha de comando, APK, ADB ou emulador.</p>
+            <p>O resultado precisa conter <code>temporaryDataReleased: true</code> e <code>stored: false</code>. Sem validação real de rede, informe: <strong>não validado contra o site real</strong>.</p>
             <p><a href="examples/">Exemplos completos e sanitizados</a>: HTML simples, API JSON, novel, manga e API criptografada. Todos usam o domínio reservado <code>source.invalid</code>.</p>
             <p class="panel-copy-after-list"><strong>A criação termina depois da validação completa.</strong> Tags, <code>schema_version</code>, GitHub, catálogo público e site de plugins são metadados de distribuição, não requisitos para criar ou importar o plugin. Use o favicon ou logo do próprio site quando existir; você não precisa hospedar um ícone separado.</p>
             <h3 class="api-subheading">Distribuição opcional após validar</h3>
@@ -1488,9 +1484,8 @@ npm run web</code></pre>
             "- Use browser/download_target.js para descoberta e plano. Declare parser para API estruturada, headers especiais, criptografia ou download nativo fora da WebView.",
             "- Garanta que cada chapterPlan.chapters[].id seja exatamente igual ao valor recebido em selectedChapterIds; não acrescente nem remova o prefixo id:.",
             "- Use o favicon ou logo público da própria fonte em browser.icon_url quando existir.",
-            "- Compacte o plugin em ZIP e teste-o no Laboratório de Plugins em tester/: informe uma obra real, execute um capítulo completo e copie o relatório JSON.",
-            "- Use o diagnóstico Android apenas como verificação final opcional de compatibilidade.",
-            "- Só declare sucesso depois de resolver conteúdo, baixar ou serializar, gravar e reabrir o arquivo. Colocar na fila não é validação.",
+            "- Compacte o plugin em ZIP e teste-o no Laboratório Web em " + documentationUrl + "tester/: informe uma obra real; o primeiro capítulo será escolhido automaticamente.",
+            "- Só declare sucesso se o relatório trouxer PLUGIN_VALID, nenhuma etapa FAIL, temporaryDataReleased: true e stored: false.",
             "- Se não houver acesso à rede, escreva exatamente: não validado contra o site real.",
             "",
             "Entregue os arquivos completos e informe mapeamento, limitações, artefatos do teste e etapas que falharam."
@@ -1503,9 +1498,8 @@ npm run web</code></pre>
             "- Use browser/download_target.js for discovery and the plan. Declare parser for structured APIs, special headers, encryption, or native downloading outside the WebView.",
             "- Keep each chapterPlan.chapters[].id exactly equal to the value in selectedChapterIds; never add or remove an id: prefix.",
             "- Use the source's own public favicon or logo as browser.icon_url when available.",
-            "- Package the plugin as a ZIP and test it in the Plugin Laboratory at tester/: enter one real work, run one complete chapter, and copy the JSON report.",
-            "- Use the Android diagnostic only as an optional final compatibility check.",
-            "- Claim success only after content is resolved, downloaded or serialized, saved, and reopened. Queueing is not validation.",
+            "- Package the plugin as a ZIP and test it in the Web Plugin Laboratory at " + documentationUrl + "tester/: enter a real work; the first chapter is selected automatically.",
+            "- Claim success only if the report contains PLUGIN_VALID, no FAIL step, temporaryDataReleased: true, and stored: false.",
             "- If network access is unavailable, state exactly: not validated against the real site.",
             "",
             "Deliver complete files and report mapping, limitations, test artifacts, and failed stages."

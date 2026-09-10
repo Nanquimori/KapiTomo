@@ -169,15 +169,9 @@ Declare `encrypted_response_format` e material de chave somente quando forem obs
 
 ## Laboratório Web de Plugins
 
-```bash
-cd tester
-npm install
-npm run web
-```
+[Abra o Laboratório Web de Plugins](tester/), envie o ZIP e informe a URL de uma obra real. O serviço hospedado escolhe o primeiro capítulo automaticamente, executa a coleta em um navegador temporário e devolve o relatório na própria página. Não é necessário instalar programas, usar linha de comando, APK, ADB ou emulador.
 
-Abra `http://127.0.0.1:4173/`, envie o ZIP do plugin e informe uma obra real que você está autorizado a acessar. O laboratório limitado não possui biblioteca, configurações, catálogos, favoritos nem downloads permanentes. Ele testa um capítulo completo e retorna `PLUGIN_VALID` somente depois de baixar/serializar, gravar e reabrir conteúdo real.
-
-O ZIP, o capítulo e a área do relatório ficam em uma sessão temporária aleatória, eliminada antes da resposta da API. Exija `temporaryFilesDeleted: true` e `sessionStored: false`. O diagnóstico Android é apenas uma verificação final opcional de compatibilidade. Sem rede, informe **“não validado contra o site real”**.
+O laboratório limitado não possui biblioteca, configurações, catálogos, favoritos nem downloads permanentes. O ZIP e o conteúdo são mantidos somente durante a requisição e descartados antes da resposta. Exija `temporaryDataReleased: true` e `stored: false`. Sem rede, informe **“não validado contra o site real”**.
 
 ## Checklist antes de entregar
 
@@ -187,7 +181,7 @@ O ZIP, o capítulo e a área do relatório ficam em uma sessão temporária alea
 - [ ] O primeiro capítulo real resolve páginas ou parágrafos.
 - [ ] Headers, cookies, sessão, restrições e criptografia foram testados.
 - [ ] Ordem dos capítulos e URLs relativas/absolutas foram conferidas.
-- [ ] O laboratório web retornou `PLUGIN_VALID`, `temporaryFilesDeleted: true` e nenhuma etapa `FAIL`.
+- [ ] O laboratório web retornou `PLUGIN_VALID`, `temporaryDataReleased: true`, `stored: false` e nenhuma etapa `FAIL`.
 - [ ] Limitações e conteúdo restrito estão documentados.
 
 ## Exemplos completos e sanitizados
@@ -196,7 +190,7 @@ Veja [examples/](examples/): `simple-html`, `json-api`, `novel`, `manga` e `encr
 
 ## Prompt rigoroso para IA
 
-> Crie um plugin Nyxovira para a URL de fonte informada, seguindo esta documentação. Primeiro inspecione a página real, scripts e tráfego de rede e procure API/documentação oficial. Não invente endpoints, seletores, headers, cookies, tokens, chaves nem resultados. Registre URL de obra/leitor, endpoints, IDs, ordem, URLs relativas, autenticação, restrições e criptografia. Use `download_target.js` para descoberta e plano; declare `parser` para API estruturada, headers especiais, criptografia ou download nativo. Garanta que cada `chapter.id` seja exatamente o ID recebido em `selectedChapterIds`. Compacte o plugin em ZIP e teste-o em `tester/` com uma obra e um capítulo reais. Só declare sucesso se o laboratório retornar `PLUGIN_VALID`, nenhuma etapa `FAIL` e `temporaryFilesDeleted: true`. Se não houver acesso à rede, escreva “não validado contra o site real”.
+> Crie um plugin Nyxovira para a URL de fonte informada, seguindo esta documentação. Primeiro inspecione a página real, scripts e tráfego de rede e procure API/documentação oficial. Não invente endpoints, seletores, headers, cookies, tokens, chaves nem resultados. Registre URL de obra/leitor, endpoints, IDs, ordem, URLs relativas, autenticação, restrições e criptografia. Use `download_target.js` para descoberta e plano; declare `parser` para API estruturada, headers especiais, criptografia ou download nativo. Garanta que cada `chapter.id` seja exatamente o ID recebido em `selectedChapterIds`. Compacte o plugin em ZIP e teste-o no [Laboratório Web](tester/) com uma obra real; o primeiro capítulo será escolhido automaticamente. Só declare sucesso se o laboratório retornar `PLUGIN_VALID`, nenhuma etapa `FAIL`, `temporaryDataReleased: true` e `stored: false`. Se não houver acesso à rede, escreva “não validado contra o site real”.
 
 ## Distribuição independente
 

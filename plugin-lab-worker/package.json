@@ -1,0 +1,17 @@
+{
+  "name": "nyxovira-plugin-lab-worker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "wrangler deploy --dry-run",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@cloudflare/playwright": "1.3.0",
+    "@zip.js/zip.js": "2.14.0"
+  },
+  "devDependencies": {
+    "wrangler": "4.131.0"
+  }
+}
