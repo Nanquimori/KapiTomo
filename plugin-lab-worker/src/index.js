@@ -293,6 +293,29 @@ async function handleProxy(request, env) {
   }
 }
 
+async function handleMedia(request, env) {
+  try {
+    if (request.headers.get("origin") && request.headers.get("origin") !== SITE_ORIGIN) {
+      return json(request, { error: "Origem não autorizada." }, 403);
+    }
+    await verifyToken(env.LAB_TOKEN_SECRET, request.headers.get("x-lab-token"));
+    const input = await request.json();
+    const target = assertPublicHttpUrl(input.url, "Imagem do capítulo");
+    const headers = upstreamHeaders(input.headers);
+    const loaded = await fetchLimited(target.href, { method: "GET", headers }, MAX_PROXY_BYTES);
+    const contentType = String(loaded.response.headers.get("content-type") || "").toLowerCase();
+    if (!loaded.response.ok) throw new Error("A imagem respondeu HTTP " + loaded.response.status + ".");
+    if (!contentType.startsWith("image/")) throw new Error("O endereço do capítulo não retornou uma imagem.");
+    const responseHeaders = new Headers(corsHeaders(request));
+    responseHeaders.set("cache-control", "no-store");
+    responseHeaders.set("content-type", contentType);
+    responseHeaders.set("x-lab-final-url", loaded.finalUrl.href);
+    return new Response(loaded.bytes, { status: loaded.response.status, headers: responseHeaders });
+  } catch (error) {
+    return json(request, { error: error?.message || String(error) }, 422);
+  }
+}
+
 async function handleSourceModule(request, env, requestUrl) {
   try {
     const match = requestUrl.pathname.match(/^\/source\/([^/]+)\/([^/]+)(\/.*)$/);
@@ -361,6 +384,7 @@ export default {
     if (request.method === "GET" && url.pathname.startsWith("/source/")) return handleSourceModule(request, env, url);
     if (request.method === "POST" && url.pathname === "/prepare") return handlePrepare(request, env, url);
     if (request.method === "POST" && url.pathname === "/proxy") return handleProxy(request, env);
+    if (request.method === "POST" && url.pathname === "/media") return handleMedia(request, env);
     return json(request, { error: "Rota não encontrada." }, 404);
   }
 };
