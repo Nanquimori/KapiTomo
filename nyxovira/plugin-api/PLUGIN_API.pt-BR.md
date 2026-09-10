@@ -146,6 +146,27 @@ Lista exata dos grupos de extração reconhecidos:
 
 Nos templates use somente os marcadores que o adaptador produz, como `{slug}`, `{workId}`, `{chapter}`, `{chapterId}`, `{page}` e `{page3}`. Um campo declarado sem corresponder ao tráfego real deve falhar no teste, não receber um valor fictício.
 
+## Autenticação e headers
+
+Mapeie `Referer`, cookies de sessão, token por capítulo/página, user agent e headers estáticos separadamente. `request_headers` só transporta valores estáticos do parser; cookies da WebView não devem ser considerados disponíveis no downloader nativo sem um teste real. Nunca grave credenciais pessoais no plugin. Se a fonte exigir login, teste com uma conta autorizada e documente que o plugin depende dessa sessão.
+
+## APIs dinâmicas
+
+Para conteúdo carregado depois do HTML, monte primeiro um plano leve e resolva apenas os capítulos selecionados em `__nyxoviraPrepareDownloadPlan`. Se o hook for assíncrono, confirme que a versão do app usada realmente o aguarda; a versão atual exige que o hook do app termine de forma síncrona. Paginação, rolagem infinita e tokens rotativos precisam ser exercitados até a última página do capítulo.
+
+## APIs criptografadas
+
+Declare `encrypted_response_format` e material de chave somente quando forem observados legitimamente no cliente da própria fonte. O adaptador `aes_json_api` aceita JSON comum, payload `IV:ciphertext` em AES/CBC derivado de `api_secret` e o envelope suportado `rotating_sbox_json`. Declarar o formato não prova que a decodificação funciona: o diagnóstico precisa chegar ao conteúdo e salvar o capítulo inteiro.
+
+## Solução de problemas
+
+- `HTTP 401/403`: confira sessão, cookies, `Referer`, tokens e headers; não aumente tentativas para mascarar bloqueio.
+- Obra sem capítulos: confira endpoint, seletor, paginação, ordem e `chapter_array_keys`/`map`.
+- Seleção vazia: compare o ID do plano e `selectedChapterIds` byte por byte.
+- Páginas vazias ou HTML no lugar de imagem: confira URL base, CDN, content type, token e decodificação.
+- Primeira página funciona e outra falha: o capítulo é inválido; o testador deve baixar todas as páginas.
+- Funciona na WebView e falha no downloader: declare o parser e reproduza os requisitos de transporte fora da WebView.
+
 ## Teste de conformidade oficial
 
 ```bash

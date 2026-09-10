@@ -96,6 +96,27 @@ Exact extraction groups recognized by the engine:
 
 Template placeholders are adapter-provided values such as `{slug}`, `{workId}`, `{chapter}`, `{chapterId}`, `{page}`, and `{page3}`.
 
+## Authentication and headers
+
+Map referer, session cookies, per-chapter/page tokens, user agent, and static headers separately. `request_headers` carries only static native-parser values; never assume WebView cookies are available to the native downloader without a real test. Do not embed personal credentials. If login is required, test with an authorized account and document the session dependency.
+
+## Dynamic APIs
+
+For data loaded after HTML, create a light initial plan and resolve only selected chapters in `__nyxoviraPrepareDownloadPlan`. If the hook is asynchronous, verify that the target app version waits for it; the current app hook must complete synchronously. Exercise pagination, infinite loading, and rotating tokens through the last chapter page.
+
+## Encrypted APIs
+
+Declare `encrypted_response_format` and key material only when legitimately observed in the source's own client. `aes_json_api` accepts plain JSON, an AES/CBC `IV:ciphertext` payload derived from `api_secret`, and the supported `rotating_sbox_json` envelope. Declaring a format is not proof: diagnostics must reach content and save the complete chapter.
+
+## Troubleshooting
+
+- `HTTP 401/403`: verify session, cookies, referer, tokens, and headers; retries do not fix access requirements.
+- Work without chapters: verify endpoint, selector, pagination, order, and `chapter_array_keys`/`map`.
+- Empty selection: compare plan IDs and `selectedChapterIds` byte for byte.
+- Empty pages or HTML returned as an image: verify base URL, CDN, content type, token, and decoding.
+- Page one works but a later page fails: the chapter is invalid; the tester must download every page.
+- Works in WebView but fails natively: declare the parser and reproduce transport requirements outside WebView.
+
 ## Official conformance tester
 
 ```bash

@@ -25,6 +25,7 @@ test("ships a schema, tester, and five complete sanitized examples", () => {
   assert.deepEqual(schema.required, ["match", "browser"]);
   assert.ok(schema.properties.parser.properties.adapter.enum.includes("aes_json_api"));
   assert.ok(existsSync(new URL(`../${apiRoot}/tester/test-plugin.js`, import.meta.url)));
+  assert.match(read(`${apiRoot}/tester/test-plugin.js`), /for \(let pageIndex = 0; pageIndex < pages\.length/);
 
   for (const name of ["simple-html", "json-api", "novel", "manga", "encrypted-api"]) {
     const manifestPath = `${apiRoot}/examples/${name}/plugin.json`;

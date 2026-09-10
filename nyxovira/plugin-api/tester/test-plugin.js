@@ -110,20 +110,26 @@ if (!pluginArg || !workUrl) {
       if (!(await fs.stat(chapterFile)).size) throw new Error("The saved novel chapter is empty.");
       step("download", "PASS", `${paragraphs.length} paragraph(s) saved and reopened.`);
     } else if (pages.length) {
-      const first = typeof pages[0] === "string" ? { url: pages[0] } : pages[0];
-      const pageUrl = new URL(first.url || first.src || first.image || first.imageUrl, workUrl).href;
-      const pageResponse = await context.request.get(pageUrl, { headers: { Referer: preparedChapter.url || workUrl, ...(first.headers || {}) }, timeout: 45000 });
-      if (!pageResponse.ok()) throw new Error(`First page HTTP ${pageResponse.status()}.`);
-      const contentType = String(pageResponse.headers()["content-type"] || "").toLowerCase();
-      if (!contentType.startsWith("image/")) throw new Error(`First page is not an image (${contentType || "unknown content type"}).`);
-      const bytes = await pageResponse.body();
-      if (!bytes.length) throw new Error("The first downloaded page is empty.");
-      const extension = contentType.includes("png") ? ".png" : contentType.includes("webp") ? ".webp" : ".jpg";
-      const imageFile = path.join(chapterDir, `001${extension}`);
       await fs.mkdir(chapterDir, { recursive: true });
-      await fs.writeFile(imageFile, bytes);
-      if (!(await fs.readFile(imageFile)).length) throw new Error("The saved page could not be reopened.");
-      step("download", "PASS", `First page HTTP ${pageResponse.status()}; ${bytes.length} bytes saved and reopened.`);
+      let totalBytes = 0;
+      let firstHttpStatus = 0;
+      for (let pageIndex = 0; pageIndex < pages.length; pageIndex += 1) {
+        const descriptor = typeof pages[pageIndex] === "string" ? { url: pages[pageIndex] } : pages[pageIndex];
+        const pageUrl = new URL(descriptor.url || descriptor.src || descriptor.image || descriptor.imageUrl, workUrl).href;
+        const pageResponse = await context.request.get(pageUrl, { headers: { Referer: preparedChapter.url || workUrl, ...(descriptor.headers || {}) }, timeout: 45000 });
+        if (!pageResponse.ok()) throw new Error(`Page ${pageIndex + 1} HTTP ${pageResponse.status()}.`);
+        const contentType = String(pageResponse.headers()["content-type"] || "").toLowerCase();
+        if (!contentType.startsWith("image/")) throw new Error(`Page ${pageIndex + 1} is not an image (${contentType || "unknown content type"}).`);
+        const bytes = await pageResponse.body();
+        if (!bytes.length) throw new Error(`Downloaded page ${pageIndex + 1} is empty.`);
+        const extension = contentType.includes("png") ? ".png" : contentType.includes("webp") ? ".webp" : ".jpg";
+        const imageFile = path.join(chapterDir, `${String(pageIndex + 1).padStart(3, "0")}${extension}`);
+        await fs.writeFile(imageFile, bytes);
+        if (!(await fs.readFile(imageFile)).length) throw new Error(`Saved page ${pageIndex + 1} could not be reopened.`);
+        if (pageIndex === 0) firstHttpStatus = pageResponse.status();
+        totalBytes += bytes.length;
+      }
+      step("download", "PASS", `First page HTTP ${firstHttpStatus}; all ${pages.length} page(s), ${totalBytes} bytes, saved and reopened.`);
     } else {
       throw new Error("The selected chapter resolved neither pages nor paragraphs.");
     }

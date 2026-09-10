@@ -13,7 +13,7 @@ await fs.mkdir(path.join(pluginDir, "browser"), { recursive: true });
 
 const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=", "base64");
 const server = http.createServer((request, response) => {
-  if (request.url === "/page.png") {
+  if (request.url === "/page.png" || request.url === "/page-2.png") {
     response.writeHead(200, { "content-type": "image/png" });
     response.end(png);
     return;
@@ -31,7 +31,7 @@ await fs.writeFile(path.join(pluginDir, "plugin.json"), JSON.stringify({
   browser: { home_url: `http://127.0.0.1:${port}/`, download_target_script_file: "browser/download_target.js" }
 }, null, 2));
 await fs.writeFile(path.join(pluginDir, "browser", "download_target.js"), `(function(){
-  window.__nyxoviraChapterPlan=JSON.stringify({title:document.querySelector('h1').textContent,canonicalUrl:location.href,chapters:[{id:'chapter-1',number:'1',title:'Chapter 1',url:new URL('/read/1',location.href).href,contentType:'images',pages:[new URL('/page.png',location.href).href]}]});
+  window.__nyxoviraChapterPlan=JSON.stringify({title:document.querySelector('h1').textContent,canonicalUrl:location.href,chapters:[{id:'chapter-1',number:'1',title:'Chapter 1',url:new URL('/read/1',location.href).href,contentType:'images',pages:[new URL('/page.png',location.href).href,new URL('/page-2.png',location.href).href]}]});
   return location.href;
 })();`);
 
@@ -49,6 +49,7 @@ try {
   assert.equal(report.verdict, "PLUGIN_VALID");
   assert.equal(report.selectedChapterId, "chapter-1");
   assert.ok((await fs.stat(path.join(outputDir, "chapter-001", "001.png"))).size > 0);
+  assert.ok((await fs.stat(path.join(outputDir, "chapter-001", "002.png"))).size > 0);
   process.stdout.write("nyxovira-plugin-test self-test passed\n");
 } finally {
   server.close();
