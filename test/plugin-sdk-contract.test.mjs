@@ -29,6 +29,8 @@ test("ships a schema, hosted web tester, and five complete sanitized examples", 
   assert.match(read(`${apiRoot}/tester/lab.js`), /visitor-browser/);
   assert.doesNotMatch(read(`${apiRoot}/tester/lab.js`), /AMBIENTE WEB BLOQUEADO|TESTE INDISPONÍVEL/i);
 
+  assert.doesNotMatch(read(`${apiRoot}/examples/index.html`), /Android diagnostic|diagnóstico.*Android/i);
+
   for (const name of ["simple-html", "json-api", "novel", "manga", "encrypted-api"]) {
     const manifestPath = `${apiRoot}/examples/${name}/plugin.json`;
     const scriptPath = `${apiRoot}/examples/${name}/browser/download_target.js`;
