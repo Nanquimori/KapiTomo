@@ -1,376 +1,185 @@
 # API de Plugins Nyxovira
 
-Versão em inglês: [PLUGIN_API.md](PLUGIN_API.md)
+English: [PLUGIN_API.md](PLUGIN_API.md)
 
-Este documento explica como criar, testar e distribuir um plugin para o Nyxovira.
+Este é o contrato oficial para criar, testar e usar plugins de fonte no Nyxovira. Todos os exemplos usam o domínio reservado `source.invalid`; nenhum site de leitura de terceiros faz parte desta API.
 
-Um plugin conecta o Nyxovira a um site de leitura. Ele abre o site, reconhece a página da obra, mostra a lista de capítulos assim que o usuário toca em baixar e prepara apenas os capítulos escolhidos pelo usuário.
+## O que significa “plugin válido”
 
-## Prompt Pronto para Copiar
+Um plugin só está validado quando, em uma URL real autorizada, ele reconhece a obra, lista capítulos, preserva o ID selecionado, resolve páginas ou parágrafos, baixa o conteúdo, grava o arquivo e consegue reabri-lo. Importar o ZIP, abrir o site ou colocar uma tarefa na fila **não valida** o plugin.
 
-O [gerador interativo de prompt para IA](https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/?lang=pt#gerador-de-prompt) aparece no início da documentação online. Informe a URL do site da fonte, escolha um modo, use **Copiar prompt** e cole o resultado na conversa com a IA que criará o plugin:
+## Três níveis de implementação
 
-- **Uso pessoal:** pede somente o mínimo necessário para importação local. Usa o favicon ou logo público do próprio site quando estiver disponível, sem exigir que um ícone separado seja hospedado.
-- **Catálogo externo:** manda a IA criar o plugin, um catálogo independente e uma página HTTPS com botão de instalação para o Nyxovira.
+1. **HTML simples:** `browser/download_target.js` lê a página renderizada e produz o plano final.
+2. **API JSON simples:** `browser/download_target.js` faz a descoberta; declare também `parser` quando a API for estruturada ou o downloader nativo precisar repetir as requisições fora da WebView.
+3. **API dinâmica, protegida ou criptografada:** `parser` é obrigatório para endpoints, cabeçalhos e decodificação; o script continua responsável pela descoberta e pela sessão do navegador.
 
-O pedido gerado também manda a IA mapear rotas, seletores, ordem dos capítulos, conteúdo de texto ou imagens, carregamento dinâmico e limitações. Primeiro ela deve verificar documentação oficial e APIs públicas; depois, examinar scripts da página e requisições de rede do navegador para encontrar APIs ou endpoints usados pelo site que não estejam documentados de forma visível.
+“Parser opcional” significa apenas que o manifesto pode ser importado sem ele. Declare `parser` sempre que houver API estruturada, cabeçalhos especiais, criptografia ou download nativo fora da WebView.
 
-## Caminho do Desenvolvedor
-
-1. [Crie o plugin](#arquivos-do-plugin): prepare o `plugin.json`, mapeie o site e monte os downloads de capítulos.
-2. [Teste por **Importar plugins**](#testar-no-nyxovira): importe a pasta local no Nyxovira e repita o teste enquanto desenvolve.
-3. **Use somente para você**, se quiser. Nesse caso, não precisa publicar, criar catálogo nem montar site.
-4. [Crie uma loja externa](#loja-externa-de-plugins) se quiser distribuir seus plugins em um catálogo independente que cada usuário conecta manualmente.
-
-## Como um Plugin Funciona
-
-1. O criador começa pelo pequeno `plugin.json` de que o Nyxovira precisa. Um script específico do site é adicionado quando o reconhecimento genérico da página não é suficiente.
-2. Durante o desenvolvimento, o criador importa a pasta local do plugin no Nyxovira e testa no site compatível.
-3. O plugin pode continuar particular. A publicação é opcional e acontece somente depois dos testes.
-4. Quando existe, `browser/download_target.js` cuida do reconhecimento específico da obra e dos capítulos. Sem ele, o Nyxovira tenta usar o detector genérico da página.
-5. Depois que o usuário escolhe os capítulos, o mesmo script prepara textos ou páginas de imagem para salvar no dispositivo.
-
-## Arquivos do Plugin
-
-Crie uma pasta com o nome do id do plugin:
+## Estrutura e mínimo pessoal
 
 ```text
-my-plugin/
+meu-plugin/
 |-- plugin.json
 `-- browser/
     `-- download_target.js
 ```
 
-| Arquivo | Função |
-| --- | --- |
-| `plugin.json` | Identifica o site compatível. Poucos campos são necessários para um plugin pessoal. |
-| `browser/download_target.js` | Opcional para importar, mas recomendado quando o detector genérico não consegue montar o plano correto de capítulos. |
-
-Para que as atualizações sejam previsíveis, use o mesmo id estável no nome da pasta e em `plugin.json`.
-
-## plugin.json
-
-### Mínimo para uso pessoal
-
-Este é o menor manifesto prático para importar um plugin diretamente no Nyxovira:
-
 ```json
 {
-  "id": "my-plugin",
-  "match": {
-    "hosts": ["example.com"]
-  },
+  "$schema": "https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/plugin.schema.json",
+  "id": "meu-plugin",
+  "match": { "hosts": ["source.invalid"] },
   "browser": {
-    "home_url": "https://example.com/",
+    "home_url": "https://source.invalid/",
+    "icon_url": "https://source.invalid/favicon.ico",
     "download_target_script_file": "browser/download_target.js"
   }
 }
 ```
 
-Para carregar a fonte, o Nyxovira precisa somente de JSON válido, nome de pasta ou `id` não vazio, pelo menos um item em `match.hosts` e `browser.home_url`. O exemplo também indica `browser/download_target.js` porque um script próprio é a forma confiável de reconhecer obras e capítulos. Se esse campo e o arquivo forem omitidos, o Nyxovira tenta usar o detector genérico da página, que pode não compreender todos os sites.
+Para uso somente no seu aparelho, o mínimo real é JSON válido, nome de pasta ou `id`, um `match.hosts` e `browser.home_url`. `name`, `version` e `language` são opcionais; `tags` não são obrigatórias, assim como repositório e catálogo. Use `browser.icon_url` quando a própria fonte tiver favicon ou logo público estável.
 
-Em um plugin que ficará apenas no seu aparelho, estes campos **não são obrigatórios**: `schema_version`, `name`, `version`, `tags`, `browser.icon_mode`, `browser.short_label` e `parser`. GitHub, catálogo público e site de plugins também não são necessários. Se o site fornecer um favicon ou logo público e estável, use essa URL em `browser.icon_url`; se não houver, o ícone pode ser omitido no uso pessoal.
+Sem `browser/download_target.js`, o detector genérico tenta reconhecer a página. Isso ajuda no HTML básico, mas não substitui o mapeamento de uma fonte específica.
 
-Campos e alcance:
+Valide `plugin.json` com [plugin.schema.json](plugin.schema.json). O schema é o contrato legível por editores e ferramentas; o app continua sendo a autoridade de execução.
 
-| Campo | Significado |
-| --- | --- |
-| `id` | Id estável do plugin. Fortemente recomendado; se faltar, o Nyxovira usa o nome da pasta. |
-| `match.hosts` | Obrigatório. Domínios reconhecidos pelo plugin. |
-| `browser.home_url` | Obrigatório. Página aberta pelo navegador interno do app. |
-| `browser.download_target_script_file` | Opcional, mas recomendado para reconhecer com segurança as obras e os capítulos daquele site. |
-| `name`, `version` | Opcionais na importação pessoal; úteis ao compartilhar e atualizar o plugin. |
-| `tags` | Desnecessárias no uso pessoal. São opcionais em um catálogo externo e servem apenas para busca ou filtros da página que você criar. |
-| `browser.icon_url` | Opcional no uso pessoal: prefira o favicon ou logo público do próprio site quando estiver disponível. Recomendado ao distribuir o plugin. |
-| `parser` | Configuração avançada e opcional do parser nativo. Não é necessária quando o script do navegador fornece o plano e o conteúdo dos capítulos. |
+## Mapeamento obrigatório antes de programar
 
-## Mapeamento do Site
+Registre estas respostas antes de criar o ZIP:
 
-Relacione os nomes usados pelo site com os campos que o Nyxovira espera. Cada plugin fica responsável pelo site que suporta.
+- URL real de uma obra e URL real do leitor;
+- endpoint da obra, dos capítulos e das páginas, se existirem;
+- seletores HTML usados e como detectar que a página terminou de carregar;
+- cabeçalhos exigidos, `Referer`, cookies, login ou tokens;
+- formato de criptografia, envelope e origem legítima da chave;
+- capítulos pagos, restritos, removidos ou que exigem conta;
+- ordem original e ordem apresentada dos capítulos;
+- URLs relativas ou absolutas e a base correta para resolvê-las;
+- formato real dos IDs de obra, capítulo e página;
+- prova de que ao menos um capítulo real virou páginas ou parágrafos.
 
-Descubra a fonte dos dados antes de escolher a implementação:
+Procure primeiro documentação oficial, OpenAPI/Swagger, GraphQL, feeds JSON e endpoints públicos da própria fonte. Se não estiverem visíveis, inspecione o HTML, os scripts carregados e as requisições de rede usadas pela página. Não invente endpoints, seletores, cabeçalhos ou chaves.
 
-- Procure documentação oficial para desenvolvedores, API pública, arquivos OpenAPI ou Swagger, GraphQL, feeds JSON e endpoints documentados.
-- Se a API não estiver visível ou documentada, examine o código da página, os scripts carregados e as requisições de rede do navegador para identificar os endpoints usados pela própria interface do site.
-- Compare os dados da API com o HTML renderizado e use a fonte mais completa e estável para obras, capítulos, textos e imagens.
+## Contrato do script do navegador
 
-Exemplo:
-
-```js
-var plugin = {
-  siteBaseUrl: "https://example.com",
-  siteVariable: "EXAMPLE_WORK_INDEX",
-  siteRoutes: {
-    detailsHash: "series",
-    readerHash: "reader"
-  },
-  appRoutes: {
-    publicSeriesPath: "manga",
-    publicChapterPath: "chapter"
-  },
-  fields: {
-    workId: "slug",
-    workTitle: "name",
-    workSummary: "synopsis",
-    workCover: "cover_url",
-    workChapters: "episodes",
-    chapterTitle: "name",
-    chapterContentType: "format",
-    chapterParagraphs: "text_blocks",
-    chapterPages: "page_urls",
-    chapterImages: "image_list",
-    imageSource: "url"
-  }
-};
-```
-
-Isso permite que o site mantenha seus próprios nomes de rotas e campos enquanto o Nyxovira recebe título, capa, capítulos, texto e imagens em um formato previsível.
-
-## Lista Instantânea de Capítulos
-
-Quando o usuário toca em baixar, o script deve definir imediatamente:
+O script define imediatamente `window.__nyxoviraChapterPlan`:
 
 ```js
 window.__nyxoviraChapterPlan = JSON.stringify({
-  title: "Work title",
-  summary: "Short summary",
-  canonicalUrl: "https://example.com/manga/work-slug/",
-  coverUrl: "https://example.com/cover.png",
-  chapters: [
-    {
-      id: "chapter-forest-hunt",
-      number: "1",
-      title: "The Forest Hunt",
-      label: "1 - The Forest Hunt",
-      url: "https://example.com/manga/work-slug/chapter/1/",
-      contentType: "novel",
-      paragraphs: ["First paragraph.", "Second paragraph."]
-    }
-  ]
+  title: "Título",
+  canonicalUrl: "https://source.invalid/work/slug",
+  chapters: [{
+    id: "chapter-387076",
+    number: "1",
+    title: "Capítulo 1",
+    label: "1 - Capítulo 1",
+    url: "https://source.invalid/read/387076",
+    contentType: "images"
+  }]
 });
+return "https://source.invalid/work/slug";
 ```
 
-Depois o script retorna a URL canônica da obra:
+O plano inicial deve ser leve. Para conteúdo obtido somente após a seleção:
 
 ```js
-return "https://example.com/manga/work-slug/";
-```
-
-O Nyxovira mostra a lista de capítulos a partir de `window.__nyxoviraChapterPlan` imediatamente.
-
-## Preparar Depois da Seleção
-
-Para quadrinhos grandes ou APIs em que cada capítulo precisa ser carregado separadamente, não carregue todas as páginas antes da lista de capítulos aparecer.
-
-Crie primeiro um plano leve:
-
-```js
-{
-  "id": "id:387076",
-  "number": "1",
-  "title": "Arrival at the Ruins",
-  "contentType": "images",
-  "url": "https://example.com/read/work/387076",
-  "chapterDataPath": "/api/chapter/387076"
-}
-```
-
-Depois implemente:
-
-```js
-window.__nyxoviraPrepareDownloadPlan = function (context) {
-  var selectedIds = Array.isArray(context.selectedChapterIds)
-    ? context.selectedChapterIds
-    : [];
-  var plan = context.chapterPlan;
-
-  plan.chapters.forEach(function (chapter) {
-    if (selectedIds.length > 0 && selectedIds.indexOf(chapter.id) < 0) {
-      return;
-    }
-
-    var payload = getJson(chapter.chapterDataPath);
-    chapter.pages = payload.pages.map(function (page) {
-      return page.imageUrl;
-    });
-    delete chapter.chapterDataPath;
-  });
-
-  window.__nyxoviraChapterPlan = JSON.stringify(plan);
-  return plan;
+window.__nyxoviraPrepareDownloadPlan = function ({ selectedChapterIds, chapterPlan }) {
+  for (const chapter of chapterPlan.chapters) {
+    if (!selectedChapterIds.includes(chapter.id)) continue;
+    const request = new XMLHttpRequest();
+    request.open("GET", `/api/chapters/${encodeURIComponent(chapter.id)}`, false);
+    request.withCredentials = true;
+    request.send();
+    if (request.status < 200 || request.status >= 300) throw new Error(`HTTP ${request.status}`);
+    const payload = JSON.parse(request.responseText);
+    chapter.pages = payload.pages.map((page) => page.url);
+  }
+  return chapterPlan;
 };
 ```
 
-O Nyxovira chama essa função somente depois que o usuário escolhe os capítulos e confirma o download. Isso mantém o primeiro clique rápido e ainda baixa corretamente todas as páginas selecionadas.
+### Invariante de ID
 
-O app passa `{ selectedChapterIds, chapterPlan }` para a função. A função pode retornar o plano final como objeto ou JSON. Se não retornar nada, o Nyxovira mantém o plano original.
+O `id` presente em `chapterPlan.chapters` deve ser **exatamente** o valor recebido em `selectedChapterIds`. Não acrescente nem remova prefixos como `id:`, não converta número em slug e não use o índice visual. IDs duplicados, vazios ou transformados invalidam a seleção.
 
-## Formatos de Capítulo
+### Formatos de conteúdo
 
-Capítulo de novel:
+- Novel: `contentType: "novel"` e `paragraphs: ["..."]` não vazio.
+- Manga/quadrinho: `contentType: "images"` e `pages: ["https://..."]` não vazio; `images` existe apenas para compatibilidade.
+- Se uma página exigir cabeçalho ou token próprio, use um objeto de página aceito pelo parser nativo ou declare os campos correspondentes em `parser`; uma URL sozinha não transporta autenticação especial.
 
-```json
-{
-  "id": "chapter-forest-hunt",
-  "title": "The Forest Hunt",
-  "contentType": "novel",
-  "paragraphs": [
-    "First paragraph.",
-    "Second paragraph."
-  ]
-}
+## Campos de `parser` e efeito operacional
+
+Adaptadores aceitos pelo app: `next_payload` (payload/rotas Next renderizadas), `html_series` (série/leitor em HTML) e `aes_json_api` (API JSON comum ou criptografada).
+
+| Campo | O que muda na execução |
+| --- | --- |
+| `adapter` | Escolhe o algoritmo nativo; valor desconhecido falha. |
+| `base_url`, `api_base`, `cdn_base` | Resolvem respectivamente rotas web, endpoints de API e imagens/CDN. |
+| `request_headers` | Anexa cabeçalhos estáticos às requisições nativas da API. |
+| `work_api_path_template`, `work_api_id_path_template` | Montam a consulta de obra por slug ou ID. |
+| `chapter_api_path_template` | Monta a consulta do conteúdo de um capítulo. |
+| `page_api_path_template`, `page_cdn_path_template` | Montam a consulta/token de página ou a URL final no CDN. |
+| `work_search_api_path_template`, `cover_search_api_path_template` | Buscam obra/capa quando a URL não contém todos os dados. |
+| `series_path_template`, `read_path_template` | Reconstruem URLs públicas de série e leitor. |
+| `public_work_path_template`, `public_chapter_path_template` | Gravam URLs públicas canônicas nos metadados. |
+| `viewer_bootstrap_path_template` | Busca o bootstrap JSON do visualizador. |
+| `static_works_script` | Baixa o arquivo JavaScript estático que contém o índice de obras. |
+| `page_token_header` | Nome do cabeçalho que recebe o token individual da página. |
+| `encrypted_response_format` | Ativa a decodificação do envelope; `rotating_sbox_json` é suportado. |
+| `api_secret`, `rotating_sbox_keys`, `rotating_sbox_key_prefix` | Fornecem o material de chave mapeado para a decodificação. Nunca invente valores. |
+| `default_workers`, `default_retries` | Ajustam concorrência e tentativas da fonte. |
+| `map` | Liga caminhos reais do JSON a `work.title`, `work.summary`, `work.cover`, `work.chapters`, `chapter.id`, `chapter.number`, `chapter.title`, `chapter.text`, `chapter.pages`, `page.number`, `page.image` e `page.cdnId`. |
+| `*_keys` | Listas de nomes alternativos procurados no JSON: obra, capítulo, página, parágrafo, título, resumo, capa e ID. |
+| `*_path_prefixes`, `*_slug_strip_prefixes`, `chapter_slug_pattern`, `ignored_root_paths`, `hash_series_path_prefixes` | Controlam reconhecimento e limpeza de rotas. |
+| `chapter_label_patterns`, `chapter_image_path_hints`, `chapter_image_class_hints`, `cdn_direct_path_prefixes` | Reconhecem rótulos e distinguem imagens reais de elementos decorativos. |
+
+Lista exata dos grupos de extração reconhecidos:
+
+- Obra: `work_object_keys` localiza o objeto; `work_title_keys`, `work_summary_keys` e `work_cover_keys` localizam título, resumo e capa.
+- Capítulos: `chapter_object_keys` localiza o envelope; `chapter_array_keys` localiza a lista; `chapter_id_keys`, `chapter_number_keys`, `chapter_title_keys` e `chapter_text_keys` extraem cada valor; `paragraph_array_keys` localiza os parágrafos.
+- Páginas: `page_array_keys` localiza a lista; `page_number_keys`, `page_image_keys` e `page_cdn_id_keys` extraem ordem, URL e identificador do CDN.
+- Busca: `search_array_keys` e `cover_search_array_keys` localizam listas de resultados de obra e capa.
+- Rotas: `base_path_prefix`, `series_path_prefix`, `series_path_prefixes`, `hash_series_path_prefixes`, `chapter_path_prefix`, `chapter_path_prefixes`, `chapter_slug_pattern`, `chapter_slug_strip_prefixes` e `ignored_root_paths` decidem quais URLs representam obra/capítulo e como obter o slug.
+- Reconhecimento visual: `chapter_label_patterns`, `chapter_image_path_hints`, `chapter_image_class_hints` e `cdn_direct_path_prefixes` filtram rótulos, classes e caminhos de imagem.
+
+Nos templates use somente os marcadores que o adaptador produz, como `{slug}`, `{workId}`, `{chapter}`, `{chapterId}`, `{page}` e `{page3}`. Um campo declarado sem corresponder ao tráfego real deve falhar no teste, não receber um valor fictício.
+
+## Teste de conformidade oficial
+
+```bash
+cd tester
+npm install
+node test-plugin.js ../meu-plugin https://source.invalid/work/slug
 ```
 
-Capítulo de quadrinho:
+Substitua a URL reservada por uma obra real que você está autorizado a acessar. O testador gera `work.json`, `chapter-plan.json`, `chapter-001/` e `report.json`. Ele retorna `PLUGIN_VALID` somente depois de baixar/serializar, gravar e reabrir conteúdo real. Sem rede, informe **“não validado contra o site real”**.
 
-```json
-{
-  "id": "chapter-arrival",
-  "title": "Arrival at the Ruins",
-  "contentType": "images",
-  "pages": [
-    "https://example.com/page-001.png",
-    "https://example.com/page-002.png"
-  ]
-}
-```
+No Android, abra **Sites → Testar fonte**, navegue até uma obra e toque no ícone de diagnóstico. O relatório mostra manifesto, site, prepare hook, obra, ID selecionado, conteúdo, HTTP da primeira página, parser/criptografia e arquivo gravado. A fila não é validação nem conta como sucesso.
 
-Para capítulos com imagens, `pages` é o campo preferido. O Nyxovira também lê `images` por compatibilidade.
+## Checklist antes de entregar
 
-## Testar no Nyxovira
+- [ ] `plugin.json` passa em `plugin.schema.json`.
+- [ ] Nenhum endpoint, seletor, cabeçalho ou segredo foi inventado.
+- [ ] A lista contém IDs únicos e a seleção preserva o ID exato.
+- [ ] O primeiro capítulo real resolve páginas ou parágrafos.
+- [ ] Headers, cookies, sessão, restrições e criptografia foram testados.
+- [ ] Ordem dos capítulos e URLs relativas/absolutas foram conferidas.
+- [ ] `node test-plugin.js` gerou todos os quatro artefatos.
+- [ ] O diagnóstico do app chegou a arquivo gravado e aberto.
+- [ ] Limitações e conteúdo restrito estão documentados.
 
-A importação manual é o caminho normal durante o desenvolvimento e também permite usar um plugin somente para você. A importação pessoal não valida tags de catálogo nem exige que você hospede um ícone. Quando o site já fornecer favicon ou logo público, use-o em `browser.icon_url`.
+## Exemplos completos e sanitizados
 
-1. Mantenha `plugin.json` e a pasta `browser` juntos dentro da pasta do plugin.
-2. No Nyxovira, abra **Sites**, toque em **Importar plugins** e selecione a pasta do plugin. Você também pode selecionar uma pasta que contenha várias pastas de plugins.
-3. Abra o site compatível e confira o reconhecimento da obra, a lista de capítulos e o download.
-4. Depois de alterar os arquivos, importe a pasta novamente e repita o teste.
+Veja [examples/](examples/): `simple-html`, `json-api`, `novel`, `manga` e `encrypted-api`. Eles usam apenas `source.invalid`; substitua os placeholders depois do mapeamento real. Exemplo não é validação.
 
-**Se o plugin é somente para você, o processo termina aqui.** Não é necessário ter tags, `schema_version`, GitHub, catálogo público ou site de plugins. Use o favicon ou logo do próprio site quando existir; você não precisa hospedar um ícone separado.
+## Prompt rigoroso para IA
 
-Se quiser compartilhar, [mantenha uma loja externa](#loja-externa-de-plugins). O KapiTomo não recebe plugins de terceiros: a página, o catálogo e os arquivos continuam sob o controle de quem os publicou.
+> Crie um plugin Nyxovira para a URL de fonte informada, seguindo esta documentação. Primeiro inspecione a página real, scripts e tráfego de rede e procure API/documentação oficial. Não invente endpoints, seletores, headers, cookies, tokens, chaves nem resultados. Registre URL de obra/leitor, endpoints, IDs, ordem, URLs relativas, autenticação, restrições e criptografia. Use `download_target.js` para descoberta e plano; declare `parser` para API estruturada, headers especiais, criptografia ou download nativo. Garanta que cada `chapter.id` seja exatamente o ID recebido em `selectedChapterIds`. Execute `node test-plugin.js <pasta> <URL-real>`, teste uma obra e um capítulo reais e só declare sucesso se o conteúdo for baixado, gravado e reaberto. Se não houver acesso à rede, escreva “não validado contra o site real”. Para uso pessoal, não exija tags, catálogo ou repositório.
 
-## Loja Externa de Plugins
+## Distribuição independente
 
-Use esta opção somente depois que os plugins estiverem prontos e testados. Ela é destinada a quem mantém uma distribuição independente com plugins próprios ou que tenha autorização para distribuir.
+Um plugin pessoal termina após importação e teste. Quem quiser compartilhar mantém seu próprio catálogo externo e os usuários o conectam manualmente no Nyxovira. O catálogo do KapiTomo não aceita publicações de terceiros. Distribuição não substitui autorização, conformidade com a fonte nem validação técnica.
 
-Uma loja externa mínima pode usar esta estrutura:
-
-```text
-plugin-store/
-|-- index.html
-|-- catalog.json
-`-- plugins/
-    `-- my-plugin/
-        |-- plugin.json
-        `-- browser/
-            `-- download_target.js
-```
-
-Hospede a pasta em um endereço HTTPS público. A aparência, a busca e os cards pertencem à própria loja; o Nyxovira precisa apenas descobrir o catálogo e receber a solicitação de instalação. Adicione um objeto à lista `plugins` para cada plugin distribuído.
-
-### Descoberta do catálogo
-
-Inclua na página principal da loja:
-
-```html
-<link rel="nyxovira-plugin-catalog" href="catalog.json">
-```
-
-Também é aceito:
-
-```html
-<meta name="nyxovira-plugin-catalog" content="catalog.json">
-```
-
-Sem uma declaração, o Nyxovira procura `catalog.json`, `catalog-store.json` e `plugins.json` na mesma pasta da página. O usuário também pode conectar diretamente a URL do JSON.
-
-### Formato do catálogo externo
-
-```json
-{
-  "schema_version": 1,
-  "name": "Minha loja de plugins",
-  "hub_url": "https://plugins.example.com/",
-  "plugins": [
-    {
-      "id": "my-plugin",
-      "name": "My Plugin",
-      "author": "Author",
-      "version": "1.0.0",
-      "manifest_url": "plugins/my-plugin/plugin.json",
-      "icon_url": "https://example.com/icon.png",
-      "site_url": "https://example.com/",
-      "status": "active"
-    }
-  ]
-}
-```
-
-`hub_url` informa qual página o Nyxovira deve abrir quando o usuário conecta o JSON diretamente. Também são aceitos `store_url` e `homepage`. URLs relativas, como `manifest_url`, são resolvidas a partir do endereço do catálogo. Uma entrada hospedada no GitHub também pode usar `repository_url`, `repository_ref` e `plugin_path`.
-
-### Instalação pela página externa
-
-Este exemplo completo cria o botão, informa quando a página foi aberta fora do aplicativo e mostra o resultado retornado pelo Nyxovira:
-
-```html
-<button id="install-my-plugin" type="button">Instalar My Plugin</button>
-<p id="install-status" aria-live="polite"></p>
-
-<script>
-  const catalogUrl = new URL("catalog.json", location.href).href;
-  const status = document.querySelector("#install-status");
-
-  document.querySelector("#install-my-plugin").addEventListener("click", () => {
-    const bridge = globalThis.NyxoviraAndroidBridge
-      || globalThis.ArchiveInkAndroidBridge;
-
-    if (!bridge || typeof bridge.installCommunityPlugin !== "function") {
-      status.textContent = "Abra este site pelo Nyxovira para instalar.";
-      return;
-    }
-
-    try {
-      const result = JSON.parse(
-        bridge.installCommunityPlugin(
-          catalogUrl,
-          JSON.stringify({ id: "my-plugin" })
-        ) || "{}"
-      );
-      status.textContent = result.message
-        || (result.success ? "Plugin instalado." : "Não foi possível instalar.");
-    } catch (error) {
-      status.textContent = "Não foi possível concluir a instalação.";
-    }
-  });
-</script>
-```
-
-Quando a loja é aberta em um navegador comum, o exemplo orienta a pessoa a abri-la pelo Nyxovira. Dentro do aplicativo, o botão instala o plugin correspondente no catálogo conectado.
-
-### Antes de publicar a loja
-
-- Hospede a página, o catálogo e os arquivos dos plugins em endereços HTTPS públicos.
-- Para cada plugin, informe corretamente o autor, o site de origem e o caminho do manifesto.
-- Teste o botão Instalar abrindo a loja pelo cartão criado em **Sites externos** no Nyxovira.
-
-### Teste antes de divulgar
-
-1. Publique todos os arquivos em HTTPS.
-2. No Nyxovira, abra **Sites > Sites externos** e conecte a URL de `index.html` ou da pasta da loja.
-3. Abra o site pelo cartão criado no aplicativo.
-4. Toque em **Instalar** e confirme a mensagem retornada.
-
-## Checklist Final
-
-Para um plugin importado para uso pessoal:
-
-1. `plugin.json` é um JSON válido, o nome da pasta (ou `id`) não está vazio, há pelo menos um valor em `match.hosts` e `browser.home_url` é válido.
-2. Se o reconhecimento genérico não for suficiente, `browser/download_target.js` reconhece a obra e cria a lista de capítulos.
-3. Novels usam `paragraphs`; quadrinhos usam `pages`.
-
-Para uma loja externa:
-
-1. A página, o catálogo e os arquivos dos plugins estão publicados.
-2. O autor e o site de origem de cada plugin estão corretos.
-3. O botão **Instalar** foi testado abrindo a loja pelo Nyxovira.
+Uma loja externa publica por HTTPS uma página e um `catalog.json`. A página declara `<link rel="nyxovira-plugin-catalog" href="catalog.json">`; o catálogo usa `hub_url` e, em cada entrada, `manifest_url`. Também são aceitos `repository_url`, `repository_ref` e `plugin_path`. O botão da página chama `installCommunityPlugin(catalogUrl, JSON.stringify({ id }))` quando aberto dentro do Nyxovira. O repositório, o catálogo e a revisão continuam sob responsabilidade de quem os publicou.

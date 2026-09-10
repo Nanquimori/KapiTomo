@@ -1,0 +1,29 @@
+{
+  "$schema": "../../plugin.schema.json",
+  "schema_version": 1,
+  "id": "sample-encrypted-api",
+  "name": "Sanitized encrypted API source",
+  "version": "1.0.0",
+  "match": { "hosts": ["source.invalid"] },
+  "browser": { "home_url": "https://source.invalid/", "download_target_script_file": "browser/download_target.js" },
+  "parser": {
+    "adapter": "aes_json_api",
+    "base_url": "https://source.invalid/",
+    "api_base": "https://source.invalid/api/",
+    "work_api_path_template": "works/{slug}",
+    "chapter_api_path_template": "chapters/{chapter}",
+    "encrypted_response_format": "rotating_sbox_json",
+    "api_secret": "REPLACE_WITH_THE_MAPPED_KEY_MATERIAL",
+    "request_headers": { "X-Client": "REPLACE_WITH_THE_REQUIRED_VALUE" },
+    "map": {
+      "work.title": "data.title",
+      "work.summary": "data.summary",
+      "work.chapters": "data.chapters",
+      "chapter.id": "id",
+      "chapter.number": "number",
+      "chapter.title": "title",
+      "chapter.pages": "data.pages",
+      "page.image": "url"
+    }
+  }
+}
