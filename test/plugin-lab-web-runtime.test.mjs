@@ -26,6 +26,17 @@ test("web lab relays null-body XHR and preserves synchronous WebView responses",
   assert.match(lab, /"x-lab-final-url": response\.headers\.get\("x-lab-final-url"\)/);
 });
 
+test("web lab follows the same target-then-plan sequence as Nyxovira", () => {
+  assert.match(lab, /return eval\(\$\{JSON\.stringify\(script\)\}\)/);
+  assert.match(lab, /const resolvedTarget = await Promise\.resolve/);
+  assert.match(lab, /buildNyxoviraPagePlan\(\)/);
+  assert.match(lab, /__reactFiber\$/);
+  assert.match(lab, /__reactProps\$/);
+  assert.match(lab, /activateChapterList\(\)/);
+  assert.match(lab, /property === "location"\) return sourceLocation/);
+  assert.doesNotMatch(lab, /O plugin não produziu o plano de capítulos/);
+});
+
 test("module relay remains restricted to the signed plugin hosts", () => {
   assert.match(worker, /verifyToken\(env\.LAB_TOKEN_SECRET/);
   assert.match(worker, /hostMatches\(target\.hostname, token\.hosts\)/);

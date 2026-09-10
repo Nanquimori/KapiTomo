@@ -230,6 +230,21 @@
       replaceState(_state, _unused, next) { if (next) currentUrl = new URL(next, currentUrl).href; },
       back() {}, forward() {}, go() {}, length: 1, state: null
     };
+    let sourceWindow;
+    sourceWindow = new Proxy(window, {
+      get(target, property) {
+        if (property === "location") return sourceLocation;
+        if (property === "history") return labHistory;
+        if (property === "fetch") return labFetch;
+        if (property === "XMLHttpRequest") return LabXMLHttpRequest;
+        if (property === "window" || property === "self" || property === "globalThis") return sourceWindow;
+        const value = Reflect.get(target, property, target);
+        return typeof value === "function" ? value.bind(target) : value;
+      },
+      set(target, property, value) {
+        return Reflect.set(target, property, value, target);
+      }
+    });
 
     const toBase64Url = (value) => btoa(value).replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/g, "");
     const sourceModuleUrl = (rawUrl) => {
@@ -316,14 +331,193 @@
       if (loadedModule) await waitForDynamicRender(initialMarkup);
     }
 
+    function normalizeSourceUrl(rawUrl) {
+      if (!String(rawUrl || "").trim()) return "";
+      try {
+        const value = new URL(String(rawUrl || ""), currentUrl);
+        const source = new URL(currentUrl);
+        if (value.origin === location.origin && value.origin !== source.origin) {
+          value.protocol = source.protocol;
+          value.host = source.host;
+        }
+        return value.href;
+      } catch {
+        return String(rawUrl || "").trim();
+      }
+    }
+
+    function buildNyxoviraPagePlan() {
+      try {
+        const clean = (value) => String(value || "").replace(/\s+/g, " ").trim();
+        const absolute = (value) => normalizeSourceUrl(clean(value));
+        const numberFrom = (value) => {
+          const match = String(value || "").match(/(?:chapter|cap(?:itulo|ítulo)?)?\s*#?\s*(\d+(?:[.,]\d+)?)/i);
+          return match ? match[1].replace(",", ".") : "";
+        };
+        const title = clean(document.querySelector("h1")?.textContent || document.title || "Obra");
+        const socialCover = document.querySelector(
+          "meta[property='og:image'],meta[name='og:image'],meta[property='twitter:image'],meta[name='twitter:image']"
+        )?.getAttribute("content") || "";
+        let coverUrl = absolute(socialCover);
+        if (!coverUrl) {
+          const image = [...document.querySelectorAll("img")].find((node) => {
+            const description = [
+              node.getAttribute("alt"),
+              node.getAttribute("src"),
+              node.getAttribute("data-src"),
+              node.className
+            ].map(clean).join(" ").toLowerCase();
+            return description.includes("cover") || description.includes("capa") || description.includes(title.toLowerCase());
+          });
+          coverUrl = absolute(image?.getAttribute("src") || image?.getAttribute("data-src") || "");
+        }
+
+        const chapters = [];
+        const add = (item) => {
+          if (!item || typeof item !== "object") return;
+          const rawId = item.id ?? item.chapterId ?? item.slug ?? "";
+          let number = clean(item.number ?? item.chapter ?? numberFrom(item.title || ""));
+          if (rawId === "" && !number) return;
+          if (!number) number = String(chapters.length + 1);
+          const rawUrl = item.url ?? item.href ?? item.link ?? item.path ?? item.permalink ?? item.canonicalUrl ?? "";
+          const url = absolute(rawUrl);
+          const key = String(rawId || number);
+          const existing = chapters.find((chapter) => chapter._key === key);
+          if (existing) {
+            if (!existing.url && url) existing.url = url;
+            return;
+          }
+          const itemTitle = clean(item.title || "");
+          chapters.push({
+            _key: key,
+            id: "id:" + key,
+            number,
+            label: "Cap " + number + (itemTitle ? " - " + itemTitle : ""),
+            url,
+            index: chapters.length
+          });
+        };
+        const looksLikeChapterArray = (value) => Array.isArray(value)
+          && value.length > 0
+          && value[0]
+          && typeof value[0] === "object"
+          && "id" in value[0]
+          && ("number" in value[0] || "title" in value[0]);
+        const scanObjectGraph = (root) => {
+          const stack = [root];
+          const visited = new Set();
+          let best = null;
+          let limit = 0;
+          while (stack.length && limit++ < 12000) {
+            const value = stack.pop();
+            if (!value || typeof value !== "object" || visited.has(value)) continue;
+            visited.add(value);
+            if (looksLikeChapterArray(value) && (!best || value.length > best.length)) best = value;
+            if (looksLikeChapterArray(value.chapters) && (!best || value.chapters.length > best.length)) best = value.chapters;
+            let keys;
+            try { keys = Object.keys(value); } catch { continue; }
+            for (const key of keys.slice(0, 80)) {
+              if (["stateNode", "child", "sibling", "return", "alternate"].includes(key)) continue;
+              try {
+                const child = value[key];
+                if (child && typeof child === "object") stack.push(child);
+              } catch {}
+            }
+          }
+          return best;
+        };
+        for (const element of [document.body, ...document.querySelectorAll("*")].slice(0, 600)) {
+          let keys = [];
+          try { keys = Object.keys(element); } catch {}
+          for (const key of keys) {
+            if (!key.startsWith("__reactFiber$") && !key.startsWith("__reactProps$")) continue;
+            const found = scanObjectGraph(element[key]);
+            if (found?.length) {
+              found.forEach(add);
+              break;
+            }
+          }
+          if (chapters.length) break;
+        }
+
+        for (const anchor of document.querySelectorAll("a[href]")) {
+          const href = absolute(anchor.getAttribute("href") || anchor.href || "");
+          if (!href) continue;
+          let path = "";
+          try { path = new URL(href).pathname; } catch { path = href; }
+          const lower = path.toLowerCase();
+          const label = clean(anchor.textContent || anchor.getAttribute("title") || anchor.getAttribute("aria-label") || "");
+          if (!lower.includes("/chapter/")
+              && !lower.includes("/read/")
+              && !lower.startsWith("/r/")
+              && !(lower.includes("/view/") && (lower.includes("/ch-") || numberFrom(label)))) continue;
+          const parts = path.split("/").filter(Boolean);
+          if (parts.length < 2) continue;
+          const last = parts.at(-1);
+          const previous = parts.at(-2) || "";
+          const id = /^\d+$/.test(last) ? last : (/^\d+$/.test(previous) ? previous : (numberFrom(last) || last));
+          const number = numberFrom(label) || numberFrom(last) || numberFrom(previous) || String(chapters.length + 1);
+          add({ id, number, title: label, url: href });
+        }
+
+        const byNumber = new Map();
+        for (const chapter of chapters) {
+          const key = String(chapter.number || chapter._key || chapter.id);
+          const previous = byNumber.get(key);
+          if (!previous || (!previous.url && chapter.url) || (String(chapter.label).length > String(previous.label).length && chapter.url)) {
+            byNumber.set(key, chapter);
+          }
+        }
+        const deduplicated = [...byNumber.values()]
+          .sort((left, right) => {
+            const a = Number.parseFloat(left.number);
+            const b = Number.parseFloat(right.number);
+            return (Number.isNaN(a) ? 999999 : a) - (Number.isNaN(b) ? 999999 : b);
+          })
+          .map((chapter, index) => {
+            const value = { ...chapter, index };
+            delete value._key;
+            return value;
+          });
+        if (!deduplicated.length) return null;
+        return { title, canonicalUrl: currentUrl, coverUrl, chapters: deduplicated };
+      } catch {
+        return null;
+      }
+    }
+
+    function readPluginPlan() {
+      try {
+        const raw = window.__nyxoviraChapterPlan;
+        const value = typeof raw === "string" ? JSON.parse(raw) : raw;
+        return value && Array.isArray(value.chapters) && value.chapters.length ? value : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function activateChapterList() {
+      const candidate = [...document.querySelectorAll("button,[role='tab'],a")].find((node) => {
+        const label = String(node.textContent || node.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim();
+        return /^(cap[ií]tulos?|chapters?)\b/i.test(label);
+      });
+      if (!candidate) return false;
+      candidate.click();
+      return true;
+    }
+
     async function waitForPlan() {
       const started = Date.now();
+      let chapterListActivated = false;
       while (Date.now() - started < 15000) {
-        try {
-          const raw = window.__nyxoviraChapterPlan;
-          const value = typeof raw === "string" ? JSON.parse(raw) : raw;
-          if (value && Array.isArray(value.chapters) && value.chapters.length) return value;
-        } catch {}
+        const pluginPlan = readPluginPlan();
+        if (pluginPlan) return pluginPlan;
+        const nativePlan = buildNyxoviraPagePlan();
+        if (nativePlan) {
+          window.__nyxoviraChapterPlan = JSON.stringify(nativePlan);
+          return nativePlan;
+        }
+        if (!chapterListActivated && Date.now() - started >= 2500) chapterListActivated = activateChapterList();
         await new Promise((resolve) => setTimeout(resolve, 100));
       }
       const diagnostic = Object.getOwnPropertyNames(window)
@@ -334,7 +528,7 @@
         .find(Boolean);
       const rendered = String(document.body?.innerText || "").replace(/\s+/g, " ").trim().slice(0, 180);
       const detail = diagnostic || (rendered ? `A fonte renderizou "${rendered}".` : "A página dinâmica permaneceu sem conteúdo.");
-      throw new Error(`O plugin não produziu o plano de capítulos em 15 segundos. ${detail}`);
+      throw new Error(`O Nyxovira não encontrou capítulos em 15 segundos. ${detail}`);
     }
 
     async function primeSynchronousResponse(rawUrl) {
@@ -352,8 +546,23 @@
 
     async function runPlugin(script) {
       try {
-        const execute = new Function("window", "document", "location", "history", "fetch", "XMLHttpRequest", `"use strict";\n${script}\n`);
-        execute(window, document, sourceLocation, labHistory, labFetch, LabXMLHttpRequest);
+        const execute = new Function(
+          "window",
+          "document",
+          "location",
+          "history",
+          "fetch",
+          "XMLHttpRequest",
+          "globalThis",
+          "self",
+          `"use strict";\nreturn eval(${JSON.stringify(script)});`
+        );
+        const resolvedTarget = await Promise.resolve(
+          execute(sourceWindow, document, sourceLocation, labHistory, labFetch, LabXMLHttpRequest, sourceWindow, sourceWindow)
+        );
+        if (typeof resolvedTarget === "string" && /^https?:\/\//i.test(resolvedTarget)) {
+          currentUrl = resolvedTarget;
+        }
         let plan = await waitForPlan();
         const selectedChapterId = String(plan.chapters[0]?.id ?? "");
         const selectedChapter = plan.chapters.find((chapter) => String(chapter?.id ?? "") === selectedChapterId);
