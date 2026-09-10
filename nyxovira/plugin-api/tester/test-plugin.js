@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 import { chromium } from "playwright";
+import { assertSafeRemoteUrl, isBrowserLocalUrl } from "./network-policy.mjs";
 
 const args = process.argv.slice(2);
 const pluginArg = args.shift();
@@ -15,7 +16,10 @@ const option = (name, fallback = "") => {
   return index >= 0 && args[index + 1] ? args[index + 1] : fallback;
 };
 const headed = args.includes("--headed");
+const allowLocal = args.includes("--allow-local");
 const requestedChapterId = option("--chapter-id");
+const maxPages = Number(option("--max-pages", "0")) || 0;
+const maxBytes = Number(option("--max-bytes", "0")) || 0;
 const testerDir = path.dirname(fileURLToPath(import.meta.url));
 const outputDir = path.resolve(option("--output", path.join(testerDir, "test-output")));
 const report = { schemaVersion: 1, verdict: "PLUGIN_INVALID", success: false, workUrl: workUrl || "", startedAt: new Date().toISOString(), steps: [] };
@@ -40,19 +44,22 @@ async function finish(error) {
 
 if (!pluginArg || !workUrl) {
   await fs.mkdir(outputDir, { recursive: true });
-  await finish(new Error("Usage: node test-plugin.js <plugin-directory> <real-work-url> [--chapter-id ID] [--output DIR] [--headed]"));
+  await finish(new Error("Usage: node test-plugin.js <plugin-directory> <real-work-url> [--chapter-id ID] [--output DIR] [--headed] [--max-pages N] [--max-bytes N]"));
 } else {
   let browser;
   try {
     report.stage = "manifest";
     const pluginDir = path.resolve(pluginArg);
     const manifest = JSON.parse(await fs.readFile(path.join(pluginDir, "plugin.json"), "utf8"));
-    const schema = JSON.parse(await fs.readFile(path.join(testerDir, "..", "plugin.schema.json"), "utf8"));
+    const localSchema = path.join(testerDir, "plugin.schema.json");
+    const documentationSchema = path.join(testerDir, "..", "plugin.schema.json");
+    const schemaPath = await fs.access(localSchema).then(() => localSchema).catch(() => documentationSchema);
+    const schema = JSON.parse(await fs.readFile(schemaPath, "utf8"));
     const ajv = new Ajv2020({ allErrors: true, strict: false });
     addFormats(ajv);
     const validate = ajv.compile(schema);
     if (!validate(manifest)) throw new Error(`plugin.json does not match plugin.schema.json: ${ajv.errorsText(validate.errors)}`);
-    const target = new URL(workUrl);
+    const target = await assertSafeRemoteUrl(workUrl, { allowLocal });
     if (!manifest.match.hosts.some((host) => target.hostname === host || target.hostname.endsWith(`.${host}`))) throw new Error("The work URL host is not declared in match.hosts.");
     const scriptName = manifest.browser.download_target_script_file;
     if (!scriptName) throw new Error("The command-line tester requires browser.download_target_script_file; use the in-app diagnostic for parser-only legacy plugins.");
@@ -68,6 +75,16 @@ if (!pluginArg || !workUrl) {
       browser = await chromium.launch({ headless: !headed });
     }
     const context = await browser.newContext();
+    await context.route("**/*", async (route) => {
+      const requestUrl = route.request().url();
+      if (isBrowserLocalUrl(requestUrl)) return route.continue();
+      try {
+        await assertSafeRemoteUrl(requestUrl, { allowLocal });
+        return route.continue();
+      } catch {
+        return route.abort("blockedbyclient");
+      }
+    });
     const page = await context.newPage();
     const response = await page.goto(workUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
     if (!response || !response.ok()) throw new Error(`Work page HTTP ${response?.status() || 0}.`);
@@ -110,12 +127,14 @@ if (!pluginArg || !workUrl) {
       if (!(await fs.stat(chapterFile)).size) throw new Error("The saved novel chapter is empty.");
       step("download", "PASS", `${paragraphs.length} paragraph(s) saved and reopened.`);
     } else if (pages.length) {
+      if (maxPages && pages.length > maxPages) throw new Error(`The selected chapter has ${pages.length} pages; the laboratory limit is ${maxPages}.`);
       await fs.mkdir(chapterDir, { recursive: true });
       let totalBytes = 0;
       let firstHttpStatus = 0;
       for (let pageIndex = 0; pageIndex < pages.length; pageIndex += 1) {
         const descriptor = typeof pages[pageIndex] === "string" ? { url: pages[pageIndex] } : pages[pageIndex];
         const pageUrl = new URL(descriptor.url || descriptor.src || descriptor.image || descriptor.imageUrl, workUrl).href;
+        await assertSafeRemoteUrl(pageUrl, { allowLocal });
         const pageResponse = await context.request.get(pageUrl, { headers: { Referer: preparedChapter.url || workUrl, ...(descriptor.headers || {}) }, timeout: 45000 });
         if (!pageResponse.ok()) throw new Error(`Page ${pageIndex + 1} HTTP ${pageResponse.status()}.`);
         const contentType = String(pageResponse.headers()["content-type"] || "").toLowerCase();
@@ -128,6 +147,7 @@ if (!pluginArg || !workUrl) {
         if (!(await fs.readFile(imageFile)).length) throw new Error(`Saved page ${pageIndex + 1} could not be reopened.`);
         if (pageIndex === 0) firstHttpStatus = pageResponse.status();
         totalBytes += bytes.length;
+        if (maxBytes && totalBytes > maxBytes) throw new Error(`The chapter exceeded the laboratory download limit of ${maxBytes} bytes.`);
       }
       step("download", "PASS", `First page HTTP ${firstHttpStatus}; all ${pages.length} page(s), ${totalBytes} bytes, saved and reopened.`);
     } else {

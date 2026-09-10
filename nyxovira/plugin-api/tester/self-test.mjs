@@ -37,7 +37,7 @@ await fs.writeFile(path.join(pluginDir, "browser", "download_target.js"), `(func
 
 try {
   const result = await new Promise((resolve) => {
-    const child = spawn(process.execPath, ["test-plugin.js", pluginDir, workUrl, "--output", outputDir], { cwd: path.dirname(fileURLToPath(import.meta.url)), stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn(process.execPath, ["test-plugin.js", pluginDir, workUrl, "--output", outputDir, "--allow-local"], { cwd: path.dirname(fileURLToPath(import.meta.url)), stdio: ["ignore", "pipe", "pipe"] });
     let stdout = "";
     let stderr = "";
     child.stdout.on("data", (chunk) => stdout += chunk);

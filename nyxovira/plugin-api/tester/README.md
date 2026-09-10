@@ -1,19 +1,64 @@
-# nyxovira-plugin-test
+# Laboratório de Plugins Nyxovira
 
-The official conformance tester exercises one real work and one real chapter. It does not mark a plugin valid merely because a request was queued.
+O laboratório abre uma interface web local e testa um plugin ZIP contra uma obra e um capítulo reais. Ele não marca o plugin como válido apenas porque uma tarefa foi enfileirada.
 
-```bash
+## Abrir no Windows
+
+Dê dois cliques em `iniciar-laboratorio.cmd` ou execute:
+
+```powershell
 npm install
-node test-plugin.js ../examples/simple-html https://your-authorized-source.invalid/work/slug
+npm run web
 ```
 
-Use a real URL supported by the plugin, not the reserved example URL. Results are written to `test-output/` by default:
+A interface abre em `http://127.0.0.1:4173/`. O servidor aceita somente conexões locais.
 
-- `work.json`
-- `chapter-plan.json`
-- `chapter-001/chapter.json` for a novel, or every downloaded page for image content
-- `report.json`
+## Fluxo para uma IA
 
-Exit code `0` and `PLUGIN_VALID` mean that the tester resolved a work, preserved the exact selected chapter ID, resolved content, downloaded or serialized the complete selected chapter, saved every output, and reopened the saved files. Network, login, access, HTTP, decryption, parser, or empty-output failures return `PLUGIN_INVALID` and a nonzero exit code.
+1. Crie o plugin e compacte `plugin.json` e os arquivos usados pelo manifesto.
+2. Abra o laboratório.
+3. Envie o ZIP e informe a URL real da obra.
+4. Execute o diagnóstico e copie o JSON do relatório.
+5. Corrija o plugin até receber `PLUGIN_VALID` sem etapas `FAIL`.
 
-Options: `--output <directory>`, `--chapter-id <exact-id>`, and `--headed`.
+Uma automação também pode enviar o ZIP diretamente:
+
+```text
+POST http://127.0.0.1:4173/api/test?workUrl=https%3A%2F%2Fsite.example%2Fobra%2Fslug
+Content-Type: application/zip
+
+<bytes do ZIP>
+```
+
+## Limites e exclusão
+
+- Um capítulo completo por execução.
+- No máximo 24 páginas e 24 MiB de conteúdo do capítulo.
+- ZIP de até 8 MiB, 128 entradas, 16 MiB expandido e 4 MiB por arquivo.
+- Tempo máximo de 90 segundos.
+- URLs locais, privadas, protocolos não HTTP e credenciais embutidas são bloqueados.
+- Caminhos absolutos, `..` e links simbólicos no ZIP são rejeitados.
+- O plugin e toda a saída são criados em uma pasta aleatória do diretório temporário.
+- A resposta somente é enviada depois da tentativa de exclusão dessa pasta.
+- Não são usados banco de dados, cookies persistentes, `localStorage` ou catálogo.
+
+`temporaryFilesDeleted: true` e `sessionStored: false` confirmam a limpeza. Se a exclusão falhar, o resultado é alterado para `PLUGIN_INVALID`.
+
+## Testador por linha de comando
+
+O modo anterior continua disponível:
+
+```powershell
+node test-plugin.js ..\examples\simple-html https://site-autorizado.example/obra/slug
+```
+
+Use `--output`, `--chapter-id`, `--headed`, `--max-pages` e `--max-bytes` quando necessário. O modo de linha de comando mantém a saída solicitada; a exclusão automática pertence ao laboratório web.
+
+## Verificação do próprio laboratório
+
+```powershell
+npm test
+npm audit
+```
+
+O autoteste cria um site, um plugin e um ZIP descartáveis, envia o ZIP pela API web, exige `PLUGIN_VALID` e confirma que a sessão foi apagada.

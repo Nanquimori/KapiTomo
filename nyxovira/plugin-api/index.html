@@ -744,7 +744,7 @@
               <article><h3><a href="PLUGIN_API.md">Complete Markdown reference</a></h3><p>Readable and downloadable English API reference.</p></article>
               <article><h3><a href="plugin.schema.json">plugin.schema.json</a></h3><p>Official machine-readable manifest contract.</p></article>
               <article><h3><a href="examples/">Complete examples</a></h3><p>Sanitized HTML, JSON, novel, manga, and encrypted API examples.</p></article>
-              <article><h3><a href="tester/">Plugin tester</a></h3><p>Commands, files, and validator used before declaring a plugin valid.</p></article>
+              <article><h3><a href="tester/">Web plugin laboratory</a></h3><p>Upload a ZIP, test one real chapter, copy the report, and leave no stored session.</p></article>
             </div>
           </section>
 
@@ -752,7 +752,7 @@
             <h2>Developer path</h2>
             <div class="rule-list">
               <article><h3>1. <a href="#files">Create the plugin</a></h3><p>Prepare <code>plugin.json</code>, map the site, and build chapter downloads.</p></article>
-              <article><h3>2. <a href="#testing">Test through Import plugins</a></h3><p>Import the local folder into Nyxovira and repeat the test while developing.</p></article>
+              <article><h3>2. <a href="#testing">Test the ZIP in the web laboratory</a></h3><p>Run the temporary Playwright executor without installing the Android app or opening an emulator.</p></article>
               <article><h3>3. Validate the complete result</h3><p>A plugin is ready only after a real chapter is downloaded, saved, and reopened successfully.</p></article>
               <article><h3>4. <a href="#external-sites">Distribute later, if needed</a></h3><p>Distribution is a separate optional step and does not change how the plugin itself is created.</p></article>
             </div>
@@ -961,20 +961,20 @@ return "https://source.invalid/manga/work/";</code></pre>
           </section>
 
           <section id="testing" class="panel">
-            <h2>Test in Nyxovira</h2>
-            <p>Manual import is the normal development loop. Nyxovira does not require catalog tags or a separately hosted icon to test a plugin. When the site already provides a public favicon or logo, use it in <code>browser.icon_url</code>.</p>
+            <h2>Test in the web laboratory</h2>
+            <p>The limited laboratory is the normal plugin development loop. It does not include the library, settings, catalogs, favorites, or permanent downloads. Nyxovira does not require catalog tags or a separately hosted icon to test a plugin. When the site already provides a public favicon or logo, use it in <code>browser.icon_url</code>.</p>
             <div class="steps">
-              <div class="step"><p>Keep <code>plugin.json</code> and the <code>browser</code> folder together inside the plugin folder.</p></div>
-              <div class="step"><p>In Nyxovira, open <strong>Sites</strong>, tap <strong>Import plugins</strong>, and select the plugin folder. You may also select a parent folder containing several plugin folders.</p></div>
-              <div class="step"><p>Open the supported site and verify work recognition, the chapter list, and the download.</p></div>
-              <div class="step"><p>After changing the files, import the folder again and repeat the test.</p></div>
+              <div class="step"><p>Keep <code>plugin.json</code> and the <code>browser</code> folder together, then create one ZIP.</p></div>
+              <div class="step"><p><a href="tester/"><strong>Open the Plugin Laboratory</strong></a>, upload the ZIP, and enter the URL of a real work.</p></div>
+              <div class="step"><p>The executor validates the manifest, mapping, exact chapter ID, complete content, saved output, and reopened files.</p></div>
+              <div class="step"><p>Copy the JSON report. The ZIP, chapter, and output are deleted before the response is returned.</p></div>
             </div>
             <h3 class="api-subheading">Conformance gate</h3>
             <pre><code>cd tester
 npm install
-node test-plugin.js ../my-plugin https://source.invalid/work/slug</code></pre>
-            <p>The tester writes <code>work.json</code>, <code>chapter-plan.json</code>, <code>chapter-001/</code>, and <code>report.json</code>. It returns <code>PLUGIN_VALID</code> only after real content is downloaded or serialized, saved, and reopened. Queueing a task is not validation.</p>
-            <p>In the Android app, open <strong>Sites → Test source</strong>, navigate to a work, and tap the diagnostic icon. Without real network validation, state: <strong>not validated against the real site</strong>.</p>
+npm run web</code></pre>
+            <p>The local web executor listens only on <code>127.0.0.1</code>. It tests one complete chapter, returns <code>PLUGIN_VALID</code> only after saving and reopening real content, and removes the random temporary session before returning the report. The public GitHub Pages interface never receives the ZIP.</p>
+            <p>The Android diagnostic is now an optional final compatibility check, not the required development loop. Without real network validation, state: <strong>not validated against the real site</strong>.</p>
             <p><a href="examples/">Complete sanitized examples</a>: simple HTML, JSON API, novel, manga, and encrypted API. All use the reserved <code>source.invalid</code> domain.</p>
             <p class="panel-copy-after-list"><strong>Plugin creation ends after complete validation.</strong> Tags, <code>schema_version</code>, GitHub, a public catalog, and a plugin website are distribution metadata, not requirements for creating or importing the plugin. Use the site's favicon or logo when available; you do not need to host a separate icon.</p>
             <h3 class="api-subheading">Optional distribution after validation</h3>
@@ -1123,7 +1123,7 @@ node test-plugin.js ../my-plugin https://source.invalid/work/slug</code></pre>
               <article><h3><a href="PLUGIN_API.pt-BR.md">Referência Markdown completa</a></h3><p>Documentação da API em português para ler ou baixar.</p></article>
               <article><h3><a href="plugin.schema.json">plugin.schema.json</a></h3><p>Contrato oficial do manifesto em formato legível por ferramentas.</p></article>
               <article><h3><a href="examples/">Exemplos completos</a></h3><p>Exemplos sanitizados de HTML, JSON, novel, manga e API criptografada.</p></article>
-              <article><h3><a href="tester/">Testador de plugins</a></h3><p>Comandos, arquivos e validador usados antes de declarar um plugin válido.</p></article>
+              <article><h3><a href="tester/">Laboratório web de plugins</a></h3><p>Envie o ZIP, teste um capítulo real, copie o relatório e não deixe uma sessão armazenada.</p></article>
             </div>
           </section>
 
@@ -1131,7 +1131,7 @@ node test-plugin.js ../my-plugin https://source.invalid/work/slug</code></pre>
             <h2>Caminho do desenvolvedor</h2>
             <div class="rule-list">
               <article><h3>1. <a href="#files-pt">Criar o plugin</a></h3><p>Prepare o <code>plugin.json</code>, mapeie o site e monte os downloads de capítulos.</p></article>
-              <article><h3>2. <a href="#testing-pt">Testar por Importar plugins</a></h3><p>Importe a pasta local no Nyxovira e repita o teste enquanto desenvolve.</p></article>
+              <article><h3>2. <a href="#testing-pt">Testar o ZIP no laboratório web</a></h3><p>Use o executor temporário Playwright sem instalar o aplicativo Android nem abrir emulador.</p></article>
               <article><h3>3. Validar o resultado completo</h3><p>O plugin só fica pronto depois que um capítulo real for baixado, salvo e reaberto com sucesso.</p></article>
               <article><h3>4. <a href="#external-sites-pt">Distribuir depois, se necessário</a></h3><p>A distribuição é uma etapa opcional separada e não muda a forma de criar o plugin.</p></article>
             </div>
@@ -1340,20 +1340,20 @@ return "https://source.invalid/manga/work/";</code></pre>
           </section>
 
           <section id="testing-pt" class="panel">
-            <h2>Testar no Nyxovira</h2>
-            <p>A importação manual é o caminho normal durante o desenvolvimento. O Nyxovira não exige tags de catálogo nem um ícone hospedado separadamente para testar o plugin. Quando o site já fornecer favicon ou logo público, use-o em <code>browser.icon_url</code>.</p>
+            <h2>Testar no laboratório web</h2>
+            <p>O laboratório limitado é o caminho normal durante o desenvolvimento. Ele não possui biblioteca, configurações, catálogos, favoritos nem downloads permanentes. O Nyxovira não exige tags de catálogo nem um ícone hospedado separadamente para testar o plugin. Quando o site já fornecer favicon ou logo público, use-o em <code>browser.icon_url</code>.</p>
             <div class="steps">
-              <div class="step"><p>Mantenha <code>plugin.json</code> e a pasta <code>browser</code> juntos dentro da pasta do plugin.</p></div>
-              <div class="step"><p>No Nyxovira, abra <strong>Sites</strong>, toque em <strong>Importar plugins</strong> e selecione a pasta do plugin. Você também pode selecionar uma pasta que contenha várias pastas de plugins.</p></div>
-              <div class="step"><p>Abra o site compatível e confira o reconhecimento da obra, a lista de capítulos e o download.</p></div>
-              <div class="step"><p>Depois de alterar os arquivos, importe a pasta novamente e repita o teste.</p></div>
+              <div class="step"><p>Mantenha <code>plugin.json</code> e a pasta <code>browser</code> juntos e crie um único ZIP.</p></div>
+              <div class="step"><p><a href="tester/"><strong>Abra o Laboratório de Plugins</strong></a>, envie o ZIP e informe a URL de uma obra real.</p></div>
+              <div class="step"><p>O executor valida manifesto, mapeamento, ID exato, conteúdo completo, arquivo salvo e reabertura.</p></div>
+              <div class="step"><p>Copie o relatório JSON. O ZIP, o capítulo e a saída são apagados antes da resposta.</p></div>
             </div>
             <h3 class="api-subheading">Barreira de conformidade</h3>
             <pre><code>cd tester
 npm install
-node test-plugin.js ../meu-plugin https://source.invalid/work/slug</code></pre>
-            <p>O testador gera <code>work.json</code>, <code>chapter-plan.json</code>, <code>chapter-001/</code> e <code>report.json</code>. Ele retorna <code>PLUGIN_VALID</code> somente depois de baixar ou serializar, gravar e reabrir conteúdo real. Colocar uma tarefa na fila não é validação.</p>
-            <p>No Android, abra <strong>Sites → Testar fonte</strong>, navegue até uma obra e toque no ícone de diagnóstico. Sem validação real de rede, informe: <strong>não validado contra o site real</strong>.</p>
+npm run web</code></pre>
+            <p>O executor web local aceita somente conexões em <code>127.0.0.1</code>. Ele testa um capítulo completo, retorna <code>PLUGIN_VALID</code> somente depois de salvar e reabrir conteúdo real e elimina a sessão temporária aleatória antes de devolver o relatório. A interface pública do GitHub Pages nunca recebe o ZIP.</p>
+            <p>O diagnóstico Android passa a ser apenas uma verificação final opcional de compatibilidade, não o caminho obrigatório de desenvolvimento. Sem validação real de rede, informe: <strong>não validado contra o site real</strong>.</p>
             <p><a href="examples/">Exemplos completos e sanitizados</a>: HTML simples, API JSON, novel, manga e API criptografada. Todos usam o domínio reservado <code>source.invalid</code>.</p>
             <p class="panel-copy-after-list"><strong>A criação termina depois da validação completa.</strong> Tags, <code>schema_version</code>, GitHub, catálogo público e site de plugins são metadados de distribuição, não requisitos para criar ou importar o plugin. Use o favicon ou logo do próprio site quando existir; você não precisa hospedar um ícone separado.</p>
             <h3 class="api-subheading">Distribuição opcional após validar</h3>
@@ -1488,7 +1488,8 @@ node test-plugin.js ../meu-plugin https://source.invalid/work/slug</code></pre>
             "- Use browser/download_target.js para descoberta e plano. Declare parser para API estruturada, headers especiais, criptografia ou download nativo fora da WebView.",
             "- Garanta que cada chapterPlan.chapters[].id seja exatamente igual ao valor recebido em selectedChapterIds; não acrescente nem remova o prefixo id:.",
             "- Use o favicon ou logo público da própria fonte em browser.icon_url quando existir.",
-            "- Execute node test-plugin.js <pasta> <URL-real> e o diagnóstico do app em uma obra e capítulo reais.",
+            "- Compacte o plugin em ZIP e teste-o no Laboratório de Plugins em tester/: informe uma obra real, execute um capítulo completo e copie o relatório JSON.",
+            "- Use o diagnóstico Android apenas como verificação final opcional de compatibilidade.",
             "- Só declare sucesso depois de resolver conteúdo, baixar ou serializar, gravar e reabrir o arquivo. Colocar na fila não é validação.",
             "- Se não houver acesso à rede, escreva exatamente: não validado contra o site real.",
             "",
@@ -1502,7 +1503,8 @@ node test-plugin.js ../meu-plugin https://source.invalid/work/slug</code></pre>
             "- Use browser/download_target.js for discovery and the plan. Declare parser for structured APIs, special headers, encryption, or native downloading outside the WebView.",
             "- Keep each chapterPlan.chapters[].id exactly equal to the value in selectedChapterIds; never add or remove an id: prefix.",
             "- Use the source's own public favicon or logo as browser.icon_url when available.",
-            "- Run node test-plugin.js <folder> <real-URL> and the in-app diagnostic against one real work and chapter.",
+            "- Package the plugin as a ZIP and test it in the Plugin Laboratory at tester/: enter one real work, run one complete chapter, and copy the JSON report.",
+            "- Use the Android diagnostic only as an optional final compatibility check.",
             "- Claim success only after content is resolved, downloaded or serialized, saved, and reopened. Queueing is not validation.",
             "- If network access is unavailable, state exactly: not validated against the real site.",
             "",
