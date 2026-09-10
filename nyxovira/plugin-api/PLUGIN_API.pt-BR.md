@@ -167,17 +167,17 @@ Declare `encrypted_response_format` e material de chave somente quando forem obs
 - Primeira página funciona e outra falha: o capítulo é inválido; o testador deve baixar todas as páginas.
 - Funciona na WebView e falha no downloader: declare o parser e reproduza os requisitos de transporte fora da WebView.
 
-## Teste de conformidade oficial
+## Laboratório Web de Plugins
 
 ```bash
 cd tester
 npm install
-node test-plugin.js ../meu-plugin https://source.invalid/work/slug
+npm run web
 ```
 
-Substitua a URL reservada por uma obra real que você está autorizado a acessar. O testador gera `work.json`, `chapter-plan.json`, `chapter-001/` e `report.json`. Ele retorna `PLUGIN_VALID` somente depois de baixar/serializar, gravar e reabrir conteúdo real. Sem rede, informe **“não validado contra o site real”**.
+Abra `http://127.0.0.1:4173/`, envie o ZIP do plugin e informe uma obra real que você está autorizado a acessar. O laboratório limitado não possui biblioteca, configurações, catálogos, favoritos nem downloads permanentes. Ele testa um capítulo completo e retorna `PLUGIN_VALID` somente depois de baixar/serializar, gravar e reabrir conteúdo real.
 
-No Android, abra **Sites → Testar fonte**, navegue até uma obra e toque no ícone de diagnóstico. O relatório mostra manifesto, site, prepare hook, obra, ID selecionado, conteúdo, HTTP da primeira página, parser/criptografia e arquivo gravado. A fila não é validação nem conta como sucesso.
+O ZIP, o capítulo e a área do relatório ficam em uma sessão temporária aleatória, eliminada antes da resposta da API. Exija `temporaryFilesDeleted: true` e `sessionStored: false`. O diagnóstico Android é apenas uma verificação final opcional de compatibilidade. Sem rede, informe **“não validado contra o site real”**.
 
 ## Checklist antes de entregar
 
@@ -187,8 +187,7 @@ No Android, abra **Sites → Testar fonte**, navegue até uma obra e toque no í
 - [ ] O primeiro capítulo real resolve páginas ou parágrafos.
 - [ ] Headers, cookies, sessão, restrições e criptografia foram testados.
 - [ ] Ordem dos capítulos e URLs relativas/absolutas foram conferidas.
-- [ ] `node test-plugin.js` gerou todos os quatro artefatos.
-- [ ] O diagnóstico do app chegou a arquivo gravado e aberto.
+- [ ] O laboratório web retornou `PLUGIN_VALID`, `temporaryFilesDeleted: true` e nenhuma etapa `FAIL`.
 - [ ] Limitações e conteúdo restrito estão documentados.
 
 ## Exemplos completos e sanitizados
@@ -197,7 +196,7 @@ Veja [examples/](examples/): `simple-html`, `json-api`, `novel`, `manga` e `encr
 
 ## Prompt rigoroso para IA
 
-> Crie um plugin Nyxovira para a URL de fonte informada, seguindo esta documentação. Primeiro inspecione a página real, scripts e tráfego de rede e procure API/documentação oficial. Não invente endpoints, seletores, headers, cookies, tokens, chaves nem resultados. Registre URL de obra/leitor, endpoints, IDs, ordem, URLs relativas, autenticação, restrições e criptografia. Use `download_target.js` para descoberta e plano; declare `parser` para API estruturada, headers especiais, criptografia ou download nativo. Garanta que cada `chapter.id` seja exatamente o ID recebido em `selectedChapterIds`. Execute `node test-plugin.js <pasta> <URL-real>`, teste uma obra e um capítulo reais e só declare sucesso se o conteúdo for baixado, gravado e reaberto. Se não houver acesso à rede, escreva “não validado contra o site real”.
+> Crie um plugin Nyxovira para a URL de fonte informada, seguindo esta documentação. Primeiro inspecione a página real, scripts e tráfego de rede e procure API/documentação oficial. Não invente endpoints, seletores, headers, cookies, tokens, chaves nem resultados. Registre URL de obra/leitor, endpoints, IDs, ordem, URLs relativas, autenticação, restrições e criptografia. Use `download_target.js` para descoberta e plano; declare `parser` para API estruturada, headers especiais, criptografia ou download nativo. Garanta que cada `chapter.id` seja exatamente o ID recebido em `selectedChapterIds`. Compacte o plugin em ZIP e teste-o em `tester/` com uma obra e um capítulo reais. Só declare sucesso se o laboratório retornar `PLUGIN_VALID`, nenhuma etapa `FAIL` e `temporaryFilesDeleted: true`. Se não houver acesso à rede, escreva “não validado contra o site real”.
 
 ## Distribuição independente
 

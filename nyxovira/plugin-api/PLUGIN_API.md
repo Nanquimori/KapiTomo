@@ -117,17 +117,17 @@ Declare `encrypted_response_format` and key material only when legitimately obse
 - Page one works but a later page fails: the chapter is invalid; the tester must download every page.
 - Works in WebView but fails natively: declare the parser and reproduce transport requirements outside WebView.
 
-## Official conformance tester
+## Web Plugin Laboratory
 
 ```bash
 cd tester
 npm install
-node test-plugin.js ../my-plugin https://source.invalid/work/slug
+npm run web
 ```
 
-Replace the reserved URL with an authorized real work. The tester writes `work.json`, `chapter-plan.json`, `chapter-001/`, and `report.json`. `PLUGIN_VALID` is emitted only after real content is serialized/downloaded, saved, and reopened. Without network access, report **“not validated against the real site.”**
+Open `http://127.0.0.1:4173/`, upload the plugin ZIP, and enter an authorized real work URL. The limited laboratory has no library, settings, catalogs, favorites, or permanent downloads. It tests one complete chapter and emits `PLUGIN_VALID` only after real content is serialized/downloaded, saved, and reopened.
 
-On Android, use **Sites → Test source**, navigate to a work, and tap the diagnostic icon. The report covers manifest, site, prepare hook, work, selected ID, content, first-page HTTP, parser/encryption, and the saved file. Queueing is not success.
+The ZIP, chapter, and report workspace are held in one random temporary session and deleted before the API response. Require `temporaryFilesDeleted: true` and `sessionStored: false`. The Android diagnostic is an optional final compatibility check. Without network access, report **“not validated against the real site.”**
 
 ## Release checklist
 
@@ -136,7 +136,7 @@ On Android, use **Sites → Test source**, navigate to a work, and tap the diagn
 - Chapter IDs are unique and selection preserves the exact ID.
 - One real chapter resolves pages or paragraphs.
 - Headers, cookies, session, restrictions, encryption, order, and relative URLs were tested.
-- The CLI produced every artifact and the app diagnostic opened the saved output.
+- The web laboratory returned `PLUGIN_VALID`, `temporaryFilesDeleted: true`, and no `FAIL` step.
 - Known limitations and restricted content are documented.
 
 ## Complete sanitized examples
@@ -145,7 +145,7 @@ See [examples/](examples/): `simple-html`, `json-api`, `novel`, `manga`, and `en
 
 ## Strict AI prompt
 
-> Create a Nyxovira plugin for the supplied source URL using this documentation. Inspect the real page, scripts, network traffic, and first-party API documentation before coding. Do not invent endpoints, selectors, headers, cookies, tokens, keys, or test results. Record work/reader URLs, endpoints, IDs, order, relative URL bases, authentication, restrictions, and encryption. Use `download_target.js` for discovery and declare `parser` for structured APIs, special headers, encryption, or native downloading. Keep each chapter ID exactly equal to the value in `selectedChapterIds`. Run `node test-plugin.js <folder> <real-URL>` against one real work/chapter and claim success only after content is downloaded, saved, and reopened. If network access is unavailable, state “not validated against the real site.”
+> Create a Nyxovira plugin for the supplied source URL using this documentation. Inspect the real page, scripts, network traffic, and first-party API documentation before coding. Do not invent endpoints, selectors, headers, cookies, tokens, keys, or test results. Record work/reader URLs, endpoints, IDs, order, relative URL bases, authentication, restrictions, and encryption. Use `download_target.js` for discovery and declare `parser` for structured APIs, special headers, encryption, or native downloading. Keep each chapter ID exactly equal to the value in `selectedChapterIds`. Package the plugin as a ZIP and test it in `tester/` against one real work/chapter. Claim success only after the laboratory returns `PLUGIN_VALID`, no `FAIL` step, and `temporaryFilesDeleted: true`. If network access is unavailable, state “not validated against the real site.”
 
 ## Independent distribution
 
