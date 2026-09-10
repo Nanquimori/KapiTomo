@@ -20,6 +20,7 @@ const host = "127.0.0.1";
 const requestedPort = Number(option("--port", process.env.NYXOVIRA_LAB_PORT || "4173"));
 const allowLocal = args.includes("--allow-local");
 const openBrowser = args.includes("--open");
+const PUBLIC_DOCUMENTATION_ORIGIN = "https://nanquimori.github.io";
 const MAX_ZIP_BYTES = 8 * 1024 * 1024;
 const MAX_EXTRACTED_BYTES = 16 * 1024 * 1024;
 const MAX_FILE_BYTES = 4 * 1024 * 1024;
@@ -214,6 +215,20 @@ const server = http.createServer(async (request, response) => {
   if (!isLoopback(request.socket.remoteAddress)) return sendJson(response, 403, { error: "The laboratory accepts loopback connections only." });
   const baseUrl = `http://${request.headers.host || `${host}:${requestedPort}`}`;
   const requestUrl = new URL(request.url || "/", baseUrl);
+  const requestOrigin = String(request.headers.origin || "");
+  const allowedCrossOrigin = requestOrigin === PUBLIC_DOCUMENTATION_ORIGIN;
+  if (allowedCrossOrigin) {
+    response.setHeader("access-control-allow-origin", PUBLIC_DOCUMENTATION_ORIGIN);
+    response.setHeader("vary", "Origin");
+    response.setHeader("access-control-allow-methods", "GET, POST, OPTIONS");
+    response.setHeader("access-control-allow-headers", "Content-Type");
+    response.setHeader("access-control-allow-private-network", "true");
+  }
+  if (request.method === "OPTIONS" && requestUrl.pathname.startsWith("/api/")) {
+    if (!allowedCrossOrigin) return sendJson(response, 403, { error: "Cross-origin preflight blocked." });
+    response.writeHead(204, { "cache-control": "no-store" });
+    return response.end();
+  }
   if (request.method === "GET" && (requestUrl.pathname === "/" || requestUrl.pathname === "/index.html")) {
     const html = await fs.readFile(path.join(testerDir, "index.html"));
     response.writeHead(200, {
@@ -231,8 +246,7 @@ const server = http.createServer(async (request, response) => {
     return sendJson(response, 200, { ready: true, engine: "playwright", temporary: true, chapterLimit: 1, pageLimit: 24 });
   }
   if (request.method === "POST" && requestUrl.pathname === "/api/test") {
-    const origin = String(request.headers.origin || "");
-    if (origin && origin !== baseUrl) return sendJson(response, 403, { error: "Cross-origin test submission blocked." });
+    if (requestOrigin && requestOrigin !== baseUrl && !allowedCrossOrigin) return sendJson(response, 403, { error: "Cross-origin test submission blocked." });
     if (!String(request.headers["content-type"] || "").toLowerCase().startsWith("application/zip")) {
       return sendJson(response, 415, { error: "Send the plugin as application/zip." });
     }
