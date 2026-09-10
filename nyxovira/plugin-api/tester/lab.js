@@ -110,6 +110,7 @@
     let sequence = 0;
     let currentUrl = config.sourceUrl;
     let missingSynchronousUrl = "";
+    const executionTrace = [];
 
     const normalizeHeaders = (headers) => {
       if (!headers) return {};
@@ -186,6 +187,7 @@
           const cached = synchronousResponses.get(absoluteUrl);
           if (!cached) {
             missingSynchronousUrl = absoluteUrl;
+            executionTrace.push("sync-request:" + absoluteUrl);
             throw new Error(`A resposta síncrona ainda não foi preparada: ${absoluteUrl}`);
           }
           this.complete(cached);
@@ -546,6 +548,7 @@
         headers: Object.fromEntries(response.headers.entries()),
         finalUrl: response.headers.get("x-lab-final-url") || absoluteUrl
       });
+      executionTrace.push("sync-ready:" + absoluteUrl);
     }
 
     async function runWithSynchronousPriming(action) {
@@ -597,7 +600,10 @@
         if (typeof resolvedTarget === "string" && /^https?:\/\//i.test(resolvedTarget)) {
           currentUrl = resolvedTarget;
         }
+        executionTrace.push("target:" + (String(resolvedTarget || "") || "empty"));
+        executionTrace.push("plugin-plan:" + (readPluginPlan() ? "yes" : "no"));
         let plan = await waitForPlan();
+        executionTrace.push("chapter:" + String(plan.chapters[0]?.id ?? ""));
         const selectedChapterId = String(plan.chapters[0]?.id ?? "");
         const selectedChapter = plan.chapters.find((chapter) => String(chapter?.id ?? "") === selectedChapterId);
         const prepare = window.__nyxoviraPrepareDownloadPlan || window.Nyxovira?.prepareDownloadPlan;
@@ -609,9 +615,9 @@
         }
         const fallback = window.__nyxoviraChapterPlan;
         if (!plan && fallback) plan = typeof fallback === "string" ? JSON.parse(fallback) : fallback;
-        parent.postMessage({ channel: config.channel, type: "plugin-result", ok: true, plan: JSON.parse(JSON.stringify(plan)) }, "*");
+        parent.postMessage({ channel: config.channel, type: "plugin-result", ok: true, plan: JSON.parse(JSON.stringify(plan)), trace: executionTrace }, "*");
       } catch (error) {
-        parent.postMessage({ channel: config.channel, type: "plugin-result", ok: false, error: error?.message || String(error) }, "*");
+        parent.postMessage({ channel: config.channel, type: "plugin-result", ok: false, error: error?.message || String(error), trace: executionTrace }, "*");
       }
     }
 
