@@ -15,17 +15,19 @@ test("documents the three implementation levels and a real-output validation gat
     assert.match(document, /criptograf|encrypted/i);
     assert.match(document, /PLUGIN_VALID/);
     assert.match(document, /selectedChapterIds/);
-    assert.match(document, /test-plugin\.js/);
-    assert.match(document, /fila não é validação|Queueing is not validation|enqueueing.+does.+not.+validate/is);
   }
 });
 
-test("ships a schema, tester, and five complete sanitized examples", () => {
+test("ships a schema, hosted web tester, and five complete sanitized examples", () => {
   const schema = JSON.parse(read(`${apiRoot}/plugin.schema.json`));
   assert.deepEqual(schema.required, ["match", "browser"]);
   assert.ok(schema.properties.parser.properties.adapter.enum.includes("aes_json_api"));
-  assert.ok(existsSync(new URL(`../${apiRoot}/tester/test-plugin.js`, import.meta.url)));
-  assert.match(read(`${apiRoot}/tester/test-plugin.js`), /for \(let pageIndex = 0; pageIndex < pages\.length/);
+  assert.ok(existsSync(new URL(`../${apiRoot}/tester/index.html`, import.meta.url)));
+  assert.match(read(`${apiRoot}/tester/index.html`), /Testar na web/);
+  assert.doesNotMatch(read(`${apiRoot}/tester/index.html`), /AMBIENTE WEB BLOQUEADO|executor local|iniciar-laboratorio/i);
+  assert.ok(existsSync(new URL(`../${apiRoot}/tester/lab.js`, import.meta.url)));
+  assert.match(read(`${apiRoot}/tester/lab.js`), /visitor-browser/);
+  assert.doesNotMatch(read(`${apiRoot}/tester/lab.js`), /AMBIENTE WEB BLOQUEADO|TESTE INDISPONÍVEL/i);
 
   for (const name of ["simple-html", "json-api", "novel", "manga", "encrypted-api"]) {
     const manifestPath = `${apiRoot}/examples/${name}/plugin.json`;
