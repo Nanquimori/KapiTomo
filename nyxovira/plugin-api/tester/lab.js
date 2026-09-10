@@ -771,6 +771,7 @@
     } else if (pages.length) {
       const testedPages = pages.slice(0, maxPages);
       let totalBytes = 0;
+      let verifiedPages = 0;
       for (let index = 0; index < testedPages.length; index += 1) {
         const descriptor = typeof testedPages[index] === "string" ? { url: testedPages[index] } : testedPages[index];
         const target = new URL(descriptor?.url || descriptor?.src || descriptor?.image || descriptor?.imageUrl, prepared.page.url).href;
@@ -784,11 +785,13 @@
         if (!contentType.startsWith("image/")) throw new Error(`Página ${index + 1} não retornou uma imagem.`);
         const bytes = await response.arrayBuffer();
         if (!bytes.byteLength || !imageLooksValid(bytes, contentType)) throw new Error(`Página ${index + 1} retornou uma imagem inválida.`);
+        if (totalBytes + bytes.byteLength > maxChapterBytes && verifiedPages > 0) break;
+        if (bytes.byteLength > maxChapterBytes) throw new Error("A primeira imagem excedeu o limite de verificação de 24 MiB.");
         totalBytes += bytes.byteLength;
-        if (totalBytes > maxChapterBytes) throw new Error("O capítulo excedeu o limite web de 24 MiB.");
+        verifiedPages += 1;
       }
-      contentSummary = pages.length > testedPages.length
-        ? `${pages.length} imagem(ns) resolvidas; as primeiras ${testedPages.length} (${totalBytes} bytes) foram baixadas e verificadas em memória.`
+      contentSummary = pages.length > verifiedPages
+        ? `${pages.length} imagem(ns) resolvidas; as primeiras ${verifiedPages} (${totalBytes} bytes) foram baixadas e verificadas em memória.`
         : `${pages.length} imagem(ns), ${totalBytes} bytes, baixadas e verificadas em memória.`;
     } else {
       throw new Error("O primeiro capítulo não resolveu páginas nem parágrafos.");

@@ -62,6 +62,9 @@ test("chapter media validation accepts only public image responses and samples l
   assert.match(worker, /contentType\.startsWith\("image\/"\)/);
   assert.match(worker, /url\.pathname === "\/media"/);
   assert.match(lab, /const testedPages = pages\.slice\(0, maxPages\)/);
+  assert.match(lab, /totalBytes \+ bytes\.byteLength > maxChapterBytes && verifiedPages > 0/);
+  assert.match(lab, /verifiedPages \+= 1/);
   assert.match(lab, /await mediaFetch\(prepared\.token/);
   assert.doesNotMatch(lab, /O capítulo tem .*limite web/);
+  assert.doesNotMatch(lab, /O capítulo excedeu o limite web/);
 });
