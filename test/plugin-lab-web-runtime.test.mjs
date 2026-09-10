@@ -21,14 +21,17 @@ test("web lab relays null-body XHR and preserves synchronous WebView responses",
   assert.match(lab, /if \(body == null\) body = undefined/);
   assert.match(lab, /this\.async = async !== false/);
   assert.match(lab, /synchronousResponses\.get\(absoluteUrl\)/);
-  assert.match(lab, /await primeSynchronousResponse/);
+  assert.match(lab, /missingSynchronousUrl = absoluteUrl/);
+  assert.match(lab, /runWithSynchronousPriming/);
+  assert.match(lab, /await primeSynchronousResponse\(requestedUrl\)/);
+  assert.match(lab, /Promise\.resolve\(prepare/);
   assert.match(lab, /this\.responseURL = cached\.finalUrl/);
   assert.match(lab, /"x-lab-final-url": response\.headers\.get\("x-lab-final-url"\)/);
 });
 
 test("web lab follows the same target-then-plan sequence as Nyxovira", () => {
   assert.match(lab, /return eval\(\$\{JSON\.stringify\(script\)\}\)/);
-  assert.match(lab, /const resolvedTarget = await Promise\.resolve/);
+  assert.match(lab, /const resolvedTarget = await runWithSynchronousPriming/);
   assert.match(lab, /buildNyxoviraPagePlan\(\)/);
   assert.match(lab, /__reactFiber\$/);
   assert.match(lab, /__reactProps\$/);

@@ -109,6 +109,7 @@
     const synchronousResponses = new Map();
     let sequence = 0;
     let currentUrl = config.sourceUrl;
+    let missingSynchronousUrl = "";
 
     const normalizeHeaders = (headers) => {
       if (!headers) return {};
@@ -183,7 +184,10 @@
         const absoluteUrl = new URL(this.url, currentUrl).href;
         if (!this.async) {
           const cached = synchronousResponses.get(absoluteUrl);
-          if (!cached) throw new Error(`A resposta síncrona ainda não foi preparada: ${absoluteUrl}`);
+          if (!cached) {
+            missingSynchronousUrl = absoluteUrl;
+            throw new Error(`A resposta síncrona ainda não foi preparada: ${absoluteUrl}`);
+          }
           this.complete(cached);
           return;
         }
@@ -544,6 +548,27 @@
       });
     }
 
+    async function runWithSynchronousPriming(action) {
+      for (let attempt = 0; attempt < 12; attempt += 1) {
+        missingSynchronousUrl = "";
+        let value;
+        let failure;
+        try {
+          value = await action();
+        } catch (error) {
+          failure = error;
+        }
+        const requestedUrl = missingSynchronousUrl;
+        if (requestedUrl) {
+          await primeSynchronousResponse(requestedUrl);
+          continue;
+        }
+        if (failure) throw failure;
+        return value;
+      }
+      throw new Error("O plugin excedeu o limite de respostas síncronas preparadas pelo laboratório.");
+    }
+
     async function runPlugin(script) {
       try {
         const execute = new Function(
@@ -557,8 +582,17 @@
           "self",
           `"use strict";\nreturn eval(${JSON.stringify(script)});`
         );
-        const resolvedTarget = await Promise.resolve(
-          execute(sourceWindow, document, sourceLocation, labHistory, labFetch, LabXMLHttpRequest, sourceWindow, sourceWindow)
+        const resolvedTarget = await runWithSynchronousPriming(
+          () => Promise.resolve(execute(
+            sourceWindow,
+            document,
+            sourceLocation,
+            labHistory,
+            labFetch,
+            LabXMLHttpRequest,
+            sourceWindow,
+            sourceWindow
+          ))
         );
         if (typeof resolvedTarget === "string" && /^https?:\/\//i.test(resolvedTarget)) {
           currentUrl = resolvedTarget;
@@ -568,8 +602,9 @@
         const selectedChapter = plan.chapters.find((chapter) => String(chapter?.id ?? "") === selectedChapterId);
         const prepare = window.__nyxoviraPrepareDownloadPlan || window.Nyxovira?.prepareDownloadPlan;
         if (typeof prepare === "function") {
-          await primeSynchronousResponse(selectedChapter?.url || selectedChapter?.href);
-          const prepared = await prepare({ selectedChapterIds: [selectedChapterId], chapterPlan: plan });
+          const prepared = await runWithSynchronousPriming(
+            () => Promise.resolve(prepare({ selectedChapterIds: [selectedChapterId], chapterPlan: plan }))
+          );
           if (prepared) plan = typeof prepared === "string" ? JSON.parse(prepared) : prepared;
         }
         const fallback = window.__nyxoviraChapterPlan;
