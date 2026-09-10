@@ -4,7 +4,13 @@ import test from "node:test";
 
 const read = relativePath => readFileSync(new URL(`../${relativePath}`, import.meta.url), "utf8");
 const lab = read("nyxovira/plugin-api/tester/lab.js");
+const labPage = read("nyxovira/plugin-api/tester/index.html");
 const worker = read("plugin-lab-worker/src/index.js");
+
+test("published lab page cache-busts the runtime after fixes", () => {
+  assert.match(labPage, /lab\.js\?v=20260910-plumacomics-fix/);
+  assert.doesNotMatch(labPage, /src="\.\/lab\.js"/);
+});
 
 test("web lab executes dynamic source modules instead of discarding them", () => {
   assert.doesNotMatch(lab, /if \(source\.type === "module"\) continue/);
