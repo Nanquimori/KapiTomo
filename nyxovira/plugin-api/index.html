@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nyxovira Plugin API</title>
     <meta name="description" content="Create personal Nyxovira plugins or host an independent external plugin catalog.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/">
@@ -11,134 +12,839 @@
     <meta property="og:description" content="Technical documentation, minimum manifest, AI prompt builder, testing, and external catalog format.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/">
-    <title>Nyxovira Plugin API</title>
-    <link rel="icon" type="image/png" href="../../assets/kapitomo-logo.png">
+    <meta name="kapitomo-doc-revision" content="20260910-original-layout">
+    <link rel="icon" type="image/png" href="../../assets/kapitomo-logo.png?v=20260704-plugin-api-en">
+    <link rel="apple-touch-icon" href="../../assets/kapitomo-logo.png?v=20260704-plugin-api-en">
     <style>
-      :root { color-scheme: dark; --bg:#080a0d; --panel:#11161d; --soft:#171e27; --line:#2b3543; --text:#f5f6f8; --muted:#aab5c2; --accent:#ff6534; --accent2:#ff8a67; --code:#090c10; }
-      * { box-sizing:border-box; }
-      html { background:var(--bg); scroll-behavior:smooth; }
-      body { margin:0; overflow-x:hidden; color:var(--text); background:radial-gradient(circle at 15% 0,rgba(255,101,52,.12),transparent 34rem),var(--bg); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
-      a { color:var(--accent2); }
-      button,input,textarea { font:inherit; }
-      code { color:#ffd0bf; }
-      pre { overflow:auto; margin:16px 0; padding:17px; border:1px solid var(--line); border-radius:14px; color:#e8edf3; background:var(--code); line-height:1.55; }
-      pre code { color:inherit; }
-      .shell { width:calc(100% - 28px); max-width:1160px; min-width:0; margin:auto; padding:18px 0 60px; }
-      .topbar { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:4px 0 28px; }
-      .brand { display:inline-flex; align-items:center; gap:10px; color:var(--text); text-decoration:none; font-weight:800; }
-      .brand img { width:34px; height:34px; border-radius:10px; }
-      .nav { display:flex; align-items:center; flex-wrap:wrap; justify-content:flex-end; gap:8px; }
-      .nav a,.language button { min-height:40px; border:1px solid var(--line); border-radius:11px; padding:9px 13px; color:var(--text); background:rgba(17,22,29,.9); text-decoration:none; cursor:pointer; }
-      .language { display:inline-flex; padding:3px; border:1px solid var(--line); border-radius:11px; }
-      .language button { min-height:32px; border:0; padding:5px 9px; background:transparent; }
-      .language button[aria-pressed="true"] { color:#111; background:var(--accent); }
-      article,.hero,.panel { min-width:0; max-width:100%; }
-      .hero,.panel { border:1px solid var(--line); border-radius:22px; background:linear-gradient(145deg,rgba(23,30,39,.96),rgba(13,17,22,.97)); box-shadow:0 20px 55px rgba(0,0,0,.28); }
-      .hero { padding:clamp(28px,6vw,64px); margin-bottom:22px; }
-      .eyebrow { margin:0 0 12px; color:var(--accent2); font-size:.78rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
-      h1 { margin:0; font-size:clamp(30px,3.6vw,44px); line-height:1.03; letter-spacing:-.035em; }
-      h2 { margin:0 0 15px; font-size:clamp(21px,2.2vw,28px); letter-spacing:-.02em; }
-      h3 { margin:22px 0 10px; font-size:1.08rem; }
-      p,li { color:var(--muted); line-height:1.7; }
-      .hero p:last-child { max-width:74ch; margin:18px 0 0; font-size:1.05rem; }
-      .panel { margin-top:18px; padding:clamp(22px,4vw,38px); }
-      .prompt-panel { border-color:rgba(255,101,52,.52); box-shadow:0 0 0 1px rgba(255,101,52,.08),0 22px 70px rgba(0,0,0,.34); }
-      .prompt-badge { display:inline-flex; margin-bottom:12px; border-radius:999px; padding:7px 11px; color:#111; background:var(--accent); font-size:.76rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
-      .field { display:grid; gap:8px; margin-top:16px; }
-      .field label { font-weight:800; }
-      .field input,.field textarea { width:100%; border:1px solid var(--line); border-radius:13px; padding:12px 14px; color:var(--text); background:var(--code); outline:none; }
-      .field input:focus,.field textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(255,101,52,.14); }
-      .field textarea { min-height:260px; resize:vertical; line-height:1.55; }
-      .mode-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
-      .mode { border:1px solid var(--line); border-radius:14px; padding:15px; color:var(--text); background:var(--code); text-align:left; cursor:pointer; }
-      .mode strong,.mode span { display:block; }
-      .mode span { margin-top:5px; color:var(--muted); font-size:.9rem; line-height:1.45; }
-      .mode[aria-pressed="true"] { border-color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent); }
-      .copy-row { display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin-top:12px; }
-      .button { min-height:43px; border:1px solid var(--accent); border-radius:12px; padding:10px 15px; color:#111; background:var(--accent); font-weight:850; cursor:pointer; }
-      .copy-status { color:var(--muted); }
-      .path-grid,.check-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
-      .path-grid article,.check-grid article,.note { border:1px solid var(--line); border-radius:15px; padding:17px; background:rgba(8,10,13,.38); }
-      .path-grid h3,.check-grid h3 { margin:0 0 7px; }
-      .path-grid p,.check-grid p,.note p { margin:0; }
-      table { width:100%; border-collapse:collapse; margin:16px 0; }
-      th,td { padding:11px; border:1px solid var(--line); text-align:left; vertical-align:top; color:var(--muted); }
-      th { color:var(--text); background:var(--soft); }
-      .toc { display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; }
-      .toc a { border:1px solid var(--line); border-radius:999px; padding:7px 11px; color:var(--text); text-decoration:none; }
-      .warning { border-left:4px solid var(--accent); }
-      .footer { padding:28px 4px 0; color:var(--muted); text-align:center; }
-      [hidden] { display:none !important; }
-      @media (max-width:860px) {
-        h1 { font-size:22px; }
-        h2 { font-size:19px; }
-        .topbar { align-items:stretch; flex-direction:column; }
-        .nav { width:100%; max-width:100%; justify-content:flex-start; }
-        .nav a { min-width:0; max-width:100%; }
-        table { display:block; max-width:100%; overflow-x:auto; }
-        .mode-grid,.path-grid,.check-grid { grid-template-columns:1fr; }
+      :root {
+        color-scheme: dark;
+        --bg: #08060d;
+        --surface: #12101a;
+        --surface-strong: #1b1727;
+        --line: rgba(255, 255, 255, 0.14);
+        --text: #f8f4ff;
+        --muted: #cfc6dc;
+        --soft: #9d91ad;
+        --accent: #ff7b58;
+        --accent-2: #f4b247;
+        --violet: #7758d3;
+        --green: #9ce6d0;
+        --font-ui: "Aptos", "Segoe UI", Arial, sans-serif;
+        --font-code: Consolas, "Cascadia Mono", monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+        min-width: 0;
+      }
+
+      html {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+      }
+
+      body {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        overflow-x: hidden;
+        background:
+          linear-gradient(145deg, rgba(255, 123, 88, 0.16), transparent 35rem),
+          linear-gradient(235deg, rgba(119, 88, 211, 0.2), transparent 40rem),
+          linear-gradient(180deg, #050409 0%, #0d0a14 46%, #151021 100%);
+        color: var(--text);
+        font-family: var(--font-ui);
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .page {
+        width: min(1180px, calc(100% - 28px));
+        margin: 0 auto;
+        padding: 18px 0 52px;
+        overflow-x: hidden;
+      }
+
+      .topbar,
+      .actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .topbar {
+        justify-content: space-between;
+        padding: 10px 0 18px;
+      }
+
+      .language-switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.035);
+        padding: 4px;
+      }
+
+      .language-button {
+        min-height: 26px;
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        padding: 0 8px;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      .language-button[aria-pressed="true"] {
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        color: #160800;
+      }
+
+      .doc-version[hidden],
+      .localized-download[hidden] {
+        display: none !important;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+      }
+
+      .brand img {
+        width: 40px;
+        height: 40px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+      }
+
+      .brand strong {
+        display: block;
+        line-height: 1.1;
+      }
+
+      .brand span {
+        display: block;
+        color: var(--soft);
+        font-size: 12px;
+      }
+
+      .button {
+        min-height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        padding: 0 10px;
+        font-size: 12px;
+        font-weight: 800;
+        text-decoration: none;
+      }
+
+      .button.primary {
+        border-color: rgba(255, 123, 88, 0.56);
+        background: linear-gradient(135deg, #b62038, var(--accent));
+      }
+
+      .hero,
+      .panel {
+        border: 1px solid var(--line);
+        background: rgba(18, 16, 26, 0.92);
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+        overflow: hidden;
+      }
+
+      .stripe {
+        height: 9px;
+        background: linear-gradient(90deg, #b62038, var(--violet), var(--accent-2));
+      }
+
+      .hero-inner {
+        padding: clamp(18px, 2.5vw, 28px);
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        max-width: 920px;
+        font-size: clamp(30px, 3.6vw, 44px);
+        line-height: 1.04;
+        font-weight: 900;
+        letter-spacing: -0.025em;
+        overflow-wrap: break-word;
+      }
+
+      h2 {
+        margin-bottom: 12px;
+        font-size: clamp(21px, 2.2vw, 28px);
+        line-height: 1.12;
+        letter-spacing: -0.015em;
+      }
+
+      h3 {
+        margin-bottom: 8px;
+        font-size: 18px;
+      }
+
+      p,
+      li {
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .hero p {
+        max-width: 760px;
+        margin-top: 12px;
+        font-size: 16px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 14px;
+        align-items: start;
+      }
+
+      .content {
+        display: grid;
+        gap: 12px;
+      }
+
+      .panel {
+        padding: clamp(16px, 2vw, 22px);
+      }
+
+      .api-subheading {
+        margin-top: 24px;
+      }
+
+      .panel h2 + .api-subheading {
+        margin-top: 0;
+      }
+
+      .panel-copy-after-list {
+        margin-top: 16px;
+      }
+
+      .prompt-panel {
+        position: relative;
+        padding: clamp(18px, 2.6vw, 30px);
+        border: 1px solid rgba(255, 178, 71, 0.62);
+        background:
+          radial-gradient(circle at 92% 8%, rgba(119, 88, 211, 0.3), transparent 29rem),
+          linear-gradient(145deg, rgba(182, 32, 56, 0.2), rgba(18, 16, 26, 0.97) 46%);
+        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.5), 0 0 34px rgba(255, 123, 88, 0.08);
+        overflow: hidden;
+      }
+
+      .prompt-panel::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 5px;
+        background: linear-gradient(180deg, var(--accent-2), var(--accent), var(--violet));
+      }
+
+      .prompt-kicker {
+        display: inline-flex;
+        margin-bottom: 10px;
+        border: 1px solid rgba(255, 178, 71, 0.5);
+        background: rgba(255, 178, 71, 0.1);
+        color: #ffd998;
+        padding: 5px 9px;
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .prompt-intro {
+        max-width: 820px;
+      }
+
+      .prompt-grid {
+        display: grid;
+        grid-template-columns: minmax(250px, 0.72fr) minmax(0, 1.28fr);
+        gap: 16px;
+        margin-top: 18px;
+      }
+
+      .prompt-controls,
+      .prompt-output-shell {
+        border: 1px solid var(--line);
+        background: rgba(5, 4, 9, 0.62);
+        padding: 14px;
+      }
+
+      .prompt-field-label,
+      .prompt-type-label,
+      .prompt-output-title {
+        display: block;
+        color: var(--text);
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .prompt-url {
+        width: 100%;
+        min-height: 42px;
+        margin-top: 7px;
+        border: 1px solid rgba(156, 230, 208, 0.32);
+        background: #08070d;
+        color: var(--text);
+        padding: 9px 11px;
+        font: 13px var(--font-code);
+        outline: none;
+      }
+
+      .prompt-url:focus {
+        border-color: var(--green);
+        box-shadow: 0 0 0 3px rgba(156, 230, 208, 0.1);
+      }
+
+      .prompt-type {
+        margin: 16px 0 0;
+        padding: 0;
+        border: 0;
+      }
+
+      .prompt-modes {
+        display: grid;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .prompt-mode {
+        width: 100%;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.035);
+        color: var(--text);
+        padding: 11px;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .prompt-mode strong,
+      .prompt-mode span {
+        display: block;
+      }
+
+      .prompt-mode strong {
+        margin-bottom: 4px;
+        font-size: 13px;
+      }
+
+      .prompt-mode span {
+        color: var(--soft);
+        font-size: 11px;
+        line-height: 1.45;
+      }
+
+      .prompt-mode[aria-pressed="true"] {
+        border-color: rgba(255, 178, 71, 0.78);
+        background: linear-gradient(135deg, rgba(182, 32, 56, 0.34), rgba(119, 88, 211, 0.24));
+        box-shadow: inset 4px 0 0 var(--accent-2);
+      }
+
+      .prompt-mode[aria-pressed="true"] span {
+        color: var(--muted);
+      }
+
+      .prompt-mode:focus-visible,
+      .prompt-copy:focus-visible {
+        outline: 3px solid rgba(255, 178, 71, 0.38);
+        outline-offset: 2px;
+      }
+
+      .prompt-output-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+
+      .prompt-copy {
+        min-height: 36px;
+        border: 1px solid rgba(255, 123, 88, 0.72);
+        background: linear-gradient(135deg, #b62038, var(--accent));
+        color: #fff;
+        padding: 0 13px;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      .prompt-copy[data-state="copied"] {
+        border-color: rgba(156, 230, 208, 0.76);
+        background: rgba(156, 230, 208, 0.16);
+        color: var(--green);
+      }
+
+      .prompt-output {
+        display: block;
+        width: 100%;
+        min-height: 300px;
+        resize: vertical;
+        border: 1px solid rgba(156, 230, 208, 0.22);
+        background: #07060b;
+        color: #e8fff7;
+        padding: 14px;
+        font: 12px/1.58 var(--font-code);
+        outline: none;
+      }
+
+      .prompt-output:focus {
+        border-color: rgba(156, 230, 208, 0.56);
+      }
+
+      .prompt-status {
+        min-height: 18px;
+        margin-top: 7px;
+        color: var(--soft);
+        font-size: 11px;
+      }
+
+      .table-wrap {
+        max-width: 100%;
+        overflow-x: auto;
+        border: 1px solid var(--line);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 620px;
+      }
+
+      th,
+      td {
+        border-bottom: 1px solid var(--line);
+        padding: 12px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      code,
+      pre {
+        font-family: var(--font-code);
+      }
+
+      code {
+        color: var(--green);
+        overflow-wrap: anywhere;
+        word-break: break-word;
+      }
+
+      pre {
+        max-width: 100%;
+        overflow-x: auto;
+        margin: 14px 0 0;
+        padding: 16px;
+        border: 1px solid rgba(156, 230, 208, 0.22);
+        background: #07060b;
+        color: #e8fff7;
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .folder {
+        max-width: 100%;
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.04);
+        padding: 18px;
+        font-family: var(--font-code);
+        color: var(--green);
+        line-height: 1.8;
+      }
+
+      .tag-groups,
+      .rule-list {
+        display: grid;
+        gap: 12px;
+        margin-top: 14px;
+      }
+
+      .tag-group,
+      .rule-list article {
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.035);
+        padding: 12px;
+      }
+
+      .tag-group h3,
+      .rule-list h3 {
+        margin-bottom: 8px;
+      }
+
+      .tag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .tag-list code {
+        display: inline-flex;
+        border: 1px solid rgba(156, 230, 208, 0.24);
+        background: rgba(156, 230, 208, 0.07);
+        padding: 3px 7px;
+      }
+
+      .steps {
+        counter-reset: step;
+        display: grid;
+        gap: 12px;
+      }
+
+      .step {
+        counter-increment: step;
+        display: grid;
+        grid-template-columns: 42px minmax(0, 1fr);
+        gap: 8px;
+        align-items: center;
+      }
+
+      .step p {
+        transform: translateY(4px);
+      }
+
+      .step::before {
+        content: counter(step);
+        width: 34px;
+        height: 34px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        color: #150700;
+        font-weight: 950;
+        align-self: center;
+        transform: translateY(4px);
+      }
+
+      @media (max-width: 860px) {
+        body {
+          font-size: 14px;
+          width: auto;
+          max-width: 100%;
+        }
+
+        .page {
+          width: 100%;
+          max-width: none;
+          margin: 0;
+          padding: 8px 8px 34px;
+        }
+
+        .topbar,
+        .hero,
+        .grid,
+        .content,
+        .panel {
+          width: 100%;
+          max-width: 100%;
+        }
+
+        .actions {
+          width: 100%;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          overflow: hidden;
+        }
+
+        .button {
+          min-height: 30px;
+          padding: 0 8px;
+          overflow: hidden;
+          font-size: 10px;
+          text-align: center;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .actions .button {
+          flex: 0 0 auto;
+          width: auto;
+          min-width: 0;
+        }
+
+        .language-switch {
+          flex: 0 0 auto;
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-inner {
+          width: 100%;
+          max-width: 100%;
+          gap: 14px;
+          padding: 14px;
+        }
+
+        h1 {
+          max-width: none;
+          font-size: 22px;
+          line-height: 1.06;
+          letter-spacing: -0.015em;
+        }
+
+        h2 {
+          margin-bottom: 10px;
+          font-size: 19px;
+          line-height: 1.12;
+        }
+
+        h3 {
+          font-size: 16px;
+        }
+
+        p,
+        li {
+          line-height: 1.55;
+        }
+
+        .hero p {
+          max-width: none;
+          margin-top: 10px;
+          font-size: 12px;
+        }
+
+        .content {
+          gap: 10px;
+        }
+
+        .panel {
+          padding: 12px;
+        }
+
+        .prompt-panel {
+          padding: 15px 13px 14px 17px;
+        }
+
+        .prompt-grid {
+          grid-template-columns: 1fr;
+          gap: 10px;
+          margin-top: 14px;
+        }
+
+        .prompt-controls,
+        .prompt-output-shell {
+          padding: 10px;
+        }
+
+        .prompt-output-head {
+          align-items: stretch;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .prompt-copy {
+          width: 100%;
+        }
+
+        .prompt-output {
+          min-height: 360px;
+          padding: 10px;
+          font-size: 10px;
+        }
+
+        table {
+          min-width: 0;
+          table-layout: fixed;
+        }
+
+        th,
+        td {
+          padding: 9px;
+          overflow-wrap: anywhere;
+        }
+
+        pre {
+          padding: 10px;
+          font-size: 10px;
+          line-height: 1.4;
+        }
+
+        .folder {
+          padding: 10px;
+          font-size: 11px;
+        }
+
+        .step {
+          grid-template-columns: 32px minmax(0, 1fr);
+          gap: 6px;
+        }
+
+        .step::before {
+          width: 28px;
+          height: 28px;
+          font-size: 13px;
+        }
+
+        .topbar {
+          align-items: flex-start;
+          flex-direction: column;
+          gap: 10px;
+          padding: 8px 0 12px;
+        }
+      }
+
+      @media (max-width: 340px) {
+        .page {
+          padding-left: 6px;
+          padding-right: 6px;
+        }
+
+        h1 {
+          font-size: 20px;
+        }
+
+        .button {
+          white-space: normal;
+        }
       }
     </style>
   </head>
   <body>
-    <main class="shell">
+    <div class="page">
       <header class="topbar">
-        <a class="brand" href="../../"><img src="../../assets/kapitomo-logo.png" alt=""><span>KapiTomo</span></a>
-        <nav class="nav" aria-label="Documentation">
-          <a href="../../plugins/" data-copy-en="Official plugins" data-copy-pt="Plugins oficiais">Official plugins</a>
-          <a href="./PLUGIN_API.md">Markdown EN</a>
-          <a href="./PLUGIN_API.pt-BR.md">Markdown PT</a>
-          <div class="language" aria-label="Language">
-            <button type="button" data-language-option="en" aria-pressed="true">EN</button>
-            <button type="button" data-language-option="pt" aria-pressed="false">PT</button>
+        <a class="brand" href="../../">
+          <img src="../../assets/kapitomo-logo.png" alt="">
+          <span>
+            <strong data-brand-title>Nyxovira Plugin API</strong>
+            <span data-brand-subtitle>KapiTomo documentation</span>
+          </span>
+        </a>
+        <div class="actions">
+          <a class="button" href="../../plugins/" data-official-link>Official plugins</a>
+          <div class="language-switch" aria-label="Documentation language">
+            <button class="language-button" type="button" data-set-lang="en" aria-pressed="true">EN</button>
+            <button class="language-button" type="button" data-set-lang="pt" aria-pressed="false">PT</button>
           </div>
-        </nav>
+          <a class="button primary localized-download" data-download-lang="en" href="PLUGIN_API.md" download>Download Markdown</a>
+          <a class="button primary localized-download" data-download-lang="pt" href="PLUGIN_API.pt-BR.md" download hidden>Baixar Markdown</a>
+        </div>
       </header>
 
-      <article data-document-language="en" lang="en">
-        <section class="hero">
-          <p class="eyebrow">Nyxovira Plugin API</p>
-          <h1>Create a plugin for personal use or an independent catalog</h1>
-          <p>Start with the real minimum Nyxovira needs, map the source carefully, test it in the app, and publish it only on your own external catalog when you choose to distribute it.</p>
-          <nav class="toc" aria-label="Sections">
-            <a href="#prompt-builder">AI prompt</a><a href="#files">Files</a><a href="#mapping">Site mapping</a><a href="#testing">Testing</a><a href="#external-catalog">External catalog</a>
-          </nav>
-        </section>
+      <div class="doc-version" data-lang-view="en">
+      <section class="hero">
+        <div class="stripe"></div>
+        <div class="hero-inner">
+          <div>
+            <h1>Create plugins for Nyxovira</h1>
+            <p>
+              A plugin connects Nyxovira to a reading site, shows the chapter list quickly, and prepares only the
+              chapters selected by the user.
+            </p>
+          </div>
+        </div>
+      </section>
 
-        <section id="prompt-builder" class="panel prompt-panel" data-prompt-builder data-prompt-language="en" data-prompt-mode="personal">
-          <span class="prompt-badge">AI prompt · copy in one click</span>
-          <h2>Generate a complete request for an AI</h2>
-          <p>Enter the source website and choose where the finished plugin will be used. The prompt includes research, implementation, testing, and delivery requirements.</p>
-          <div class="field"><label>Source website URL</label><input type="url" value="https://example.com/" autocomplete="off" autocapitalize="off" spellcheck="false" data-prompt-url></div>
-          <div class="field">
-            <label>Use type</label>
-            <div class="mode-grid">
-              <button class="mode" type="button" data-prompt-mode-option="personal" aria-pressed="true"><strong>Personal plugin</strong><span>Only the files needed to import and use it locally.</span></button>
-              <button class="mode" type="button" data-prompt-mode-option="external" aria-pressed="false"><strong>Independent external catalog</strong><span>Plugin, public repository, catalog page, JSON, and install button.</span></button>
+      <main class="grid">
+        <div class="content">
+          <section id="prompt-builder" class="panel prompt-panel" data-prompt-builder data-prompt-language="en" data-prompt-mode="personal">
+            <span class="prompt-kicker">AI prompt · copy in one click</span>
+            <h2>Generate an AI prompt to create your plugin</h2>
+            <p class="prompt-intro">Enter the source site and choose how the plugin will be used. Copy the result into the conversation with the AI that will create the plugin. Personal use and an independent external catalog stay clearly separated.</p>
+            <div class="prompt-grid">
+              <div class="prompt-controls">
+                <label class="prompt-field-label">Source site URL
+                  <input class="prompt-url" type="url" value="https://example.com/" placeholder="https://example.com/" autocomplete="off" autocapitalize="off" spellcheck="false" data-prompt-url>
+                </label>
+                <fieldset class="prompt-type">
+                  <legend class="prompt-type-label">How will you use this plugin?</legend>
+                  <div class="prompt-modes">
+                    <button class="prompt-mode" type="button" data-prompt-mode-option="personal" aria-pressed="true">
+                      <strong>Personal use</strong>
+                      <span>Only the minimum needed to import and use it on your device.</span>
+                    </button>
+                    <button class="prompt-mode" type="button" data-prompt-mode-option="external" aria-pressed="false">
+                      <strong>Independent external catalog</strong>
+                      <span>Creates the plugin, a public repository, your own HTTPS catalog page and its installation button.</span>
+                    </button>
+                  </div>
+                </fieldset>
+              </div>
+              <div class="prompt-output-shell">
+                <div class="prompt-output-head">
+                  <span class="prompt-output-title">Prompt ready to send to an AI assistant</span>
+                  <button class="prompt-copy" type="button" data-copy-prompt data-copy-default="Copy prompt" data-copy-success="Prompt copied">Copy prompt</button>
+                </div>
+                <textarea class="prompt-output" rows="13" readonly spellcheck="false" aria-label="Generated plugin request" data-prompt-output>Create a Nyxovira plugin for personal use for the site "https://example.com/", following the official documentation: "https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/".</textarea>
+                <p class="prompt-status" aria-live="polite" data-copy-status>Change the URL or mode; the prompt updates automatically.</p>
+              </div>
             </div>
-          </div>
-          <div class="field"><label>Generated prompt</label><textarea readonly spellcheck="false" data-prompt-output aria-label="Generated AI prompt"></textarea></div>
-          <div class="copy-row"><button class="button" type="button" data-copy-prompt>Copy prompt</button><span class="copy-status" data-copy-status aria-live="polite"></span></div>
-        </section>
+          </section>
 
-        <section class="panel">
-          <h2>Developer path</h2>
-          <div class="path-grid">
-            <article><h3>1. Create the files</h3><p>Start with the minimum manifest and add a browser script only when the generic detector is insufficient.</p></article>
-            <article><h3>2. Map the source</h3><p>Find stable work, chapter, text, and image data before choosing selectors or endpoints.</p></article>
-            <article><h3>3. Test in Nyxovira</h3><p>Import the local folder, open the site, list chapters, and complete a real download.</p></article>
-            <article><h3>4. Choose distribution</h3><p>Keep it local or host your own independent catalog. KapiTomo does not receive external plugins.</p></article>
-          </div>
-        </section>
+          <section class="panel">
+            <h2>Developer path</h2>
+            <div class="rule-list">
+              <article><h3>1. <a href="#files">Create the plugin</a></h3><p>Prepare <code>plugin.json</code>, map the site, and build chapter downloads.</p></article>
+              <article><h3>2. <a href="#testing">Test through Import plugins</a></h3><p>Import the local folder into Nyxovira and repeat the test while developing.</p></article>
+              <article><h3>3. Keep it for yourself</h3><p>If only you will use the plugin, no publication, catalog, or website is required.</p></article>
+              <article><h3>4. <a href="#external-sites">Create an external catalog</a></h3><p>Choose this only when you want to maintain your own independent distribution of ready plugins.</p></article>
+            </div>
+          </section>
 
-        <section id="files" class="panel">
-          <h2>Plugin files and real minimum</h2>
-          <pre><code>my-plugin/
-|-- plugin.json
-`-- browser/
-    `-- download_target.js</code></pre>
-          <p><code>browser/download_target.js</code> is optional when Nyxovira's generic page detector already recognizes the work and chapters.</p>
-          <pre><code>{
+          <section id="overview" class="panel">
+            <h2>How a plugin works</h2>
+            <div class="steps">
+              <div class="step"><p>The creator starts with the small <code>plugin.json</code> that Nyxovira needs. A site-specific script is added when generic page recognition is not enough.</p></div>
+              <div class="step"><p>During development, the creator imports the local plugin folder into Nyxovira and tests it on the supported site.</p></div>
+              <div class="step"><p>The plugin may remain private. Publication is optional and happens only after testing.</p></div>
+              <div class="step"><p>When present, the browser script handles site-specific work and chapter recognition. Without it, Nyxovira tries its generic page detector.</p></div>
+            </div>
+          </section>
+
+          <section id="files" class="panel">
+            <h2>Plugin files</h2>
+            <p>Start with the manifest in a non-empty plugin folder. Add the browser script when site-specific recognition is needed.</p>
+            <div class="folder">
+              my-plugin/<br>
+              |-- plugin.json<br>
+              `-- browser/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;`-- download_target.js
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>File</th><th>Purpose</th></tr></thead>
+                <tbody>
+                  <tr><td><code>plugin.json</code></td><td>Identifies the supported site. Only a few fields are needed for a personal plugin.</td></tr>
+                  <tr><td><code>browser/download_target.js</code></td><td>Optional for import, but recommended when generic detection cannot build the correct chapter plan.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section id="manifest" class="panel">
+            <h2>plugin.json</h2>
+            <h3 class="api-subheading">Minimum for personal use</h3>
+            <p>This is the smallest practical manifest for a plugin imported directly into Nyxovira:</p>
+            <pre><code>{
   "id": "my-plugin",
   "match": { "hosts": ["example.com"] },
   "browser": {
@@ -146,398 +852,866 @@
     "download_target_script_file": "browser/download_target.js"
   }
 }</code></pre>
-          <p>Nyxovira needs valid JSON, a non-empty folder name or <code>id</code>, at least one <code>match.hosts</code> value, and <code>browser.home_url</code>. For personal use, <code>name</code>, <code>version</code>, <code>tags</code>, <code>schema_version</code>, <code>parser</code>, GitHub, and a public catalog are not required.</p>
-          <table>
-            <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
-            <tbody>
-              <tr><td><code>id</code></td><td>Stable identifier; strongly recommended. Otherwise the folder name is used.</td></tr>
-              <tr><td><code>match.hosts</code></td><td>Required source domains recognized by the plugin.</td></tr>
-              <tr><td><code>browser.home_url</code></td><td>Required page opened by the app browser.</td></tr>
-              <tr><td><code>browser.download_target_script_file</code></td><td>Optional site-specific work and chapter logic.</td></tr>
-              <tr><td><code>browser.icon_url</code></td><td>Optional for personal use. Prefer the site's own stable public favicon or logo when available.</td></tr>
-              <tr><td><code>tags</code></td><td>Not required for personal use. Optional metadata for filters in an external catalog.</td></tr>
-            </tbody>
-          </table>
-        </section>
+            <p>To load the source, Nyxovira only needs valid JSON, a non-empty folder name or <code>id</code>, at least one <code>match.hosts</code> entry, and <code>browser.home_url</code>. The example also names the browser script because it is the reliable way to recognize works and chapters. Without it, Nyxovira tries generic page detection, which may not understand every site.</p>
+            <p><strong>Not required for personal use:</strong> <code>schema_version</code>, <code>name</code>, <code>version</code>, <code>tags</code>, <code>browser.icon_mode</code>, <code>browser.short_label</code>, <code>parser</code>, GitHub, a catalog, or a plugin website. If the site provides a stable public favicon or logo, use its URL in <code>browser.icon_url</code>; otherwise the icon may be omitted for personal use.</p>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Field</th><th>When it is needed</th></tr></thead>
+                <tbody>
+                  <tr><td><code>id</code></td><td>Strongly recommended; otherwise Nyxovira uses the folder name.</td></tr>
+                  <tr><td><code>match.hosts</code></td><td>Required. Domains recognized by the plugin.</td></tr>
+                  <tr><td><code>browser.home_url</code></td><td>Required. Page opened by the app browser.</td></tr>
+                  <tr><td><code>browser.download_target_script_file</code></td><td>Optional, but recommended for reliable site-specific detection.</td></tr>
+                  <tr><td><code>name</code>, <code>version</code></td><td>Optional for personal use; useful when sharing and updating.</td></tr>
+                  <tr><td><code>tags</code></td><td>Not needed for personal use. Add them only when your own external catalog uses tags for organization or filtering.</td></tr>
+                  <tr><td><code>browser.icon_url</code></td><td>Optional for personal use. Prefer the site's public favicon or logo when one is available.</td></tr>
+                  <tr><td><code>parser</code></td><td>Optional advanced native-parser configuration.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
 
-        <section id="mapping" class="panel">
-          <h2>Map the source before writing selectors</h2>
-          <ul>
-            <li>Check official developer documentation, public APIs, OpenAPI or Swagger files, GraphQL, JSON feeds, and documented endpoints.</li>
-            <li>If an API is not visible or documented, inspect the rendered page, loaded scripts, and browser network requests to identify data used by the site's own interface.</li>
-            <li>Map work routes, chapter routes, order, identifiers, titles, covers, text, images, pagination, infinite scrolling, and dynamic loading.</li>
-            <li>Compare API data with the rendered HTML and choose the most complete and stable source.</li>
-            <li>Record limitations and test with more than one work and chapter.</li>
-          </ul>
-          <pre><code>window.__nyxoviraChapterPlan = {
-  title: document.querySelector("h1")?.textContent?.trim() || document.title,
+          <section id="mapping" class="panel">
+            <h2>Site mapping</h2>
+            <p>Map the site's names to the fields Nyxovira expects: title, cover, chapters, text, and page images.</p>
+            <h3 class="api-subheading">Discover the data source first</h3>
+            <ul>
+              <li>Look for official developer documentation, a public API, OpenAPI or Swagger files, GraphQL, JSON feeds, and documented endpoints.</li>
+              <li>If the API is not linked or documented, inspect the page source, loaded scripts, and the browser's network requests to identify the endpoints used by the site's own interface.</li>
+              <li>Compare the API data with the rendered HTML and use the most complete and stable source for works, chapters, text, and images.</li>
+            </ul>
+            <pre><code>var plugin = {
+  siteBaseUrl: "https://example.com",
+  siteVariable: "EXAMPLE_WORK_INDEX",
+  siteRoutes: {
+    detailsHash: "series",
+    readerHash: "reader"
+  },
+  appRoutes: {
+    publicSeriesPath: "manga",
+    publicChapterPath: "chapter"
+  },
+  fields: {
+    workId: "slug",
+    workTitle: "name",
+    workSummary: "synopsis",
+    workCover: "cover_url",
+    workChapters: "episodes",
+    chapterParagraphs: "text_blocks",
+    chapterPages: "page_urls",
+    imageSource: "url"
+  }
+};</code></pre>
+          </section>
+
+          <section id="chapter-plan" class="panel">
+            <h2>Instant chapter list</h2>
+            <p>When the user taps download, set <code>window.__nyxoviraChapterPlan</code> immediately and return the canonical work URL.</p>
+            <pre><code>window.__nyxoviraChapterPlan = JSON.stringify({
+  title: "Work title",
+  summary: "Short summary",
+  canonicalUrl: "https://example.com/manga/work/",
+  coverUrl: "https://example.com/cover.png",
   chapters: [
-    { id: "chapter-1", title: "Chapter 1", url: "https://example.com/chapter-1" }
-  ]
-};</code></pre>
-          <p>The first download action should return the chapter list quickly. Load full chapter text or image pages only after the user selects chapters whenever the site requires separate chapter requests.</p>
-          <pre><code>window.__nyxoviraPrepareChapter = async function (chapter) {
-  const response = await fetch(chapter.url);
-  const html = await response.text();
-  const page = new DOMParser().parseFromString(html, "text/html");
-  return {
-    id: chapter.id,
-    title: chapter.title,
-    contentType: "novel",
-    paragraphs: [...page.querySelectorAll(".chapter-content p")]
-      .map(node => node.textContent.trim())
-      .filter(Boolean)
-  };
-};</code></pre>
-          <p>Text chapters use <code>paragraphs</code>. Image chapters use <code>pages</code>, with <code>images</code> accepted for compatibility.</p>
-        </section>
-
-        <section id="testing" class="panel">
-          <h2>Test in Nyxovira</h2>
-          <ol>
-            <li>Keep <code>plugin.json</code> and the optional <code>browser</code> folder inside one plugin folder.</li>
-            <li>Open <strong>Sites</strong>, choose <strong>Import plugins</strong>, and select that folder.</li>
-            <li>Open the source and verify work recognition and chapter order.</li>
-            <li>Confirm that the chapter list appears before full chapter data is downloaded.</li>
-            <li>Download selected text and image chapters and open the saved result.</li>
-            <li>Repeat after every mapping change.</li>
-          </ol>
-          <div class="note"><p>If the plugin is only for you, the process ends here. No website, public repository, catalog, or tags are necessary.</p></div>
-        </section>
-
-        <section id="external-catalog" class="panel">
-          <h2>Independent external catalog</h2>
-          <p>Use this only when you want other people to connect your catalog manually. You control the hosting, plugin files, descriptions, updates, and security. The catalog stays separate from KapiTomo.</p>
-          <pre><code>plugin-store/
-|-- index.html
-|-- catalog.json
-`-- plugins/
-    `-- my-plugin/
-        |-- plugin.json
-        `-- browser/
-            `-- download_target.js</code></pre>
-          <h3>Catalog discovery</h3>
-          <pre><code>&lt;meta name="nyxovira-plugin-catalog" content="./catalog.json"&gt;</code></pre>
-          <h3>Catalog format</h3>
-          <pre><code>{
-  "schema_version": 3,
-  "name": "My plugins",
-  "hub_url": "https://example.com/plugin-store/",
-  "plugins": [
     {
-      "id": "my-plugin",
-      "name": "My Plugin",
-      "author": "Your name",
-      "version": "1.0.0",
-      "site_url": "https://source.example/",
-      "icon_url": "https://source.example/favicon.ico",
-      "manifest_url": "./plugins/my-plugin/plugin.json",
-      "tags": ["portuguese", "manga"],
-      "status": "active"
+      id: "chapter-forest-hunt",
+      number: "1",
+      title: "The Forest Hunt",
+      contentType: "novel",
+      paragraphs: ["First paragraph.", "Second paragraph."]
     }
   ]
-}</code></pre>
-          <p><code>hub_url</code> tells Nyxovira which page to open. <code>store_url</code> and <code>homepage</code> are also accepted. Relative <code>manifest_url</code> values are resolved against the catalog URL. A GitHub-hosted entry may instead use <code>repository_url</code>, <code>repository_ref</code>, and <code>plugin_path</code>.</p>
-          <h3>Install button</h3>
-          <pre><code>&lt;button id="install-my-plugin"&gt;Install&lt;/button&gt;
-&lt;p id="install-status"&gt;&lt;/p&gt;
-&lt;script&gt;
-  document.getElementById("install-my-plugin").addEventListener("click", () =&gt; {
-    const status = document.getElementById("install-status");
-    const bridge = window.NyxoviraAndroidBridge || window.ArchiveInkAndroidBridge;
-    if (!bridge || typeof bridge.installCommunityPlugin !== "function") {
-      status.textContent = "Open this page inside Nyxovira.";
+});
+
+return "https://example.com/manga/work/";</code></pre>
+          </section>
+
+          <section id="prepare" class="panel">
+            <h2>Prepare after selection</h2>
+            <p>For large comics or APIs, keep the first plan lightweight. Load page URLs only after the user confirms selected chapters.</p>
+            <pre><code>window.__nyxoviraPrepareDownloadPlan = function (context) {
+  var selectedIds = Array.isArray(context.selectedChapterIds)
+    ? context.selectedChapterIds
+    : [];
+  var plan = context.chapterPlan;
+
+  plan.chapters.forEach(function (chapter) {
+    if (selectedIds.length > 0 && selectedIds.indexOf(chapter.id) < 0) {
       return;
     }
-    const result = JSON.parse(
-      bridge.installCommunityPlugin("https://example.com/plugin-store/catalog.json", "my-plugin") || "{}"
-    );
-    status.textContent = result.message || (result.success ? "Installed." : "Installation failed.");
+
+    var payload = getJson(chapter.chapterDataPath);
+    chapter.pages = payload.pages.map(function (page) {
+      return page.imageUrl;
+    });
+    delete chapter.chapterDataPath;
+  });
+
+  window.__nyxoviraChapterPlan = JSON.stringify(plan);
+  return plan;
+};</code></pre>
+            <p>Nyxovira passes <code>{ selectedChapterIds, chapterPlan }</code>. The function may return the final plan object or a JSON string. If it returns nothing, the app keeps the original plan.</p>
+          </section>
+
+          <section id="formats" class="panel">
+            <h2>Chapter formats</h2>
+            <p>Use <code>paragraphs</code> for novels and <code>pages</code> for image chapters. The app also reads <code>images</code> for compatibility.</p>
+            <pre><code>{
+  "id": "chapter-forest-hunt",
+  "title": "The Forest Hunt",
+  "contentType": "novel",
+  "paragraphs": [
+    "First paragraph.",
+    "Second paragraph."
+  ]
+}</code></pre>
+            <pre><code>{
+  "id": "chapter-arrival",
+  "title": "Arrival at the Ruins",
+  "contentType": "images",
+  "pages": [
+    "https://example.com/page-001.png",
+    "https://example.com/page-002.png"
+  ]
+}</code></pre>
+          </section>
+
+          <section id="testing" class="panel">
+            <h2>Test in Nyxovira</h2>
+            <p>Manual import is the normal development loop and also supports plugins intended only for personal use. Personal import does not validate catalog tags or require you to host an icon. When the site already provides a public favicon or logo, use it in <code>browser.icon_url</code>.</p>
+            <div class="steps">
+              <div class="step"><p>Keep <code>plugin.json</code> and the <code>browser</code> folder together inside the plugin folder.</p></div>
+              <div class="step"><p>In Nyxovira, open <strong>Sites</strong>, tap <strong>Import plugins</strong>, and select the plugin folder. You may also select a parent folder containing several plugin folders.</p></div>
+              <div class="step"><p>Open the supported site and verify work recognition, the chapter list, and the download.</p></div>
+              <div class="step"><p>After changing the files, import the folder again and repeat the test.</p></div>
+            </div>
+            <p class="panel-copy-after-list"><strong>If the plugin is only for you, you are done.</strong> You do not need tags, <code>schema_version</code>, GitHub, a public catalog, or a plugin website. Use the site's favicon or logo when available; you do not need to host a separate icon.</p>
+            <h3 class="api-subheading">If you want to distribute it</h3>
+            <p>Host your own independent external catalog. You control its repository, page, plugin files, descriptions, updates, and security; it is not submitted to KapiTomo.</p>
+          </section>
+
+          <section id="external-sites" class="panel">
+            <h2>External plugin store</h2>
+            <p>Use this option only after the plugins are ready and tested. It is intended for anyone maintaining an independent distribution that may contain their own plugins and plugins from other creators.</p>
+            <p>A minimal external store can use this structure:</p>
+            <div class="folder">
+              plugin-store/<br>
+              |-- index.html<br>
+              |-- catalog.json<br>
+              `-- plugins/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;`-- my-plugin/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-- plugin.json<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-- browser/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-- download_target.js
+            </div>
+            <p class="panel-copy-after-list">Host the folder at a public HTTPS address. The appearance, search, and plugin cards belong to the store itself; Nyxovira only needs to discover the catalog and receive the installation request. Add one object to the <code>plugins</code> list for every distributed plugin and identify its author and source site correctly.</p>
+            <h3 class="api-subheading">Catalog discovery</h3>
+            <p>Declare the catalog in the store's main page. A <code>meta</code> tag with the same name and a <code>content</code> URL is also supported.</p>
+            <pre><code>&lt;link rel="nyxovira-plugin-catalog" href="catalog.json"&gt;</code></pre>
+            <p>Without a declaration, Nyxovira looks for <code>catalog.json</code>, <code>catalog-store.json</code>, and <code>plugins.json</code> in the page's directory. Users may also connect the JSON URL directly.</p>
+            <h3 class="api-subheading">External catalog</h3>
+            <pre><code>{
+  "schema_version": 1,
+  "name": "My plugin store",
+  "hub_url": "https://plugins.example.com/",
+  "plugins": [{
+    "id": "my-plugin",
+    "name": "My Plugin",
+    "author": "Author",
+    "version": "1.0.0",
+    "manifest_url": "plugins/my-plugin/plugin.json",
+    "icon_url": "https://example.com/icon.png",
+      "site_url": "https://example.com/",
+      "status": "active"
+  }]
+}</code></pre>
+            <p><code>hub_url</code> identifies the storefront when a JSON URL is connected directly. <code>store_url</code> and <code>homepage</code> are accepted aliases. Relative URLs are resolved against the catalog URL. Repository-based entries may use <code>repository_url</code>, <code>repository_ref</code>, and <code>plugin_path</code>.</p>
+            <h3 class="api-subheading">Direct installation</h3>
+            <p>This complete example creates the button, explains when the page is open outside the app, and displays the result returned by Nyxovira.</p>
+            <pre><code>&lt;button id="install-my-plugin" type="button"&gt;Install My Plugin&lt;/button&gt;
+&lt;p id="install-status" aria-live="polite"&gt;&lt;/p&gt;
+
+&lt;script&gt;
+  const catalogUrl = new URL("catalog.json", location.href).href;
+  const status = document.querySelector("#install-status");
+
+  document.querySelector("#install-my-plugin").addEventListener("click", () =&gt; {
+    const bridge = globalThis.NyxoviraAndroidBridge
+      || globalThis.ArchiveInkAndroidBridge;
+
+    if (!bridge || typeof bridge.installCommunityPlugin !== "function") {
+      status.textContent = "Open this site from Nyxovira to install.";
+      return;
+    }
+
+    try {
+      const result = JSON.parse(
+        bridge.installCommunityPlugin(
+          catalogUrl,
+          JSON.stringify({ id: "my-plugin" })
+        ) || "{}"
+      );
+      status.textContent = result.message
+        || (result.success ? "Plugin installed." : "Could not install the plugin.");
+    } catch (error) {
+      status.textContent = "Could not complete the installation.";
+    }
   });
 &lt;/script&gt;</code></pre>
-          <div class="note warning"><p>An external catalog is not reviewed by KapiTomo. Publish over HTTPS, keep author and source information accurate, inspect every distributed file, and test installation from the page opened inside Nyxovira.</p></div>
-        </section>
-
-        <section class="panel">
-          <h2>Final checklist</h2>
-          <div class="check-grid">
-            <article><h3>Personal plugin</h3><p>Valid manifest, correct host and home URL, stable mapping, ordered chapters, completed text/image download, and no unnecessary catalog metadata.</p></article>
-            <article><h3>External catalog</h3><p>HTTPS page and JSON, correct author and source, public manifest and icon URLs, independent identity, tested install button, and an update plan.</p></article>
-          </div>
-        </section>
-      </article>
-
-      <article data-document-language="pt" lang="pt-BR" hidden>
-        <section class="hero">
-          <p class="eyebrow">API de Plugins Nyxovira</p>
-          <h1>Crie um plugin para uso pessoal ou para um catálogo independente</h1>
-          <p>Comece pelo mínimo real exigido pelo Nyxovira, mapeie a fonte com cuidado, teste no aplicativo e publique somente em seu próprio catálogo externo quando decidir distribuí-lo.</p>
-          <nav class="toc" aria-label="Seções">
-            <a href="#gerador-de-prompt">Prompt para IA</a><a href="#arquivos">Arquivos</a><a href="#mapeamento">Mapeamento</a><a href="#testes">Testes</a><a href="#catalogo-externo">Catálogo externo</a>
-          </nav>
-        </section>
-
-        <section id="gerador-de-prompt" class="panel prompt-panel" data-prompt-builder data-prompt-language="pt" data-prompt-mode="personal">
-          <span class="prompt-badge">Prompt para IA · copie em um clique</span>
-          <h2>Gere um pedido completo para uma IA</h2>
-          <p>Informe o site da fonte e escolha onde o plugin pronto será usado. O prompt inclui pesquisa, implementação, testes e forma de entrega.</p>
-          <div class="field"><label>URL do site da fonte</label><input type="url" value="https://example.com/" autocomplete="off" autocapitalize="off" spellcheck="false" data-prompt-url></div>
-          <div class="field">
-            <label>Tipo de uso</label>
-            <div class="mode-grid">
-              <button class="mode" type="button" data-prompt-mode-option="personal" aria-pressed="true"><strong>Plugin pessoal</strong><span>Somente os arquivos necessários para importar e usar localmente.</span></button>
-              <button class="mode" type="button" data-prompt-mode-option="external" aria-pressed="false"><strong>Catálogo externo independente</strong><span>Plugin, repositório público, página do catálogo, JSON e botão de instalação.</span></button>
+            <p>When the store is open in a regular browser, the example tells the person to open it from Nyxovira. Inside the app, the button installs the matching plugin from the connected catalog.</p>
+            <h3 class="api-subheading">Before launching your external catalog</h3>
+            <div class="rule-list">
+              <article><p>Host the page, catalog, and plugin files at public HTTPS addresses.</p></article>
+              <article><p>For every plugin, accurately identify the author, source site, and manifest path.</p></article>
+              <article><p>Test the Install button by opening the store from its card under <strong>External sites</strong> in Nyxovira.</p></article>
             </div>
-          </div>
-          <div class="field"><label>Prompt gerado</label><textarea readonly spellcheck="false" data-prompt-output aria-label="Prompt para IA gerado"></textarea></div>
-          <div class="copy-row"><button class="button" type="button" data-copy-prompt>Copiar prompt</button><span class="copy-status" data-copy-status aria-live="polite"></span></div>
-        </section>
+            <h3 class="api-subheading">Test before sharing</h3>
+            <div class="steps">
+              <div class="step"><p>Publish every file over HTTPS.</p></div>
+              <div class="step"><p>In Nyxovira, open <strong>Sites → External sites</strong> and connect the store page or directory.</p></div>
+              <div class="step"><p>Open the connected site from its card and tap <strong>Install</strong>.</p></div>
+              <div class="step"><p>Confirm the message returned by the installation.</p></div>
+            </div>
+          </section>
 
-        <section class="panel">
-          <h2>Caminho do desenvolvedor</h2>
-          <div class="path-grid">
-            <article><h3>1. Criar os arquivos</h3><p>Comece pelo manifesto mínimo e adicione um script do navegador somente quando o detector genérico não for suficiente.</p></article>
-            <article><h3>2. Mapear a fonte</h3><p>Encontre dados estáveis de obra, capítulos, textos e imagens antes de escolher seletores ou endpoints.</p></article>
-            <article><h3>3. Testar no Nyxovira</h3><p>Importe a pasta local, abra o site, liste os capítulos e conclua um download real.</p></article>
-            <article><h3>4. Escolher a distribuição</h3><p>Mantenha o plugin local ou hospede seu próprio catálogo independente. O KapiTomo não recebe plugins externos.</p></article>
-          </div>
-        </section>
+          <section class="panel">
+            <h2>Final checklist</h2>
+            <div class="rule-list">
+              <article>
+                <h3>Personal plugin</h3>
+                <p>Valid JSON, a non-empty folder name (or id), at least one supported host, and a valid home URL. Add a browser script only when generic recognition is insufficient; use <code>paragraphs</code> for novels or <code>pages</code> for comics.</p>
+              </article>
+              <article>
+                <h3>Independent external catalog</h3>
+                <p>Public repository, HTTPS page and catalog; correct author and source-site information; stable public site icon when available; Install button tested by opening the catalog from Nyxovira.</p>
+              </article>
+            </div>
+          </section>
+        </div>
+      </main>
+      </div>
 
-        <section id="arquivos" class="panel">
-          <h2>Arquivos do plugin e mínimo real</h2>
-          <pre><code>meu-plugin/
-|-- plugin.json
-`-- browser/
-    `-- download_target.js</code></pre>
-          <p><code>browser/download_target.js</code> é opcional quando o detector genérico de página do Nyxovira já reconhece corretamente a obra e os capítulos.</p>
-          <pre><code>{
-  "id": "meu-plugin",
+      <div class="doc-version" data-lang-view="pt" hidden>
+      <section class="hero">
+        <div class="stripe"></div>
+        <div class="hero-inner">
+          <div>
+            <h1>Crie plugins para o Nyxovira</h1>
+            <p>
+              Um plugin conecta o Nyxovira a um site de leitura, mostra a lista de capítulos rapidamente e prepara
+              apenas os capítulos escolhidos pelo usuário.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <main class="grid">
+        <div class="content">
+          <section id="gerador-de-prompt" class="panel prompt-panel" data-prompt-builder data-prompt-language="pt" data-prompt-mode="personal">
+            <span class="prompt-kicker">Prompt para IA · copie em um clique</span>
+            <h2>Gere um prompt para uma IA criar seu plugin</h2>
+            <p class="prompt-intro">Informe o site da fonte e escolha como o plugin será usado. Copie o resultado na conversa com a IA que criará o plugin. O uso pessoal e um catálogo externo independente ficam claramente separados.</p>
+            <div class="prompt-grid">
+              <div class="prompt-controls">
+                <label class="prompt-field-label">URL do site da fonte
+                  <input class="prompt-url" type="url" value="https://example.com/" placeholder="https://example.com/" autocomplete="off" autocapitalize="off" spellcheck="false" data-prompt-url>
+                </label>
+                <fieldset class="prompt-type">
+                  <legend class="prompt-type-label">Como você usará este plugin?</legend>
+                  <div class="prompt-modes">
+                    <button class="prompt-mode" type="button" data-prompt-mode-option="personal" aria-pressed="true">
+                      <strong>Uso pessoal</strong>
+                      <span>Somente o mínimo necessário para importar e usar no seu aparelho.</span>
+                    </button>
+                    <button class="prompt-mode" type="button" data-prompt-mode-option="external" aria-pressed="false">
+                      <strong>Catálogo externo independente</strong>
+                      <span>Cria o plugin, um repositório público, sua própria página HTTPS de catálogo e o botão de instalação.</span>
+                    </button>
+                  </div>
+                </fieldset>
+              </div>
+              <div class="prompt-output-shell">
+                <div class="prompt-output-head">
+                  <span class="prompt-output-title">Prompt pronto para enviar a uma IA</span>
+                  <button class="prompt-copy" type="button" data-copy-prompt data-copy-default="Copiar prompt" data-copy-success="Prompt copiado">Copiar prompt</button>
+                </div>
+                <textarea class="prompt-output" rows="13" readonly spellcheck="false" aria-label="Pedido de plugin gerado" data-prompt-output>Crie um plugin Nyxovira para uso pessoal para o site "https://example.com/", seguindo a documentação oficial: "https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/".</textarea>
+                <p class="prompt-status" aria-live="polite" data-copy-status>Altere a URL ou o tipo; o prompt será atualizado automaticamente.</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h2>Caminho do desenvolvedor</h2>
+            <div class="rule-list">
+              <article><h3>1. <a href="#files-pt">Criar o plugin</a></h3><p>Prepare o <code>plugin.json</code>, mapeie o site e monte os downloads de capítulos.</p></article>
+              <article><h3>2. <a href="#testing-pt">Testar por Importar plugins</a></h3><p>Importe a pasta local no Nyxovira e repita o teste enquanto desenvolve.</p></article>
+              <article><h3>3. Usar somente para você</h3><p>Se apenas você usará o plugin, não precisa publicar, criar catálogo nem montar site.</p></article>
+              <article><h3>4. <a href="#external-sites-pt">Criar um catálogo externo</a></h3><p>Escolha isso somente quando quiser manter sua própria distribuição independente de plugins prontos.</p></article>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h2>Como um plugin funciona</h2>
+            <div class="steps">
+              <div class="step"><p>O criador começa pelo pequeno <code>plugin.json</code> de que o Nyxovira precisa. Um script específico do site é adicionado quando o reconhecimento genérico da página não é suficiente.</p></div>
+              <div class="step"><p>Durante o desenvolvimento, o criador importa a pasta local do plugin no Nyxovira e testa no site compatível.</p></div>
+              <div class="step"><p>O plugin pode continuar particular. A publicação é opcional e acontece somente depois dos testes.</p></div>
+              <div class="step"><p>Quando existe, o script cuida do reconhecimento específico da obra e dos capítulos. Sem ele, o Nyxovira tenta usar o detector genérico da página.</p></div>
+            </div>
+          </section>
+
+          <section id="files-pt" class="panel">
+            <h2>Arquivos do plugin</h2>
+            <p>Comece pelo manifesto em uma pasta de plugin com nome não vazio. Adicione o script quando o site exigir reconhecimento específico.</p>
+            <div class="folder">
+              my-plugin/<br>
+              |-- plugin.json<br>
+              `-- browser/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;`-- download_target.js
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Arquivo</th><th>Função</th></tr></thead>
+                <tbody>
+                  <tr><td><code>plugin.json</code></td><td>Identifica o site compatível. Poucos campos são necessários para um plugin pessoal.</td></tr>
+                  <tr><td><code>browser/download_target.js</code></td><td>Opcional para importar, mas recomendado quando o detector genérico não monta o plano correto de capítulos.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h2>plugin.json</h2>
+            <h3 class="api-subheading">Mínimo para uso pessoal</h3>
+            <p>Este é o menor manifesto prático para importar um plugin diretamente no Nyxovira:</p>
+            <pre><code>{
+  "id": "my-plugin",
   "match": { "hosts": ["example.com"] },
   "browser": {
     "home_url": "https://example.com/",
     "download_target_script_file": "browser/download_target.js"
   }
 }</code></pre>
-          <p>O Nyxovira precisa de JSON válido, nome de pasta ou <code>id</code> não vazio, pelo menos um valor em <code>match.hosts</code> e <code>browser.home_url</code>. Para uso pessoal, <code>name</code>, <code>version</code>, <code>tags</code>, <code>schema_version</code>, <code>parser</code>, GitHub e catálogo público não são obrigatórios.</p>
-          <table>
-            <thead><tr><th>Campo</th><th>Significado</th></tr></thead>
-            <tbody>
-              <tr><td><code>id</code></td><td>Identificador estável; muito recomendado. Sem ele, o nome da pasta é usado.</td></tr>
-              <tr><td><code>match.hosts</code></td><td>Domínios obrigatórios reconhecidos pelo plugin.</td></tr>
-              <tr><td><code>browser.home_url</code></td><td>Página obrigatória aberta pelo navegador do aplicativo.</td></tr>
-              <tr><td><code>browser.download_target_script_file</code></td><td>Lógica opcional e específica para obras e capítulos do site.</td></tr>
-              <tr><td><code>browser.icon_url</code></td><td>Opcional no uso pessoal. Prefira o favicon ou logo público e estável do próprio site quando existir.</td></tr>
-              <tr><td><code>tags</code></td><td>Desnecessárias no uso pessoal. Metadados opcionais para filtros em um catálogo externo.</td></tr>
-            </tbody>
-          </table>
-        </section>
+            <p>Para carregar a fonte, o Nyxovira precisa somente de JSON válido, nome de pasta ou <code>id</code> não vazio, pelo menos um item em <code>match.hosts</code> e <code>browser.home_url</code>. O exemplo também indica o script do navegador porque ele é a forma confiável de reconhecer obras e capítulos. Sem ele, o Nyxovira tenta usar o detector genérico da página, que pode não compreender todos os sites.</p>
+            <p><strong>Não exigidos no uso pessoal:</strong> <code>schema_version</code>, <code>name</code>, <code>version</code>, <code>tags</code>, <code>browser.icon_mode</code>, <code>browser.short_label</code>, <code>parser</code>, GitHub, catálogo ou site de plugins. Se o site fornecer um favicon ou logo público e estável, use essa URL em <code>browser.icon_url</code>; se não houver, o ícone pode ser omitido no uso pessoal.</p>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Campo</th><th>Quando é necessário</th></tr></thead>
+                <tbody>
+                  <tr><td><code>id</code></td><td>Fortemente recomendado; se faltar, o Nyxovira usa o nome da pasta.</td></tr>
+                  <tr><td><code>match.hosts</code></td><td>Obrigatório. Domínios reconhecidos pelo plugin.</td></tr>
+                  <tr><td><code>browser.home_url</code></td><td>Obrigatório. Página aberta pelo navegador interno.</td></tr>
+                  <tr><td><code>browser.download_target_script_file</code></td><td>Opcional, mas recomendado para reconhecer corretamente aquele site.</td></tr>
+                  <tr><td><code>name</code>, <code>version</code></td><td>Opcionais no uso pessoal; úteis ao compartilhar e atualizar.</td></tr>
+                  <tr><td><code>tags</code></td><td>Desnecessárias no uso pessoal. Adicione somente se o seu catálogo externo usar tags para organização ou filtros.</td></tr>
+                  <tr><td><code>browser.icon_url</code></td><td>Opcional no uso pessoal. Prefira o favicon ou logo público do próprio site quando estiver disponível.</td></tr>
+                  <tr><td><code>parser</code></td><td>Configuração avançada e opcional do parser nativo.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
 
-        <section id="mapeamento" class="panel">
-          <h2>Mapeie a fonte antes de escrever seletores</h2>
-          <ul>
-            <li>Procure documentação oficial para desenvolvedores, APIs públicas, arquivos OpenAPI ou Swagger, GraphQL, feeds JSON e endpoints documentados.</li>
-            <li>Se uma API não estiver visível ou documentada, examine a página renderizada, os scripts carregados e as requisições de rede do navegador para identificar os dados usados pela interface do próprio site.</li>
-            <li>Mapeie rotas de obra e capítulo, ordem, identificadores, títulos, capas, textos, imagens, paginação, rolagem infinita e carregamento dinâmico.</li>
-            <li>Compare os dados da API com o HTML renderizado e escolha a fonte mais completa e estável.</li>
-            <li>Registre limitações e teste mais de uma obra e mais de um capítulo.</li>
-          </ul>
-          <pre><code>window.__nyxoviraChapterPlan = {
-  title: document.querySelector("h1")?.textContent?.trim() || document.title,
+          <section class="panel">
+            <h2>Mapeamento do site</h2>
+            <p>Relacione os nomes usados pelo site com os campos que o Nyxovira espera: título, capa, capítulos, texto e imagens.</p>
+            <h3 class="api-subheading">Descubra primeiro de onde vêm os dados</h3>
+            <ul>
+              <li>Procure documentação oficial para desenvolvedores, API pública, arquivos OpenAPI ou Swagger, GraphQL, feeds JSON e endpoints documentados.</li>
+              <li>Se a API não estiver visível ou documentada, examine o código da página, os scripts carregados e as requisições de rede do navegador para identificar os endpoints usados pela própria interface do site.</li>
+              <li>Compare os dados da API com o HTML renderizado e use a fonte mais completa e estável para obras, capítulos, textos e imagens.</li>
+            </ul>
+            <pre><code>var plugin = {
+  siteBaseUrl: "https://example.com",
+  siteVariable: "EXAMPLE_WORK_INDEX",
+  siteRoutes: {
+    detailsHash: "series",
+    readerHash: "reader"
+  },
+  appRoutes: {
+    publicSeriesPath: "manga",
+    publicChapterPath: "chapter"
+  },
+  fields: {
+    workId: "slug",
+    workTitle: "name",
+    workSummary: "synopsis",
+    workCover: "cover_url",
+    workChapters: "episodes",
+    chapterParagraphs: "text_blocks",
+    chapterPages: "page_urls",
+    imageSource: "url"
+  }
+};</code></pre>
+          </section>
+
+          <section id="chapter-plan-pt" class="panel">
+            <h2>Lista instantânea de capítulos</h2>
+            <p>Quando o usuário toca em baixar, defina <code>window.__nyxoviraChapterPlan</code> imediatamente e retorne a URL canônica da obra.</p>
+            <pre><code>window.__nyxoviraChapterPlan = JSON.stringify({
+  title: "Work title",
+  summary: "Short summary",
+  canonicalUrl: "https://example.com/manga/work/",
+  coverUrl: "https://example.com/cover.png",
   chapters: [
-    { id: "capitulo-1", title: "Capítulo 1", url: "https://example.com/capitulo-1" }
-  ]
-};</code></pre>
-          <p>O primeiro toque em baixar deve devolver rapidamente a lista de capítulos. Carregue textos completos ou páginas de imagens somente depois que o usuário selecionar capítulos quando o site exigir requisições separadas.</p>
-          <pre><code>window.__nyxoviraPrepareChapter = async function (chapter) {
-  const response = await fetch(chapter.url);
-  const html = await response.text();
-  const page = new DOMParser().parseFromString(html, "text/html");
-  return {
-    id: chapter.id,
-    title: chapter.title,
-    contentType: "novel",
-    paragraphs: [...page.querySelectorAll(".chapter-content p")]
-      .map(node => node.textContent.trim())
-      .filter(Boolean)
-  };
-};</code></pre>
-          <p>Capítulos de texto usam <code>paragraphs</code>. Capítulos de imagens usam <code>pages</code>, com <code>images</code> aceito por compatibilidade.</p>
-        </section>
-
-        <section id="testes" class="panel">
-          <h2>Testar no Nyxovira</h2>
-          <ol>
-            <li>Mantenha <code>plugin.json</code> e a pasta opcional <code>browser</code> dentro de uma única pasta do plugin.</li>
-            <li>Abra <strong>Sites</strong>, escolha <strong>Importar plugins</strong> e selecione essa pasta.</li>
-            <li>Abra a fonte e confira o reconhecimento da obra e a ordem dos capítulos.</li>
-            <li>Confirme que a lista de capítulos aparece antes do download dos dados completos.</li>
-            <li>Baixe capítulos selecionados de texto e imagens e abra o resultado salvo.</li>
-            <li>Repita o teste depois de cada mudança no mapeamento.</li>
-          </ol>
-          <div class="note"><p>Se o plugin é somente para você, o processo termina aqui. Não são necessários site, repositório público, catálogo nem tags.</p></div>
-        </section>
-
-        <section id="catalogo-externo" class="panel">
-          <h2>Catálogo externo independente</h2>
-          <p>Use esta opção somente quando quiser que outras pessoas conectem seu catálogo manualmente. Você controla a hospedagem, os arquivos, as descrições, as atualizações e a segurança. O catálogo permanece separado do KapiTomo.</p>
-          <pre><code>loja-de-plugins/
-|-- index.html
-|-- catalog.json
-`-- plugins/
-    `-- meu-plugin/
-        |-- plugin.json
-        `-- browser/
-            `-- download_target.js</code></pre>
-          <h3>Descoberta do catálogo</h3>
-          <pre><code>&lt;meta name="nyxovira-plugin-catalog" content="./catalog.json"&gt;</code></pre>
-          <h3>Formato do catálogo</h3>
-          <pre><code>{
-  "schema_version": 3,
-  "name": "Meus plugins",
-  "hub_url": "https://example.com/loja-de-plugins/",
-  "plugins": [
     {
-      "id": "meu-plugin",
-      "name": "Meu Plugin",
-      "author": "Seu nome",
-      "version": "1.0.0",
-      "site_url": "https://fonte.example/",
-      "icon_url": "https://fonte.example/favicon.ico",
-      "manifest_url": "./plugins/meu-plugin/plugin.json",
-      "tags": ["portuguese", "manga"],
-      "status": "active"
+      id: "chapter-forest-hunt",
+      number: "1",
+      title: "The Forest Hunt",
+      contentType: "novel",
+      paragraphs: ["First paragraph.", "Second paragraph."]
     }
   ]
-}</code></pre>
-          <p><code>hub_url</code> informa ao Nyxovira qual página abrir. <code>store_url</code> e <code>homepage</code> também são aceitos. Valores relativos de <code>manifest_url</code> são resolvidos a partir da URL do catálogo. Uma entrada hospedada no GitHub pode usar <code>repository_url</code>, <code>repository_ref</code> e <code>plugin_path</code>.</p>
-          <h3>Botão de instalação</h3>
-          <pre><code>&lt;button id="install-my-plugin"&gt;Instalar&lt;/button&gt;
-&lt;p id="install-status"&gt;&lt;/p&gt;
-&lt;script&gt;
-  document.getElementById("install-my-plugin").addEventListener("click", () =&gt; {
-    const status = document.getElementById("install-status");
-    const bridge = window.NyxoviraAndroidBridge || window.ArchiveInkAndroidBridge;
-    if (!bridge || typeof bridge.installCommunityPlugin !== "function") {
-      status.textContent = "Abra esta página dentro do Nyxovira.";
+});
+
+return "https://example.com/manga/work/";</code></pre>
+          </section>
+
+          <section class="panel">
+            <h2>Preparar depois da seleção</h2>
+            <p>Para quadrinhos grandes ou APIs, mantenha o primeiro plano leve. Carregue as URLs das páginas somente depois que o usuário confirmar os capítulos escolhidos.</p>
+            <pre><code>window.__nyxoviraPrepareDownloadPlan = function (context) {
+  var selectedIds = Array.isArray(context.selectedChapterIds)
+    ? context.selectedChapterIds
+    : [];
+  var plan = context.chapterPlan;
+
+  plan.chapters.forEach(function (chapter) {
+    if (selectedIds.length > 0 && selectedIds.indexOf(chapter.id) < 0) {
       return;
     }
-    const result = JSON.parse(
-      bridge.installCommunityPlugin("https://example.com/loja-de-plugins/catalog.json", "meu-plugin") || "{}"
-    );
-    status.textContent = result.message || (result.success ? "Instalado." : "Falha na instalação.");
+
+    var payload = getJson(chapter.chapterDataPath);
+    chapter.pages = payload.pages.map(function (page) {
+      return page.imageUrl;
+    });
+    delete chapter.chapterDataPath;
+  });
+
+  window.__nyxoviraChapterPlan = JSON.stringify(plan);
+  return plan;
+};</code></pre>
+            <p>O Nyxovira passa <code>{ selectedChapterIds, chapterPlan }</code>. A função pode retornar o plano final como objeto ou JSON. Se não retornar nada, o app mantém o plano original.</p>
+          </section>
+
+          <section class="panel">
+            <h2>Formatos de capítulo</h2>
+            <p>Use <code>paragraphs</code> para novels e <code>pages</code> para capítulos com imagens. O app também lê <code>images</code> por compatibilidade.</p>
+            <pre><code>{
+  "id": "chapter-forest-hunt",
+  "title": "The Forest Hunt",
+  "contentType": "novel",
+  "paragraphs": [
+    "First paragraph.",
+    "Second paragraph."
+  ]
+}</code></pre>
+            <pre><code>{
+  "id": "chapter-arrival",
+  "title": "Arrival at the Ruins",
+  "contentType": "images",
+  "pages": [
+    "https://example.com/page-001.png",
+    "https://example.com/page-002.png"
+  ]
+}</code></pre>
+          </section>
+
+          <section id="testing-pt" class="panel">
+            <h2>Testar no Nyxovira</h2>
+            <p>A importação manual é o caminho normal durante o desenvolvimento e também permite usar um plugin somente para você. A importação pessoal não valida tags de catálogo nem exige que você hospede um ícone. Quando o site já fornecer favicon ou logo público, use-o em <code>browser.icon_url</code>.</p>
+            <div class="steps">
+              <div class="step"><p>Mantenha <code>plugin.json</code> e a pasta <code>browser</code> juntos dentro da pasta do plugin.</p></div>
+              <div class="step"><p>No Nyxovira, abra <strong>Sites</strong>, toque em <strong>Importar plugins</strong> e selecione a pasta do plugin. Você também pode selecionar uma pasta que contenha várias pastas de plugins.</p></div>
+              <div class="step"><p>Abra o site compatível e confira o reconhecimento da obra, a lista de capítulos e o download.</p></div>
+              <div class="step"><p>Depois de alterar os arquivos, importe a pasta novamente e repita o teste.</p></div>
+            </div>
+            <p class="panel-copy-after-list"><strong>Se o plugin é somente para você, o processo termina aqui.</strong> Não é necessário ter tags, <code>schema_version</code>, GitHub, catálogo público ou site de plugins. Use o favicon ou logo do próprio site quando existir; você não precisa hospedar um ícone separado.</p>
+            <h3 class="api-subheading">Se quiser distribuir</h3>
+            <p>Hospede seu próprio catálogo externo independente. Você controla o repositório, a página, os arquivos, as descrições, as atualizações e a segurança; nada é enviado ao KapiTomo.</p>
+          </section>
+
+          <section id="external-sites-pt" class="panel">
+            <h2>Loja externa de plugins</h2>
+            <p>Use esta opção somente depois que os plugins estiverem prontos e testados. Ela é destinada a quem mantém uma distribuição independente com plugins próprios e, se quiser, plugins de outros criadores.</p>
+            <p>Uma loja externa mínima pode usar esta estrutura:</p>
+            <div class="folder">
+              plugin-store/<br>
+              |-- index.html<br>
+              |-- catalog.json<br>
+              `-- plugins/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;`-- my-plugin/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|-- plugin.json<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-- browser/<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-- download_target.js
+            </div>
+            <p class="panel-copy-after-list">Hospede a pasta em um endereço HTTPS público. A aparência, a busca e os cards pertencem à própria loja; o Nyxovira precisa apenas descobrir o catálogo e receber a solicitação de instalação. Adicione um objeto à lista <code>plugins</code> para cada plugin distribuído e informe corretamente seu autor e site de origem.</p>
+            <h3 class="api-subheading">Descoberta do catálogo</h3>
+            <p>Declare o catálogo na página principal da loja. Também é aceita uma tag <code>meta</code> com o mesmo nome e a URL em <code>content</code>.</p>
+            <pre><code>&lt;link rel="nyxovira-plugin-catalog" href="catalog.json"&gt;</code></pre>
+            <p>Sem uma declaração, o Nyxovira procura <code>catalog.json</code>, <code>catalog-store.json</code> e <code>plugins.json</code> na mesma pasta da página. O usuário também pode conectar diretamente a URL do JSON.</p>
+            <h3 class="api-subheading">Catálogo externo</h3>
+            <pre><code>{
+  "schema_version": 1,
+  "name": "Minha loja de plugins",
+  "hub_url": "https://plugins.example.com/",
+  "plugins": [{
+    "id": "my-plugin",
+    "name": "My Plugin",
+    "author": "Author",
+    "version": "1.0.0",
+    "manifest_url": "plugins/my-plugin/plugin.json",
+    "icon_url": "https://example.com/icon.png",
+      "site_url": "https://example.com/",
+      "status": "active"
+  }]
+}</code></pre>
+            <p><code>hub_url</code> identifica a página da loja quando uma URL JSON é conectada diretamente. <code>store_url</code> e <code>homepage</code> são aliases aceitos. URLs relativas são resolvidas a partir do catálogo. Entradas baseadas em repositório podem usar <code>repository_url</code>, <code>repository_ref</code> e <code>plugin_path</code>.</p>
+            <h3 class="api-subheading">Instalação direta</h3>
+            <p>Este exemplo completo cria o botão, informa quando a página está fora do aplicativo e mostra o resultado retornado pelo Nyxovira.</p>
+            <pre><code>&lt;button id="install-my-plugin" type="button"&gt;Instalar My Plugin&lt;/button&gt;
+&lt;p id="install-status" aria-live="polite"&gt;&lt;/p&gt;
+
+&lt;script&gt;
+  const catalogUrl = new URL("catalog.json", location.href).href;
+  const status = document.querySelector("#install-status");
+
+  document.querySelector("#install-my-plugin").addEventListener("click", () =&gt; {
+    const bridge = globalThis.NyxoviraAndroidBridge
+      || globalThis.ArchiveInkAndroidBridge;
+
+    if (!bridge || typeof bridge.installCommunityPlugin !== "function") {
+      status.textContent = "Abra este site pelo Nyxovira para instalar.";
+      return;
+    }
+
+    try {
+      const result = JSON.parse(
+        bridge.installCommunityPlugin(
+          catalogUrl,
+          JSON.stringify({ id: "my-plugin" })
+        ) || "{}"
+      );
+      status.textContent = result.message
+        || (result.success ? "Plugin instalado." : "Não foi possível instalar.");
+    } catch (error) {
+      status.textContent = "Não foi possível concluir a instalação.";
+    }
   });
 &lt;/script&gt;</code></pre>
-          <div class="note warning"><p>Um catálogo externo não é analisado pelo KapiTomo. Publique em HTTPS, mantenha autor e fonte corretos, examine todos os arquivos distribuídos e teste a instalação pela página aberta dentro do Nyxovira.</p></div>
-        </section>
+            <p>Quando a loja é aberta em um navegador comum, o exemplo orienta a pessoa a abri-la pelo Nyxovira. Dentro do aplicativo, o botão instala o plugin correspondente no catálogo conectado.</p>
+            <h3 class="api-subheading">Antes de lançar seu catálogo externo</h3>
+            <div class="rule-list">
+              <article><p>Hospede a página, o catálogo e os arquivos dos plugins em endereços HTTPS públicos.</p></article>
+              <article><p>Para cada plugin, informe corretamente o autor, o site de origem e o caminho do manifesto.</p></article>
+              <article><p>Teste o botão Instalar abrindo a loja pelo cartão criado em <strong>Sites externos</strong> no Nyxovira.</p></article>
+            </div>
+            <h3 class="api-subheading">Teste antes de divulgar</h3>
+            <div class="steps">
+              <div class="step"><p>Publique todos os arquivos em HTTPS.</p></div>
+              <div class="step"><p>No Nyxovira, abra <strong>Sites → Sites externos</strong> e conecte a página ou pasta da loja.</p></div>
+              <div class="step"><p>Abra o site conectado pelo cartão e toque em <strong>Instalar</strong>.</p></div>
+              <div class="step"><p>Confirme a mensagem retornada pela instalação.</p></div>
+            </div>
+          </section>
 
-        <section class="panel">
-          <h2>Checklist final</h2>
-          <div class="check-grid">
-            <article><h3>Plugin pessoal</h3><p>Manifesto válido, host e página inicial corretos, mapeamento estável, capítulos ordenados, download completo de texto/imagens e nenhum metadado de catálogo desnecessário.</p></article>
-            <article><h3>Catálogo externo</h3><p>Página e JSON em HTTPS, autor e fonte corretos, URLs públicas do manifesto e ícone, identidade independente, botão de instalação testado e plano de atualização.</p></article>
-          </div>
-        </section>
-      </article>
-
-      <footer class="footer"><p><a href="../../terms/">Terms</a> · <a href="../../nyxovira/privacy/">Nyxovira Privacy</a></p></footer>
-    </main>
-
+          <section class="panel">
+            <h2>Checklist final</h2>
+            <div class="rule-list">
+              <article>
+                <h3>Plugin pessoal</h3>
+                <p>JSON válido, nome de pasta (ou id) não vazio, pelo menos um host compatível e URL inicial válida. Adicione script do navegador somente quando o reconhecimento genérico não bastar; use <code>paragraphs</code> para novels ou <code>pages</code> para quadrinhos.</p>
+              </article>
+              <article>
+                <h3>Catálogo externo independente</h3>
+                <p>Repositório público, página e catálogo em HTTPS; autor e fonte corretos; ícone público estável do site quando disponível; botão Instalar testado pelo Nyxovira.</p>
+              </article>
+            </div>
+          </section>
+        </div>
+      </main>
+      </div>
+    </div>
     <script>
-      (() => {
+      (function () {
+        var storageKey = "nyxoviraPluginApiLanguageV2";
+        var supported = { en: true, pt: true };
         const documentationUrl = "https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/";
-        const languageKey = "kapitomo.pluginApiLanguage.v2";
 
-        function normalizeSite(value) {
-          let site = String(value || "").trim() || "https://example.com/";
+        function normalizePromptSite(value) {
+          var site = String(value || "").trim();
+          if (!site) return "https://example.com/";
           if (!/^https?:\/\//i.test(site)) site = "https://" + site;
           try {
-            const url = new URL(site);
-            return url.href;
-          } catch {
-            return "https://example.com/";
+            var parsed = new URL(site);
+            return /^https?:$/.test(parsed.protocol) ? parsed.href : "https://example.com/";
+          } catch (error) {
+            return site;
           }
         }
 
         function buildPluginPrompt(language, mode, rawSite) {
-          const site = normalizeSite(rawSite);
-          const external = mode === "external";
-          if (language === "pt") {
-            const lines = [
-              "Crie um plugin Nyxovira " + (external ? "para distribuir em um catálogo externo independente" : "para uso pessoal") + " para o site \"" + site + "\", seguindo integralmente a documentação oficial: \"" + documentationUrl + "\".",
+          var site = normalizePromptSite(rawSite);
+          if (language === "pt" && mode === "external") {
+            return [
+              "Crie um plugin Nyxovira para distribuir em um catálogo externo independente para o site \"" + site + "\", seguindo integralmente a documentação oficial: \"" + documentationUrl + "\".",
               "",
-              "Antes de programar, mapeie profundamente o site: rotas de obra e capítulo, seletores, ordem, IDs, títulos, capas, textos, imagens, paginação, rolagem infinita, carregamento dinâmico e limitações.",
-              "Procure primeiro documentação oficial para desenvolvedores, API pública, OpenAPI ou Swagger, GraphQL, feeds JSON e endpoints documentados. Se a API não estiver visível ou documentada, examine a página, os scripts carregados e as requisições de rede do navegador usadas pela interface do próprio site. Compare API e HTML e escolha a fonte mais estável.",
-              "Crie e entregue todos os arquivos completos do plugin. Use o mínimo real aceito pelo Nyxovira: plugin.json válido, id ou nome de pasta, match.hosts e browser.home_url. Adicione browser/download_target.js somente quando necessário para reconhecer obras, listar capítulos rapidamente e preparar textos ou páginas depois da seleção.",
-              "Se o site oferecer favicon ou logo público e estável, use-o em browser.icon_url. Teste no Nyxovira por Importar plugins, valide mais de uma obra, confira a ordem dos capítulos e conclua downloads reais de texto e imagens.",
-              external
-                ? "Também crie um repositório público, uma página HTTPS independente, catalog.json com meta nyxovira-plugin-catalog e botão de instalação usando installCommunityPlugin. O catálogo deve se identificar como externo e independente do KapiTomo. Faça commit de todos os arquivos e envie a branch main ao repositório."
-                : "Não adicione tags de catálogo nem crie site, catálogo ou repositório público, pois o plugin será importado localmente para uso pessoal.",
-              "Ao terminar, informe os arquivos criados, decisões de mapeamento, APIs ou endpoints encontrados, limitações, testes executados e o que ainda precisa ser validado no aplicativo."
-            ];
-            return lines.join("\n");
+              "Antes de implementar, mapeie e analise o site: rotas, domínio e subdomínios, página da obra, lista e ordem dos capítulos, conteúdo de texto ou imagens, paginação, carregamento dinâmico, seletores, dados embutidos e limitações.",
+              "- Procure documentação oficial para desenvolvedores, API pública, OpenAPI ou Swagger, GraphQL, feeds JSON e endpoints documentados.",
+              "- Se a API não estiver visível ou documentada, examine o código da página, os scripts carregados e as requisições de rede do navegador para descobrir os endpoints usados pela própria interface do site.",
+              "- Compare a API com o HTML renderizado e escolha a fonte de dados mais completa e estável para o plugin.",
+              "",
+              "Requisitos deste modo:",
+              "- Crie e entregue todos os arquivos completos do plugin; não responda apenas com explicações.",
+              "- Use id estável, nome, versão, match.hosts e browser.home_url corretos.",
+              "- Adicione browser/download_target.js quando necessário para reconhecer a obra e baixar capítulos de forma confiável.",
+              "- Se o site fornecer favicon ou logo público e estável, use essa URL como browser.icon_url.",
+              "- Adicione tags somente quando forem úteis para organizar ou filtrar o seu próprio catálogo.",
+              "- Crie um repositório público no GitHub para o plugin, inicialize o Git, faça commit de todos os arquivos e envie a branch principal com push.",
+              "- Crie uma página HTTPS independente, catalog.json com meta nyxovira-plugin-catalog e botão de instalação usando installCommunityPlugin. Identifique claramente que o catálogo é externo e independente do KapiTomo.",
+              "- Valide a importação no Nyxovira, a lista de capítulos e um download completo, incluindo o formato final de textos ou imagens.",
+              "",
+              "Ao final, informe os arquivos criados, as decisões de mapeamento, as limitações encontradas, os testes executados e o que ainda exige validação no aplicativo."
+            ].join("\n");
           }
-          const lines = [
-            "Create a Nyxovira plugin " + (external ? "for distribution through an independent external catalog" : "for personal use") + " for the site \"" + site + "\", following the official documentation completely: \"" + documentationUrl + "\".",
+
+          if (language === "pt") {
+            return [
+              "Crie um plugin Nyxovira para uso pessoal para o site \"" + site + "\", seguindo integralmente a documentação oficial: \"" + documentationUrl + "\".",
+              "",
+              "Antes de implementar, mapeie e analise o site: rotas, domínio e subdomínios, página da obra, lista e ordem dos capítulos, conteúdo de texto ou imagens, paginação, carregamento dinâmico, seletores, dados embutidos e limitações.",
+              "- Procure documentação oficial para desenvolvedores, API pública, OpenAPI ou Swagger, GraphQL, feeds JSON e endpoints documentados.",
+              "- Se a API não estiver visível ou documentada, examine o código da página, os scripts carregados e as requisições de rede do navegador para descobrir os endpoints usados pela própria interface do site.",
+              "- Compare a API com o HTML renderizado e escolha a fonte de dados mais completa e estável para o plugin.",
+              "",
+              "Requisitos deste modo:",
+              "- Faça somente o necessário para importar e usar o plugin no meu aparelho.",
+              "- O plugin.json precisa ser um JSON válido, com pasta ou id não vazio, pelo menos um match.hosts e browser.home_url.",
+              "- Não adicione tags de catálogo, GitHub, site de plugins ou outros metadados de publicação sem necessidade técnica.",
+              "- Se o site disponibilizar um favicon ou logo público, use essa URL como browser.icon_url. Se não houver, o ícone pode ser omitido no uso pessoal.",
+              "- Adicione browser/download_target.js somente se a detecção genérica do Nyxovira não reconhecer corretamente a obra e os capítulos.",
+              "- Crie e entregue todos os arquivos completos do plugin; não responda apenas com explicações.",
+              "- Teste a importação, a lista de capítulos e um download completo.",
+              "",
+              "Ao final, informe os arquivos criados, as decisões de mapeamento, as limitações encontradas, os testes executados e o que ainda exige validação no aplicativo."
+            ].join("\n");
+          }
+
+          if (mode === "external") {
+            return [
+              "Create a Nyxovira plugin for distribution through an independent external catalog for the site \"" + site + "\", following the official documentation completely: \"" + documentationUrl + "\".",
+              "",
+              "Before implementing it, map and analyze the site: routes, domains and subdomains, work page, chapter list and order, text or image content, pagination, dynamic loading, selectors, embedded data, and limitations.",
+              "- Look for official developer documentation, a public API, OpenAPI or Swagger files, GraphQL, JSON feeds, and documented endpoints.",
+              "- If the API is not visible or documented, inspect the page source, loaded scripts, and browser network requests to discover the endpoints used by the site's own interface.",
+              "- Compare the API with the rendered HTML and choose the most complete and stable data source for the plugin.",
+              "",
+              "Requirements for this mode:",
+              "- Create and deliver all complete plugin files; do not respond with explanations only.",
+              "- Use a stable id, name, version, correct match.hosts, and browser.home_url.",
+              "- Add browser/download_target.js when needed for reliable work recognition and chapter downloads.",
+              "- If the site provides a stable public favicon or logo, use that URL as browser.icon_url.",
+              "- Add tags only when they are useful for organizing or filtering your own catalog.",
+              "- Create a public repository on GitHub for the plugin, initialize Git, commit every file, and push the main branch.",
+              "- Create an independent HTTPS page, catalog.json with a nyxovira-plugin-catalog meta tag, and an installation button using installCommunityPlugin. Clearly identify the catalog as external and independent from KapiTomo.",
+              "- Validate Nyxovira import, the chapter list, and one complete download, including final text or image formats.",
+              "",
+              "Finish by reporting the created files, mapping decisions, discovered limitations, tests performed, and anything that still requires in-app validation."
+            ].join("\n");
+          }
+
+          return [
+            "Create a Nyxovira plugin for personal use for the site \"" + site + "\", following the official documentation completely: \"" + documentationUrl + "\".",
             "",
-            "Before coding, map the site deeply: work and chapter routes, selectors, order, IDs, titles, covers, text, images, pagination, infinite scrolling, dynamic loading, and limitations.",
-            "First look for official developer documentation, a public API, OpenAPI or Swagger, GraphQL, JSON feeds, and documented endpoints. If the API is not visible or documented, inspect the page, loaded scripts, and browser network requests used by the site's own interface. Compare API and HTML and choose the most stable source.",
-            "Create and deliver every complete plugin file. Use Nyxovira's real minimum: valid plugin.json, an id or folder name, match.hosts, and browser.home_url. Add browser/download_target.js only when needed to recognize works, list chapters quickly, and prepare text or pages after selection.",
-            "If the site provides a stable public favicon or logo, use it in browser.icon_url. Test through Import plugins in Nyxovira, validate more than one work, verify chapter order, and complete real text and image downloads.",
-            external
-              ? "Also create a public repository, an independent HTTPS page, catalog.json with a nyxovira-plugin-catalog meta tag, and an installation button using installCommunityPlugin. The catalog must identify itself as external and independent from KapiTomo. Commit every file and push the main branch to the repository."
-              : "Do not add catalog tags or create a website, catalog, or public repository because the plugin will be imported locally for personal use.",
-            "Finish by listing created files, mapping decisions, discovered APIs or endpoints, limitations, tests performed, and anything that still requires in-app validation."
-          ];
-          return lines.join("\n");
+            "Before implementing it, map and analyze the site: routes, domains and subdomains, work page, chapter list and order, text or image content, pagination, dynamic loading, selectors, embedded data, and limitations.",
+            "- Look for official developer documentation, a public API, OpenAPI or Swagger files, GraphQL, JSON feeds, and documented endpoints.",
+            "- If the API is not visible or documented, inspect the page source, loaded scripts, and browser network requests to discover the endpoints used by the site's own interface.",
+            "- Compare the API with the rendered HTML and choose the most complete and stable data source for the plugin.",
+            "",
+            "Requirements for this mode:",
+            "- Include only what is needed to import and use the plugin on my device.",
+            "- plugin.json must be valid JSON with a non-empty folder or id, at least one match.hosts entry, and browser.home_url.",
+            "- Do not add catalog tags, GitHub, a plugin website, or other publication metadata without a technical need.",
+            "- If the site provides a public favicon or logo, use that URL as browser.icon_url. If none exists, the icon may be omitted for personal use.",
+            "- Add browser/download_target.js only if Nyxovira's generic detection cannot recognize the work and chapters correctly.",
+            "- Create and deliver all complete plugin files; do not respond with explanations only.",
+            "- Test import, the chapter list, and one complete download.",
+            "",
+            "Finish by reporting the created files, mapping decisions, discovered limitations, tests performed, and anything that still requires in-app validation."
+          ].join("\n");
         }
 
         function updateBuilder(builder) {
-          const input = builder.querySelector("[data-prompt-url]");
-          const output = builder.querySelector("[data-prompt-output]");
-          output.value = buildPluginPrompt(builder.dataset.promptLanguage, builder.dataset.promptMode, input.value);
+          var input = builder.querySelector("[data-prompt-url]");
+          var output = builder.querySelector("[data-prompt-output]");
+          var language = builder.getAttribute("data-prompt-language") || "en";
+          var mode = builder.getAttribute("data-prompt-mode") || "personal";
+          if (output) output.value = buildPluginPrompt(language, mode, input ? input.value : "");
         }
 
-        document.querySelectorAll("[data-prompt-builder]").forEach(builder => {
-          const input = builder.querySelector("[data-prompt-url]");
-          const buttons = [...builder.querySelectorAll("[data-prompt-mode-option]")];
-          const copy = builder.querySelector("[data-copy-prompt]");
-          const status = builder.querySelector("[data-copy-status]");
-          input.addEventListener("input", () => updateBuilder(builder));
-          buttons.forEach(button => button.addEventListener("click", () => {
-            builder.dataset.promptMode = button.dataset.promptModeOption;
-            buttons.forEach(item => item.setAttribute("aria-pressed", String(item === button)));
-            updateBuilder(builder);
-          }));
-          copy.addEventListener("click", async () => {
-            const output = builder.querySelector("[data-prompt-output]");
-            try {
-              await navigator.clipboard.writeText(output.value);
-            } catch {
-              output.focus();
-              output.select();
-              document.execCommand("copy");
-            }
-            status.textContent = builder.dataset.promptLanguage === "pt" ? "Prompt copiado." : "Prompt copied.";
-          });
+        function setPromptCopyState(builder, copied, message) {
+          var button = builder.querySelector("[data-copy-prompt]");
+          var status = builder.querySelector("[data-copy-status]");
+          if (!button) return;
+          button.setAttribute("data-state", copied ? "copied" : "idle");
+          button.textContent = copied ? button.getAttribute("data-copy-success") : button.getAttribute("data-copy-default");
+          if (status && message) status.textContent = message;
+          if (builder.__promptCopyTimer) window.clearTimeout(builder.__promptCopyTimer);
+          builder.__promptCopyTimer = window.setTimeout(function () {
+            button.setAttribute("data-state", "idle");
+            button.textContent = button.getAttribute("data-copy-default");
+          }, 2200);
+        }
+
+        function fallbackCopyPrompt(output) {
+          try {
+            output.focus();
+            output.select();
+            output.setSelectionRange(0, output.value.length);
+            return document.execCommand("copy");
+          } catch (error) {
+            return false;
+          }
+        }
+
+        function copyGeneratedPrompt(builder) {
+          var output = builder.querySelector("[data-prompt-output]");
+          var language = builder.getAttribute("data-prompt-language") || "en";
+          if (!output) return;
           updateBuilder(builder);
+          var successMessage = language === "pt" ? "Prompt copiado. Agora é só colar na conversa com a IA." : "Prompt copied. Paste it into your AI conversation.";
+          var failureMessage = language === "pt" ? "Não foi possível copiar automaticamente. Selecione o texto e copie manualmente." : "Automatic copy failed. Select the text and copy it manually.";
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(output.value).then(function () {
+              setPromptCopyState(builder, true, successMessage);
+            }).catch(function () {
+              var copied = fallbackCopyPrompt(output);
+              setPromptCopyState(builder, copied, copied ? successMessage : failureMessage);
+            });
+            return;
+          }
+          var copied = fallbackCopyPrompt(output);
+          setPromptCopyState(builder, copied, copied ? successMessage : failureMessage);
+        }
+
+        function initializePromptBuilder(builder) {
+          var input = builder.querySelector("[data-prompt-url]");
+          var modeButtons = builder.querySelectorAll("[data-prompt-mode-option]");
+          if (input) {
+            input.addEventListener("input", function () { updateBuilder(builder); });
+            input.addEventListener("blur", function () {
+              input.value = normalizePromptSite(input.value);
+              updateBuilder(builder);
+            });
+          }
+          modeButtons.forEach(function (button) {
+            button.addEventListener("click", function () {
+              var mode = button.getAttribute("data-prompt-mode-option");
+              builder.setAttribute("data-prompt-mode", mode);
+              modeButtons.forEach(function (candidate) {
+                candidate.setAttribute("aria-pressed", candidate === button ? "true" : "false");
+              });
+              updateBuilder(builder);
+            });
+          });
+          var copyButton = builder.querySelector("[data-copy-prompt]");
+          if (copyButton) copyButton.addEventListener("click", function () { copyGeneratedPrompt(builder); });
+          updateBuilder(builder);
+        }
+
+        function normalizeLanguage(value) {
+          var lang = String(value ? value : "").toLowerCase();
+          if (lang.indexOf("pt") === 0) return "pt";
+          return "en";
+        }
+
+        function detectLanguage() {
+          var candidates = [];
+          if (navigator.languages && navigator.languages.length) {
+            candidates = candidates.concat(Array.prototype.slice.call(navigator.languages));
+          }
+          if (navigator.language) {
+            candidates.push(navigator.language);
+          }
+
+          try {
+            var locale = Intl.DateTimeFormat().resolvedOptions().locale;
+            if (locale) candidates.push(locale);
+          } catch (error) {}
+
+          for (var i = 0; i < candidates.length; i += 1) {
+            if (normalizeLanguage(candidates[i]) === "pt") return "pt";
+          }
+
+          try {
+            var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            if (/Sao_Paulo|Lisbon|Madeira|Azores|Luanda|Maputo|Bissau|Cape_Verde/i.test(String(timeZone))) {
+              return "pt";
+            }
+          } catch (error) {}
+
+          return "en";
+        }
+
+        function readUrlLanguage() {
+          try {
+            var params = new URLSearchParams(window.location.search);
+            var value = params.get("lang");
+            return value ? normalizeLanguage(value) : "";
+          } catch (error) {
+            return "";
+          }
+        }
+
+        function setLanguage(lang, persist) {
+          var next = supported[lang] ? lang : "en";
+          document.documentElement.lang = next === "pt" ? "pt-BR" : "en";
+
+          document.querySelectorAll("[data-lang-view]").forEach(function (node) {
+            node.hidden = node.getAttribute("data-lang-view") !== next;
+          });
+
+          document.querySelectorAll("[data-download-lang]").forEach(function (node) {
+            node.hidden = node.getAttribute("data-download-lang") !== next;
+          });
+
+          document.querySelectorAll("[data-set-lang]").forEach(function (button) {
+            button.setAttribute("aria-pressed", button.getAttribute("data-set-lang") === next ? "true" : "false");
+          });
+
+          var title = document.querySelector("[data-brand-title]");
+          var subtitle = document.querySelector("[data-brand-subtitle]");
+          var officialLink = document.querySelector("[data-official-link]");
+          if (title) title.textContent = next === "pt" ? "API de Plugins Nyxovira" : "Nyxovira Plugin API";
+          if (subtitle) subtitle.textContent = next === "pt" ? "Documentação KapiTomo" : "KapiTomo documentation";
+          if (officialLink) officialLink.textContent = next === "pt" ? "Plugins oficiais" : "Official plugins";
+          document.title = next === "pt" ? "Nyxovira | API de Plugins" : "Nyxovira Plugin API";
+
+          if (persist) {
+            try { window.localStorage.setItem(storageKey, next); } catch (error) {}
+          }
+        }
+
+        var initial = readUrlLanguage();
+        if (!initial) {
+          try {
+            var stored = window.localStorage.getItem(storageKey);
+            initial = stored ? stored : "";
+          } catch (error) {}
+        }
+        if (!initial) {
+          initial = detectLanguage();
+        }
+
+        document.querySelectorAll("[data-set-lang]").forEach(function (button) {
+          button.addEventListener("click", function () {
+            setLanguage(button.getAttribute("data-set-lang"), true);
+          });
         });
 
-        const query = new URLSearchParams(location.search).get("lang");
-        let saved = "";
-        try { saved = localStorage.getItem(languageKey) || ""; } catch {}
-        let language = String(query || saved || navigator.language || "").toLowerCase().startsWith("pt") ? "pt" : "en";
-        const documents = [...document.querySelectorAll("[data-document-language]")];
-        const languageButtons = [...document.querySelectorAll("[data-language-option]")];
-        function setLanguage(next) {
-          language = next === "pt" ? "pt" : "en";
-          document.documentElement.lang = language === "pt" ? "pt-BR" : "en";
-          documents.forEach(node => { node.hidden = node.dataset.documentLanguage !== language; });
-          languageButtons.forEach(button => button.setAttribute("aria-pressed", String(button.dataset.languageOption === language)));
-          document.querySelectorAll("[data-copy-en]").forEach(node => { node.textContent = node.dataset[language === "pt" ? "copyPt" : "copyEn"]; });
-          try { localStorage.setItem(languageKey, language); } catch {}
-        }
-        languageButtons.forEach(button => button.addEventListener("click", () => setLanguage(button.dataset.languageOption)));
-        setLanguage(language);
+        document.querySelectorAll("[data-prompt-builder]").forEach(initializePromptBuilder);
+
+        setLanguage(initial, false);
       })();
     </script>
   </body>
