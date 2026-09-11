@@ -10,7 +10,7 @@ const docsPt = read("nyxovira/plugin-api/PLUGIN_API.pt-BR.md");
 const jsonApiExample = read("nyxovira/plugin-api/examples/json-api/plugin.json");
 
 test("published lab page cache-busts the runtime after fixes", () => {
-  assert.match(labPage, /lab\.js\?v=20260911-native-parser-parity/);
+  assert.match(labPage, /lab\.js\?v=20260911-compact-report/);
   assert.doesNotMatch(labPage, /src="\.\/lab\.js"/);
 });
 
@@ -118,4 +118,14 @@ test("web lab exercises and reports the native aes_json_api fallback route", () 
   assert.match(lab, /reportableEndpoint/);
   assert.match(docsPt, /substitui exatamente `\{chapter\}` e `\{workId\}`/);
   assert.doesNotMatch(JSON.parse(jsonApiExample).parser.chapter_api_path_template, /chapter_id|chapterId/);
+});
+
+test("visible reports stay compact while copy and JSON keep the full result", () => {
+  assert.match(lab, /function compactUiText/);
+  assert.match(lab, /repeatedInFailure/);
+  assert.match(lab, /compactUiText\(item\.detail, 240\)/);
+  assert.match(lab, /navigator\.clipboard\.writeText\(JSON\.stringify\(lastResult, null, 2\)\)/);
+  assert.match(lab, /new Blob\(\[`\$\{JSON\.stringify\(lastResult, null, 2\)\}\\n`\]/);
+  assert.match(labPage, /-webkit-line-clamp:3/);
+  assert.match(labPage, /grid-template-columns:72px minmax\(0,1fr\)/);
 });
