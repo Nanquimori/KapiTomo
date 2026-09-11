@@ -8,7 +8,7 @@ const MAX_ENTRIES = 40;
 const MAX_HTML_BYTES = 2 * 1024 * 1024;
 const MAX_PROXY_BYTES = 24 * 1024 * 1024;
 const TOKEN_TTL_SECONDS = 15 * 60;
-const WEBVIEW_USER_AGENT = "Mozilla/5.0 (Linux; Android 13; Pixel 7 Build/TQ3A.230805.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile Safari/537.36";
+const WEBVIEW_USER_AGENT = "Mozilla/5.0 (Linux; Android 14; Nyxovira) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36";
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();

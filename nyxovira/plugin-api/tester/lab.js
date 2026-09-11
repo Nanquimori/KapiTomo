@@ -2,8 +2,8 @@
   "use strict";
 
   const apiBase = "https://nyxovira-plugin-lab.nanquimori-kapitomo.workers.dev";
-  const maxPages = 24;
-  const maxChapterBytes = 24 * 1024 * 1024;
+  const maxPages = 120;
+  const maxChapterBytes = 96 * 1024 * 1024;
   const qs = (selector) => document.querySelector(selector);
   const status = qs("[data-service-status]");
   const statusLabel = qs("[data-service-label]");
@@ -764,16 +764,20 @@
     const paragraphs = Array.isArray(chapter.paragraphs) ? chapter.paragraphs.map(String).filter((text) => text.trim()) : [];
     const pages = Array.isArray(chapter.pages) ? chapter.pages : (Array.isArray(chapter.images) ? chapter.images : []);
     let contentSummary;
+    let verifiedPageCount = 0;
+    let verifiedByteCount = 0;
     if (paragraphs.length) {
       const reopened = JSON.parse(JSON.stringify({ paragraphs }));
       if (reopened.paragraphs.length !== paragraphs.length) throw new Error("O capítulo de texto não pôde ser reaberto em memória.");
       contentSummary = `${paragraphs.length} parágrafo(s) serializados e reabertos em memória.`;
     } else if (pages.length) {
-      const testedPages = pages.slice(0, maxPages);
+      if (pages.length > maxPages) {
+        throw new Error(`O primeiro capítulo tem ${pages.length} páginas e excede o limite técnico de ${maxPages}; o plugin não será declarado válido com um teste parcial.`);
+      }
       let totalBytes = 0;
       let verifiedPages = 0;
-      for (let index = 0; index < testedPages.length; index += 1) {
-        const descriptor = typeof testedPages[index] === "string" ? { url: testedPages[index] } : testedPages[index];
+      for (let index = 0; index < pages.length; index += 1) {
+        const descriptor = typeof pages[index] === "string" ? { url: pages[index] } : pages[index];
         const target = new URL(descriptor?.url || descriptor?.src || descriptor?.image || descriptor?.imageUrl, prepared.page.url).href;
         const response = await mediaFetch(prepared.token, {
           url: target,
@@ -785,14 +789,15 @@
         if (!contentType.startsWith("image/")) throw new Error(`Página ${index + 1} não retornou uma imagem.`);
         const bytes = await response.arrayBuffer();
         if (!bytes.byteLength || !imageLooksValid(bytes, contentType)) throw new Error(`Página ${index + 1} retornou uma imagem inválida.`);
-        if (totalBytes + bytes.byteLength > maxChapterBytes && verifiedPages > 0) break;
-        if (bytes.byteLength > maxChapterBytes) throw new Error("A primeira imagem excedeu o limite de verificação de 24 MiB.");
+        if (totalBytes + bytes.byteLength > maxChapterBytes) {
+          throw new Error("O primeiro capítulo excedeu o limite técnico de 96 MiB; o plugin não será declarado válido com um teste parcial.");
+        }
         totalBytes += bytes.byteLength;
         verifiedPages += 1;
       }
-      contentSummary = pages.length > verifiedPages
-        ? `${pages.length} imagem(ns) resolvidas; as primeiras ${verifiedPages} (${totalBytes} bytes) foram baixadas e verificadas em memória.`
-        : `${pages.length} imagem(ns), ${totalBytes} bytes, baixadas e verificadas em memória.`;
+      verifiedPageCount = verifiedPages;
+      verifiedByteCount = totalBytes;
+      contentSummary = `${verifiedPages} de ${pages.length} imagem(ns), ${totalBytes} bytes, baixadas e verificadas em memória; nenhuma página foi ignorada.`;
     } else {
       throw new Error("O primeiro capítulo não resolveu páginas nem parágrafos.");
     }
@@ -808,6 +813,9 @@
         workTitle: plan.title,
         selectedChapterId,
         chapterCount: plan.chapters.length,
+        verifiedPageCount,
+        verifiedByteCount,
+        validationScope: "complete-first-chapter",
         steps
       },
       temporaryDataReleased: true,

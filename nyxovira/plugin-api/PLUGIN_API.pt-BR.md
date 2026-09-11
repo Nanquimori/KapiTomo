@@ -106,8 +106,7 @@ O `id` presente em `chapterPlan.chapters` deve ser **exatamente** o valor recebi
 ### Formatos de conteúdo
 
 - Novel: `contentType: "novel"` e `paragraphs: ["..."]` não vazio.
-- Manga/quadrinho: `contentType: "images"` e `pages: ["https://..."]` não vazio; `images` existe apenas para compatibilidade.
-- Se uma página exigir cabeçalho ou token próprio, use um objeto de página aceito pelo parser nativo ou declare os campos correspondentes em `parser`; uma URL sozinha não transporta autenticação especial.
+- Manga/quadrinho: `contentType: "images"` e `pages` não vazio; `images` existe apenas para compatibilidade. Se uma página precisar de headers ou token, retorne `{ "url": "https://...", "headers": { "Authorization": "..." } }`; o Nyxovira transporta esses headers para a requisição nativa da imagem. Uma URL em texto não carrega autenticação especial.
 
 ## Campos de `parser` e efeito operacional
 
@@ -169,7 +168,7 @@ Declare `encrypted_response_format` e material de chave somente quando forem obs
 
 ## Laboratório Web de Plugins
 
-[Abra o Laboratório Web de Plugins](tester/), envie o ZIP e informe a URL de uma obra real. O serviço hospedado escolhe o primeiro capítulo automaticamente, executa a coleta em um navegador temporário e devolve o relatório na própria página. Não é necessário instalar programas, usar linha de comando, APK, ADB ou emulador.
+[Abra o Laboratório Web de Plugins](tester/), envie o ZIP e informe a URL de uma obra real. O serviço hospedado escolhe o primeiro capítulo automaticamente, baixa todas as páginas desse capítulo, executa a coleta em um navegador temporário e devolve o relatório na própria página. Ele nunca retorna `PLUGIN_VALID` depois de conferir somente o começo do capítulo. Não é necessário instalar programas, usar linha de comando, APK, ADB ou emulador.
 
 O laboratório limitado não possui biblioteca, configurações, catálogos, favoritos nem downloads permanentes. O ZIP e o conteúdo são mantidos somente durante a requisição e descartados antes da resposta. Exija `temporaryDataReleased: true` e `stored: false`. Sem rede, informe **“não validado contra o site real”**.
 

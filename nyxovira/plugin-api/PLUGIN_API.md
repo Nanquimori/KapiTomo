@@ -62,7 +62,7 @@ Content formats:
 
 - Novel: `contentType: "novel"` plus nonempty `paragraphs`.
 - Comic/manga: `contentType: "images"` plus nonempty `pages`; `images` is compatibility-only.
-- If a page needs a header/token, use the native parser page form or corresponding parser fields; a string URL cannot carry special authentication.
+- If a browser-plan page needs headers or a token, return an object such as `{ "url": "https://...", "headers": { "Authorization": "..." } }`; Nyxovira carries those headers into the native image request. A string URL cannot carry special authentication. Parser-generated pages can use the corresponding parser fields.
 
 ## Operational parser fields
 
@@ -119,7 +119,7 @@ Declare `encrypted_response_format` and key material only when legitimately obse
 
 ## Web Plugin Laboratory
 
-[Open the Web Plugin Laboratory](tester/), upload the ZIP, and enter a real work URL. The hosted service automatically selects the first chapter, runs the collection in a temporary browser, and returns the report on the same page. No program, command line, APK, ADB, or emulator is required.
+[Open the Web Plugin Laboratory](tester/), upload the ZIP, and enter a real work URL. The hosted service automatically selects the first chapter, downloads every page in that chapter, runs the collection in a temporary browser, and returns the report on the same page. It never returns `PLUGIN_VALID` after checking only the beginning of a chapter. No program, command line, APK, ADB, or emulator is required.
 
 The limited laboratory has no library, settings, catalogs, favorites, or permanent downloads. The ZIP and content exist only for the request and are released before the response. Require `temporaryDataReleased: true` and `stored: false`. Without network access, report **“not validated against the real site.”**
 
