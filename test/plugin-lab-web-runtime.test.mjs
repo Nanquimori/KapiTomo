@@ -6,9 +6,11 @@ const read = relativePath => readFileSync(new URL(`../${relativePath}`, import.m
 const lab = read("nyxovira/plugin-api/tester/lab.js");
 const labPage = read("nyxovira/plugin-api/tester/index.html");
 const worker = read("plugin-lab-worker/src/index.js");
+const docsPt = read("nyxovira/plugin-api/PLUGIN_API.pt-BR.md");
+const jsonApiExample = read("nyxovira/plugin-api/examples/json-api/plugin.json");
 
 test("published lab page cache-busts the runtime after fixes", () => {
-  assert.match(labPage, /lab\.js\?v=20260911-native-request-parity/);
+  assert.match(labPage, /lab\.js\?v=20260911-native-parser-parity/);
   assert.doesNotMatch(labPage, /src="\.\/lab\.js"/);
 });
 
@@ -101,4 +103,19 @@ test("chapter media validation uses the Nyxovira request profile and never appro
 test("worker uses the same network identity as the Android downloader", () => {
   assert.match(worker, /Linux; Android 14; Nyxovira/);
   assert.doesNotMatch(worker, /Pixel 7|Version\/4\.0/);
+});
+
+test("web lab exercises and reports the native aes_json_api fallback route", () => {
+  assert.match(worker, /nativeParser: parserForLab\(plugin\.manifest\.parser\)/);
+  assert.match(lab, /validateNativeParserPath/);
+  assert.match(lab, /chapter_api_path_template contém/);
+  assert.match(lab, /substitui somente \{chapter\} e \{workId\}/);
+  assert.match(lab, /Accept: "application\/json"/);
+  assert.match(lab, /"Content-Type": "application\/json"/);
+  assert.match(lab, /key: "parser_nativo"/);
+  assert.match(lab, /respondeu HTTP \$\{response\.status\}/);
+  assert.match(lab, /error\?\.diagnosticKey \|\| "diagnóstico"/);
+  assert.match(lab, /reportableEndpoint/);
+  assert.match(docsPt, /substitui exatamente `\{chapter\}` e `\{workId\}`/);
+  assert.doesNotMatch(JSON.parse(jsonApiExample).parser.chapter_api_path_template, /chapter_id|chapterId/);
 });
