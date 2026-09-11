@@ -5,8 +5,6 @@
   const maxPages = 120;
   const maxChapterBytes = 96 * 1024 * 1024;
   const qs = (selector) => document.querySelector(selector);
-  const status = qs("[data-service-status]");
-  const statusLabel = qs("[data-service-label]");
   const form = qs("[data-test-form]");
   const zipInput = qs("#pluginZip");
   const workUrl = qs("#workUrl");
@@ -29,16 +27,10 @@
       const body = await response.json();
       if (!response.ok || !body.ready || body.execution !== "visitor-browser") throw new Error();
       serviceReady = true;
-      status.classList.add("ready");
-      status.classList.remove("offline");
-      statusLabel.textContent = "Laboratório web disponível";
       testButton.disabled = false;
       serviceError.classList.add("hidden");
     } catch {
       serviceReady = false;
-      status.classList.add("offline");
-      status.classList.remove("ready");
-      statusLabel.textContent = "Serviço web indisponível";
       testButton.disabled = true;
       serviceError.classList.remove("hidden");
     }
