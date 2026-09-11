@@ -73,6 +73,7 @@ test("AI prompt builder has one creation flow in both languages", () => {
   assert.match(promptPt, /corrija a causa, gere um novo ZIP e repita o teste/);
   assert.match(promptEn, /Create and validate a Nyxovira plugin for the site/);
   assert.match(promptEn, /fix the cause, build a new ZIP, and run the test again/);
+  assert.doesNotMatch(html, />Crie um plugin Nyxovira para o site|>Create a Nyxovira plugin for the site/);
 });
 
 test("published SDK resources are directly linked from both language views", () => {
