@@ -8,7 +8,7 @@ const labPage = read("nyxovira/plugin-api/tester/index.html");
 const worker = read("plugin-lab-worker/src/index.js");
 
 test("published lab page cache-busts the runtime after fixes", () => {
-  assert.match(labPage, /lab\.js\?v=20260910-plumacomics-fix/);
+  assert.match(labPage, /lab\.js\?v=20260910-complete-chapter/);
   assert.doesNotMatch(labPage, /src="\.\/lab\.js"/);
 });
 
@@ -62,15 +62,27 @@ test("module relay remains restricted to the signed plugin hosts", () => {
   assert.match(worker, /"cache-control": "no-store"/);
 });
 
-test("chapter media validation accepts only public image responses and samples long chapters", () => {
+test("chapter media validation accepts only public images and never approves a partial chapter", () => {
   assert.match(worker, /async function handleMedia/);
   assert.match(worker, /assertPublicHttpUrl\(input\.url, "Imagem do capítulo"\)/);
   assert.match(worker, /contentType\.startsWith\("image\/"\)/);
   assert.match(worker, /url\.pathname === "\/media"/);
-  assert.match(lab, /const testedPages = pages\.slice\(0, maxPages\)/);
-  assert.match(lab, /totalBytes \+ bytes\.byteLength > maxChapterBytes && verifiedPages > 0/);
+  assert.match(lab, /const maxPages = 120/);
+  assert.match(lab, /const maxChapterBytes = 96 \* 1024 \* 1024/);
+  assert.match(lab, /pages\.length > maxPages/);
+  assert.match(lab, /for \(let index = 0; index < pages\.length; index \+= 1\)/);
+  assert.doesNotMatch(lab, /pages\.slice\(0, maxPages\)/);
+  assert.doesNotMatch(lab, /verifiedPages > 0\) break/);
   assert.match(lab, /verifiedPages \+= 1/);
+  assert.match(lab, /nenhuma página foi ignorada/);
+  assert.match(lab, /validationScope: "complete-first-chapter"/);
+  assert.match(lab, /verifiedByteCount/);
   assert.match(lab, /await mediaFetch\(prepared\.token/);
   assert.doesNotMatch(lab, /O capítulo tem .*limite web/);
   assert.doesNotMatch(lab, /O capítulo excedeu o limite web/);
+});
+
+test("worker uses the same network identity as the Android downloader", () => {
+  assert.match(worker, /Linux; Android 14; Nyxovira/);
+  assert.doesNotMatch(worker, /Pixel 7|Version\/4\.0/);
 });

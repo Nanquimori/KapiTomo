@@ -27,6 +27,7 @@ test("ships a schema, hosted web tester, and five complete sanitized examples", 
   assert.doesNotMatch(read(`${apiRoot}/tester/index.html`), /AMBIENTE WEB BLOQUEADO|executor local|iniciar-laboratorio/i);
   assert.doesNotMatch(read(`${apiRoot}/tester/index.html`), /class="brand(?:-mark)?"|#ff6d3e|#f0ae45|#f3b347|#ffd889/i);
   assert.match(read(`${apiRoot}/tester/index.html`), /--accent:#7b35f5/);
+  assert.match(read(`${apiRoot}/tester/index.html`), /capítulo completo/);
   assert.ok(existsSync(new URL(`../${apiRoot}/tester/lab.js`, import.meta.url)));
   assert.match(read(`${apiRoot}/tester/lab.js`), /visitor-browser/);
   assert.doesNotMatch(read(`${apiRoot}/tester/lab.js`), /AMBIENTE WEB BLOQUEADO|TESTE INDISPONÍVEL/i);
