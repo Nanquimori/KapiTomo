@@ -12,23 +12,23 @@
     <meta property="og:description" content="Technical documentation, schema, examples, AI prompt builder, and official conformance tester.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/">
-    <meta name="kapitomo-doc-revision" content="20260910-original-layout">
+    <meta name="kapitomo-doc-revision" content="20260911-purple-palette">
     <link rel="icon" type="image/png" href="../../assets/kapitomo-logo.png?v=20260704-plugin-api-en">
     <link rel="apple-touch-icon" href="../../assets/kapitomo-logo.png?v=20260704-plugin-api-en">
     <style>
       :root {
         color-scheme: dark;
-        --bg: #08060d;
-        --surface: #12101a;
-        --surface-strong: #1b1727;
-        --line: rgba(255, 255, 255, 0.14);
-        --text: #f8f4ff;
-        --muted: #cfc6dc;
-        --soft: #9d91ad;
-        --accent: #ff7b58;
-        --accent-2: #f4b247;
-        --violet: #7758d3;
-        --green: #9ce6d0;
+        --bg: #030207;
+        --surface: #120a1f;
+        --surface-strong: #1b1230;
+        --line: rgba(166, 113, 255, 0.24);
+        --text: #f7f2ff;
+        --muted: #c7bce0;
+        --soft: #9f91b6;
+        --accent: #7b35f5;
+        --accent-2: #a764ff;
+        --violet: #d4c4ff;
+        --green: #c7b5ff;
         --font-ui: "Aptos", "Segoe UI", Arial, sans-serif;
         --font-code: Consolas, "Cascadia Mono", monospace;
       }
@@ -51,9 +51,9 @@
         margin: 0;
         overflow-x: hidden;
         background:
-          linear-gradient(145deg, rgba(255, 123, 88, 0.16), transparent 35rem),
-          linear-gradient(235deg, rgba(119, 88, 211, 0.2), transparent 40rem),
-          linear-gradient(180deg, #050409 0%, #0d0a14 46%, #151021 100%);
+          linear-gradient(145deg, rgba(123, 53, 245, 0.18), transparent 35rem),
+          linear-gradient(235deg, rgba(166, 113, 255, 0.14), transparent 40rem),
+          linear-gradient(180deg, #030207 0%, #0b0613 46%, #120a1f 100%);
         color: var(--text);
         font-family: var(--font-ui);
       }
@@ -104,7 +104,7 @@
 
       .language-button[aria-pressed="true"] {
         background: linear-gradient(135deg, var(--accent), var(--accent-2));
-        color: #160800;
+        color: #ffffff;
       }
 
       .doc-version[hidden],
@@ -152,21 +152,21 @@
       }
 
       .button.primary {
-        border-color: rgba(255, 123, 88, 0.56);
-        background: linear-gradient(135deg, #b62038, var(--accent));
+        border-color: rgba(166, 113, 255, 0.64);
+        background: linear-gradient(135deg, #5b1cce, var(--accent));
       }
 
       .hero,
       .panel {
         border: 1px solid var(--line);
-        background: rgba(18, 16, 26, 0.92);
+        background: rgba(18, 10, 31, 0.92);
         box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
         overflow: hidden;
       }
 
       .stripe {
         height: 9px;
-        background: linear-gradient(90deg, #b62038, var(--violet), var(--accent-2));
+        background: linear-gradient(90deg, #5b1cce, var(--accent), var(--accent-2));
       }
 
       .hero-inner {
@@ -244,11 +244,11 @@
       .prompt-panel {
         position: relative;
         padding: clamp(18px, 2.6vw, 30px);
-        border: 1px solid rgba(255, 178, 71, 0.62);
+        border: 1px solid rgba(166, 113, 255, 0.62);
         background:
-          radial-gradient(circle at 92% 8%, rgba(119, 88, 211, 0.3), transparent 29rem),
-          linear-gradient(145deg, rgba(182, 32, 56, 0.2), rgba(18, 16, 26, 0.97) 46%);
-        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.5), 0 0 34px rgba(255, 123, 88, 0.08);
+          radial-gradient(circle at 92% 8%, rgba(166, 113, 255, 0.24), transparent 29rem),
+          linear-gradient(145deg, rgba(91, 28, 206, 0.2), rgba(18, 10, 31, 0.97) 46%);
+        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.5), 0 0 34px rgba(123, 53, 245, 0.12);
         overflow: hidden;
       }
 
@@ -263,9 +263,9 @@
       .prompt-kicker {
         display: inline-flex;
         margin-bottom: 10px;
-        border: 1px solid rgba(255, 178, 71, 0.5);
-        background: rgba(255, 178, 71, 0.1);
-        color: #ffd998;
+        border: 1px solid rgba(166, 113, 255, 0.52);
+        background: rgba(123, 53, 245, 0.13);
+        color: #e3d9ff;
         padding: 5px 9px;
         font-size: 11px;
         font-weight: 900;
@@ -303,8 +303,8 @@
         width: 100%;
         min-height: 42px;
         margin-top: 7px;
-        border: 1px solid rgba(156, 230, 208, 0.32);
-        background: #08070d;
+        border: 1px solid rgba(166, 113, 255, 0.34);
+        background: #08050f;
         color: var(--text);
         padding: 9px 11px;
         font: 13px var(--font-code);
@@ -313,11 +313,11 @@
 
       .prompt-url:focus {
         border-color: var(--green);
-        box-shadow: 0 0 0 3px rgba(156, 230, 208, 0.1);
+        box-shadow: 0 0 0 3px rgba(166, 113, 255, 0.12);
       }
 
       .prompt-copy:focus-visible {
-        outline: 3px solid rgba(255, 178, 71, 0.38);
+        outline: 3px solid rgba(166, 113, 255, 0.42);
         outline-offset: 2px;
       }
 
@@ -331,8 +331,8 @@
 
       .prompt-copy {
         min-height: 36px;
-        border: 1px solid rgba(255, 123, 88, 0.72);
-        background: linear-gradient(135deg, #b62038, var(--accent));
+        border: 1px solid rgba(166, 113, 255, 0.72);
+        background: linear-gradient(135deg, #5b1cce, var(--accent));
         color: #fff;
         padding: 0 13px;
         font: inherit;
@@ -342,8 +342,8 @@
       }
 
       .prompt-copy[data-state="copied"] {
-        border-color: rgba(156, 230, 208, 0.76);
-        background: rgba(156, 230, 208, 0.16);
+        border-color: rgba(199, 181, 255, 0.76);
+        background: rgba(166, 113, 255, 0.16);
         color: var(--green);
       }
 
@@ -352,16 +352,16 @@
         width: 100%;
         min-height: 300px;
         resize: vertical;
-        border: 1px solid rgba(156, 230, 208, 0.22);
-        background: #07060b;
-        color: #e8fff7;
+        border: 1px solid rgba(166, 113, 255, 0.24);
+        background: #07040d;
+        color: #eee8ff;
         padding: 14px;
         font: 12px/1.58 var(--font-code);
         outline: none;
       }
 
       .prompt-output:focus {
-        border-color: rgba(156, 230, 208, 0.56);
+        border-color: rgba(166, 113, 255, 0.58);
       }
 
       .prompt-status {
@@ -412,9 +412,9 @@
         overflow-x: auto;
         margin: 14px 0 0;
         padding: 16px;
-        border: 1px solid rgba(156, 230, 208, 0.22);
-        background: #07060b;
-        color: #e8fff7;
+        border: 1px solid rgba(166, 113, 255, 0.24);
+        background: #07040d;
+        color: #eee8ff;
         font-size: 13px;
         line-height: 1.55;
       }
@@ -457,8 +457,8 @@
 
       .tag-list code {
         display: inline-flex;
-        border: 1px solid rgba(156, 230, 208, 0.24);
-        background: rgba(156, 230, 208, 0.07);
+        border: 1px solid rgba(166, 113, 255, 0.26);
+        background: rgba(166, 113, 255, 0.08);
         padding: 3px 7px;
       }
 
@@ -487,7 +487,7 @@
         display: grid;
         place-items: center;
         background: linear-gradient(135deg, var(--accent), var(--accent-2));
-        color: #150700;
+        color: #ffffff;
         font-weight: 950;
         align-self: center;
         transform: translateY(4px);

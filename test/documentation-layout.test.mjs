@@ -14,7 +14,9 @@ test("keeps the original Plugin API visual structure", () => {
   assert.match(html, /class="brand"/);
   assert.match(html, /class="stripe"/);
   assert.match(html, /class="prompt-grid"/);
-  assert.match(html, /--violet:\s*#7758d3/);
+  assert.match(html, /--accent:\s*#7b35f5/);
+  assert.match(html, /--accent-2:\s*#a764ff/);
+  assert.doesNotMatch(html, /#ff7b58|#f4b247|#b62038|#ffd998|rgba\(255, 123, 88|rgba\(255, 178, 71|rgba\(182, 32, 56/i);
   assert.doesNotMatch(html, /class="shell"/);
   assert.doesNotMatch(html, /border-radius:\s*22px/);
 });
