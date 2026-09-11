@@ -928,7 +928,7 @@ return "https://source.invalid/manga/work/";</code></pre>
           <section id="advanced-sources" class="panel">
             <h2>Headers, dynamic APIs, and encrypted APIs</h2>
             <h3 class="api-subheading">Authentication / headers</h3>
-            <p>Map referer, cookies, login, static headers, and per-page tokens separately. A browser-plan page may use <code>{ url, headers }</code>; Nyxovira carries those headers into the native image request. Never assume WebView cookies reach native requests unless the required value is explicitly included, and never embed personal credentials.</p>
+            <p>Map referer, cookies, login, static headers, and per-page tokens separately. Authentication does not make the plugin public-only: it may use an authorized session already opened by the user and only the access granted to that session. A browser-plan page may use <code>{ url, headers }</code>; Nyxovira carries those headers into the native image request. Never assume WebView cookies reach native requests unless the required value is explicitly included, and never request, store, export, or embed personal credentials, cookies, or tokens in plugin files or reports. Determine availability from the real authorized session, not from promotional copy or a generic notice.</p>
             <h3 class="api-subheading">Dynamic APIs</h3>
             <p>Keep discovery light, resolve only selected chapters, and exercise pagination or rotating tokens through the last page. The current in-app prepare hook must finish synchronously.</p>
             <h3 class="api-subheading">Encrypted APIs</h3>
@@ -1305,7 +1305,7 @@ return "https://source.invalid/manga/work/";</code></pre>
           <section id="advanced-sources-pt" class="panel">
             <h2>Headers, APIs dinâmicas e APIs criptografadas</h2>
             <h3 class="api-subheading">Autenticação / headers</h3>
-            <p>Mapeie referer, cookies, login, headers estáticos e tokens por página separadamente. Uma página do plano do navegador pode usar <code>{ url, headers }</code>; o Nyxovira transporta esses headers para a requisição nativa da imagem. Não suponha que cookies da WebView chegam às requisições nativas sem incluir explicitamente o valor necessário e nunca inclua credenciais pessoais.</p>
+            <p>Mapeie referer, cookies, login, headers estáticos e tokens por página separadamente. A autenticação não torna o plugin limitado ao conteúdo público: ele pode usar uma sessão autorizada já aberta pelo usuário e somente o acesso concedido a essa sessão. Uma página do plano do navegador pode usar <code>{ url, headers }</code>; o Nyxovira transporta esses headers para a requisição nativa da imagem. Não suponha que cookies da WebView chegam às requisições nativas sem incluir explicitamente o valor necessário e nunca solicite, armazene, exporte ou inclua credenciais, cookies ou tokens pessoais nos arquivos do plugin ou nos relatórios. Determine a disponibilidade pela sessão autorizada real, não por texto promocional ou aviso genérico.</p>
             <h3 class="api-subheading">APIs dinâmicas</h3>
             <p>Mantenha a descoberta leve, resolva somente capítulos selecionados e percorra paginação ou tokens rotativos até a última página. O hook de preparação atual do app deve terminar de forma síncrona.</p>
             <h3 class="api-subheading">APIs criptografadas</h3>
@@ -1480,6 +1480,8 @@ return "https://source.invalid/manga/work/";</code></pre>
             "",
             "Antes de programar, inspecione a página real, os scripts carregados, as requisições de rede do navegador e qualquer documentação oficial para desenvolvedores, API pública, OpenAPI ou Swagger da própria fonte. Não invente endpoints, seletores, headers, cookies, tokens, chaves ou resultados.",
             "- Registre URL de obra e leitor; endpoints de obra, capítulos e páginas; seletores; ordem; URLs relativas; IDs reais; login e cookies; restrições e criptografia.",
+            "- Se a fonte usar autenticação, não reduza automaticamente o plugin a capítulos públicos. Trabalhe somente com a sessão já autenticada e com o acesso efetivamente concedido ao próprio usuário no navegador ou aplicativo. Nunca solicite, registre, exporte ou inclua credenciais, cookies ou tokens pessoais no plugin, ZIP ou relatório.",
+            "- Não conclua o alcance do plugin apenas por textos promocionais ou avisos genéricos da página. Confirme o comportamento real da sessão autorizada e, quando ela não permitir um capítulo, registre-o como indisponível nessa sessão sem inventar resultado.",
             "- Escolha o nível correto: HTML simples; API JSON; ou API dinâmica, protegida ou criptografada.",
             "- Crie a estrutura mínima com plugin.json e o arquivo indicado por browser.download_target_script_file, normalmente browser/download_target.js. Valide o manifesto com " + documentationUrl + "plugin.schema.json.",
             "- Faça browser/download_target.js definir imediatamente um window.__nyxoviraChapterPlan leve, com título, URL canônica e capítulos reais, únicos e ordenados.",
@@ -1503,6 +1505,8 @@ return "https://source.invalid/manga/work/";</code></pre>
             "",
             "Before coding, inspect the real page, loaded scripts, browser network requests, and any official developer documentation, public API, OpenAPI or Swagger description. Do not invent endpoints, selectors, headers, cookies, tokens, keys, or results.",
             "- Record work and reader URLs; work, chapter, and page endpoints; selectors; order; relative URLs; real IDs; login and cookies; restrictions; and encryption.",
+            "- If the source uses authentication, do not automatically reduce the plugin to public chapters. Work only with the session already authenticated by the user and the access actually granted to that user in the browser or app. Never request, record, export, or include personal credentials, cookies, or tokens in the plugin, ZIP, or report.",
+            "- Do not infer the plugin's scope from promotional copy or generic notices alone. Confirm the real behavior of the authorized session and, when it does not allow a chapter, report that chapter as unavailable in that session without inventing a result.",
             "- Choose the correct level: simple HTML; JSON API; or dynamic, protected, or encrypted API.",
             "- Create the minimum structure with plugin.json and the file named by browser.download_target_script_file, normally browser/download_target.js. Validate the manifest with " + documentationUrl + "plugin.schema.json.",
             "- Make browser/download_target.js immediately define a lightweight window.__nyxoviraChapterPlan with the real title, canonical URL, and unique ordered chapters.",
