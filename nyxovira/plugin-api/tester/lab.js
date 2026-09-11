@@ -791,11 +791,16 @@
       for (let index = 0; index < pages.length; index += 1) {
         const descriptor = typeof pages[index] === "string" ? { url: pages[index] } : pages[index];
         const target = new URL(descriptor?.url || descriptor?.src || descriptor?.image || descriptor?.imageUrl, prepared.page.url).href;
-        const response = await mediaFetch(prepared.token, {
-          url: target,
-          method: "GET",
-          headers: { Referer: chapter.url || prepared.page.url, ...(descriptor.headers || {}) }
-        });
+        let response;
+        try {
+          response = await mediaFetch(prepared.token, {
+            url: target,
+            method: "GET",
+            headers: { Referer: chapter.url || prepared.page.url, ...(descriptor.headers || {}) }
+          });
+        } catch (error) {
+          throw new Error(`Página ${index + 1}: ${error?.message || String(error)}`);
+        }
         if (!response.ok) throw new Error(`Página ${index + 1} respondeu HTTP ${response.status}.`);
         const contentType = String(response.headers.get("content-type") || "").toLowerCase();
         if (!contentType.startsWith("image/")) throw new Error(`Página ${index + 1} não retornou uma imagem.`);

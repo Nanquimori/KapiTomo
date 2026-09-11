@@ -19,6 +19,7 @@ test("web lab validates both boundaries of the supplied work", () => {
   assert.match(lab, /complete-boundary-chapters-of-one-work/);
   assert.match(lab, /testedChapterCount/);
   assert.match(lab, /Capítulo \$\{selectedChapterId\}/);
+  assert.match(lab, /Página \$\{index \+ 1\}: \$\{error/);
 });
 test("web lab executes dynamic source modules instead of discarding them", () => {
   assert.doesNotMatch(lab, /if \(source\.type === "module"\) continue/);
