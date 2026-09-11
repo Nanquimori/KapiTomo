@@ -67,11 +67,18 @@ test("AI prompt builder has one creation flow in both languages", () => {
     assert.match(prompt, /validationScope: complete-first-chapter/);
     assert.match(prompt, /verifiedPageCount/);
     assert.match(prompt, /\{ url, headers, contentType \}/);
+    assert.doesNotMatch(prompt, /only public chapters|somente (?:os )?capítulos públicos/i);
     assert.doesNotMatch(prompt, /personal use|uso pessoal|independent external catalog|catálogo externo independente/i);
   }
   assert.match(promptPt, /Crie e valide um plugin Nyxovira para o site/);
+  assert.match(promptPt, /não reduza automaticamente o plugin a capítulos públicos/);
+  assert.match(promptPt, /sessão já autenticada e com o acesso efetivamente concedido/);
+  assert.match(promptPt, /Nunca solicite, registre, exporte ou inclua credenciais/);
   assert.match(promptPt, /corrija a causa, gere um novo ZIP e repita o teste/);
   assert.match(promptEn, /Create and validate a Nyxovira plugin for the site/);
+  assert.match(promptEn, /do not automatically reduce the plugin to public chapters/);
+  assert.match(promptEn, /session already authenticated by the user and the access actually granted/);
+  assert.match(promptEn, /Never request, record, export, or include personal credentials/);
   assert.match(promptEn, /fix the cause, build a new ZIP, and run the test again/);
   assert.doesNotMatch(html, />Crie um plugin Nyxovira para o site|>Create a Nyxovira plugin for the site/);
 });
