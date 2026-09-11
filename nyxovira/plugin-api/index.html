@@ -966,12 +966,12 @@ return "https://source.invalid/manga/work/";</code></pre>
             <div class="steps">
               <div class="step"><p>Keep <code>plugin.json</code> and the <code>browser</code> folder together, then create one ZIP.</p></div>
               <div class="step"><p><a href="tester/"><strong>Open the Plugin Laboratory</strong></a>, upload the ZIP, and enter the URL of a real work.</p></div>
-              <div class="step"><p>The hosted test validates the manifest, mapping, chapter IDs, and the complete content of the first chapter.</p></div>
+              <div class="step"><p>The hosted test validates the manifest, mapping, chapter IDs, and the complete content of the first and last chapters of the supplied work.</p></div>
               <div class="step"><p>Copy the JSON report. The ZIP, navigation, and collected content are released before the response is returned.</p></div>
             </div>
             <h3 class="api-subheading">Conformance gate</h3>
             <p><a class="button primary" href="tester/"><strong>Open the Web Plugin Laboratory</strong></a></p>
-            <p>Upload the ZIP and enter the work URL. The hosted service chooses the first chapter automatically and returns <code>PLUGIN_VALID</code> only after downloading every page in that chapter. It never approves a partial chapter. No local service, command line, APK, ADB, or emulator is required.</p>
+            <p>Upload the ZIP and enter the work URL. The hosted service chooses the first and last chapters automatically and returns <code>PLUGIN_VALID</code> only after downloading every page in both chapters. It never approves a partial chapter. No local service, command line, APK, ADB, or emulator is required.</p>
             <p>The result must contain <code>temporaryDataReleased: true</code> and <code>stored: false</code>. Without real network validation, state: <strong>not validated against the real site</strong>.</p>
             <p><a href="examples/">Complete sanitized examples</a>: simple HTML, JSON API, novel, manga, and encrypted API. All use the reserved <code>source.invalid</code> domain.</p>
             <p class="panel-copy-after-list"><strong>Plugin creation ends after complete validation.</strong> Tags, <code>schema_version</code>, GitHub, a public catalog, and a plugin website are distribution metadata, not requirements for creating or importing the plugin. Use the site's favicon or logo when available; you do not need to host a separate icon.</p>
@@ -1343,12 +1343,12 @@ return "https://source.invalid/manga/work/";</code></pre>
             <div class="steps">
               <div class="step"><p>Mantenha <code>plugin.json</code> e a pasta <code>browser</code> juntos e crie um único ZIP.</p></div>
               <div class="step"><p><a href="tester/"><strong>Abra o Laboratório de Plugins</strong></a>, envie o ZIP e informe a URL de uma obra real.</p></div>
-              <div class="step"><p>O teste hospedado valida manifesto, mapeamento, IDs e o conteúdo completo do primeiro capítulo.</p></div>
+              <div class="step"><p>O teste hospedado valida manifesto, mapeamento, IDs e o conteúdo completo do primeiro e do último capítulo da obra informada.</p></div>
               <div class="step"><p>Copie o relatório JSON. O ZIP, a navegação e o conteúdo coletado são descartados antes da resposta.</p></div>
             </div>
             <h3 class="api-subheading">Barreira de conformidade</h3>
             <p><a class="button primary" href="tester/"><strong>Abrir o Laboratório Web de Plugins</strong></a></p>
-            <p>Envie o ZIP e informe a URL da obra. O serviço hospedado escolhe o primeiro capítulo automaticamente e só retorna <code>PLUGIN_VALID</code> depois de baixar todas as páginas desse capítulo. Ele nunca aprova um capítulo parcial. Não é necessário serviço local, linha de comando, APK, ADB ou emulador.</p>
+            <p>Envie o ZIP e informe a URL da obra. O serviço hospedado escolhe o primeiro e o último capítulo automaticamente e só retorna <code>PLUGIN_VALID</code> depois de baixar todas as páginas dos dois capítulos. Ele nunca aprova um capítulo parcial. Não é necessário serviço local, linha de comando, APK, ADB ou emulador.</p>
             <p>O resultado precisa conter <code>temporaryDataReleased: true</code> e <code>stored: false</code>. Sem validação real de rede, informe: <strong>não validado contra o site real</strong>.</p>
             <p><a href="examples/">Exemplos completos e sanitizados</a>: HTML simples, API JSON, novel, manga e API criptografada. Todos usam o domínio reservado <code>source.invalid</code>.</p>
             <p class="panel-copy-after-list"><strong>A criação termina depois da validação completa.</strong> Tags, <code>schema_version</code>, GitHub, catálogo público e site de plugins são metadados de distribuição, não requisitos para criar ou importar o plugin. Use o favicon ou logo do próprio site quando existir; você não precisa hospedar um ícone separado.</p>
@@ -1493,9 +1493,9 @@ return "https://source.invalid/manga/work/";</code></pre>
             "",
             "Validação obrigatória no Laboratório Web de Plugins: \"" + documentationUrl + "tester/\".",
             "- Compacte plugin.json e os arquivos referenciados em um ZIP, envie-o ao laboratório e informe a URL de uma obra real da fonte.",
-            "- O laboratório escolhe o primeiro capítulo, executa o plugin e baixa todas as páginas desse capítulo. Não aceite validação parcial nem pule imagens para obter aprovação.",
+            "- O laboratório escolhe o primeiro e o último capítulo da obra informada, executa o plugin e baixa todas as páginas dos dois capítulos. Não aceite validação parcial nem pule imagens para obter aprovação.",
             "- Se qualquer etapa retornar FAIL ou BLOCKED, corrija a causa, gere um novo ZIP e repita o teste. Não altere o plugin ou o relatório para simular sucesso.",
-            "- Só declare sucesso se o JSON final tiver success: true, verdict: PLUGIN_VALID, nenhuma etapa FAIL ou BLOCKED, validationScope: complete-first-chapter, temporaryDataReleased: true e stored: false.",
+            "- Só declare sucesso se o JSON final tiver success: true, verdict: PLUGIN_VALID, nenhuma etapa FAIL ou BLOCKED, validationScope: complete-boundary-chapters-of-one-work, temporaryDataReleased: true e stored: false.",
             "- Em capítulos de imagens, confirme que verifiedPageCount é igual ao total de páginas resolvidas e que o detalhe de conteúdo informa N de N imagens verificadas. Em novels, exija conteúdo e conclusão PASS.",
             "- Se não houver acesso à rede, escreva exatamente: não validado contra o site real.",
             "",
@@ -1518,9 +1518,9 @@ return "https://source.invalid/manga/work/";</code></pre>
             "",
             "Mandatory validation in the Web Plugin Laboratory: \"" + documentationUrl + "tester/\".",
             "- Package plugin.json and every referenced file as a ZIP, upload it to the laboratory, and enter a real work URL from the source.",
-            "- The laboratory selects the first chapter, executes the plugin, and downloads every page in that chapter. Do not accept partial validation or skip images to obtain approval.",
+            "- The laboratory selects the first and last chapters of the supplied work, executes the plugin, and downloads every page in both chapters. Do not accept partial validation or skip images to obtain approval.",
             "- If any step returns FAIL or BLOCKED, fix the cause, build a new ZIP, and run the test again. Do not change the plugin or report to simulate success.",
-            "- Claim success only if the final JSON has success: true, verdict: PLUGIN_VALID, no FAIL or BLOCKED step, validationScope: complete-first-chapter, temporaryDataReleased: true, and stored: false.",
+            "- Claim success only if the final JSON has success: true, verdict: PLUGIN_VALID, no FAIL or BLOCKED step, validationScope: complete-boundary-chapters-of-one-work, temporaryDataReleased: true, and stored: false.",
             "- For image chapters, confirm verifiedPageCount equals the total resolved pages and the content detail reports N of N verified images. For novels, require PASS for content and conclusion.",
             "- If network access is unavailable, state exactly: not validated against the real site.",
             "",

@@ -64,7 +64,7 @@ test("AI prompt builder has one creation flow in both languages", () => {
     assert.match(prompt, /https:\/\/example\.org\//);
     assert.match(prompt, /https:\/\/nanquimori\.github\.io\/KapiTomo\/nyxovira\/plugin-api\//);
     assert.match(prompt, /https:\/\/nanquimori\.github\.io\/KapiTomo\/nyxovira\/plugin-api\/tester\//);
-    assert.match(prompt, /validationScope: complete-first-chapter/);
+    assert.match(prompt, /validationScope: complete-boundary-chapters-of-one-work/);
     assert.match(prompt, /verifiedPageCount/);
     assert.match(prompt, /\{ url, headers, contentType \}/);
     assert.doesNotMatch(prompt, /only public chapters|somente (?:os )?capítulos públicos/i);

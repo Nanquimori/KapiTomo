@@ -626,15 +626,35 @@
         executionTrace.push("target:" + (String(resolvedTarget || "") || "empty"));
         executionTrace.push("plugin-plan:" + (readPluginPlan() ? "yes" : "no"));
         let plan = await waitForPlan();
-        executionTrace.push("chapter:" + String(plan.chapters[0]?.id ?? ""));
-        const selectedChapterId = String(plan.chapters[0]?.id ?? "");
-        const selectedChapter = plan.chapters.find((chapter) => String(chapter?.id ?? "") === selectedChapterId);
+        const selectedChapterIds = [...new Set([
+          String(plan.chapters[0]?.id ?? ""),
+          String(plan.chapters[plan.chapters.length - 1]?.id ?? "")
+        ].filter(Boolean))];
+        executionTrace.push("chapters:" + selectedChapterIds.join(","));
         const prepare = window.__nyxoviraPrepareDownloadPlan || window.Nyxovira?.prepareDownloadPlan;
         if (typeof prepare === "function") {
-          const prepared = await runWithSynchronousPriming(
-            () => Promise.resolve(prepare({ selectedChapterIds: [selectedChapterId], chapterPlan: plan }))
-          );
-          if (prepared) plan = typeof prepared === "string" ? JSON.parse(prepared) : prepared;
+          const basePlan = JSON.parse(JSON.stringify(plan));
+          const combinedPlan = JSON.parse(JSON.stringify(plan));
+          for (const selectedChapterId of selectedChapterIds) {
+            let prepared;
+            try {
+              prepared = await runWithSynchronousPriming(
+                () => Promise.resolve(prepare({
+                  selectedChapterIds: [selectedChapterId],
+                  chapterPlan: JSON.parse(JSON.stringify(basePlan))
+                }))
+              );
+            } catch (error) {
+              throw new Error(`Capítulo ${selectedChapterId}: ${error?.message || String(error)}`);
+            }
+            if (!prepared) continue;
+            const preparedPlan = typeof prepared === "string" ? JSON.parse(prepared) : prepared;
+            const preparedChapter = preparedPlan?.chapters?.find((chapter) => String(chapter?.id ?? "") === selectedChapterId);
+            if (!preparedChapter) throw new Error(`Capítulo ${selectedChapterId}: o ID desapareceu durante a preparação.`);
+            const targetIndex = combinedPlan.chapters.findIndex((chapter) => String(chapter?.id ?? "") === selectedChapterId);
+            combinedPlan.chapters[targetIndex] = preparedChapter;
+          }
+          plan = combinedPlan;
         }
         const fallback = window.__nyxoviraChapterPlan;
         if (!plan && fallback) plan = typeof fallback === "string" ? JSON.parse(fallback) : fallback;
@@ -807,7 +827,7 @@
         chapterCount: plan.chapters.length,
         verifiedPageCount,
         verifiedByteCount,
-        validationScope: "complete-first-chapter",
+        validationScope: "complete-one-chapter",
         steps
       },
       temporaryDataReleased: true,
@@ -815,6 +835,59 @@
     };
   }
 
+  async function validateBoundaryPlan(prepared, plan) {
+    const chapterIds = Array.isArray(plan?.chapters)
+      ? plan.chapters.map((chapter) => String(chapter?.id ?? "")).filter(Boolean)
+      : [];
+    if (!chapterIds.length) return validatePlan(prepared, plan);
+    const firstId = chapterIds[0];
+    const lastId = chapterIds[chapterIds.length - 1];
+    let firstResult;
+    try {
+      firstResult = await validatePlan(prepared, plan);
+    } catch (error) {
+      throw new Error(`Capítulo ${firstId}: ${error?.message || String(error)}`);
+    }
+    const selectedChapterIds = [...new Set([firstId, lastId])];
+    const workStep = firstResult.report.steps.find((step) => step.key === "obra");
+    if (workStep) workStep.detail = `${plan.title}: ${plan.chapters.length} capítulo(s); as duas extremidades foram escolhidas automaticamente.`;
+    const selectionStep = firstResult.report.steps.find((step) => step.key === "seleção");
+    if (selectionStep) selectionStep.detail = `${selectedChapterIds.length > 1 ? "Capítulos" : "Capítulo"} ${selectedChapterIds.join(" e ")} preparado(s) sem alterar os IDs.`;
+    if (selectedChapterIds.length === 1) {
+      firstResult.report.selectedChapterIds = selectedChapterIds;
+      firstResult.report.testedChapterCount = 1;
+      firstResult.report.validationScope = "complete-boundary-chapters-of-one-work";
+      firstResult.report.steps.at(-1).detail = "O plugin passou somente nesta obra e no único capítulo disponível.";
+      return firstResult;
+    }
+
+    const lastChapter = plan.chapters.find((chapter) => String(chapter?.id ?? "") === lastId);
+    const lastPlan = { ...plan, chapters: [lastChapter, ...plan.chapters.filter((chapter) => String(chapter?.id ?? "") !== lastId)] };
+    let lastResult;
+    try {
+      lastResult = await validatePlan({ ...prepared, report: { steps: [] } }, lastPlan);
+    } catch (error) {
+      throw new Error(`Capítulo ${lastId}: ${error?.message || String(error)}`);
+    }
+    const lastContent = lastResult.report.steps.find((step) => step.key === "conteúdo");
+    firstResult.report.steps = firstResult.report.steps.filter((step) => step.key !== "conclusão");
+    firstResult.report.steps.push({
+      key: "conteúdo_limite_oposto",
+      status: "PASS",
+      detail: `Capítulo ${lastId}: ${lastContent?.detail || "conteúdo integral verificado."}`
+    });
+    firstResult.report.steps.push({
+      key: "conclusão",
+      status: "PASS",
+      detail: `O plugin passou somente nesta obra e nos capítulos de fronteira ${firstId} e ${lastId}.`
+    });
+    firstResult.report.selectedChapterIds = selectedChapterIds;
+    firstResult.report.testedChapterCount = selectedChapterIds.length;
+    firstResult.report.verifiedPageCount += Number(lastResult.report.verifiedPageCount || 0);
+    firstResult.report.verifiedByteCount += Number(lastResult.report.verifiedByteCount || 0);
+    firstResult.report.validationScope = "complete-boundary-chapters-of-one-work";
+    return firstResult;
+  }
   zipInput.addEventListener("change", () => setFile(zipInput.files[0]));
   for (const name of ["dragenter", "dragover"]) dropZone.addEventListener(name, (event) => { event.preventDefault(); dropZone.classList.add("drag"); });
   for (const name of ["dragleave", "drop"]) dropZone.addEventListener(name, (event) => { event.preventDefault(); dropZone.classList.remove("drag"); });
@@ -839,7 +912,7 @@
       prepared = await response.json();
       if (!response.ok || !prepared.prepared) throw new Error(prepared.report?.error || prepared.error || `HTTP ${response.status}`);
       const plan = await executeInSandbox(prepared);
-      render(await validatePlan(prepared, plan));
+      render(await validateBoundaryPlan(prepared, plan));
     } catch (error) {
       const steps = [...(prepared?.report?.steps || [])];
       steps.push({ key: "diagnóstico", status: "FAIL", detail: error?.message || String(error) });
