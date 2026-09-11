@@ -8,4 +8,4 @@ These examples use the reserved host `source.invalid`; they describe complete pl
 - `manga`: complete image-page chapter plan with request headers.
 - `encrypted-api`: browser discovery plus mandatory native parser configuration for a protected response.
 
-An example is a template, not proof that a real source works. Upload the finished ZIP to the Web Plugin Laboratory and require `PLUGIN_VALID`, no `FAIL` step, `temporaryDataReleased: true`, and `stored: false` against a real work. The first and last chapters of the supplied work are selected automatically.
+An example is a template, not proof that a real source works. Upload the finished ZIP to the Web Plugin Laboratory and require `PLUGIN_VALID_FOR_TESTED_WORK`, no `FAIL` step, `requestProfile: nyxovira-android-http-v1`, `packageSha256`, `temporaryDataReleased: true`, and `stored: false` for the exact work URL. The first and last chapters of that work are selected automatically; no result applies to a different work or ZIP.

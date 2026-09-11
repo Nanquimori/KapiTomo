@@ -8,7 +8,7 @@ const labPage = read("nyxovira/plugin-api/tester/index.html");
 const worker = read("plugin-lab-worker/src/index.js");
 
 test("published lab page cache-busts the runtime after fixes", () => {
-  assert.match(labPage, /lab\.js\?v=20260911-boundary-parity/);
+  assert.match(labPage, /lab\.js\?v=20260911-native-request-parity/);
   assert.doesNotMatch(labPage, /src="\.\/lab\.js"/);
 });
 
@@ -16,10 +16,10 @@ test("web lab validates both boundaries of the supplied work", () => {
   assert.match(lab, /plan\.chapters\[plan\.chapters\.length - 1\]/);
   assert.match(lab, /selectedChapterIds: \[selectedChapterId\]/);
   assert.match(lab, /validateBoundaryPlan/);
-  assert.match(lab, /complete-boundary-chapters-of-one-work/);
+  assert.match(lab, /exact-work-complete-boundary-chapters/);
   assert.match(lab, /testedChapterCount/);
   assert.match(lab, /Capítulo \$\{selectedChapterId\}/);
-  assert.match(lab, /Página \$\{index \+ 1\}: \$\{error/);
+  assert.match(lab, /"Página " \+ \(index \+ 1\)/);
 });
 test("web lab executes dynamic source modules instead of discarding them", () => {
   assert.doesNotMatch(lab, /if \(source\.type === "module"\) continue/);
@@ -71,7 +71,7 @@ test("module relay remains restricted to the signed plugin hosts", () => {
   assert.match(worker, /"cache-control": "no-store"/);
 });
 
-test("chapter media validation accepts only public images and never approves a partial chapter", () => {
+test("chapter media validation uses the Nyxovira request profile and never approves a partial chapter", () => {
   assert.match(worker, /async function handleMedia/);
   assert.match(worker, /assertPublicHttpUrl\(input\.url, "Imagem do capítulo"\)/);
   assert.match(worker, /contentType\.startsWith\("image\/"\)/);
@@ -79,14 +79,21 @@ test("chapter media validation accepts only public images and never approves a p
   assert.match(lab, /const maxPages = 120/);
   assert.match(lab, /const maxChapterBytes = 96 \* 1024 \* 1024/);
   assert.match(lab, /pages\.length > maxPages/);
-  assert.match(lab, /for \(let index = 0; index < pages\.length; index \+= 1\)/);
+  assert.match(lab, /nativeDownloadWorkers = 4/);
+  assert.match(lab, /nativeDownloadRetries = 3/);
+  assert.match(lab, /nativeDownloadBatchSize = nativeDownloadWorkers \* 2/);
+  assert.match(lab, /downloadBatchLikeNyxovira/);
+  assert.match(lab, /Promise\.all/);
+  assert.match(lab, /headers: \{ Accept: "\*\/\*", Referer:/);
   assert.doesNotMatch(lab, /pages\.slice\(0, maxPages\)/);
   assert.doesNotMatch(lab, /verifiedPages > 0\) break/);
-  assert.match(lab, /verifiedPages \+= 1/);
+  assert.match(lab, /verifiedPages \+= batchResults\.length/);
   assert.match(lab, /nenhuma página foi ignorada/);
-  assert.match(lab, /validationScope\s*=\s*"complete-boundary-chapters-of-one-work"/);
+  assert.match(lab, /validationScope\s*=\s*"exact-work-complete-boundary-chapters"/);
   assert.match(lab, /verifiedByteCount/);
   assert.match(lab, /await mediaFetch\(prepared\.token/);
+  assert.match(lab, /packageSha256/);
+  assert.match(lab, /PLUGIN_VALID_FOR_TESTED_WORK/);
   assert.doesNotMatch(lab, /O capítulo tem .*limite web/);
   assert.doesNotMatch(lab, /O capítulo excedeu o limite web/);
 });

@@ -4,6 +4,9 @@
   const apiBase = "https://nyxovira-plugin-lab.nanquimori-kapitomo.workers.dev";
   const maxPages = 120;
   const maxChapterBytes = 96 * 1024 * 1024;
+  const nativeDownloadWorkers = 4;
+  const nativeDownloadRetries = 3;
+  const nativeDownloadBatchSize = nativeDownloadWorkers * 2;
   const qs = (selector) => document.querySelector(selector);
   const form = qs("[data-test-form]");
   const zipInput = qs("#pluginZip");
@@ -55,13 +58,29 @@
     fileLabel.textContent = `${file.name} · ${(file.size / 1024).toFixed(1)} KiB`;
   }
 
+  async function sha256File(file) {
+    const digest = await crypto.subtle.digest("SHA-256", await file.arrayBuffer());
+    return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+  }
+
+  function annotatePackage(result, prepared, file, packageSha256) {
+    const report = result.report || (result.report = {});
+    report.packageSha256 = packageSha256;
+    report.packageSizeBytes = file.size;
+    const steps = Array.isArray(report.steps) ? report.steps : (report.steps = []);
+    const detail = `${prepared?.plugin?.id || file.name} · arquivo ${file.name} · ${file.size} bytes · SHA-256 ${packageSha256}.`;
+    const manifestIndex = steps.findIndex((item) => item.key === "manifesto");
+    steps.splice(manifestIndex >= 0 ? manifestIndex + 1 : 0, 0, { key: "pacote", status: "INFO", detail });
+    return result;
+  }
+
   function render(result) {
     lastResult = result;
     resultCard.classList.remove("hidden");
     const report = result.report || {};
     const valid = report.success === true;
     const verdict = qs("[data-verdict]");
-    verdict.textContent = report.verdict || "PLUGIN_INVALID";
+    verdict.textContent = report.verdict || "PLUGIN_INVALID_FOR_TESTED_WORK";
     verdict.className = `verdict ${valid ? "valid" : "invalid"}`;
     qs("[data-work-summary]").textContent = [report.pluginId, report.workTitle].filter(Boolean).join(" · ") || "Diagnóstico concluído.";
     const cleanup = qs("[data-cleanup]");
@@ -761,6 +780,52 @@
     return head[0] === 0xff && head[1] === 0xd8;
   }
 
+  async function downloadPageLikeNyxovira(prepared, chapter, descriptor, index) {
+    const target = new URL(descriptor?.url || descriptor?.src || descriptor?.image || descriptor?.imageUrl, prepared.page.url).href;
+    let lastError;
+    for (let attempt = 0; attempt <= nativeDownloadRetries; attempt += 1) {
+      try {
+        const response = await mediaFetch(prepared.token, {
+          url: target,
+          method: "GET",
+          headers: { Accept: "*/*", Referer: chapter.url || prepared.page.url, ...(descriptor.headers || {}) }
+        });
+        if (!response.ok) throw new Error("respondeu HTTP " + response.status);
+        const contentType = String(response.headers.get("content-type") || "").toLowerCase();
+        if (!contentType.startsWith("image/")) throw new Error("não retornou uma imagem");
+        const bytes = await response.arrayBuffer();
+        if (!bytes.byteLength || !imageLooksValid(bytes, contentType)) throw new Error("retornou uma imagem inválida");
+        return { index, byteLength: bytes.byteLength };
+      } catch (error) {
+        lastError = error;
+        if (attempt < nativeDownloadRetries) {
+          await new Promise((resolve) => setTimeout(resolve, Math.min(1200, 350 * (attempt + 1))));
+        }
+      }
+    }
+    throw new Error("Página " + (index + 1) + ": " + (lastError?.message || String(lastError)) + " após " + (nativeDownloadRetries + 1) + " tentativa(s).");
+  }
+
+  async function downloadBatchLikeNyxovira(prepared, chapter, pages, startIndex) {
+    const batch = pages.slice(startIndex, startIndex + nativeDownloadBatchSize);
+    const results = new Array(batch.length);
+    let cursor = 0;
+    async function worker() {
+      while (cursor < batch.length) {
+        const localIndex = cursor;
+        cursor += 1;
+        const raw = batch[localIndex];
+        const descriptor = typeof raw === "string" ? { url: raw } : raw;
+        results[localIndex] = await downloadPageLikeNyxovira(prepared, chapter, descriptor, startIndex + localIndex);
+      }
+    }
+    await Promise.all(Array.from(
+      { length: Math.min(nativeDownloadWorkers, batch.length) },
+      () => worker()
+    ));
+    return results;
+  }
+
   async function validatePlan(prepared, plan) {
     const steps = [...(prepared.report?.steps || [])];
     if (!String(plan?.title || "").trim()) throw new Error("O plano não informou o título da obra.");
@@ -784,33 +849,18 @@
       contentSummary = `${paragraphs.length} parágrafo(s) serializados e reabertos em memória.`;
     } else if (pages.length) {
       if (pages.length > maxPages) {
-        throw new Error(`O primeiro capítulo tem ${pages.length} páginas e excede o limite técnico de ${maxPages}; o plugin não será declarado válido com um teste parcial.`);
+        throw new Error(`O primeiro capítulo tem ${pages.length} páginas e excede o limite técnico de ${maxPages}; a execução não será aprovada com um teste parcial.`);
       }
       let totalBytes = 0;
       let verifiedPages = 0;
-      for (let index = 0; index < pages.length; index += 1) {
-        const descriptor = typeof pages[index] === "string" ? { url: pages[index] } : pages[index];
-        const target = new URL(descriptor?.url || descriptor?.src || descriptor?.image || descriptor?.imageUrl, prepared.page.url).href;
-        let response;
-        try {
-          response = await mediaFetch(prepared.token, {
-            url: target,
-            method: "GET",
-            headers: { Referer: chapter.url || prepared.page.url, ...(descriptor.headers || {}) }
-          });
-        } catch (error) {
-          throw new Error(`Página ${index + 1}: ${error?.message || String(error)}`);
+      for (let startIndex = 0; startIndex < pages.length; startIndex += nativeDownloadBatchSize) {
+        const batchResults = await downloadBatchLikeNyxovira(prepared, chapter, pages, startIndex);
+        const batchBytes = batchResults.reduce((sum, result) => sum + result.byteLength, 0);
+        if (totalBytes + batchBytes > maxChapterBytes) {
+          throw new Error("O primeiro capítulo excedeu o limite técnico de 96 MiB; a execução não será aprovada com um teste parcial.");
         }
-        if (!response.ok) throw new Error(`Página ${index + 1} respondeu HTTP ${response.status}.`);
-        const contentType = String(response.headers.get("content-type") || "").toLowerCase();
-        if (!contentType.startsWith("image/")) throw new Error(`Página ${index + 1} não retornou uma imagem.`);
-        const bytes = await response.arrayBuffer();
-        if (!bytes.byteLength || !imageLooksValid(bytes, contentType)) throw new Error(`Página ${index + 1} retornou uma imagem inválida.`);
-        if (totalBytes + bytes.byteLength > maxChapterBytes) {
-          throw new Error("O primeiro capítulo excedeu o limite técnico de 96 MiB; o plugin não será declarado válido com um teste parcial.");
-        }
-        totalBytes += bytes.byteLength;
-        verifiedPages += 1;
+        totalBytes += batchBytes;
+        verifiedPages += batchResults.length;
       }
       verifiedPageCount = verifiedPages;
       verifiedByteCount = totalBytes;
@@ -819,11 +869,21 @@
       throw new Error("O primeiro capítulo não resolveu páginas nem parágrafos.");
     }
     steps.push({ key: "conteúdo", status: "PASS", detail: contentSummary });
-    steps.push({ key: "conclusão", status: "PASS", detail: "O plugin passou nesta obra e no primeiro capítulo testado." });
+    steps.push({
+      key: "transporte",
+      status: "PASS",
+      detail: `Páginas verificadas em lotes de ${nativeDownloadBatchSize}, com ${nativeDownloadWorkers} conexões simultâneas, ${nativeDownloadRetries} novas tentativas, User-Agent, Accept, Referer, redirects e headers suportados do plano equivalentes ao downloader Nyxovira.`
+    });
+    steps.push({
+      key: "cobertura",
+      status: "INFO",
+      detail: "Somente a URL de obra informada e os capítulos indicados neste relatório foram testados. O resultado não valida outras obras, outros capítulos, outro ZIP nem uma instalação anterior."
+    });
+    steps.push({ key: "conclusão", status: "PASS", detail: "A execução testada passou; isso não declara o plugin inteiro válido." });
     return {
       report: {
-        schemaVersion: 3,
-        verdict: "PLUGIN_VALID",
+        schemaVersion: 4,
+        verdict: "PLUGIN_VALID_FOR_TESTED_WORK",
         success: true,
         pluginId: prepared.plugin.id,
         workUrl: prepared.page.url,
@@ -832,7 +892,8 @@
         chapterCount: plan.chapters.length,
         verifiedPageCount,
         verifiedByteCount,
-        validationScope: "complete-one-chapter",
+        validationScope: "exact-work-complete-one-chapter",
+        requestProfile: "nyxovira-android-http-v1",
         steps
       },
       temporaryDataReleased: true,
@@ -861,8 +922,8 @@
     if (selectedChapterIds.length === 1) {
       firstResult.report.selectedChapterIds = selectedChapterIds;
       firstResult.report.testedChapterCount = 1;
-      firstResult.report.validationScope = "complete-boundary-chapters-of-one-work";
-      firstResult.report.steps.at(-1).detail = "O plugin passou somente nesta obra e no único capítulo disponível.";
+      firstResult.report.validationScope = "exact-work-complete-boundary-chapters";
+      firstResult.report.steps.at(-1).detail = "A execução passou somente nesta obra e no único capítulo disponível; isso não declara o plugin inteiro válido.";
       return firstResult;
     }
 
@@ -884,13 +945,13 @@
     firstResult.report.steps.push({
       key: "conclusão",
       status: "PASS",
-      detail: `O plugin passou somente nesta obra e nos capítulos de fronteira ${firstId} e ${lastId}.`
+      detail: `A execução passou somente nesta obra e nos capítulos de fronteira ${firstId} e ${lastId}; isso não declara o plugin inteiro válido.`
     });
     firstResult.report.selectedChapterIds = selectedChapterIds;
     firstResult.report.testedChapterCount = selectedChapterIds.length;
     firstResult.report.verifiedPageCount += Number(lastResult.report.verifiedPageCount || 0);
     firstResult.report.verifiedByteCount += Number(lastResult.report.verifiedByteCount || 0);
-    firstResult.report.validationScope = "complete-boundary-chapters-of-one-work";
+    firstResult.report.validationScope = "exact-work-complete-boundary-chapters";
     return firstResult;
   }
   zipInput.addEventListener("change", () => setFile(zipInput.files[0]));
@@ -906,7 +967,9 @@
     progress.classList.remove("hidden");
     resultCard.classList.add("hidden");
     let prepared;
+    let packageSha256 = "";
     try {
+      packageSha256 = await sha256File(file);
       const query = new URLSearchParams({ workUrl: workUrl.value.trim() });
       const response = await fetch(`${apiBase}/prepare?${query}`, {
         method: "POST",
@@ -917,14 +980,14 @@
       prepared = await response.json();
       if (!response.ok || !prepared.prepared) throw new Error(prepared.report?.error || prepared.error || `HTTP ${response.status}`);
       const plan = await executeInSandbox(prepared);
-      render(await validateBoundaryPlan(prepared, plan));
+      render(annotatePackage(await validateBoundaryPlan(prepared, plan), prepared, file, packageSha256));
     } catch (error) {
       const steps = [...(prepared?.report?.steps || [])];
       steps.push({ key: "diagnóstico", status: "FAIL", detail: error?.message || String(error) });
-      render({
+      render(annotatePackage({
         report: {
-          schemaVersion: 3,
-          verdict: "PLUGIN_INVALID",
+          schemaVersion: 4,
+          verdict: "PLUGIN_INVALID_FOR_TESTED_WORK",
           success: false,
           pluginId: prepared?.plugin?.id,
           workUrl: prepared?.page?.url || workUrl.value.trim(),
@@ -933,7 +996,7 @@
         },
         temporaryDataReleased: true,
         stored: false
-      });
+      }, prepared, file, packageSha256 || "indisponível"));
     } finally {
       prepared = null;
       progress.classList.add("hidden");
