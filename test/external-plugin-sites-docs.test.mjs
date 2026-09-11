@@ -63,10 +63,16 @@ test("AI prompt builder has one creation flow in both languages", () => {
   for (const prompt of [promptPt, promptEn]) {
     assert.match(prompt, /https:\/\/example\.org\//);
     assert.match(prompt, /https:\/\/nanquimori\.github\.io\/KapiTomo\/nyxovira\/plugin-api\//);
+    assert.match(prompt, /https:\/\/nanquimori\.github\.io\/KapiTomo\/nyxovira\/plugin-api\/tester\//);
+    assert.match(prompt, /validationScope: complete-first-chapter/);
+    assert.match(prompt, /verifiedPageCount/);
+    assert.match(prompt, /\{ url, headers, contentType \}/);
     assert.doesNotMatch(prompt, /personal use|uso pessoal|independent external catalog|catálogo externo independente/i);
   }
-  assert.match(promptPt, /Crie um plugin Nyxovira para o site/);
-  assert.match(promptEn, /Create a Nyxovira plugin for the site/);
+  assert.match(promptPt, /Crie e valide um plugin Nyxovira para o site/);
+  assert.match(promptPt, /corrija a causa, gere um novo ZIP e repita o teste/);
+  assert.match(promptEn, /Create and validate a Nyxovira plugin for the site/);
+  assert.match(promptEn, /fix the cause, build a new ZIP, and run the test again/);
 });
 
 test("published SDK resources are directly linked from both language views", () => {

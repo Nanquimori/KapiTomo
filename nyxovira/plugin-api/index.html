@@ -1476,33 +1476,51 @@ return "https://source.invalid/manga/work/";</code></pre>
           var site = normalizePromptSite(rawSite);
           var isPortuguese = language === "pt";
           var lines = isPortuguese ? [
-            "Crie um plugin Nyxovira para o site \"" + site + "\", seguindo integralmente a documentação oficial: \"" + documentationUrl + "\".",
+            "Crie e valide um plugin Nyxovira para o site \"" + site + "\", seguindo integralmente a documentação oficial: \"" + documentationUrl + "\".",
             "",
             "Antes de programar, inspecione a página real, os scripts carregados, as requisições de rede do navegador e qualquer documentação oficial para desenvolvedores, API pública, OpenAPI ou Swagger da própria fonte. Não invente endpoints, seletores, headers, cookies, tokens, chaves ou resultados.",
             "- Registre URL de obra e leitor; endpoints de obra, capítulos e páginas; seletores; ordem; URLs relativas; IDs reais; login e cookies; restrições e criptografia.",
             "- Escolha o nível correto: HTML simples; API JSON; ou API dinâmica, protegida ou criptografada.",
-            "- Use browser/download_target.js para descoberta e plano. Declare parser para API estruturada, headers especiais, criptografia ou download nativo fora da WebView.",
+            "- Crie a estrutura mínima com plugin.json e o arquivo indicado por browser.download_target_script_file, normalmente browser/download_target.js. Valide o manifesto com " + documentationUrl + "plugin.schema.json.",
+            "- Faça browser/download_target.js definir imediatamente um window.__nyxoviraChapterPlan leve, com título, URL canônica e capítulos reais, únicos e ordenados.",
+            "- Resolva apenas o conteúdo dos capítulos selecionados em window.__nyxoviraPrepareDownloadPlan. O hook deve terminar de forma síncrona e devolver todas as páginas ou todos os parágrafos do capítulo.",
             "- Garanta que cada chapterPlan.chapters[].id seja exatamente igual ao valor recebido em selectedChapterIds; não acrescente nem remova o prefixo id:.",
+            "- Preserve a ordem e resolva URLs relativas com a base correta. Quando uma imagem exigir Referer, Authorization ou outro header, retorne a página como { url, headers, contentType }; não descarte esses headers antes do download nativo.",
+            "- Declare parser para API estruturada, headers estáticos, criptografia ou download nativo fora da WebView. Não declare campos que não correspondam ao tráfego real.",
             "- Use o favicon ou logo público da própria fonte em browser.icon_url quando existir.",
-            "- Compacte o plugin em ZIP e teste-o no Laboratório Web em " + documentationUrl + "tester/: informe uma obra real; o primeiro capítulo será escolhido automaticamente.",
-            "- Só declare sucesso se o relatório trouxer PLUGIN_VALID, nenhuma etapa FAIL, temporaryDataReleased: true e stored: false.",
+            "",
+            "Validação obrigatória no Laboratório Web de Plugins: \"" + documentationUrl + "tester/\".",
+            "- Compacte plugin.json e os arquivos referenciados em um ZIP, envie-o ao laboratório e informe a URL de uma obra real da fonte.",
+            "- O laboratório escolhe o primeiro capítulo, executa o plugin e baixa todas as páginas desse capítulo. Não aceite validação parcial nem pule imagens para obter aprovação.",
+            "- Se qualquer etapa retornar FAIL ou BLOCKED, corrija a causa, gere um novo ZIP e repita o teste. Não altere o plugin ou o relatório para simular sucesso.",
+            "- Só declare sucesso se o JSON final tiver success: true, verdict: PLUGIN_VALID, nenhuma etapa FAIL ou BLOCKED, validationScope: complete-first-chapter, temporaryDataReleased: true e stored: false.",
+            "- Em capítulos de imagens, confirme que verifiedPageCount é igual ao total de páginas resolvidas e que o detalhe de conteúdo informa N de N imagens verificadas. Em novels, exija conteúdo e conclusão PASS.",
             "- Se não houver acesso à rede, escreva exatamente: não validado contra o site real.",
             "",
-            "Entregue os arquivos completos e informe mapeamento, limitações, artefatos do teste e etapas que falharam."
+            "Entregue os arquivos completos, o ZIP final e o relatório JSON real. Informe o mapeamento encontrado, limitações, capítulo testado, quantidade de páginas verificadas e toda etapa que precisou ser corrigida."
           ] : [
-            "Create a Nyxovira plugin for the site \"" + site + "\", following the official documentation completely: \"" + documentationUrl + "\".",
+            "Create and validate a Nyxovira plugin for the site \"" + site + "\", following the official documentation completely: \"" + documentationUrl + "\".",
             "",
             "Before coding, inspect the real page, loaded scripts, browser network requests, and any official developer documentation, public API, OpenAPI or Swagger description. Do not invent endpoints, selectors, headers, cookies, tokens, keys, or results.",
             "- Record work and reader URLs; work, chapter, and page endpoints; selectors; order; relative URLs; real IDs; login and cookies; restrictions; and encryption.",
             "- Choose the correct level: simple HTML; JSON API; or dynamic, protected, or encrypted API.",
-            "- Use browser/download_target.js for discovery and the plan. Declare parser for structured APIs, special headers, encryption, or native downloading outside the WebView.",
+            "- Create the minimum structure with plugin.json and the file named by browser.download_target_script_file, normally browser/download_target.js. Validate the manifest with " + documentationUrl + "plugin.schema.json.",
+            "- Make browser/download_target.js immediately define a lightweight window.__nyxoviraChapterPlan with the real title, canonical URL, and unique ordered chapters.",
+            "- Resolve only selected chapter content in window.__nyxoviraPrepareDownloadPlan. The hook must finish synchronously and return every page or paragraph in the chapter.",
             "- Keep each chapterPlan.chapters[].id exactly equal to the value in selectedChapterIds; never add or remove an id: prefix.",
+            "- Preserve order and resolve relative URLs against the correct base. When an image needs Referer, Authorization, or another header, return the page as { url, headers, contentType }; do not discard those headers before native download.",
+            "- Declare parser for structured APIs, static headers, encryption, or native downloading outside the WebView. Do not declare fields that do not match real traffic.",
             "- Use the source's own public favicon or logo as browser.icon_url when available.",
-            "- Package the plugin as a ZIP and test it in the Web Plugin Laboratory at " + documentationUrl + "tester/: enter a real work; the first chapter is selected automatically.",
-            "- Claim success only if the report contains PLUGIN_VALID, no FAIL step, temporaryDataReleased: true, and stored: false.",
+            "",
+            "Mandatory validation in the Web Plugin Laboratory: \"" + documentationUrl + "tester/\".",
+            "- Package plugin.json and every referenced file as a ZIP, upload it to the laboratory, and enter a real work URL from the source.",
+            "- The laboratory selects the first chapter, executes the plugin, and downloads every page in that chapter. Do not accept partial validation or skip images to obtain approval.",
+            "- If any step returns FAIL or BLOCKED, fix the cause, build a new ZIP, and run the test again. Do not change the plugin or report to simulate success.",
+            "- Claim success only if the final JSON has success: true, verdict: PLUGIN_VALID, no FAIL or BLOCKED step, validationScope: complete-first-chapter, temporaryDataReleased: true, and stored: false.",
+            "- For image chapters, confirm verifiedPageCount equals the total resolved pages and the content detail reports N of N verified images. For novels, require PASS for content and conclusion.",
             "- If network access is unavailable, state exactly: not validated against the real site.",
             "",
-            "Deliver complete files and report mapping, limitations, test artifacts, and failed stages."
+            "Deliver the complete files, final ZIP, and real JSON report. Report the discovered mapping, limitations, tested chapter, verified page count, and every stage that required correction."
           ];
           return lines.join("\n");
         }
