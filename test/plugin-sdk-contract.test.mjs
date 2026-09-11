@@ -13,7 +13,7 @@ test("documents the three implementation levels and a real-output validation gat
     assert.match(document, /HTML simples|Simple HTML/i);
     assert.match(document, /API JSON|JSON API/i);
     assert.match(document, /criptograf|encrypted/i);
-    assert.match(document, /PLUGIN_VALID/);
+    assert.match(document, /PLUGIN_VALID_FOR_TESTED_WORK/);
     assert.match(document, /selectedChapterIds/);
   }
 });
@@ -52,7 +52,8 @@ test("the generated AI prompt forbids fabricated mappings and false success", ()
   assert.match(html, /Não invente endpoints, seletores, headers, cookies, tokens, chaves ou resultados/);
   assert.match(html, /not validated against the real site/);
   assert.match(html, /não validado contra o site real/);
-  assert.match(html, /validationScope: complete-boundary-chapters-of-one-work/);
+  assert.match(html, /validationScope: exact-work-complete-boundary-chapters/);
+  assert.match(html, /packageSha256/);
   assert.match(html, /verifiedPageCount/);
   assert.match(html, /\{ url, headers, contentType \}/);
   assert.match(html, /FAIL or BLOCKED/);
