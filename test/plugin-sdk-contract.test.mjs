@@ -52,7 +52,7 @@ test("the generated AI prompt forbids fabricated mappings and false success", ()
   assert.match(html, /Não invente endpoints, seletores, headers, cookies, tokens, chaves ou resultados/);
   assert.match(html, /not validated against the real site/);
   assert.match(html, /não validado contra o site real/);
-  assert.match(html, /validationScope: complete-first-chapter/);
+  assert.match(html, /validationScope: complete-boundary-chapters-of-one-work/);
   assert.match(html, /verifiedPageCount/);
   assert.match(html, /\{ url, headers, contentType \}/);
   assert.match(html, /FAIL or BLOCKED/);

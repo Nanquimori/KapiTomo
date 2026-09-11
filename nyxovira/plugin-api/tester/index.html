@@ -26,7 +26,7 @@
       <h2>Testar um plugin</h2>
       <form data-test-form>
         <div class="field drop" data-drop-zone><label for="pluginZip">Plugin em ZIP</label><input id="pluginZip" type="file" accept=".zip,application/zip" required><small data-file-label>Máximo de 2 MiB. Arraste o ZIP para esta área ou selecione o arquivo.</small></div>
-        <div class="field"><label for="workUrl">URL da obra</label><input id="workUrl" type="url" inputmode="url" placeholder="https://site.example/obra/nome" autocomplete="off" required><small>Informe a página ou rota da obra. O capítulo usado no diagnóstico será escolhido automaticamente.</small></div>
+        <div class="field"><label for="workUrl">URL da obra</label><input id="workUrl" type="url" inputmode="url" placeholder="https://site.example/obra/nome" autocomplete="off" required><small>Informe exatamente a obra que será usada no app. O primeiro e o último capítulo serão escolhidos automaticamente.</small></div>
         <div class="actions"><button class="button primary" type="submit" data-test-button disabled>Testar na web</button><button class="button" type="button" data-clear-button>Limpar</button></div>
       </form>
       <div class="progress hidden" data-progress aria-label="Teste em andamento"><span></span></div>
@@ -37,6 +37,6 @@
       <p data-work-summary></p><div class="cleanup" data-cleanup>Os dados temporários foram descartados.</div><div class="error hidden" data-result-error></div><div class="steps" data-steps></div>
     </section>
   </main>
-  <script src="./lab.js?v=20260910-clean-copy"></script>
+  <script src="./lab.js?v=20260911-boundary-parity"></script>
 </body>
 </html>

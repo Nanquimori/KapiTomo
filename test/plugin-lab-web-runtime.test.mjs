@@ -8,10 +8,18 @@ const labPage = read("nyxovira/plugin-api/tester/index.html");
 const worker = read("plugin-lab-worker/src/index.js");
 
 test("published lab page cache-busts the runtime after fixes", () => {
-  assert.match(labPage, /lab\.js\?v=20260910-clean-copy/);
+  assert.match(labPage, /lab\.js\?v=20260911-boundary-parity/);
   assert.doesNotMatch(labPage, /src="\.\/lab\.js"/);
 });
 
+test("web lab validates both boundaries of the supplied work", () => {
+  assert.match(lab, /plan\.chapters\[plan\.chapters\.length - 1\]/);
+  assert.match(lab, /selectedChapterIds: \[selectedChapterId\]/);
+  assert.match(lab, /validateBoundaryPlan/);
+  assert.match(lab, /complete-boundary-chapters-of-one-work/);
+  assert.match(lab, /testedChapterCount/);
+  assert.match(lab, /Capítulo \$\{selectedChapterId\}/);
+});
 test("web lab executes dynamic source modules instead of discarding them", () => {
   assert.doesNotMatch(lab, /if \(source\.type === "module"\) continue/);
   assert.match(lab, /await loadModule\(source\)/);
@@ -75,7 +83,7 @@ test("chapter media validation accepts only public images and never approves a p
   assert.doesNotMatch(lab, /verifiedPages > 0\) break/);
   assert.match(lab, /verifiedPages \+= 1/);
   assert.match(lab, /nenhuma página foi ignorada/);
-  assert.match(lab, /validationScope: "complete-first-chapter"/);
+  assert.match(lab, /validationScope\s*=\s*"complete-boundary-chapters-of-one-work"/);
   assert.match(lab, /verifiedByteCount/);
   assert.match(lab, /await mediaFetch\(prepared\.token/);
   assert.doesNotMatch(lab, /O capítulo tem .*limite web/);
