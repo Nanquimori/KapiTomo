@@ -24,6 +24,12 @@
     "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", "\"": "&quot;"
   })[char]);
 
+  function compactUiText(value, maxLength = 220) {
+    const text = String(value ?? "").replace(/\s+/g, " ").trim();
+    if (text.length <= maxLength) return text;
+    return `${text.slice(0, Math.max(0, maxLength - 3)).trimEnd()}...`;
+  }
+
   async function health() {
     try {
       const response = await fetch(`${apiBase}/health`, { cache: "no-store" });
@@ -82,7 +88,10 @@
     const verdict = qs("[data-verdict]");
     verdict.textContent = report.verdict || "PLUGIN_INVALID_FOR_TESTED_WORK";
     verdict.className = `verdict ${valid ? "valid" : "invalid"}`;
-    qs("[data-work-summary]").textContent = [report.pluginId, report.workTitle].filter(Boolean).join(" · ") || "Diagnóstico concluído.";
+    qs("[data-work-summary]").textContent = compactUiText(
+      [report.pluginId, report.workTitle].filter(Boolean).join(" · ") || "Diagnóstico concluído.",
+      140
+    );
     const cleanup = qs("[data-cleanup]");
     const released = result.temporaryDataReleased === true && result.stored === false;
     cleanup.textContent = released
@@ -90,10 +99,16 @@
       : "O descarte dos dados temporários não foi confirmado.";
     cleanup.classList.toggle("bad", !released);
     const error = qs("[data-result-error]");
-    error.textContent = report.error || "";
+    const steps = Array.isArray(report.steps) ? report.steps : [];
+    const reportError = String(report.error || "").trim();
+    const repeatedInFailure = reportError && steps.some((item) => (
+      String(item?.status || "").toUpperCase() === "FAIL"
+      && String(item?.detail || "").trim() === reportError
+    ));
+    error.textContent = repeatedInFailure ? "" : compactUiText(reportError, 260);
     error.classList.toggle("hidden", !error.textContent);
-    qs("[data-steps]").innerHTML = (report.steps || []).map((item) => (
-      `<article class="step"><span class="badge ${escapeHtml(String(item.status || "info").toLowerCase())}">${escapeHtml(item.status || "INFO")}</span><div><strong>${escapeHtml(item.key || "etapa")}</strong><p>${escapeHtml(item.detail || "")}</p></div></article>`
+    qs("[data-steps]").innerHTML = steps.map((item) => (
+      `<article class="step"><span class="badge ${escapeHtml(String(item.status || "info").toLowerCase())}">${escapeHtml(item.status || "INFO")}</span><div><strong>${escapeHtml(item.key || "etapa")}</strong><p>${escapeHtml(compactUiText(item.detail, 240))}</p></div></article>`
     )).join("");
     resultCard.scrollIntoView({ behavior: "smooth", block: "start" });
   }
