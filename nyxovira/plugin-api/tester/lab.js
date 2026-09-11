@@ -826,6 +826,127 @@
     return results;
   }
 
+  function nativeParserError(detail) {
+    const error = new Error(detail);
+    error.diagnosticKey = "parser_nativo";
+    return error;
+  }
+
+  function encodeNativeRouteValue(value) {
+    return encodeURIComponent(String(value ?? "").trim()).replace(/[!'()*]/g, (character) => (
+      `%${character.charCodeAt(0).toString(16).toUpperCase()}`
+    ));
+  }
+
+  function applyNativeChapterTemplate(template, workId, chapterValue) {
+    let path = String(template || "").trim();
+    if (!path) throw nativeParserError("O parser aes_json_api não declarou chapter_api_path_template; o Nyxovira não consegue montar a requisição de download.");
+    if (!/^https?:\/\//i.test(path) && !path.startsWith("/")) path = `/${path}`;
+    path = path
+      .replaceAll("{workId}", encodeNativeRouteValue(workId))
+      .replaceAll("{chapter}", encodeNativeRouteValue(chapterValue));
+    const unresolved = [...new Set(path.match(/\{[^{}]+\}/g) || [])];
+    if (unresolved.length) {
+      throw nativeParserError(
+        `chapter_api_path_template contém ${unresolved.join(", ")}, mas o Nyxovira substitui somente {chapter} e {workId}. `
+        + "A rota nativa fica inválida e pode produzir HTTP 400."
+      );
+    }
+    return path;
+  }
+
+  function nativeParserEndpoint(parser, path) {
+    if (/^https?:\/\//i.test(path)) return new URL(path).href;
+    const apiBase = String(parser?.api_base || "").trim().replace(/\/$/, "");
+    if (!apiBase) throw nativeParserError("O parser aes_json_api não declarou api_base; o Nyxovira não consegue montar a requisição de download.");
+    return `${apiBase}${path}`;
+  }
+
+  function reportableEndpoint(endpoint) {
+    const parsed = new URL(endpoint);
+    return `${parsed.origin}${parsed.pathname}${parsed.search ? "?[parâmetros omitidos]" : ""}`;
+  }
+
+  function nativeChapterCandidates(chapter) {
+    const rawNumber = String(chapter?.number ?? "").trim();
+    const normalizedNumber = (rawNumber.replace(",", ".").match(/\d+(?:\.\d+)?/) || [""])[0];
+    return [...new Set([
+      String(chapter?.id ?? "").trim(),
+      rawNumber,
+      normalizedNumber || "1"
+    ].filter(Boolean))];
+  }
+
+  async function requestLikeNativeParser(prepared, parser, chapter, plan) {
+    const candidates = nativeChapterCandidates(chapter);
+    if (!candidates.length) throw nativeParserError("O capítulo não possui ID nem número para a requisição do parser nativo.");
+    const workId = String(plan?.remoteWorkId ?? plan?.workId ?? plan?.id ?? "").trim();
+    let lastFailure = null;
+    for (const candidate of candidates) {
+      const path = applyNativeChapterTemplate(parser.chapter_api_path_template, workId, candidate);
+      const endpoint = nativeParserEndpoint(parser, path);
+      const safeEndpoint = reportableEndpoint(endpoint);
+      for (let attempt = 0; attempt <= nativeDownloadRetries; attempt += 1) {
+        let response;
+        try {
+          response = await proxyFetch(prepared.token, {
+            url: endpoint,
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+              Referer: chapter?.url || prepared.page.url,
+              ...(parser.request_headers || {}),
+              "Content-Type": "application/json"
+            }
+          });
+        } catch (error) {
+          lastFailure = `${safeEndpoint} falhou: ${error?.message || String(error)}`;
+          if (attempt < nativeDownloadRetries) continue;
+          break;
+        }
+        if (response.ok) return { endpoint: safeEndpoint, candidate, status: response.status, attempts: attempt + 1 };
+        lastFailure = `${safeEndpoint} respondeu HTTP ${response.status}`;
+        if (attempt < nativeDownloadRetries) continue;
+      }
+    }
+    throw nativeParserError(
+      `Capítulo ${String(chapter?.id ?? chapter?.number ?? "?")}: ${lastFailure || "a requisição do parser nativo falhou"} `
+      + `após testar ${candidates.length} identificador(es), com até ${nativeDownloadRetries + 1} tentativa(s) por identificador.`
+    );
+  }
+
+  async function validateNativeParserPath(prepared, plan) {
+    const parser = prepared.nativeParser;
+    if (!parser) {
+      prepared.report.steps.push({
+        key: "parser_nativo",
+        status: "INFO",
+        detail: "O plugin não declara parser nativo; o download depende integralmente do plano preparado no navegador."
+      });
+      return;
+    }
+    if (parser.adapter !== "aes_json_api") {
+      prepared.report.steps.push({
+        key: "parser_nativo",
+        status: "INFO",
+        detail: `O adaptador ${parser.adapter || "não informado"} usa a página/leitor; seu conteúdo já é exercitado pela preparação e pelo download integral abaixo.`
+      });
+      return;
+    }
+    const chapters = Array.isArray(plan?.chapters) ? plan.chapters : [];
+    if (!chapters.length) throw nativeParserError("O plano não contém capítulos para testar o parser nativo.");
+    const boundaryChapters = [...new Map([chapters[0], chapters.at(-1)].map((chapter) => [String(chapter?.id ?? ""), chapter])).values()];
+    const probes = [];
+    for (const chapter of boundaryChapters) probes.push(await requestLikeNativeParser(prepared, parser, chapter, plan));
+    prepared.report.steps.push({
+      key: "parser_nativo",
+      status: "PASS",
+      detail: probes.map((probe) => (
+        `Capítulo ${probe.candidate}: HTTP ${probe.status} em ${probe.endpoint} (${probe.attempts} tentativa(s))`
+      )).join("; ") + ". A rota alternativa usada pelo downloader Nyxovira também respondeu."
+    });
+  }
+
   async function validatePlan(prepared, plan) {
     const steps = [...(prepared.report?.steps || [])];
     if (!String(plan?.title || "").trim()) throw new Error("O plano não informou o título da obra.");
@@ -980,10 +1101,11 @@
       prepared = await response.json();
       if (!response.ok || !prepared.prepared) throw new Error(prepared.report?.error || prepared.error || `HTTP ${response.status}`);
       const plan = await executeInSandbox(prepared);
+      await validateNativeParserPath(prepared, plan);
       render(annotatePackage(await validateBoundaryPlan(prepared, plan), prepared, file, packageSha256));
     } catch (error) {
       const steps = [...(prepared?.report?.steps || [])];
-      steps.push({ key: "diagnóstico", status: "FAIL", detail: error?.message || String(error) });
+      steps.push({ key: error?.diagnosticKey || "diagnóstico", status: "FAIL", detail: error?.message || String(error) });
       render(annotatePackage({
         report: {
           schemaVersion: 4,

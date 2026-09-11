@@ -94,7 +94,7 @@ Exact extraction groups recognized by the engine:
 - Routes: `base_path_prefix`, `series_path_prefix`, `series_path_prefixes`, `hash_series_path_prefixes`, `chapter_path_prefix`, `chapter_path_prefixes`, `chapter_slug_pattern`, `chapter_slug_strip_prefixes`, and `ignored_root_paths` decide which URLs are works/chapters and derive the slug.
 - Visual recognition: `chapter_label_patterns`, `chapter_image_path_hints`, `chapter_image_class_hints`, and `cdn_direct_path_prefixes` filter labels, classes, and image paths.
 
-Template placeholders are adapter-provided values such as `{slug}`, `{workId}`, `{chapter}`, `{chapterId}`, `{page}`, and `{page3}`.
+Use only the placeholders produced for each template call. In `chapter_api_path_template`, Nyxovira replaces exactly `{chapter}` and `{workId}`; do not use `{chapterId}` or `{chapter_id}` in that field. Other templates may receive `{slug}`, `{page}`, and `{page3}` as documented. A declared field that does not match real traffic must fail validation instead of receiving an invented value.
 
 ## Authentication and headers
 

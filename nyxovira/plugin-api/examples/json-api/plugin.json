@@ -11,7 +11,7 @@
     "base_url": "https://source.invalid/",
     "api_base": "https://source.invalid/api/",
     "work_api_path_template": "works/{slug}",
-    "chapter_api_path_template": "chapters/{chapter_id}",
+    "chapter_api_path_template": "chapters/{chapter}",
     "map": { "work_title": "title", "work_chapters": "chapters", "chapter_id": "id", "chapter_title": "title", "chapter_pages": "pages" }
   }
 }

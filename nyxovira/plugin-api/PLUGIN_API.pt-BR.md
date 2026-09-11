@@ -143,7 +143,7 @@ Lista exata dos grupos de extração reconhecidos:
 - Rotas: `base_path_prefix`, `series_path_prefix`, `series_path_prefixes`, `hash_series_path_prefixes`, `chapter_path_prefix`, `chapter_path_prefixes`, `chapter_slug_pattern`, `chapter_slug_strip_prefixes` e `ignored_root_paths` decidem quais URLs representam obra/capítulo e como obter o slug.
 - Reconhecimento visual: `chapter_label_patterns`, `chapter_image_path_hints`, `chapter_image_class_hints` e `cdn_direct_path_prefixes` filtram rótulos, classes e caminhos de imagem.
 
-Nos templates use somente os marcadores que o adaptador produz, como `{slug}`, `{workId}`, `{chapter}`, `{chapterId}`, `{page}` e `{page3}`. Um campo declarado sem corresponder ao tráfego real deve falhar no teste, não receber um valor fictício.
+Nos templates use somente os marcadores produzidos em cada chamada. Em `chapter_api_path_template`, o Nyxovira substitui exatamente `{chapter}` e `{workId}`; não use `{chapterId}` nem `{chapter_id}` nesse campo. Outros templates podem receber `{slug}`, `{page}` e `{page3}` conforme a função descrita. Um campo declarado sem corresponder ao tráfego real deve falhar no teste, não receber um valor fictício.
 
 ## Autenticação e headers
 

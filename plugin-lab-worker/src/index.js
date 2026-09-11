@@ -114,6 +114,28 @@ function assertManifest(manifest) {
   return hosts.map((host) => String(host).toLowerCase());
 }
 
+function parserForLab(parser) {
+  if (!parser || typeof parser !== "object" || Array.isArray(parser)) return null;
+  const allowed = [
+    "adapter",
+    "base_url",
+    "api_base",
+    "chapter_api_path_template",
+    "read_path_template",
+    "public_chapter_path_template"
+  ];
+  const result = {};
+  for (const name of allowed) {
+    if (typeof parser[name] === "string") result[name] = parser[name];
+  }
+  if (parser.request_headers && typeof parser.request_headers === "object" && !Array.isArray(parser.request_headers)) {
+    result.request_headers = Object.fromEntries(
+      Object.entries(parser.request_headers).filter(([, value]) => typeof value === "string")
+    );
+  }
+  return result;
+}
+
 function hostMatches(hostname, hosts) {
   const current = hostname.toLowerCase();
   return hosts.some((host) => current === host || current.endsWith(`.${host}`));
@@ -258,6 +280,7 @@ async function handlePrepare(request, env, requestUrl) {
     return json(request, {
       prepared: true,
       plugin: { id: plugin.manifest.id || plugin.manifest.name || "plugin-sem-id", script: plugin.script },
+      nativeParser: parserForLab(plugin.manifest.parser),
       page: { url: pageUrl.href, html },
       token,
       report: { schemaVersion: 3, steps },
