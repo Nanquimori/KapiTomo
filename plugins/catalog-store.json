@@ -2,7 +2,7 @@
   "schema_version": 3,
   "name": "KapiTomo Plugins",
   "description": "Official plugins published by Nanquimori for Nyxovira.",
-  "catalog_revision": "20260910-official-only",
+  "catalog_revision": "20260913-security-hardening",
   "official_tags": {
     "languages": ["portuguese", "english"],
     "types": ["manga", "manhua", "manhwa", "novel", "webtoon", "comic", "other"]
@@ -13,7 +13,7 @@
       "name": "KapiTomo",
       "description": "Plugin oficial do KapiTomo para baixar obras pelo Nyxovira.",
       "author": "Nanquimori",
-      "version": "1.0.17",
+      "version": "1.0.18",
       "site_url": "https://nanquimori.github.io/KapiTomo/",
       "homepage": "https://nanquimori.github.io/KapiTomo/",
       "icon_url": "https://nanquimori.github.io/KapiTomo/assets/kapitomo-logo.png?v=20260626",

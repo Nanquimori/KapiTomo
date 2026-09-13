@@ -2,6 +2,8 @@
 
 Security fixes target the current versions of the KapiTomo website, public APIs, official plugin catalog, and official KapiTomo plugin published from `main` and `gh-pages`.
 
+KapiTomo publishes public content, so API payloads are not presented as confidential. Browser-facing protection focuses on HTTPS, restrictive content loading, output encoding, same-origin media, reproducible generation, and integrity checks. Encoding or encrypting public JSON with a key shipped in public JavaScript would be obfuscation rather than access control.
+
 ## Report a vulnerability privately
 
 Do not open a public issue when a message contains an undisclosed vulnerability, personal data, credentials, or instructions that could be used to harm users.

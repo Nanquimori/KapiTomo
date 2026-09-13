@@ -1,0 +1,5 @@
+Contact: mailto:nanquimori@gmail.com
+Expires: 2027-09-13T23:59:59Z
+Preferred-Languages: pt-BR, en
+Canonical: https://nanquimori.github.io/KapiTomo/.well-known/security.txt
+Policy: https://github.com/Nanquimori/KapiTomo/security/policy

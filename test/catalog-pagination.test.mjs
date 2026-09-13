@@ -33,7 +33,7 @@ test("publishes one official-only PT and EN catalog through both aliases", () =>
   const catalogs = ["catalog-store.json", "catalog.json"]
     .map(name => JSON.parse(fs.readFileSync(path.join(projectRoot, "plugins", name), "utf8")));
   assert.deepEqual(catalogs[0], catalogs[1]);
-  assert.equal(catalogs[0].catalog_revision, "20260910-official-only");
+  assert.equal(catalogs[0].catalog_revision, "20260913-security-hardening");
   assert.deepEqual(catalogs[0].official_tags.languages, ["portuguese", "english"]);
   assert.deepEqual(catalogs[0].plugins.map(plugin => plugin.id), ["kapitomo"]);
   assert.ok(catalogs[0].plugins.every(plugin => plugin.author === "Nanquimori"));

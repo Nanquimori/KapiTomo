@@ -384,6 +384,17 @@ function escapeHtml(value) {
     .replace(/'/g, "&#039;");
 }
 
+function safeAssetUrl(value) {
+  try {
+    const url = new URL(String(value || ""), document.baseURI);
+    const canonical = new URL(document.querySelector('link[rel="canonical"]')?.href || "https://nanquimori.github.io/KapiTomo/");
+    if (url.protocol !== "https:" || url.origin !== canonical.origin || !url.pathname.startsWith("/KapiTomo/")) return "";
+    return url.href;
+  } catch {
+    return "";
+  }
+}
+
 function displayValue(value) {
   return DISPLAY_VALUES[currentLanguage]?.[value] || value || "";
 }
@@ -482,11 +493,12 @@ function getChapterParagraphs(work, chapter, index) {
 }
 
 function getChapterImages(chapter) {
-  if (Array.isArray(chapter.images) && chapter.images.length) {
-    return chapter.images;
-  }
-
-  return Array.isArray(chapter.pages) ? chapter.pages.filter((page) => typeof page === "object" && page.src) : [];
+  const images = Array.isArray(chapter.images) && chapter.images.length
+    ? chapter.images
+    : (Array.isArray(chapter.pages) ? chapter.pages.filter((page) => typeof page === "object" && page.src) : []);
+  return images
+    .map((image) => ({ ...image, src: safeAssetUrl(image.src) }))
+    .filter((image) => image.src);
 }
 
 function renderWorks() {
@@ -504,7 +516,7 @@ function renderWorks() {
     card.className = "work-card";
     card.innerHTML = `
       <a class="work-cover-link" href="${workUrl(work)}" aria-label="${escapeHtml(t("work.open", { title }))}">
-        <img src="${work.cover}" alt="${escapeHtml(t("work.cover", { title }))}">
+        <img src="${escapeHtml(safeAssetUrl(work.cover))}" alt="${escapeHtml(t("work.cover", { title }))}">
         <span class="work-cover-badge">${escapeHtml(displayValue(work.format) || t("work.formatFallback"))}</span>
       </a>
       <div class="work-card-body">
@@ -526,7 +538,7 @@ function renderWorkPage(work) {
     sort: "asc"
   };
 
-  fragment.querySelector(".manga-cover").src = work.cover;
+  fragment.querySelector(".manga-cover").src = safeAssetUrl(work.cover);
   fragment.querySelector(".manga-cover").alt = t("work.cover", { title });
   fragment.querySelector(".manga-genre").textContent = "";
   fragment.querySelector("h1").textContent = title;
@@ -648,16 +660,16 @@ function renderChapterPage(work, chapterIndex = 0) {
     page.classList.add("image-chapter-page");
     fragment.querySelector(".webtoon-strip").className = "image-reader";
     fragment.querySelector(".image-reader").innerHTML = imagePages
-      .map((image, index) => `<img src="${image.src}" alt="${escapeHtml(image.alt || t("chapter.imageAlt", { title: displayChapterTitle(chapter, safeIndex), page: index + 1 }))}" loading="lazy">`)
+      .map((image, index) => `<img src="${escapeHtml(image.src)}" alt="${escapeHtml(image.alt || t("chapter.imageAlt", { title: displayChapterTitle(chapter, safeIndex), page: index + 1 }))}" loading="lazy">`)
       .join("");
   } else {
     fragment.querySelector(".webtoon-strip").innerHTML = [
-      `<section class="webtoon-cover-panel"><img src="${work.cover}" alt="${escapeHtml(t("work.cover", { title: workTitle }))}"><div><span>${escapeHtml(workTitle)}</span><strong>${escapeHtml(displayChapterTitle(chapter, safeIndex))}</strong></div></section>`,
+      `<section class="webtoon-cover-panel"><img src="${escapeHtml(safeAssetUrl(work.cover))}" alt="${escapeHtml(t("work.cover", { title: workTitle }))}"><div><span>${escapeHtml(workTitle)}</span><strong>${escapeHtml(displayChapterTitle(chapter, safeIndex))}</strong></div></section>`,
       ...paragraphs.map(
         (pageText, index) => `
           <section class="webtoon-panel">
             <small>${String(index + 1).padStart(2, "0")}</small>
-            <p>${pageText}</p>
+            <p>${escapeHtml(pageText)}</p>
           </section>
         `
       )

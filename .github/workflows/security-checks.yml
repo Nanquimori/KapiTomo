@@ -1,0 +1,40 @@
+name: Security checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "23 8 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out the exact revision
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: plugin-lab-worker/package-lock.json
+
+      - name: Install locked Worker dependencies
+        run: npm ci --prefix plugin-lab-worker
+
+      - name: Run repository tests
+        run: node --test test/*.test.mjs
+
+      - name: Audit runtime and development dependencies
+        run: npm audit --prefix plugin-lab-worker --audit-level=high
