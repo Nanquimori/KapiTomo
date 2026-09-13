@@ -106,11 +106,14 @@ For data loaded after HTML, create a light initial plan and resolve only selecte
 
 ## Encrypted APIs
 
-Declare `encrypted_response_format` and key material only when legitimately observed in the source's own client. `aes_json_api` accepts plain JSON, an AES/CBC `IV:ciphertext` payload derived from `api_secret`, and the supported `rotating_sbox_json` envelope. Declaring a format is not proof: diagnostics must reach content and save the complete chapter.
+Declare `encrypted_response_format` and key material only when legitimately observed in the source's own client. `aes_json_api` accepts plain JSON, an AES/CBC `IV:ciphertext` payload derived from `api_secret`, and the supported `rotating_sbox_json` envelope. Record envelope fields, encoding, key/IV/version selection, API origin, CDN origin, and where the official client decodes the response separately. Client-visible material is neither a personal credential nor authorization to access restricted content. Declaring a format is not proof: diagnostics must reach content and save the complete chapter.
+
+The [complete synthetic example](examples/encrypted-api/) uses only the reserved `.invalid` namespace and includes five test keys, rotating S-box decoding, the AES/CBC alternative, separate API/CDN origins, decoded fixtures, exact ID preservation, and complete selected-page resolution.
 
 ## Troubleshooting
 
 - `HTTP 401/403`: verify session, cookies, referer, tokens, and headers; retries do not fix access requirements.
+- `HTTP 403` before the plugin script runs: report `BLOCKED` as an environment/source limitation; it neither proves the plugin invalid nor authorizes bypassing access control.
 - Work without chapters: verify endpoint, selector, pagination, order, and `chapter_array_keys`/`map`.
 - Empty selection: compare plan IDs and `selectedChapterIds` byte for byte.
 - Empty pages or HTML returned as an image: verify base URL, CDN, content type, token, and decoding.

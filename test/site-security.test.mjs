@@ -76,6 +76,7 @@ test("catalog, documentation, laboratory, and policy pages declare loading polic
     "nyxovira/plugin-api/index.html",
     "nyxovira/plugin-api/tester/index.html",
     "nyxovira/plugin-api/examples/index.html",
+    "nyxovira/plugin-api/examples/encrypted-api/index.html",
     "privacy/index.html",
     "terms/index.html",
     "nyxovira/privacy/index.html",

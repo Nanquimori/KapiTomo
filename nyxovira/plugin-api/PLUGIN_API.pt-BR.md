@@ -155,11 +155,14 @@ Para conteúdo carregado depois do HTML, monte primeiro um plano leve e resolva 
 
 ## APIs criptografadas
 
-Declare `encrypted_response_format` e material de chave somente quando forem observados legitimamente no cliente da própria fonte. O adaptador `aes_json_api` aceita JSON comum, payload `IV:ciphertext` em AES/CBC derivado de `api_secret` e o envelope suportado `rotating_sbox_json`. Declarar o formato não prova que a decodificação funciona: o diagnóstico precisa chegar ao conteúdo e salvar o capítulo inteiro.
+Declare `encrypted_response_format` e material de chave somente quando forem observados legitimamente no cliente da própria fonte. O adaptador `aes_json_api` aceita JSON comum, payload `IV:ciphertext` em AES/CBC derivado de `api_secret` e o envelope suportado `rotating_sbox_json`. Registre separadamente os campos do envelope, codificação, escolha de chave/IV/versão, origem da API, origem do CDN e ponto em que o cliente oficial decodifica a resposta. Material público no cliente não é credencial pessoal nem autorização para acessar conteúdo restrito. Declarar o formato não prova que a decodificação funciona: o diagnóstico precisa chegar ao conteúdo e salvar o capítulo inteiro.
+
+O [exemplo sintético completo](examples/encrypted-api/) usa somente a namespace reservada `.invalid`: contém cinco chaves de teste, decodificador S-box rotativo, alternativa AES/CBC, API e CDN separados, fixtures decodificadas, preservação de IDs e resolução integral das páginas selecionadas.
 
 ## Solução de problemas
 
 - `HTTP 401/403`: confira sessão, cookies, `Referer`, tokens e headers; não aumente tentativas para mascarar bloqueio.
+- `HTTP 403` antes da execução do script: registre `BLOCKED` como limitação do ambiente/fonte; isso não prova que o plugin é inválido e não autoriza contornar o controle de acesso.
 - Obra sem capítulos: confira endpoint, seletor, paginação, ordem e `chapter_array_keys`/`map`.
 - Seleção vazia: compare o ID do plano e `selectedChapterIds` byte por byte.
 - Páginas vazias ou HTML no lugar de imagem: confira URL base, CDN, content type, token e decodificação.
