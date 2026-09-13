@@ -58,10 +58,10 @@ test("AI prompt builder has one creation flow in both languages", () => {
   const helperStart = scripts[0].indexOf("const documentationUrl");
   const helperEnd = scripts[0].indexOf("function updateBuilder");
   const helpers = new Function(`${scripts[0].slice(helperStart, helperEnd)}; return { buildPluginPrompt };`)();
-  const promptPt = helpers.buildPluginPrompt("pt", "example.org");
-  const promptEn = helpers.buildPluginPrompt("en", "example.org");
+  const promptPt = helpers.buildPluginPrompt("pt", "example.org/work/sample-work");
+  const promptEn = helpers.buildPluginPrompt("en", "example.org/work/sample-work");
   for (const prompt of [promptPt, promptEn]) {
-    assert.match(prompt, /https:\/\/example\.org\//);
+    assert.match(prompt, /https:\/\/example\.org\/work\/sample-work/);
     assert.match(prompt, /https:\/\/nanquimori\.github\.io\/KapiTomo\/nyxovira\/plugin-api\//);
     assert.match(prompt, /https:\/\/nanquimori\.github\.io\/KapiTomo\/nyxovira\/plugin-api\/tester\//);
     assert.match(prompt, /validationScope: exact-work-complete-boundary-chapters/);
@@ -71,12 +71,12 @@ test("AI prompt builder has one creation flow in both languages", () => {
     assert.doesNotMatch(prompt, /only public chapters|somente (?:os )?capítulos públicos/i);
     assert.doesNotMatch(prompt, /personal use|uso pessoal|independent external catalog|catálogo externo independente/i);
   }
-  assert.match(promptPt, /Crie e valide um plugin Nyxovira para o site/);
+  assert.match(promptPt, /Crie e valide um plugin Nyxovira para a URL de obra/);
   assert.match(promptPt, /não reduza automaticamente o plugin a capítulos públicos/);
   assert.match(promptPt, /sessão já autenticada e com o acesso efetivamente concedido/);
   assert.match(promptPt, /Nunca solicite, registre, exporte ou inclua credenciais/);
   assert.match(promptPt, /corrija a causa, gere um novo ZIP e repita o teste/);
-  assert.match(promptEn, /Create and validate a Nyxovira plugin for the site/);
+  assert.match(promptEn, /Create and validate a Nyxovira plugin for the work URL/);
   assert.match(promptEn, /do not automatically reduce the plugin to public chapters/);
   assert.match(promptEn, /session already authenticated by the user and the access actually granted/);
   assert.match(promptEn, /Never request, record, export, or include personal credentials/);
