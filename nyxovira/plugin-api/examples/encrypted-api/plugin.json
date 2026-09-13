@@ -2,28 +2,60 @@
   "$schema": "../../plugin.schema.json",
   "schema_version": 1,
   "id": "sample-encrypted-api",
-  "name": "Sanitized encrypted API source",
-  "version": "1.0.0",
-  "match": { "hosts": ["source.invalid"] },
-  "browser": { "home_url": "https://source.invalid/", "download_target_script_file": "browser/download_target.js" },
+  "name": "Synthetic encrypted API source",
+  "version": "1.1.0",
+  "match": {
+    "hosts": ["source.invalid", "api.source.invalid", "cdn.source.invalid"]
+  },
+  "browser": {
+    "home_url": "https://source.invalid/work/sample-work",
+    "download_target_script_file": "browser/download_target.js"
+  },
   "parser": {
     "adapter": "aes_json_api",
-    "base_url": "https://source.invalid/",
-    "api_base": "https://source.invalid/api/",
-    "work_api_path_template": "works/{slug}",
-    "chapter_api_path_template": "chapters/{chapter}",
+    "base_url": "https://source.invalid",
+    "api_base": "https://api.source.invalid",
+    "cdn_base": "https://cdn.source.invalid",
+    "work_api_path_template": "/v1/works/{slug}",
+    "chapter_api_path_template": "/v1/chapters/{chapter}",
+    "series_path_template": "/work/{slug}",
+    "read_path_template": "/read/{slug}/{chapter}",
+    "public_work_path_template": "/work/{slug}",
+    "public_chapter_path_template": "/read/{slug}/{chapter}",
     "encrypted_response_format": "rotating_sbox_json",
-    "api_secret": "REPLACE_WITH_THE_MAPPED_KEY_MATERIAL",
-    "request_headers": { "X-Client": "REPLACE_WITH_THE_REQUIRED_VALUE" },
+    "rotating_sbox_keys": [
+      "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f",
+      "404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f",
+      "606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f",
+      "808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f"
+    ],
+    "request_headers": {
+      "Accept": "application/json"
+    },
+    "default_workers": 4,
+    "default_retries": 3,
+    "work_title_keys": ["title"],
+    "work_summary_keys": ["summary"],
+    "work_cover_keys": ["coverImage"],
+    "chapter_array_keys": ["chapters"],
+    "chapter_id_keys": ["id"],
+    "chapter_number_keys": ["number"],
+    "chapter_title_keys": ["title"],
+    "page_array_keys": ["pages"],
+    "page_number_keys": ["number"],
+    "page_image_keys": ["imageUrl"],
     "map": {
       "work.title": "data.title",
       "work.summary": "data.summary",
+      "work.cover": "data.coverImage",
       "work.chapters": "data.chapters",
       "chapter.id": "id",
       "chapter.number": "number",
       "chapter.title": "title",
       "chapter.pages": "data.pages",
-      "page.image": "url"
+      "page.number": "number",
+      "page.image": "imageUrl"
     }
   }
 }

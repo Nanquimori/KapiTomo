@@ -721,11 +721,11 @@
           <section id="prompt-builder" class="panel prompt-panel" data-prompt-builder data-prompt-language="en">
             <span class="prompt-kicker">AI prompt · copy in one click</span>
             <h2>Generate an AI prompt to create your plugin</h2>
-            <p class="prompt-intro">Enter the source site and copy the complete request into the conversation with the AI that will create and validate the plugin.</p>
+            <p class="prompt-intro">Enter a real work URL from the source and copy the complete request into the conversation with the AI that will create and validate the plugin.</p>
             <div class="prompt-grid">
               <div class="prompt-controls">
-                <label class="prompt-field-label">Source site URL
-                  <input class="prompt-url" type="url" value="https://source.invalid/" placeholder="https://source.invalid/" autocomplete="off" autocapitalize="off" spellcheck="false" data-prompt-url>
+                <label class="prompt-field-label">Real work URL
+                  <input class="prompt-url" type="url" value="https://source.invalid/work/sample-work" placeholder="https://source.invalid/work/sample-work" autocomplete="off" autocapitalize="off" spellcheck="false" data-prompt-url>
                 </label>
               </div>
               <div class="prompt-output-shell">
@@ -733,7 +733,7 @@
                   <span class="prompt-output-title">Prompt ready to send to an AI assistant</span>
                   <button class="prompt-copy" type="button" data-copy-prompt data-copy-default="Copy prompt" data-copy-success="Prompt copied">Copy prompt</button>
                 </div>
-                <textarea class="prompt-output" rows="13" readonly spellcheck="false" aria-label="Generated plugin request" data-prompt-output>Create and validate a Nyxovira plugin for the site "https://source.invalid/", following the official documentation: "https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/".</textarea>
+                <textarea class="prompt-output" rows="13" readonly spellcheck="false" aria-label="Generated plugin request" data-prompt-output>Create and validate a Nyxovira plugin for the work URL "https://source.invalid/work/sample-work", following the official documentation: "https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/".</textarea>
                 <p class="prompt-status" aria-live="polite" data-copy-status>Change the URL; the prompt updates automatically.</p>
               </div>
             </div>
@@ -934,9 +934,9 @@ return "https://source.invalid/manga/work/";</code></pre>
             <h3 class="api-subheading">Dynamic APIs</h3>
             <p>Keep discovery light, resolve only selected chapters, and exercise pagination or rotating tokens through the last page. The current in-app prepare hook must finish synchronously.</p>
             <h3 class="api-subheading">Encrypted APIs</h3>
-            <p>Declare only legitimately observed formats and key material. A declared format is not proof; content must decode and the complete chapter must be saved.</p>
+            <p>Declare only legitimately observed formats and client-visible key material. Document the envelope fields, key/version selection, encoding, API origin and CDN origin separately. A declared format is not proof; content must decode and the complete chapter must be saved. See the <a href="examples/encrypted-api/">complete synthetic encrypted API flow</a>, including rotating S-box and AES/CBC variants.</p>
             <h3 class="api-subheading">Troubleshooting</h3>
-            <p>For 401/403 check transport requirements; for missing chapters check selectors, pagination and mapping; for empty pages check URL bases, CDN and decoding. If page one works but a later page fails, the plugin is not valid.</p>
+            <p>For 401/403 check transport requirements; if 403 occurs before the plugin runs, report <code>BLOCKED</code> instead of calling the plugin invalid or bypassing access control. For missing chapters check selectors, pagination and mapping; for empty pages check URL bases, CDN and decoding. If page one works but a later page fails, the plugin is not valid.</p>
           </section>
 
           <section id="formats" class="panel">
@@ -1098,11 +1098,11 @@ return "https://source.invalid/manga/work/";</code></pre>
           <section id="gerador-de-prompt" class="panel prompt-panel" data-prompt-builder data-prompt-language="pt">
             <span class="prompt-kicker">Prompt para IA · copie em um clique</span>
             <h2>Gere um prompt para uma IA criar seu plugin</h2>
-            <p class="prompt-intro">Informe o site da fonte e copie o pedido completo na conversa com a IA que criará e validará o plugin.</p>
+            <p class="prompt-intro">Informe a URL de uma obra real da fonte e copie o pedido completo na conversa com a IA que criará e validará o plugin.</p>
             <div class="prompt-grid">
               <div class="prompt-controls">
-                <label class="prompt-field-label">URL do site da fonte
-                  <input class="prompt-url" type="url" value="https://source.invalid/" placeholder="https://source.invalid/" autocomplete="off" autocapitalize="off" spellcheck="false" data-prompt-url>
+                <label class="prompt-field-label">URL de uma obra real
+                  <input class="prompt-url" type="url" value="https://source.invalid/work/sample-work" placeholder="https://source.invalid/work/sample-work" autocomplete="off" autocapitalize="off" spellcheck="false" data-prompt-url>
                 </label>
               </div>
               <div class="prompt-output-shell">
@@ -1110,7 +1110,7 @@ return "https://source.invalid/manga/work/";</code></pre>
                   <span class="prompt-output-title">Prompt pronto para enviar a uma IA</span>
                   <button class="prompt-copy" type="button" data-copy-prompt data-copy-default="Copiar prompt" data-copy-success="Prompt copiado">Copiar prompt</button>
                 </div>
-                <textarea class="prompt-output" rows="13" readonly spellcheck="false" aria-label="Pedido de plugin gerado" data-prompt-output>Crie e valide um plugin Nyxovira para o site "https://source.invalid/", seguindo a documentação oficial: "https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/".</textarea>
+                <textarea class="prompt-output" rows="13" readonly spellcheck="false" aria-label="Pedido de plugin gerado" data-prompt-output>Crie e valide um plugin Nyxovira para a URL de obra "https://source.invalid/work/sample-work", seguindo a documentação oficial: "https://nanquimori.github.io/KapiTomo/nyxovira/plugin-api/".</textarea>
                 <p class="prompt-status" aria-live="polite" data-copy-status>Altere a URL; o prompt será atualizado automaticamente.</p>
               </div>
             </div>
@@ -1311,9 +1311,9 @@ return "https://source.invalid/manga/work/";</code></pre>
             <h3 class="api-subheading">APIs dinâmicas</h3>
             <p>Mantenha a descoberta leve, resolva somente capítulos selecionados e percorra paginação ou tokens rotativos até a última página. O hook de preparação atual do app deve terminar de forma síncrona.</p>
             <h3 class="api-subheading">APIs criptografadas</h3>
-            <p>Declare somente formatos e material de chave observados legitimamente. Declarar o formato não prova nada; o conteúdo deve ser decodificado e o capítulo completo precisa ser salvo.</p>
+            <p>Declare somente formatos e material de chave visível no cliente e observado legitimamente. Documente separadamente os campos do envelope, escolha de chave/versão, codificação, origem da API e origem do CDN. Declarar o formato não prova nada; o conteúdo deve ser decodificado e o capítulo completo precisa ser salvo. Veja o <a href="examples/encrypted-api/">fluxo sintético completo de API criptografada</a>, com variantes S-box rotativa e AES/CBC.</p>
             <h3 class="api-subheading">Solução de problemas</h3>
-            <p>Em 401/403 confira transporte; sem capítulos confira seletores, paginação e mapeamento; sem páginas confira URL base, CDN e decodificação. Se a página 1 funciona e outra falha, o plugin não é válido.</p>
+            <p>Em 401/403 confira transporte; se o 403 ocorrer antes do plugin executar, registre <code>BLOCKED</code> em vez de chamar o plugin de inválido ou contornar o controle de acesso. Sem capítulos confira seletores, paginação e mapeamento; sem páginas confira URL base, CDN e decodificação. Se a página 1 funciona e outra falha, o plugin não é válido.</p>
           </section>
 
           <section class="panel">
@@ -1464,11 +1464,11 @@ return "https://source.invalid/manga/work/";</code></pre>
 
         function normalizePromptSite(value) {
           var site = String(value || "").trim();
-          if (!site) return "https://source.invalid/";
+          if (!site) return "https://source.invalid/work/sample-work";
           if (!/^https?:\/\//i.test(site)) site = "https://" + site;
           try {
             var parsed = new URL(site);
-            return /^https?:$/.test(parsed.protocol) ? parsed.href : "https://source.invalid/";
+            return /^https?:$/.test(parsed.protocol) ? parsed.href : "https://source.invalid/work/sample-work";
           } catch (error) {
             return site;
           }
@@ -1478,13 +1478,14 @@ return "https://source.invalid/manga/work/";</code></pre>
           var site = normalizePromptSite(rawSite);
           var isPortuguese = language === "pt";
           var lines = isPortuguese ? [
-            "Crie e valide um plugin Nyxovira para o site \"" + site + "\", seguindo integralmente a documentação oficial: \"" + documentationUrl + "\".",
+            "Crie e valide um plugin Nyxovira para a URL de obra \"" + site + "\", seguindo integralmente a documentação oficial: \"" + documentationUrl + "\".",
             "",
             "Antes de programar, inspecione a página real, os scripts carregados, as requisições de rede do navegador e qualquer documentação oficial para desenvolvedores, API pública, OpenAPI ou Swagger da própria fonte. Não invente endpoints, seletores, headers, cookies, tokens, chaves ou resultados.",
             "- Registre URL de obra e leitor; endpoints de obra, capítulos e páginas; seletores; ordem; URLs relativas; IDs reais; login e cookies; restrições e criptografia.",
             "- Se a fonte usar autenticação, não reduza automaticamente o plugin a capítulos públicos. Trabalhe somente com a sessão já autenticada e com o acesso efetivamente concedido ao próprio usuário no navegador ou aplicativo. Nunca solicite, registre, exporte ou inclua credenciais, cookies ou tokens pessoais no plugin, ZIP ou relatório.",
             "- Não conclua o alcance do plugin apenas por textos promocionais ou avisos genéricos da página. Confirme o comportamento real da sessão autorizada e, quando ela não permitir um capítulo, registre-o como indisponível nessa sessão sem inventar resultado.",
             "- Escolha o nível correto: HTML simples; API JSON; ou API dinâmica, protegida ou criptografada.",
+            "- Se a resposta usar um envelope opaco, documente os campos, a codificação, a seleção de chave/IV/versão, o ponto em que o cliente oficial decodifica, a origem da API e a origem do CDN. Não trate material visível no cliente como credencial pessoal nem como permissão para acessar conteúdo restrito.",
             "- Crie a estrutura mínima com plugin.json e o arquivo indicado por browser.download_target_script_file, normalmente browser/download_target.js. Valide o manifesto com " + documentationUrl + "plugin.schema.json.",
             "- Faça browser/download_target.js definir imediatamente um window.__nyxoviraChapterPlan leve, com título, URL canônica e capítulos reais, únicos e ordenados.",
             "- Resolva apenas o conteúdo dos capítulos selecionados em window.__nyxoviraPrepareDownloadPlan. O hook deve terminar de forma síncrona e devolver todas as páginas ou todos os parágrafos do capítulo.",
@@ -1497,19 +1498,21 @@ return "https://source.invalid/manga/work/";</code></pre>
             "- Compacte plugin.json e os arquivos referenciados em um ZIP, envie-o ao laboratório e informe a URL de uma obra real da fonte.",
             "- No Laboratório Web, informe a URL exata da obra que precisa ser validada. O teste escolhe o primeiro e o último capítulo, baixa todas as páginas em lotes com 4 conexões e 3 novas tentativas e registra o SHA-256 do ZIP. Não aceite validação parcial nem generalize o resultado para outra obra, capítulo, ZIP ou instalação.",
             "- Se qualquer etapa retornar FAIL ou BLOCKED, corrija a causa, gere um novo ZIP e repita o teste. Não altere o plugin ou o relatório para simular sucesso.",
+            "- Se a fonte bloquear o ambiente antes da execução do plugin, preserve BLOCKED no relatório: isso não prova que o plugin é inválido nem autoriza contornar o controle de acesso.",
             "- Só declare sucesso para a obra testada se o JSON final tiver success: true, verdict: PLUGIN_VALID_FOR_TESTED_WORK, nenhuma etapa FAIL ou BLOCKED, validationScope: exact-work-complete-boundary-chapters, requestProfile: nyxovira-android-http-v1, packageSha256, temporaryDataReleased: true e stored: false. Nunca generalize esse resultado para outra obra, capítulo, ZIP ou instalação.",
             "- Em capítulos de imagens, confirme que verifiedPageCount é igual ao total de páginas resolvidas e que o detalhe de conteúdo informa N de N imagens verificadas. Em novels, exija conteúdo e conclusão PASS.",
             "- Se não houver acesso à rede, escreva exatamente: não validado contra o site real.",
             "",
             "Entregue os arquivos completos, o ZIP final e o relatório JSON real. Informe o mapeamento encontrado, limitações, capítulo testado, quantidade de páginas verificadas e toda etapa que precisou ser corrigida."
           ] : [
-            "Create and validate a Nyxovira plugin for the site \"" + site + "\", following the official documentation completely: \"" + documentationUrl + "\".",
+            "Create and validate a Nyxovira plugin for the work URL \"" + site + "\", following the official documentation completely: \"" + documentationUrl + "\".",
             "",
             "Before coding, inspect the real page, loaded scripts, browser network requests, and any official developer documentation, public API, OpenAPI or Swagger description. Do not invent endpoints, selectors, headers, cookies, tokens, keys, or results.",
             "- Record work and reader URLs; work, chapter, and page endpoints; selectors; order; relative URLs; real IDs; login and cookies; restrictions; and encryption.",
             "- If the source uses authentication, do not automatically reduce the plugin to public chapters. Work only with the session already authenticated by the user and the access actually granted to that user in the browser or app. Never request, record, export, or include personal credentials, cookies, or tokens in the plugin, ZIP, or report.",
             "- Do not infer the plugin's scope from promotional copy or generic notices alone. Confirm the real behavior of the authorized session and, when it does not allow a chapter, report that chapter as unavailable in that session without inventing a result.",
             "- Choose the correct level: simple HTML; JSON API; or dynamic, protected, or encrypted API.",
+            "- If responses use an opaque envelope, document its fields, encoding, key/IV/version selection, the point where the official client decodes it, the API origin, and the CDN origin. Do not treat client-visible material as a personal credential or as permission to access restricted content.",
             "- Create the minimum structure with plugin.json and the file named by browser.download_target_script_file, normally browser/download_target.js. Validate the manifest with " + documentationUrl + "plugin.schema.json.",
             "- Make browser/download_target.js immediately define a lightweight window.__nyxoviraChapterPlan with the real title, canonical URL, and unique ordered chapters.",
             "- Resolve only selected chapter content in window.__nyxoviraPrepareDownloadPlan. The hook must finish synchronously and return every page or paragraph in the chapter.",
@@ -1522,6 +1525,7 @@ return "https://source.invalid/manga/work/";</code></pre>
             "- Package plugin.json and every referenced file as a ZIP, upload it to the laboratory, and enter a real work URL from the source.",
             "- In the Web Laboratory, enter the exact work URL that needs validation. The test selects its first and last chapters, downloads every page in batches with 4 connections and 3 retries, and records the ZIP SHA-256. Do not accept partial validation or generalize the result to another work, chapter, ZIP, or installation.",
             "- If any step returns FAIL or BLOCKED, fix the cause, build a new ZIP, and run the test again. Do not change the plugin or report to simulate success.",
+            "- If the source blocks the environment before the plugin runs, preserve BLOCKED in the report: it neither proves the plugin invalid nor authorizes bypassing access control.",
             "- Claim success only for the tested work when the final JSON has success: true, verdict: PLUGIN_VALID_FOR_TESTED_WORK, no FAIL or BLOCKED step, validationScope: exact-work-complete-boundary-chapters, requestProfile: nyxovira-android-http-v1, packageSha256, temporaryDataReleased: true, and stored: false. Never generalize that result to another work, chapter, ZIP, or installation.",
             "- For image chapters, confirm verifiedPageCount equals the total resolved pages and the content detail reports N of N verified images. For novels, require PASS for content and conclusion.",
             "- If network access is unavailable, state exactly: not validated against the real site.",

@@ -1,0 +1,11 @@
+{
+  "data": {
+    "title": "Synthetic encrypted work",
+    "summary": "Reserved-domain fixture for documentation tests.",
+    "coverImage": "/covers/sample-work.webp",
+    "chapters": [
+      { "id": "chapter-001", "number": 1, "title": "Chapter 1" },
+      { "id": "chapter-002", "number": 2, "title": "Chapter 2" }
+    ]
+  }
+}

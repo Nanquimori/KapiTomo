@@ -1,0 +1,9 @@
+{
+  "data": {
+    "id": "chapter-001",
+    "pages": [
+      { "number": 1, "imageUrl": "/pages/chapter-001/001.webp", "contentType": "image/webp" },
+      { "number": 2, "imageUrl": "/pages/chapter-001/002.webp", "contentType": "image/webp" }
+    ]
+  }
+}
