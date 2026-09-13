@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
+import vm from "node:vm";
 
 const read = relativePath => readFileSync(new URL(`../${relativePath}`, import.meta.url), "utf8");
 const apiRoot = "nyxovira/plugin-api";
@@ -59,4 +60,36 @@ test("the generated AI prompt forbids fabricated mappings and false success", ()
   assert.match(html, /FAIL or BLOCKED/);
   assert.match(html, /FAIL ou BLOCKED/);
   assert.doesNotMatch(html, /example\.com|nexustoons/i);
+});
+
+test("official KapiTomo plugin builds complete novel and image plans", () => {
+  const dataSource = read("data/works.js");
+  const pluginSource = read(`${apiRoot}/kapitomo/browser/download_target.js`);
+
+  for (const workId of ["world-without-humans", "world-without-humans-comics"]) {
+    const sandbox = {
+      URL,
+      URLSearchParams,
+      console,
+      navigator: { language: "pt-BR", languages: ["pt-BR"] },
+      location: { pathname: "/KapiTomo/", search: "?lang=pt", hash: `#work/${workId}` },
+      history: { state: null, replaceState() {} },
+      localStorage: { getItem() { return "pt"; } },
+      document: { documentElement: { getAttribute() { return "pt-BR"; } }, title: "KapiTomo" }
+    };
+    sandbox.window = sandbox;
+    vm.createContext(sandbox);
+    vm.runInContext(dataSource, sandbox);
+    const target = vm.runInContext(pluginSource, sandbox);
+    const plan = JSON.parse(sandbox.__nyxoviraChapterPlan);
+    assert.match(target, new RegExp(`/manga/${workId}/`));
+    assert.equal(plan.chapters.length, 3);
+    assert.deepEqual(Array.from(plan.chapters, chapter => chapter.id), ["id:0", "id:1", "id:2"]);
+    if (workId.endsWith("-comics")) {
+      assert.ok(plan.chapters.every(chapter => chapter.pages.length === 2));
+      assert.ok(plan.chapters.flatMap(chapter => chapter.pages).every(url => url.startsWith("https://nanquimori.github.io/KapiTomo/")));
+    } else {
+      assert.ok(plan.chapters.every(chapter => chapter.paragraphs.length > 0));
+    }
+  }
 });

@@ -182,6 +182,8 @@ function New-ChapterPage([string]$Title, [string]$BodyHtml, [string]$Background)
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src https://nanquimori.github.io; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
     <title>$(Escape-Html $Title) | KapiTomo</title>
     <style>body{margin:0;background:$Background;color:#15151a;font-family:Arial,Helvetica,sans-serif}.reading-content{width:min(900px,100%);margin:0 auto;padding:0}.novel-content{width:min(780px,calc(100% - 36px));margin:0 auto;padding:32px 0 56px}.novel-content p{font-size:1.08rem;line-height:1.8;margin:0 0 20px}.wp-manga-chapter-img{display:block;width:100%;height:auto}</style>
   </head>
@@ -458,6 +460,8 @@ foreach ($workDir in $workDirs) {
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
     <title>$(Escape-Html $title) | KapiTomo</title>
   </head>
   <body>

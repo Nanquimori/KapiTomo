@@ -212,10 +212,15 @@
 
       function add(value) {
         var source = text(value);
-        if (source && /^https?:\/\//i.test(source) && !seen[source]) {
-          seen[source] = true;
-          output.push(source);
-        }
+        if (!source) return;
+        try {
+          var resolved = new URL(source, addon.siteBaseUrl + "/");
+          var official = new URL(addon.siteBaseUrl + "/");
+          if (resolved.protocol !== "https:" || resolved.origin !== official.origin || resolved.pathname.indexOf(official.pathname) !== 0) return;
+          if (seen[resolved.href]) return;
+          seen[resolved.href] = true;
+          output.push(resolved.href);
+        } catch (error) {}
       }
 
       if (Array.isArray(directPages)) {
